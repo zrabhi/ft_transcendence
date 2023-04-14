@@ -62,10 +62,11 @@
 
 .square:nth-child(5) {
 	animation-delay: .4s;
-}
+} 
 
 @keyframes change_opacity {
 	to {
 		opacity: .5;
+		transform: translateY(10px);
 	}
 }

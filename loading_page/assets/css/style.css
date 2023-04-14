@@ -34,7 +34,7 @@
 	width: 80%;
 	margin-left: auto;
 	margin-right: auto;
-	margin-top: 10px;
+	margin-top: 30px;
 	display: flex;
 	justify-content: space-evenly;
 	align-items: center;
@@ -45,4 +45,27 @@
 	aspect-ratio: 1 / 1;
 	background-color: var(--main-color);
 	border-radius: 5px;
+	animation: change_opacity .5s infinite alternate;
+}
+
+.square:nth-child(2) {
+	animation-delay: .1s;
+}
+
+.square:nth-child(3) {
+	animation-delay: .2s;
+}
+
+.square:nth-child(4) {
+	animation-delay: .3s;
+}
+
+.square:nth-child(5) {
+	animation-delay: .4s;
+}
+
+@keyframes change_opacity {
+	to {
+		opacity: .5;
+	}
 }

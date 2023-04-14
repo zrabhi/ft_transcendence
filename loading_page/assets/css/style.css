@@ -1,0 +1,48 @@
+
+@import url('https://fonts.cdnfonts.com/css/austere');
+
+:root {
+	--main-color: #DAA520;
+	--main-background-color: #b34242;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	font-family: 'Austere', sans-serif;
+}
+
+.container {
+	width: 100vw;
+	height: 100vh;
+	background-color: var(--main-background-color);
+	color: var(--main-color);
+}
+
+.loading {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 100px;
+	width: fit-content;
+	height: fit-content;
+}
+
+.squares {
+	height: 60px;
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 10px;
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+.square {
+	width: 12%;
+	aspect-ratio: 1 / 1;
+	background-color: var(--main-color);
+	border-radius: 5px;
+}

@@ -1,2 +1,2 @@
 # ft_transcendence
-Online bing bong game
+Online pong  game

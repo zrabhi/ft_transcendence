@@ -13,8 +13,8 @@ export default function SignIn () {
         <div className="img">
           <Image
             src={pongGif}
-            width={500}
-            height={500}
+            width={400}
+            height={400}
             alt="video showing the pong goame who looks like"
           />
         </div>

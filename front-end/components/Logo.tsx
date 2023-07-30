@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import logo from './../public/logo.svg'
-import exp from 'constants';
 
 const Logo = () => {
   return (

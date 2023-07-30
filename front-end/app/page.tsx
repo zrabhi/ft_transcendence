@@ -1,5 +1,6 @@
 // 'use client'
 import "../public/logo.svg"
+import './hero-section.scss'
 import Navbar from './../components/Navbar'
 import MainContent from './../components/MainContent'
 import ScrollDown from '../components/ScrollDown'

@@ -1,0 +1,66 @@
+
+@import './globals.scss';
+
+/* Start Hero Section Rules */
+
+.hero-section {
+  padding-top: 2rem;
+  .container-box {
+    background: linear-gradient(to bottom, $grd-first-color, $grd-second-color);
+    height: 80vh;
+    width: 97vw;
+    margin: auto;
+    border-radius: 2rem;
+    // Start Main Content 
+    .main-content {
+      padding-top: 4rem;
+      color: $main-text-color;
+      text-align: center;
+      h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+      }
+      h2 {
+        font-size: 1.5rem;
+        margin-top: .5rem;
+        margin-bottom: 2rem;
+      }
+      p {
+        width: 60%;
+        margin: auto;
+        opacity: .6;
+      }
+      .img {
+        margin-top: 4rem;
+        img {
+          margin: auto;
+          border-radius: 2rem;
+          width: auto;
+          height: 400px;
+          filter: grayscale(100%);
+        }
+      }
+    }
+    // Start Scroll Down
+    .scroll-down {
+      margin-top: 4rem;
+      text-align: center;
+      p {
+        color: $main-text-color;
+        text-transform: capitalize;
+        font-weight: 600;
+        font-size: .8rem;
+        letter-spacing: 1px;
+        opacity: .5;
+      }
+      svg {
+        width: 1.2rem;
+        height: 1.2rem;
+        margin: auto;
+        margin-top: .2rem;
+        color: $main-text-color;
+        opacity: .5;
+      }
+    }
+  }
+}

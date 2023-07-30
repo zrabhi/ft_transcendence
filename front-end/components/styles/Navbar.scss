@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+$grd-first-color: #2f245e; // for box gradient
+$grd-second-color: #251C48; // for box gradient
+$main-text-color: #fff; // for text 
+$blue-bg-color: #4D4AC9; // some box need diff bg color
+$main-bg-color: #090227; // bg for body
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 3rem;
+  padding-top: 1.5rem;
+  ul {
+    display: flex;
+    gap: .8rem;
+    font-weight: bold;
+    color: $main-text-color;
+    text-transform: capitalize;
+    button {
+      background-color: $blue-bg-color;
+      text-transform: capitalize;
+      font-weight: bold;
+      border-radius: .5rem;
+    }
+    .link {
+      padding: .5rem 1rem;
+      &:hover {
+        border-radius: .5rem;
+        background-color: $blue-bg-color;
+      }
+    }
+  }
+}

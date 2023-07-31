@@ -16,22 +16,70 @@ $main-bg-color: #090227; // bg for body
   padding-top: 1.5rem;
   ul {
     display: flex;
-    gap: .8rem;
+    gap: .1rem;
     font-weight: bold;
     color: $main-text-color;
     text-transform: capitalize;
-    button {
+    align-items: center;
+    li {
+      .link {
+        padding: .6rem 1rem;
+        transition: .2s ease-in-out;
+        &:hover {
+          border-radius: .5rem;
+          background-color: $blue-bg-color;
+        }
+      }
+    }
+    .signin-btn {
       background-color: $blue-bg-color;
+      color: $main-text-color;
       text-transform: capitalize;
       font-weight: bold;
       border-radius: .5rem;
     }
-    .link {
-      padding: .5rem 1rem;
-      &:hover {
-        border-radius: .5rem;
-        background-color: $blue-bg-color;
+    .close-list {
+      display: none;
+    }
+  }
+  .drop-down {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .navbar {
+    ul {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      background-color: $main-bg-color;
+      color: #fff;
+      z-index: 2;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2rem;
+      transform: translateY(-100vh);
+      .close-list {
+        display: block;
+        position: absolute;
+        top: 5rem;
+        right: 3.5rem;
+        cursor: pointer;
       }
+      .signin-btn {
+        margin-left: 0;
+      }
+    }
+    ul.showList {
+      transition: .5s ease-in-out;
+      transform: none;
+    }
+    .drop-down {
+      display: block;
     }
   }
 }
+

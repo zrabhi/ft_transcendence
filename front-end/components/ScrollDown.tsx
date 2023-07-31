@@ -1,11 +1,9 @@
-import { faChevronDown, faCircleChevronDown} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
+import {FaChevronCircleDown} from 'react-icons/fa'
 const ScrollDown = () => {
   return (
     <div className="scroll-down">
       <p>scroll down</p>
-      <FontAwesomeIcon icon={faCircleChevronDown} />
+      <FaChevronCircleDown />
     </div>
   );
 }

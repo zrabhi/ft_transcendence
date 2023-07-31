@@ -1,9 +1,11 @@
 import Image from 'next/image'
 import logo from './../public/logo.svg'
+import Link from 'next/link';
 
 const Logo = () => {
   return (
     <>
+      <Link href="/" >
       <div className="logo">
         <Image
           src={logo}
@@ -12,6 +14,7 @@ const Logo = () => {
           alt='Logo of the website shows a man playing ping pong game'
         />
       </div>
+      </Link>
     </>
   );
 }

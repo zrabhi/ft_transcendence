@@ -13,12 +13,13 @@ body {
   background-size: cover;
 }
 
+
 .singin-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 4rem;
-  padding: 4rem;
+  padding: 4rem 0;
   .img {
     position: relative;
     &::after {

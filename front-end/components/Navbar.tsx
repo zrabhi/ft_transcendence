@@ -16,38 +16,40 @@ const Navbar = () => {
 
   return (
     <header>
-      <nav className="navbar">
-        <Logo />
-        <ul ref={listRef} className='' >
-          <li>
-            <Link className='link' href='#' >Home</Link>
-          </li>
-          <li>
-            <Link className='link' href='#' >game history</Link>
-          </li>
-          <li>
-            <Link className='link' href='#' >instructions</Link>
-          </li>
-          <li>
-            <Link className='link' href='#' >About us</Link>
-          </li>
-            <Link href='/signin' >
-              <button className='
-                signin-btn
-                px-4 py-2
-                ml-4'
-                >
-                sign in
-              </button>
-            </Link>
-            <div className="close-list" onClick={showList}>
-              <FaTimes size={32} />
-            </div>
-        </ul>
-        <button className='drop-down' style={{color: '#fff'}} >
-          <BsList color size={32} onClick={showList} />
-        </button>
-      </nav>
+      <div className="container">
+        <nav className="navbar">
+          <Logo />
+          <ul ref={listRef} className='' >
+            <li>
+              <Link className='link' href='#' >Home</Link>
+            </li>
+            <li>
+              <Link className='link' href='#' >game history</Link>
+            </li>
+            <li>
+              <Link className='link' href='#' >instructions</Link>
+            </li>
+            <li>
+              <Link className='link' href='#' >About us</Link>
+            </li>
+              <Link href='/signin' >
+                <button className='
+                  signin-btn
+                  px-4 py-2
+                  ml-4'
+                  >
+                  sign in
+                </button>
+              </Link>
+              <div className="close-list" onClick={showList}>
+                <FaTimes size={32} />
+              </div>
+          </ul>
+          <button className='drop-down' style={{color: '#fff'}} >
+            <BsList color size={32} onClick={showList} />
+          </button>
+        </nav>
+      </div>
     </header>
   );
 }

@@ -1,0 +1,156 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   Int      @unique @default(autoincrement())
+  username             String   @unique
+  password             String
+  avatar               String   @default("avatar.img")
+  status               Status   @default(ONLINE)
+  win                  Int      @default(0)
+  los                  Int      @default(0)
+  ladder_level         Int      @default(0)
+  tenGameInRowAchie    Boolean  @default(false)
+  xp                   Int      @default(50)
+  created_date         DateTime @default(now())
+
+  channelMessage Channel_message[] @relation(name: "channelMessage")
+
+  messageSended   Message[] @relation(name: "messageSended")
+  messageRecieved Message[] @relation(name: "messageRecieved")
+
+  matchWon Match[] @relation(name: "MatchWon")
+  matchLoss  Match[] @relation(name: "MatchLoss")
+
+  friendRequest Friend[] @relation(name: "friendRequest")
+  friendRecieve Friend[] @relation(name: "friendRecieve")
+
+  achievement Achievement?
+
+  roles UserRole[] @relation(name:"userRole")
+  channelState ChannelBlock[] @relation(name:"userChannelState")
+}
+
+model Match {
+  id           Int      @unique @default(autoincrement())
+  winner_id    Int
+  loser_id     Int
+  winner_score Int
+  loser_score  Int
+  played_at    DateTime @default(now())
+
+  winner User @relation(fields: [winner_id], references: [id], name: "MatchWon")
+  loser  User @relation(fields: [loser_id], references: [id], name: "MatchLoss")
+}
+
+model Achievement{
+  id Int @unique @default(autoincrement())
+  userId Int @unique
+  accountCreationAchie Boolean  @default(true)
+  firstFriendAchie     Boolean  @default(false)
+  firstGameAchie       Boolean  @default(false)
+  threeGameInRowAchie  Boolean  @default(false)
+  firstWinAchie        Boolean  @default(false)
+  cleanSheetGameAchie  Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Friend {
+  id          Int      @unique @default(autoincrement())
+  sender_id   Int
+  reciever_id Int
+  state    State  
+  created_at  DateTime @default(now())
+
+  sender   User @relation(fields: [sender_id], references: [id], name: "friendRequest")
+  reciever User @relation(fields: [reciever_id], references: [id], name: "friendRecieve")
+}
+
+model Message {
+  id          Int      @unique @default(autoincrement())
+  sender_id   Int
+  reciever_id Int
+  content     String
+  created_at  DateTime @default(now())
+
+  sender      User     @relation(fields: [sender_id], references: [id], name: "messageSended")
+  reciever    User     @relation(fields: [reciever_id], references: [id], name: "messageRecieved")
+}
+
+model Channel {
+  id   Int    @unique @default(autoincrement())
+  name String
+  type Type
+  password String
+
+  messages Channel_message[] @relation("message")
+  roles UserRole[] @relation(name: "channelUser")
+  restrictedUsers ChannelBlock[] @relation(name: "restrictedUser")
+}
+
+model Channel_message {
+  id         Int      @unique @default(autoincrement())
+  channel_id Int
+  user_id    Int
+  content    String
+  created_at DateTime @default(now())
+
+  user    User    @relation(fields: [user_id], references: [id], name: "channelMessage")
+  channel Channel @relation(fields: [channel_id], references: [id], name: "message")
+}
+
+model UserRole{
+  id Int @unique @default(autoincrement())
+  userId Int
+  channelId Int
+  role Role
+
+  user User @relation(fields: [userId], references:[id], name: "userRole")
+  channel Channel @relation(fields: [channelId], references:[id], name: "channelUser")
+}
+
+model ChannelBlock{
+  id Int @unique @default(autoincrement())
+  userId Int
+  channelId Int
+  isBanned Boolean
+  isKicked Boolean
+  isMute Boolean
+
+  user User @relation(fields: [userId], references:[id], name: "userChannelState")
+  channel Channel @relation(fields: [channelId], references:[id], name: "restrictedUser")
+}
+
+enum State {
+  FRIENDS
+  REQUESTER_BLOCK_RECIEVER
+  RECIEVER_BLOCK_REQUESTER
+}
+
+enum Status {
+  OFFLINE
+  ONLINE
+  INGAME
+}
+
+enum Role{
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum Type {
+  PUBLIC
+  PRIVATE
+  PROTECTED
+}

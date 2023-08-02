@@ -152,3 +152,12 @@ body {
     }
   }
 }
+
+@media (max-width: 768px) {
+  .singin-content {
+    width: 90%;
+    .singin {
+      width: 96%;
+    }
+  }
+}

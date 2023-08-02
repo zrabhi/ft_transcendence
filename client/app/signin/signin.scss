@@ -32,7 +32,6 @@ body {
     }
   }
   .singin {
-    height: 50rem;
     width: 35vw;
     border-radius: 1rem;
     padding: 2rem 1rem;
@@ -83,45 +82,51 @@ body {
           padding: .5rem;
           border-radius: .5rem;
           background-color: rgb(77 22 150 / 0.6);
+          font-size: .9rem;
           &::placeholder {
             text-transform: capitalize;
           }
         }
-        .forgot-pass {
-          a {
-            font-size: .8rem;
-            display: block;
-            position: absolute;
-            right: 1.5rem;
-            top: 6.1rem;
-            opacity: .7;
-          }
-        }
-        .pass-strength {
-          margin-top: 1rem;
-          margin-bottom: 1rem;
-          .bar {
-            height: 3px;
-            width: 100%;
-            background-color: #fff;
-            margin-top: -1rem;
-            border-radius: 1rem;
-            position: relative;
-            .green-bar {
-              width: 60%;
-              height: 3px;
-              border-radius: 1rem;
-              background-color: green;
+        .pass {
+          position: relative;
+          .forgot-pass {
+            a {
+              font-size: .8rem;
+              display: block;
               position: absolute;
+              right: 0;
               top: 0;
-              left: 0;
-              opacity: .8;
+              font-size: .7rem;
+              font-weight: bold;
+              opacity: .7;
             }
           }
-          .text {
-            font-size: .7rem;
-            opacity: .7;
-            text-transform: capitalize;
+          .pass-strength {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            .bar {
+              height: 3px;
+              width: 100%;
+              background-color: #fff;
+              margin-top: -1rem;
+              border-radius: 1rem;
+              position: relative;
+              .green-bar {
+                width: 60%;
+                height: 3px;
+                border-radius: 1rem;
+                background-color: green;
+                position: absolute;
+                top: 0;
+                left: 0;
+                opacity: .8;
+              }
+            }
+            .text {
+              font-size: .7rem;
+              opacity: .7;
+              text-transform: capitalize;
+            }
           }
         }
       }

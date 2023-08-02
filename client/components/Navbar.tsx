@@ -11,15 +11,16 @@ const Navbar = () => {
   const listRef = useRef();
 
   const showList = () => {
-    listRef.current.classList.toggle("showList");
+    // listRef.current.classList.toggle("showList");
   }
 
   return (
+    // <div>This is navbar</div>
     <header>
       <div className="container">
         <nav className="navbar">
           <Logo />
-          <ul ref={listRef} className='' >
+          <ul  className='' >
             <li>
               <Link className='link' href='#' >Home</Link>
             </li>
@@ -45,8 +46,8 @@ const Navbar = () => {
                 <FaTimes size={32} />
               </div>
           </ul>
-          <button className='drop-down' style={{color: '#fff'}} >
-            <BsList color size={32} onClick={showList} />
+          <button className='drop-down' style={{color: "#fff"}} >
+            <BsList size={32} onClick={showList} />
           </button>
         </nav>
       </div>

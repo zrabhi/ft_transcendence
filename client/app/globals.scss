@@ -17,6 +17,9 @@ $main-bg-color: #090227; // bg for body
 
 body {
   background-color: $main-bg-color;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .container {
@@ -32,10 +35,11 @@ body {
 
 @media only screen and (max-width: 768px) {
   .container {
-    width: 100%;
+    width: 98%;
     padding: 1rem;
   }
 }
+
 /* End Global Rules */
 
 

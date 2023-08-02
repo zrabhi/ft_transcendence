@@ -39,6 +39,11 @@
           filter: grayscale(100%);
         }
       }
+      @media (max-width: 572px) {
+        .img {
+          display: none;
+        }
+      }
     }
     // Start Scroll Down
     .scroll-down {

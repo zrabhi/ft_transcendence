@@ -1,12 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-$grd-first-color: #2f245e; // for box gradient
-$grd-second-color: #251C48; // for box gradient
-$main-text-color: #fff; // for text 
-$blue-bg-color: #4D4AC9; // some box need diff bg color
-$main-bg-color: #090227; // bg for body
+@import './../../app/globals.scss';
 
 .navbar {
   display: flex;

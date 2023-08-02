@@ -1,7 +1,7 @@
 import './globals.scss'
 import type { Metadata } from 'next'
 import { Montserrat } from 'next/font/google'
-
+import Footer from './../components/Footer'
 
 export const metadata: Metadata = {
   title: 'Pong Game',
@@ -22,7 +22,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={roboto.className}>{children}</body>
+      <body className={roboto.className}>
+        {children}
+        <Footer />
+      </body>
     </html>
   )
 }

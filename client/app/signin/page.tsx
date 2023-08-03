@@ -12,6 +12,16 @@ import GithubLogo from './../../public/github.png'
 
 export default function SignIn () {
 
+  //All refs
+  const emailMessage = useRef();
+  const passMessage = useRef();
+
+  // is email valid
+  const emailPattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
+  function isValidEmail(email : string) {
+    return emailPattern.test(email);
+  }
+
   const checkOne = useRef();
   const handleCheckOne = () => {
     checkOne.current.classList.toggle("hidden");
@@ -30,7 +40,15 @@ export default function SignIn () {
   }
 
   const handleInvalidEmail = (e) => {
-    console.log(e.target.validationMessage);
+    e.preventDefault();
+    if (e.target.validationMessage.length)
+      emailMessage.current.innerText = e.target.validationMessage;
+  }
+
+  const handleInvalidPassword = (e) => {
+    e.preventDefault();
+    if (e.target.validationMessage.length)
+      passMessage.current.innerText = e.target.validationMessage;
   }
 
   return (
@@ -44,22 +62,24 @@ export default function SignIn () {
             <div className="auth">
               <form action="">
                 <div className="email">
-                  <label className='label' htmlFor="emailInput" onInvalid={handleInvalidEmail} >email</label>
-                  <input className='input' id='emailInput' type="email" placeholder='email' autoFocus required/>
+                  <label className='label' htmlFor="emailInput" >email</label>
+                  <input className='input' id='emailInput' type="email" placeholder='email' autoFocus required onInvalid={handleInvalidEmail} />
+                  <div ref={emailMessage} className="error email-error">
+                  </div>
                 </div>
                 <div className="pass">
                   <label className='label' htmlFor="passwordInput">password</label>
-                  <input className='input' id='passwordInput' type='password' placeholder='password' onChange={passStrengthInfo} required ></input>
+                  <input className='input' id='passwordInput' type='password' placeholder='password' onChange={passStrengthInfo} required onInvalid={handleInvalidPassword}  ></input>
                   <div className="forgot-pass">
                     <Link href="#">Forgot your password?</Link>
                   </div>
-                  <div className="pass-strength">
+                  <div className="error pass-strength">
                     <div className="bar">
                       <div className="green-bar">
 
                       </div>
                     </div>
-                    <div className="text">week password</div>
+                    <div ref={passMessage} className="text"></div>
                   </div>
                 </div>
                 <div className="checkbox">

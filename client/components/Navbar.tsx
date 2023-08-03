@@ -11,7 +11,7 @@ const Navbar = () => {
   const listRef = useRef();
 
   const showList = () => {
-    // listRef.current.classList.toggle("showList");
+    listRef.current.classList.toggle("showList");
   }
 
   return (
@@ -20,7 +20,7 @@ const Navbar = () => {
       <div className="container">
         <nav className="navbar">
           <Logo />
-          <ul  className='' >
+          <ul ref={listRef} className='' >
             <li>
               <Link className='link' href='#' >Home</Link>
             </li>

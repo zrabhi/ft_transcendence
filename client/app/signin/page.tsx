@@ -4,7 +4,6 @@ import Link from 'next/link'
 import Image from 'next/image';
 import './signin.scss'
 import './../hero-section.scss'
-import pongGif from './../../public/pong.gif'
 import { useRef } from 'react';
 import { FaCheckSquare } from 'react-icons/fa';
 import googleLogo from './../../public/google.png'
@@ -30,6 +29,10 @@ export default function SignIn () {
     // console.log(passStrengthRef.current.classList);
   }
 
+  const handleInvalidEmail = (e) => {
+    console.log(e.target.validationMessage);
+  }
+
   return (
     <div className='container-box'>
       <Navbar />
@@ -41,7 +44,7 @@ export default function SignIn () {
             <div className="auth">
               <form action="">
                 <div className="email">
-                  <label className='label' htmlFor="emailInput">email</label>
+                  <label className='label' htmlFor="emailInput" onInvalid={handleInvalidEmail} >email</label>
                   <input className='input' id='emailInput' type="email" placeholder='email' autoFocus required/>
                 </div>
                 <div className="pass">
@@ -50,7 +53,7 @@ export default function SignIn () {
                   <div className="forgot-pass">
                     <Link href="#">Forgot your password?</Link>
                   </div>
-                  <div className="pass-strength ">
+                  <div className="pass-strength">
                     <div className="bar">
                       <div className="green-bar">
 

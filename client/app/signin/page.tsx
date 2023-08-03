@@ -13,41 +13,30 @@ import GithubLogo from './../../public/github.png'
 export default function SignIn () {
 
   //All refs
-  const emailMessage = useRef();
-  const passMessage = useRef();
+  const emailMessage = useRef<HTMLParagraphElement>(null);
+  const passMessage = useRef<HTMLParagraphElement>(null);
+  const checkOne = useRef<HTMLParagraphElement>(null); // for checkbox number 1
+  const checkTwo = useRef<HTMLParagraphElement>(null); // for checkbox number 2
 
-  // is email valid
-  const emailPattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
-  function isValidEmail(email : string) {
-    return emailPattern.test(email);
-  }
-
-  const checkOne = useRef();
   const handleCheckOne = () => {
-    checkOne.current.classList.toggle("hidden");
+    if (checkOne.current)
+      checkOne.current.classList.toggle("hidden");
   }
 
-  const checkTwo = useRef();
   const handleCheckTwo = () => {
-    checkTwo.current.classList.toggle("hidden");
+    if (checkTwo.current)
+      checkTwo.current.classList.toggle("hidden");
   }
 
-  // const passStrengthRef = useRef();
-
-  const passStrengthInfo = () => {
-    // passStrengthRef.current.classList.add('invisible');
-    // console.log(passStrengthRef.current.classList);
-  }
-
-  const handleInvalidEmail = (e) => {
+  const handleInvalidEmail = (e : any) => {
     e.preventDefault();
-    if (e.target.validationMessage.length)
+    if (e.target.validationMessage.length && emailMessage.current)
       emailMessage.current.innerText = e.target.validationMessage;
   }
 
-  const handleInvalidPassword = (e) => {
+  const handleInvalidPassword = (e : any) => {
     e.preventDefault();
-    if (e.target.validationMessage.length)
+    if (e.target.validationMessage.length && passMessage.current)
       passMessage.current.innerText = e.target.validationMessage;
   }
 
@@ -69,16 +58,11 @@ export default function SignIn () {
                 </div>
                 <div className="pass">
                   <label className='label' htmlFor="passwordInput">password</label>
-                  <input className='input' id='passwordInput' type='password' placeholder='password' onChange={passStrengthInfo} required onInvalid={handleInvalidPassword}  ></input>
+                  <input className='input' id='passwordInput' type='password' placeholder='password' required onInvalid={handleInvalidPassword}  ></input>
                   <div className="forgot-pass">
                     <Link href="#">Forgot your password?</Link>
                   </div>
                   <div className="error pass-strength">
-                    <div className="bar">
-                      <div className="green-bar">
-
-                      </div>
-                    </div>
                     <div ref={passMessage} className="text"></div>
                   </div>
                 </div>

@@ -8,10 +8,11 @@ import { FaTimes } from 'react-icons/fa'
 
 const Navbar = () => {
 
-  const listRef = useRef();
+  const listRef = useRef<HTMLUListElement>(null);
 
   const showList = () => {
-    listRef.current.classList.toggle("showList");
+    if (listRef.current)
+      listRef.current.classList.toggle("showList");
   }
 
   return (

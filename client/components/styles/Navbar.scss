@@ -1,10 +1,15 @@
 @import './../../app/globals.scss';
 
+header {
+  background-color: $grd-second-color;
+  border-radius: 2rem 2rem 0 0;
+}
+
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 1.5rem;
+  padding: .8rem 0;
   ul {
     display: flex;
     gap: .1rem;
@@ -28,6 +33,10 @@
       text-transform: capitalize;
       font-weight: bold;
       border-radius: .5rem;
+      transition: .2s ease-in-out;
+      &:hover {
+        opacity: .8;
+      }
     }
     .close-list {
       display: none;

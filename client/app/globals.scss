@@ -27,6 +27,13 @@ body {
   margin: auto;
 }
 
+.container-box {
+  background: linear-gradient(to bottom, $grd-first-color, $grd-second-color);
+  width: 97vw;
+  margin: 2rem auto 0;
+  border-radius: 2rem;
+}
+
 @media only screen and (max-width: 1024px) {
   .container {
     width: 96%;

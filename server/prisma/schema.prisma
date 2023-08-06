@@ -11,25 +11,27 @@ datasource db {
 }
 
 model User {
-  id                   Int      @unique @default(autoincrement())
+  id                   String   @unique @default(uuid())
+  email                String   @unique
   username             String   @unique
   password             String
-  avatar               String   @default("avatar.img")
+  avatar               String   @default("../resources/avatar.png")
+  cover                String   @default("../resources/cover.png")
   status               Status   @default(ONLINE)
   win                  Int      @default(0)
-  los                  Int      @default(0)
+  loss                 Int      @default(0)
   ladder_level         Int      @default(0)
-  tenGameInRowAchie    Boolean  @default(false)
   xp                   Int      @default(50)
+  totalGames           Int      @default(0)
   created_date         DateTime @default(now())
 
-  channelMessage Channel_message[] @relation(name: "channelMessage")
+  channelMessages Channel_message[] @relation(name: "channelMessage")
 
-  messageSended   Message[] @relation(name: "messageSended")
-  messageRecieved Message[] @relation(name: "messageRecieved")
+  messagesSended   Message[] @relation(name: "messageSended")
+  messagesRecieved Message[] @relation(name: "messageRecieved")
 
   matchWon Match[] @relation(name: "MatchWon")
-  matchLoss  Match[] @relation(name: "MatchLoss")
+  matchLost  Match[] @relation(name: "MatchLost")
 
   friendRequest Friend[] @relation(name: "friendRequest")
   friendRecieve Friend[] @relation(name: "friendRecieve")
@@ -42,33 +44,34 @@ model User {
 
 model Match {
   id           Int      @unique @default(autoincrement())
-  winner_id    Int
-  loser_id     Int
+  winner_id    String
+  loser_id     String
   winner_score Int
   loser_score  Int
   played_at    DateTime @default(now())
 
   winner User @relation(fields: [winner_id], references: [id], name: "MatchWon")
-  loser  User @relation(fields: [loser_id], references: [id], name: "MatchLoss")
+  loser  User @relation(fields: [loser_id], references: [id], name: "MatchLost")
 }
 
 model Achievement{
   id Int @unique @default(autoincrement())
-  userId Int @unique
-  accountCreationAchie Boolean  @default(true)
+  userId String @unique
+  accountCreationAchie Boolean
   firstFriendAchie     Boolean  @default(false)
   firstGameAchie       Boolean  @default(false)
   threeGameInRowAchie  Boolean  @default(false)
   firstWinAchie        Boolean  @default(false)
   cleanSheetGameAchie  Boolean  @default(false)
+  tenGameInRowAchie    Boolean  @default(false)
 
   user User @relation(fields: [userId], references: [id])
 }
 
 model Friend {
   id          Int      @unique @default(autoincrement())
-  sender_id   Int
-  reciever_id Int
+  sender_id   String
+  reciever_id String
   state    State  
   created_at  DateTime @default(now())
 
@@ -78,8 +81,8 @@ model Friend {
 
 model Message {
   id          Int      @unique @default(autoincrement())
-  sender_id   Int
-  reciever_id Int
+  sender_id   String
+  reciever_id String
   content     String
   created_at  DateTime @default(now())
 
@@ -101,7 +104,7 @@ model Channel {
 model Channel_message {
   id         Int      @unique @default(autoincrement())
   channel_id Int
-  user_id    Int
+  user_id    String
   content    String
   created_at DateTime @default(now())
 
@@ -111,7 +114,7 @@ model Channel_message {
 
 model UserRole{
   id Int @unique @default(autoincrement())
-  userId Int
+  userId String
   channelId Int
   role Role
 
@@ -121,7 +124,7 @@ model UserRole{
 
 model ChannelBlock{
   id Int @unique @default(autoincrement())
-  userId Int
+  userId String
   channelId Int
   isBanned Boolean
   isKicked Boolean

@@ -2,7 +2,7 @@
 import Navbar from '@/components/Navbar';
 import Link from 'next/link'
 import Image from 'next/image';
-import './signin.scss'
+import './style.scss'
 import './../hero-section.scss'
 import { useRef } from 'react';
 import { FaCheckSquare } from 'react-icons/fa';
@@ -35,7 +35,7 @@ export default function SignIn () {
   }
 
   const handleInvalidPassword = (e : any) => {
-    e.preventDefault();
+    e.preventDefault(); 
     if (e.target.validationMessage.length && passMessage.current)
       passMessage.current.innerText = e.target.validationMessage;
   }
@@ -44,8 +44,8 @@ export default function SignIn () {
     <div className='container-box'>
       <Navbar />
       <div className='container'>
-        <div className="singin-content">
-          <div className="singin">
+        <div className="signin-content">
+          <div className="signin">
             <h2>Join the game!</h2>
             <p>Go inside the best gamers social network!</p>
             <div className="auth">
@@ -118,6 +118,9 @@ export default function SignIn () {
                   </div>
                 </div>
               </form>
+            </div>
+            <div className="signupbtn">
+              <button>create an account</button>
             </div>
           </div>
         </div>

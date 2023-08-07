@@ -1,9 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Param } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Achievement, User } from '@prisma/client';
+import { Achievement, Match, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
-import { triggerAsyncId } from 'async_hooks';
+import { CreateMatchDto } from './dto/create-match.dto';
 
 @Injectable()
 export class UserService {
@@ -92,6 +92,59 @@ export class UserService {
                 }
             })
         } catch(error) {
+
+        }
+    }
+
+    async getMatchesByUserId(@Param('user_id') user_id:string):Promise<Match[]>{
+        try
+        {
+            return await this.prismaService.match.findMany({
+                where: {
+                    OR:[
+                        {winner_id: user_id},
+                        {loser_id: user_id}
+                    ]
+                },
+                orderBy: {
+                    played_at: 'asc'
+                }
+            })
+        } catch(error)
+        {
+            console.log(error);
+        }
+    }
+
+    async createMatch(createMatchDto:CreateMatchDto){
+        try {
+            await this.prismaService.user.update({
+                where:{id:createMatchDto.winner_id},
+                data:{
+                    win: { increment:1 },
+                    totalGames: { increment: 1},
+                }
+            })
+            await this.prismaService.user.update({
+                where:{id:createMatchDto.loser_id},
+                data:{
+                    loss: { increment: 1 },
+                    totalGames: { increment: 1},
+                }
+            })
+            return await this.prismaService.match.create({
+                data:{
+                    winner_id:createMatchDto.winner_id,
+                    loser_id:createMatchDto.loser_id,
+                    winner_score:createMatchDto.winner_score,
+                    loser_score:createMatchDto.loser_score,
+                },
+                select:{
+                    id:true,
+                }
+            })
+        } catch(error)
+        {
 
         }
     }

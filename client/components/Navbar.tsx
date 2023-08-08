@@ -8,10 +8,11 @@ import { FaTimes } from 'react-icons/fa'
 
 const Navbar = () => {
 
-  const listRef = useRef();
+  const listRef = useRef<HTMLUListElement>(null);
 
   const showList = () => {
-    // listRef.current.classList.toggle("showList");
+    if (listRef.current)
+      listRef.current.classList.toggle("showList");
   }
 
   return (
@@ -20,7 +21,7 @@ const Navbar = () => {
       <div className="container">
         <nav className="navbar">
           <Logo />
-          <ul  className='' >
+          <ul ref={listRef} className='' >
             <li>
               <Link className='link' href='#' >Home</Link>
             </li>

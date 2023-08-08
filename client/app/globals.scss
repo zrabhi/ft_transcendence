@@ -7,6 +7,7 @@ $grd-second-color: #251C48; // for box gradient
 $main-text-color: #fff; // for text 
 $blue-bg-color: #4D4AC9; // some box need diff bg color
 $main-bg-color: #090227; // bg for body
+$error-color: #D43A48; // for error messages
 
 /* Start Global Rules */
 * {
@@ -25,6 +26,13 @@ body {
 .container {
   width: 92%;
   margin: auto;
+}
+
+.container-box {
+  background: linear-gradient(to bottom, $grd-first-color, $grd-second-color);
+  width: 97vw;
+  margin: 2rem auto 0;
+  border-radius: 2rem;
 }
 
 @media only screen and (max-width: 1024px) {

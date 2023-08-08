@@ -25,7 +25,7 @@ let UserService = exports.UserService = class UserService {
     }
     async findUserById(user_id) {
         try {
-            return await this.prismaService.user.findUnique({
+            return await this.prismaService.user.findUniqueOrThrow({
                 where: {
                     id: user_id,
                 },
@@ -69,13 +69,17 @@ let UserService = exports.UserService = class UserService {
             });
         }
         catch (error) {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.BAD_REQUEST,
+                error: error,
+            }, common_1.HttpStatus.BAD_REQUEST);
         }
     }
-    async deleteUserByUsername(username) {
+    async deleteUserByUsername(user_id) {
         try {
             return await this.prismaService.user.delete({
                 where: {
-                    id: username,
+                    id: user_id,
                 },
                 select: { id: true }
             });
@@ -83,7 +87,7 @@ let UserService = exports.UserService = class UserService {
         catch (error) {
             throw new common_1.HttpException({
                 status: common_1.HttpStatus.NO_CONTENT,
-                error: `There is no content for ${username}`,
+                error: `There is no content for ${user_id}`,
             }, common_1.HttpStatus.NO_CONTENT, {});
         }
     }
@@ -108,7 +112,7 @@ let UserService = exports.UserService = class UserService {
                     ]
                 },
                 orderBy: {
-                    played_at: 'asc'
+                    played_at: 'desc'
                 }
             });
         }
@@ -132,7 +136,6 @@ let UserService = exports.UserService = class UserService {
                     totalGames: { increment: 1 },
                 }
             });
-            console.log("crazy");
             return await this.prismaService.match.create({
                 data: {
                     winner_id: createMatchDto.winner_id,

@@ -1,9 +1,11 @@
 import { HttpException, HttpStatus, Injectable, Param } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Achievement, Match, User } from '@prisma/client';
+import { Achievement, Match, Prisma, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateMatchDto } from './dto/create-match.dto';
+import { isInstance } from 'class-validator';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -16,7 +18,7 @@ export class UserService {
     async findUserById(user_id:string):Promise<User>{
         try
         {
-            return await this.prismaService.user.findUnique({
+            return await this.prismaService.user.findUniqueOrThrow({
                 where:
                 {
                     id:user_id,
@@ -63,22 +65,25 @@ export class UserService {
                 }
             });
         } catch(error) {
-
+            throw new HttpException({
+                status: HttpStatus.BAD_REQUEST,
+                error: error,
+            }, HttpStatus.BAD_REQUEST);
         }
     }
 
-    async deleteUserByUsername(username:string){
+    async deleteUserByUsername(user_id:string){
         try {
             return await this.prismaService.user.delete({
                 where:{
-                    id:username,
+                    id:user_id,
                 },
                 select:{id:true}
             });
         } catch(error) {
             throw new HttpException({
                 status: HttpStatus.NO_CONTENT,
-                error: `There is no content for ${username}`,
+                error: `There is no content for ${user_id}`,
             }, HttpStatus.NO_CONTENT, {
             })
         }
@@ -107,7 +112,7 @@ export class UserService {
                     ]
                 },
                 orderBy: {
-                    played_at: 'asc'
+                    played_at: 'desc'
                 }
             })
         } catch(error)
@@ -148,4 +153,30 @@ export class UserService {
 
         }
     }
+
+    // async updateUser(updateUserDto: UpdateUserDto){
+    //     try {
+    //         if (updateUserDto.username !== undefined)
+    //         {
+    //             if (!!await this.prismaService.user.findFirst({
+    //                 where:{
+    //                     username:updateUserDto.username,
+    //                 }
+    //             }))
+    //             {
+    //                 throw new HttpException({
+    //                     status: HttpStatus.BAD_REQUEST,
+    //                     error: `These ${updateUserDto.username} already used try another one`,
+    //                 }, HttpStatus.BAD_REQUEST, {
+    //                 })
+    //             }
+    //         }
+    //         if (updateUserDto.Oldpassword !== undefined && updateUserDto.Newpassword && updateUserDto.Confirmedpassword)
+    //         {
+    //             if (updateUserDto.)
+    //         }
+    //     } catch(error) {
+
+    //     }
+    // }
 }

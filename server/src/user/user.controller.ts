@@ -23,9 +23,9 @@ export class UserController {
         return await this.userService.addUser(createUserDto);
     }
 
-    @Delete('/users/:username')
-    async deleteUser(@Param('username') username:string){
-        return await this.userService.deleteUserByUsername(username);
+    @Delete('/users/:user_id')
+    async deleteUser(@Param('user_id') user_id:string){
+        return await this.userService.deleteUserByUsername(user_id);
     }
 
     @Get('/users/:user_id/achievement')

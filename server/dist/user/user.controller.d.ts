@@ -10,7 +10,7 @@ export declare class UserController {
     createUser(createUserDto: CreateUserDto): Promise<{
         id: string;
     }>;
-    deleteUser(username: string): Promise<{
+    deleteUser(user_id: string): Promise<{
         id: string;
     }>;
     getUserAchievement(user_id: string): Promise<Achievement>;

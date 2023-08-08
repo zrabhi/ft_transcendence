@@ -18,11 +18,14 @@ model User {
   avatar               String   @default("../resources/avatar.png")
   cover                String   @default("../resources/cover.png")
   status               Status   @default(ONLINE)
+  country              String
   win                  Int      @default(0)
   loss                 Int      @default(0)
   ladder_level         Int      @default(0)
   xp                   Int      @default(50)
   totalGames           Int      @default(0)
+  discordHandler       String?
+  twitterHandler       String?
   created_date         DateTime @default(now())
 
   channelMessages Channel_message[] @relation(name: "channelMessage")

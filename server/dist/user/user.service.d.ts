@@ -10,7 +10,7 @@ export declare class UserService {
     addUser(createUserDto: CreateUserDto): Promise<{
         id: string;
     }>;
-    deleteUserByUsername(username: string): Promise<{
+    deleteUserByUsername(user_id: string): Promise<{
         id: string;
     }>;
     achievementById(user_id: string): Promise<Achievement>;

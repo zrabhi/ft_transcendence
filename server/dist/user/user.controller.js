@@ -30,8 +30,8 @@ let UserController = exports.UserController = class UserController {
     async createUser(createUserDto) {
         return await this.userService.addUser(createUserDto);
     }
-    async deleteUser(username) {
-        return await this.userService.deleteUserByUsername(username);
+    async deleteUser(user_id) {
+        return await this.userService.deleteUserByUsername(user_id);
     }
     async getUserAchievement(user_id) {
         return await this.userService.achievementById(user_id);
@@ -64,8 +64,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "createUser", null);
 __decorate([
-    (0, common_1.Delete)('/users/:username'),
-    __param(0, (0, common_1.Param)('username')),
+    (0, common_1.Delete)('/users/:user_id'),
+    __param(0, (0, common_1.Param)('user_id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)

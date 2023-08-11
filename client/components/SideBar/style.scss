@@ -18,14 +18,14 @@
     gap: 3rem;
     div {
       background: linear-gradient(to bottom, #725caf, #2a1a47);
-      padding: .8rem;
+      padding: 1rem;
       color: $main-text-color;
-      border-radius: .2rem;
+      border-radius: 50%;
       cursor: pointer;
       transition: .2s ease-in-out;
       &:hover {
         // background: $main-bg-color;
-        transform: scale(1.4);
+        transform: scale(1.2);
         border-radius: 50%;
       }
     }

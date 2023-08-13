@@ -4,8 +4,6 @@ import { Achievement, Match, Prisma, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateMatchDto } from './dto/create-match.dto';
-import { isInstance } from 'class-validator';
-import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {

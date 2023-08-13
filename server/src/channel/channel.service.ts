@@ -1,7 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
-import { Role, Type, UserRole } from '@prisma/client';
+import { Role} from '@prisma/client';
+import { createUserRoleDto } from './dto/create-UserRole.dto';
+import { blockChannelUserDto } from './dto/blockChannelUser.dto';
+import { createMessageChannelDto } from './dto/create-Message-channel.dto';
 
 @Injectable()
 export class ChannelService {
@@ -19,27 +22,70 @@ export class ChannelService {
                             role:Role.OWNER
                         }
                     ]
+                },
+                messages:{
+                },
+                restrictedUsers:{
+
                 }
-            }
+            },
+            select:{id: true}
         })
     }
 
     async deleteChannelById(channelId:string){
-        // try{
+        try{
             return await this.prismaService.channel.delete({
                 where:{
-                    id:channelId
-                }
+                    id: channelId,
+                },
+                select:{id:true}
             })
-        // }
-        // catch (error)
-        // {
-        //     throw new HttpException({
-        //         status: HttpStatus.NO_CONTENT,
-        //         error: `There is no content for channel provided`,
-        //     }, HttpStatus.NO_CONTENT, {
-        //     })
-        // }
+        } catch(error)
+        {
+            throw new HttpException({
+                status: HttpStatus.NO_CONTENT,
+                error: `There is no content for this channel Id`,
+            }, HttpStatus.NO_CONTENT, {
+            })
+        }
+    }
+
+    async getAllChannelMembers(channelId:string){
+        return await this.prismaService.userRole.findMany({
+            where:{
+                channelId:channelId,
+            },
+            select:{userId:true}
+        })
+    }
+
+    async addUserChannel(createUserRole:createUserRoleDto){
+        let exist = !!await this.prismaService.userRole.findFirst({
+            where: {
+                userId: createUserRole.userId,
+                channelId: createUserRole.channelId,
+            }
+        })
+
+        if (exist)
+        {
+            throw new HttpException({
+                status: HttpStatus.FORBIDDEN,
+                error: `This user is already registred in the channel`,
+            }, HttpStatus.FORBIDDEN)
+        }
+
+        return await this.prismaService.userRole.create({
+            data:{
+                userId:createUserRole.userId,
+                channelId: createUserRole.channelId,
+                role: createUserRole.role
+            },
+            select:{
+                id:true
+            }
+        })
     }
 
     async getChannelById(channelId:string){
@@ -50,9 +96,46 @@ export class ChannelService {
         })
     }
 
-    async getRoles(){
-        return await this.prismaService.userRole.findMany({      
+    // async banUserById(blockChannelUserDto:blockChannelUserDto){
+    //     return await this.prismaService.channelBlock.create({
+    //         data:{
+    //             userId:blockChannelUserDto.userId,
+    //             channelId:blockChannelUserDto.channelId,
+    //             isBanned:true,
+    //             isMute:false
+    //         }
+    //     })
+    // }
+
+    async createMessage(createMsgChanDto:createMessageChannelDto){
+        return await this.prismaService.channel_message.create({
+            data:{
+                user_id:createMsgChanDto.user_id,
+                channel_id:createMsgChanDto.channel_id,
+                content:createMsgChanDto.content,
+            }
         })
     }
+
+    async getAllChannelMessage(){
+        return await this.prismaService.channel_message.findMany({
+        })
+    }
+
+    async getMessagesByChannelId(channelId:string){
+        return await this.prismaService.channel_message.findMany({
+            where:{
+                channel_id:channelId,
+            },
+            orderBy:{
+                created_at:'desc',
+            }
+        })
+    }
+
+    // async getRoles(){
+    //     return await this.prismaService.userRole.findMany({      
+    //     })
+    // }
 
 }

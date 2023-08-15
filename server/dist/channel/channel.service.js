@@ -100,9 +100,6 @@ let ChannelService = exports.ChannelService = class ChannelService {
             }
         });
     }
-    async getAllChannelMessage() {
-        return await this.prismaService.channel_message.findMany({});
-    }
     async getMessagesByChannelId(channelId) {
         return await this.prismaService.channel_message.findMany({
             where: {

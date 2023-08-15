@@ -96,17 +96,6 @@ export class ChannelService {
         })
     }
 
-    // async banUserById(blockChannelUserDto:blockChannelUserDto){
-    //     return await this.prismaService.channelBlock.create({
-    //         data:{
-    //             userId:blockChannelUserDto.userId,
-    //             channelId:blockChannelUserDto.channelId,
-    //             isBanned:true,
-    //             isMute:false
-    //         }
-    //     })
-    // }
-
     async createMessage(createMsgChanDto:createMessageChannelDto){
         return await this.prismaService.channel_message.create({
             data:{
@@ -114,11 +103,6 @@ export class ChannelService {
                 channel_id:createMsgChanDto.channel_id,
                 content:createMsgChanDto.content,
             }
-        })
-    }
-
-    async getAllChannelMessage(){
-        return await this.prismaService.channel_message.findMany({
         })
     }
 
@@ -132,10 +116,5 @@ export class ChannelService {
             }
         })
     }
-
-    // async getRoles(){
-    //     return await this.prismaService.userRole.findMany({      
-    //     })
-    // }
 
 }

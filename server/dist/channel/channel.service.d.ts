@@ -30,13 +30,6 @@ export declare class ChannelService {
         content: string;
         created_at: Date;
     }>;
-    getAllChannelMessage(): Promise<{
-        id: string;
-        channel_id: string;
-        user_id: string;
-        content: string;
-        created_at: Date;
-    }[]>;
     getMessagesByChannelId(channelId: string): Promise<{
         id: string;
         channel_id: string;

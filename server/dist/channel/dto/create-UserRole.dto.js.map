@@ -1,1 +1,1 @@
-{"version":3,"file":"create-UserRole.dto.js","sourceRoot":"","sources":["../../../src/channel/dto/create-UserRole.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,2CAAqC;AACrC,qDAAsD;AAEtD,MAAa,iBAAiB;CAW7B;AAXD,8CAWC;AARG;IAFC,IAAA,4BAAU,GAAE;IACZ,IAAA,0BAAQ,GAAE;;iDACE;AAIb;IAFC,IAAA,4BAAU,GAAE;IACZ,IAAA,0BAAQ,GAAE;;oDACK;AAGhB;IADC,IAAA,4BAAU,GAAE;;+CACJ"}
+{"version":3,"file":"create-UserRole.dto.js","sourceRoot":"","sources":["../../../src/channel/dto/create-UserRole.dto.ts"],"names":[],"mappings":""}

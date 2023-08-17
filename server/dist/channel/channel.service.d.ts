@@ -1,12 +1,14 @@
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateChannelDto } from './dto/create-channel.dto';
 import { Response } from 'express';
-import { updateUserRoleDto } from './dto/update-UserRole.dto';
+import { CreateChannelDto, createMessageChannelDto, updateUserRoleDto } from './dto/channel.dto';
 export declare class ChannelService {
     private prismaService;
     constructor(prismaService: PrismaService);
     addChannel(createChannelDto: CreateChannelDto): Promise<{
         id: string;
+        name: string;
+        type: import(".prisma/client").$Enums.Type;
+        password: string;
     }>;
     deleteChannelById(channelId: string, res: Response): Promise<{
         id: string;
@@ -19,6 +21,9 @@ export declare class ChannelService {
         userId: string;
     }[]>;
     updateUserRole(channelId: string, updateUserRoleDto: updateUserRoleDto): Promise<{
+        id: string;
+    }>;
+    addMsgToChannel(createMsgDto: createMessageChannelDto): Promise<{
         id: string;
     }>;
 }

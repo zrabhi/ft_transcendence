@@ -1,14 +1,16 @@
 import { 
     HttpException,
     HttpStatus,
-    Injectable, 
-    NotFoundException,
-    Param} from '@nestjs/common';
+    Injectable,
+    } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateChannelDto } from './dto/create-channel.dto';
 import { Role} from '@prisma/client';
 import { Response } from 'express';
-import { updateUserRoleDto } from './dto/update-UserRole.dto';
+import { 
+    CreateChannelDto, 
+    createMessageChannelDto, 
+    updateUserRoleDto, 
+    userBanMuteDto} from './dto/channel.dto';
 
 @Injectable()
 export class ChannelService {
@@ -27,6 +29,15 @@ export class ChannelService {
                         }
                     ]
                 },
+                restrictedUsers:{
+                    create:[
+                        {
+                            userId:createChannelDto.owner_id,
+                            isBanned:false,
+                            isMute:false,
+                        }
+                    ]
+                }
             },
             select:{id: true}
         })
@@ -132,6 +143,74 @@ export class ChannelService {
                 status: HttpStatus.BAD_REQUEST,
                 error: 'Invalid owner Id',
             }, HttpStatus.BAD_REQUEST, {
+                cause:error
+            });
+        }
+    }
+
+    // async banUser(userbanmuteDto:userBanMuteDto){
+    //     try{
+    //         await this.prismaService.userRole.findFirstOrThrow({
+    //             where:{
+    //                 userId:userbanmuteDto.banned_id,
+
+    //             }
+    //         })
+    //     }
+    //     catch(error)
+    //     {
+
+    //     }
+    // }
+
+    // async kickUser(userbanmuteDto:userBanMuteDto){
+    //     try
+    //     {
+
+    //         await this.removeUserfromChannel(userbanmuteDto.banned_id, userbanmuteDto.channel_id);
+    //     }
+    //     catch(error)
+    //     {
+
+    //     }
+    // }
+
+    async addMsgToChannel(createMsgDto:createMessageChannelDto){
+        try{
+            await this.prismaService.userRole.findFirstOrThrow({
+                where:{
+                    userId:createMsgDto.user_id,
+                    channelId:createMsgDto.channel_id
+                }
+            })
+            await this.prismaService.channelBlock.findFirstOrThrow({
+                where:{
+                    userId:createMsgDto.user_id,
+                    channelId:createMsgDto.channel_id,
+                    AND:[
+                        {isBanned:false},
+                        {isMute:false}
+                    ]
+                }
+            })
+            return await this.prismaService.channel_message.create({
+                data:{
+                    channel_id:createMsgDto.user_id,
+                    user_id:createMsgDto.user_id,
+                    content:createMsgDto.content
+                },
+                select:{
+                    id:true
+                }
+            })
+        }
+        catch(error)
+        {
+            console.log(error);
+            throw new HttpException({
+                status: HttpStatus.FORBIDDEN,
+                error: 'user cannot send message',
+            }, HttpStatus.FORBIDDEN, {
                 cause:error
             });
         }

@@ -129,9 +129,8 @@ model ChannelBlock{
   id        String @unique @default(uuid())
   userId    String
   channelId String
-  isBanned  Boolean
-  isKicked  Boolean
-  isMute    Boolean
+  isBanned  Boolean @default(false)
+  isMute    Boolean @default(false)
 
   user User @relation(fields: [userId], references:[id], name: "userChannelState", onDelete: Cascade)
   channel Channel @relation(fields: [channelId], references:[id], name: "restrictedUser", onDelete: Cascade)

@@ -30,6 +30,15 @@ let ChannelService = exports.ChannelService = class ChannelService {
                         }
                     ]
                 },
+                restrictedUsers: {
+                    create: [
+                        {
+                            userId: createChannelDto.owner_id,
+                            isBanned: false,
+                            isMute: false,
+                        }
+                    ]
+                }
             },
             select: { id: true }
         });
@@ -125,6 +134,45 @@ let ChannelService = exports.ChannelService = class ChannelService {
                 status: common_1.HttpStatus.BAD_REQUEST,
                 error: 'Invalid owner Id',
             }, common_1.HttpStatus.BAD_REQUEST, {
+                cause: error
+            });
+        }
+    }
+    async addMsgToChannel(createMsgDto) {
+        try {
+            await this.prismaService.userRole.findFirstOrThrow({
+                where: {
+                    userId: createMsgDto.user_id,
+                    channelId: createMsgDto.channel_id
+                }
+            });
+            await this.prismaService.channelBlock.findFirstOrThrow({
+                where: {
+                    userId: createMsgDto.user_id,
+                    channelId: createMsgDto.channel_id,
+                    AND: [
+                        { isBanned: false },
+                        { isMute: false }
+                    ]
+                }
+            });
+            return await this.prismaService.channel_message.create({
+                data: {
+                    channel_id: createMsgDto.user_id,
+                    user_id: createMsgDto.user_id,
+                    content: createMsgDto.content
+                },
+                select: {
+                    id: true
+                }
+            });
+        }
+        catch (error) {
+            console.log(error);
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.FORBIDDEN,
+                error: 'user cannot send message',
+            }, common_1.HttpStatus.FORBIDDEN, {
                 cause: error
             });
         }

@@ -1,33 +1,20 @@
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
-import { createMessageChannelDto } from './dto/create-Message-channel.dto';
+import { Response } from 'express';
 export declare class ChannelController {
     private channelService;
     constructor(channelService: ChannelService);
     createChannel(createChannelDto: CreateChannelDto): Promise<{
         id: string;
     }>;
-    getchannel(channelId: string): Promise<{
-        id: string;
-        name: string;
-        type: import(".prisma/client").$Enums.Type;
-        password: string;
-    }>;
-    deleteUserChannelDto(channelId: string): Promise<{
+    deleteChannel(channelId: string, res: Response): Promise<{
         id: string;
     }>;
-    getChannelMessages(channelId: string): Promise<{
+    leaveChannel(user_id: string, channelId: string): Promise<{
         id: string;
-        channel_id: string;
-        user_id: string;
-        content: string;
-        created_at: Date;
+    }>;
+    membersOfChannels(channelId: string): Promise<{
+        role: import(".prisma/client").$Enums.Role;
+        userId: string;
     }[]>;
-    addMessages(createMsgChanDto: createMessageChannelDto): Promise<{
-        id: string;
-        channel_id: string;
-        user_id: string;
-        content: string;
-        created_at: Date;
-    }>;
 }

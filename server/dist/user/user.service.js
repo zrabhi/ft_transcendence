@@ -41,13 +41,13 @@ let UserService = exports.UserService = class UserService {
     async addUser(createUserDto) {
         let exist = !!await this.prismaService.user.findFirst({
             where: {
-                username: createUserDto.username,
+                OR: [{ username: createUserDto.username }, { email: createUserDto.email }]
             }
         });
         if (exist) {
             throw new common_1.HttpException({
                 status: common_1.HttpStatus.FORBIDDEN,
-                error: `This Username:${createUserDto.username} already used`,
+                error: `This Username or email already used`,
             }, common_1.HttpStatus.FORBIDDEN, {});
         }
         createUserDto.password = await bcrypt.hash(createUserDto.password, 10);

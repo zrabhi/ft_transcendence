@@ -1,10 +1,15 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { 
+    HttpException,
+    HttpStatus,
+    Injectable, 
+    NotFoundException,
+    Param} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { Role} from '@prisma/client';
 import { createUserRoleDto } from './dto/create-UserRole.dto';
-import { blockChannelUserDto } from './dto/blockChannelUser.dto';
 import { createMessageChannelDto } from './dto/create-Message-channel.dto';
+import { Response } from 'express';
 
 @Injectable()
 export class ChannelService {
@@ -23,17 +28,12 @@ export class ChannelService {
                         }
                     ]
                 },
-                messages:{
-                },
-                restrictedUsers:{
-
-                }
             },
             select:{id: true}
         })
     }
 
-    async deleteChannelById(channelId:string){
+    async deleteChannelById(channelId:string, res:Response){
         try{
             return await this.prismaService.channel.delete({
                 where:{
@@ -43,78 +43,55 @@ export class ChannelService {
             })
         } catch(error)
         {
-            throw new HttpException({
-                status: HttpStatus.NO_CONTENT,
-                error: `There is no content for this channel Id`,
-            }, HttpStatus.NO_CONTENT, {
-            })
+            res.status(HttpStatus.NO_CONTENT).json({error: 'No Content For this User'});
         }
     }
 
-    async getAllChannelMembers(channelId:string){
+    async removeUserfromChannel(user_id:string, channel_id:string)
+    {
+        try{
+            const exist = await this.prismaService.userRole.findFirstOrThrow({
+                where:{
+                    userId:user_id,
+                    channelId:channel_id,
+                },
+                select:{
+                    id:true
+                }
+            })
+            if (exist)
+            {
+                return await this.prismaService.userRole.delete({
+                    where:{
+                        id:exist.id,
+                    },
+                    select:{
+                        id:true,
+                    }
+                })
+            }
+        }
+        catch (error)
+        {
+        throw new HttpException({
+            status: HttpStatus.NO_CONTENT,
+            error: 'There is no content for this User Role',
+        }, HttpStatus.NO_CONTENT, {
+            cause: error
+        });
+        }
+    }
+
+    async getMembersOfChannel(channelId:string)
+    {
         return await this.prismaService.userRole.findMany({
             where:{
                 channelId:channelId,
             },
-            select:{userId:true}
-        })
-    }
-
-    async addUserChannel(createUserRole:createUserRoleDto){
-        let exist = !!await this.prismaService.userRole.findFirst({
-            where: {
-                userId: createUserRole.userId,
-                channelId: createUserRole.channelId,
-            }
-        })
-
-        if (exist)
-        {
-            throw new HttpException({
-                status: HttpStatus.FORBIDDEN,
-                error: `This user is already registred in the channel`,
-            }, HttpStatus.FORBIDDEN)
-        }
-
-        return await this.prismaService.userRole.create({
-            data:{
-                userId:createUserRole.userId,
-                channelId: createUserRole.channelId,
-                role: createUserRole.role
-            },
             select:{
-                id:true
+                userId:true,
+                role:true,
             }
         })
     }
-
-    async getChannelById(channelId:string){
-        return await this.prismaService.channel.findFirst({
-            where:{
-                id:channelId,
-            }
-        })
-    }
-
-    async createMessage(createMsgChanDto:createMessageChannelDto){
-        return await this.prismaService.channel_message.create({
-            data:{
-                user_id:createMsgChanDto.user_id,
-                channel_id:createMsgChanDto.channel_id,
-                content:createMsgChanDto.content,
-            }
-        })
-    }
-
-    async getMessagesByChannelId(channelId:string){
-        return await this.prismaService.channel_message.findMany({
-            where:{
-                channel_id:channelId,
-            },
-            orderBy:{
-                created_at:'desc',
-            }
-        })
-    }
-
 }

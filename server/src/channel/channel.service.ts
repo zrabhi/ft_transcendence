@@ -7,9 +7,8 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { Role} from '@prisma/client';
-import { createUserRoleDto } from './dto/create-UserRole.dto';
-import { createMessageChannelDto } from './dto/create-Message-channel.dto';
 import { Response } from 'express';
+import { updateUserRoleDto } from './dto/update-UserRole.dto';
 
 @Injectable()
 export class ChannelService {
@@ -93,5 +92,48 @@ export class ChannelService {
                 role:true,
             }
         })
+    }
+
+    async updateUserRole(channelId:string, updateUserRoleDto:updateUserRoleDto){
+        try{
+            const owner = await this.prismaService.userRole.findFirstOrThrow({
+                where:{
+                    userId:updateUserRoleDto.owner_id,
+                    channelId:channelId,
+                }
+            })
+            const exist = await this.prismaService.userRole.findFirstOrThrow({
+                where:{
+                    channelId:channelId,
+                    userId:updateUserRoleDto.user_id
+                },
+                select:{
+                    id:true
+                }
+            })
+            if (exist)
+            {
+                return await this.prismaService.userRole.update({
+                    where:{
+                        id:exist.id,
+                    },
+                    data:{
+                        role:updateUserRoleDto.role,
+                    },
+                    select:{
+                        id:true
+                    }
+                })
+            }
+        }
+        catch(error)
+        {
+            throw new HttpException({
+                status: HttpStatus.BAD_REQUEST,
+                error: 'Invalid owner Id',
+            }, HttpStatus.BAD_REQUEST, {
+                cause:error
+            });
+        }
     }
 }

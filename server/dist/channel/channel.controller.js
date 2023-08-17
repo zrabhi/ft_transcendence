@@ -16,6 +16,7 @@ exports.ChannelController = void 0;
 const common_1 = require("@nestjs/common");
 const channel_service_1 = require("./channel.service");
 const create_channel_dto_1 = require("./dto/create-channel.dto");
+const update_UserRole_dto_1 = require("./dto/update-UserRole.dto");
 let ChannelController = exports.ChannelController = class ChannelController {
     constructor(channelService) {
         this.channelService = channelService;
@@ -31,6 +32,9 @@ let ChannelController = exports.ChannelController = class ChannelController {
     }
     async membersOfChannels(channelId) {
         return await this.channelService.getMembersOfChannel(channelId);
+    }
+    async setRole(channelId, updateUserRoleDto) {
+        return await this.channelService.updateUserRole(channelId, updateUserRoleDto);
     }
 };
 __decorate([
@@ -62,6 +66,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "membersOfChannels", null);
+__decorate([
+    (0, common_1.Patch)('/:channelId/role'),
+    __param(0, (0, common_1.Param)('channelId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_UserRole_dto_1.updateUserRoleDto]),
+    __metadata("design:returntype", Promise)
+], ChannelController.prototype, "setRole", null);
 exports.ChannelController = ChannelController = __decorate([
     (0, common_1.Controller)('api/channels'),
     __metadata("design:paramtypes", [channel_service_1.ChannelService])

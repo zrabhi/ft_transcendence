@@ -89,6 +89,46 @@ let ChannelService = exports.ChannelService = class ChannelService {
             }
         });
     }
+    async updateUserRole(channelId, updateUserRoleDto) {
+        try {
+            const owner = await this.prismaService.userRole.findFirstOrThrow({
+                where: {
+                    userId: updateUserRoleDto.owner_id,
+                    channelId: channelId,
+                }
+            });
+            const exist = await this.prismaService.userRole.findFirstOrThrow({
+                where: {
+                    channelId: channelId,
+                    userId: updateUserRoleDto.user_id
+                },
+                select: {
+                    id: true
+                }
+            });
+            if (exist) {
+                return await this.prismaService.userRole.update({
+                    where: {
+                        id: exist.id,
+                    },
+                    data: {
+                        role: updateUserRoleDto.role,
+                    },
+                    select: {
+                        id: true
+                    }
+                });
+            }
+        }
+        catch (error) {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.BAD_REQUEST,
+                error: 'Invalid owner Id',
+            }, common_1.HttpStatus.BAD_REQUEST, {
+                cause: error
+            });
+        }
+    }
 };
 exports.ChannelService = ChannelService = __decorate([
     (0, common_1.Injectable)(),

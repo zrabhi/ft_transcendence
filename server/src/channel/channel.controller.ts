@@ -4,10 +4,14 @@ import {
     Delete, 
     Get, 
     Param,
+    Patch,
     Post } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { Response } from 'express';
+import { Role } from '@prisma/client';
+import { updateUserRoleDto } from './dto/update-UserRole.dto';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
 
 @Controller('api/channels')
 export class ChannelController {
@@ -36,5 +40,10 @@ export class ChannelController {
     @Get('/:channelId/members')
     async membersOfChannels(@Param('channelId') channelId:string){
         return await this.channelService.getMembersOfChannel(channelId);
+    }
+
+    @Patch('/:channelId/role')
+    async setRole(@Param('channelId') channelId:string, @Body() updateUserRoleDto:updateUserRoleDto){
+        return await this.channelService.updateUserRole(channelId, updateUserRoleDto);
     }
 }

@@ -25,7 +25,7 @@ export declare class updateUserRoleDto {
     role: Role;
 }
 export declare class userBanMuteDto {
-    baner_id: string;
+    banner_id: string;
     banned_id: string;
     channel_id: string;
 }

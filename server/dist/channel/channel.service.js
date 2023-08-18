@@ -138,6 +138,105 @@ let ChannelService = exports.ChannelService = class ChannelService {
             });
         }
     }
+    async checkUserAvailability(userId) {
+        const user = await this.prismaService.userRole.findFirstOrThrow({
+            where: {
+                userId: userId,
+            }
+        });
+        return (user);
+    }
+    banMutePossibility(bannerRole, bannedRole) {
+        if (bannerRole == client_1.Role.MEMBER)
+            return (false);
+        if (bannerRole == client_1.Role.ADMIN && bannedRole == client_1.Role.OWNER)
+            return (false);
+        return true;
+    }
+    async function(userbanmuteDto) {
+        const banner = await this.checkUserAvailability(userbanmuteDto.banner_id);
+        const banned = await this.checkUserAvailability(userbanmuteDto.banned_id);
+        if (banner.channelId !== banned.channelId) {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.BAD_REQUEST,
+                error: "users belongs to two Different channelIds",
+            }, common_1.HttpStatus.BAD_REQUEST);
+        }
+        if (!this.banMutePossibility(banner.role, banned.role)) {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.BAD_REQUEST,
+                error: "You have not the privilege to ban this User",
+            }, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async muteUser(userbanmuteDto) {
+        this.function(userbanmuteDto);
+        try {
+            return await this.prismaService.channelBlock.create({
+                data: {
+                    isMute: true,
+                    user: {
+                        connect: {
+                            id: userbanmuteDto.banned_id,
+                        }
+                    },
+                    channel: {
+                        connect: {
+                            id: userbanmuteDto.channel_id
+                        }
+                    }
+                },
+                select: {
+                    id: true,
+                }
+            });
+        }
+        catch (error) {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.BAD_REQUEST,
+                error: "users provided are not founds",
+            }, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async unmuteUser(channelBlockId) {
+        await this.prismaService.channelBlock.update({
+            where: {
+                id: channelBlockId
+            },
+            data: {
+                isMute: false,
+            }
+        });
+    }
+    async banUser(userbanmuteDto) {
+        this.function(userbanmuteDto);
+        try {
+            return await this.prismaService.channelBlock.create({
+                data: {
+                    isBanned: true,
+                    user: {
+                        connect: {
+                            id: userbanmuteDto.banned_id,
+                        }
+                    },
+                    channel: {
+                        connect: {
+                            id: userbanmuteDto.channel_id
+                        }
+                    }
+                },
+                select: {
+                    id: true,
+                }
+            });
+        }
+        catch (error) {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.BAD_REQUEST,
+                error: "users provided are not founds",
+            }, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
     async addMsgToChannel(createMsgDto) {
         try {
             await this.prismaService.userRole.findFirstOrThrow({

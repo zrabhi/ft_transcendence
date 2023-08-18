@@ -98,7 +98,7 @@ exports.userBanMuteDto = userBanMuteDto;
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
-], userBanMuteDto.prototype, "baner_id", void 0);
+], userBanMuteDto.prototype, "banner_id", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)

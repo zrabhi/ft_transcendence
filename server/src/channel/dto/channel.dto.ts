@@ -63,7 +63,7 @@ export class updateUserRoleDto{
 
 export class userBanMuteDto{
     @IsNotEmpty()
-    baner_id:string
+    banner_id:string
 
     @IsNotEmpty()
     banned_id:string

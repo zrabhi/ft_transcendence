@@ -16,6 +16,7 @@ exports.ChannelController = void 0;
 const common_1 = require("@nestjs/common");
 const channel_service_1 = require("./channel.service");
 const channel_dto_1 = require("./dto/channel.dto");
+const timers_1 = require("timers");
 let ChannelController = exports.ChannelController = class ChannelController {
     constructor(channelService) {
         this.channelService = channelService;
@@ -34,6 +35,13 @@ let ChannelController = exports.ChannelController = class ChannelController {
     }
     async setRole(channelId, updateUserRoleDto) {
         return await this.channelService.updateUserRole(channelId, updateUserRoleDto);
+    }
+    async banUser(userBanMuteDto) {
+        return await this.channelService.banUser(userBanMuteDto);
+    }
+    async muteUser(userBanMuteDto) {
+        const channelMutedId = await this.channelService.muteUser(userBanMuteDto);
+        (0, timers_1.setTimeout)(this.channelService.unmuteUser(channelMutedId.id).then, 30000);
     }
     async createMessage(createMsgDto) {
         return await this.channelService.addMsgToChannel(createMsgDto);
@@ -79,6 +87,20 @@ __decorate([
     __metadata("design:paramtypes", [String, channel_dto_1.updateUserRoleDto]),
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "setRole", null);
+__decorate([
+    (0, common_1.Post)('/ban'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [channel_dto_1.userBanMuteDto]),
+    __metadata("design:returntype", Promise)
+], ChannelController.prototype, "banUser", null);
+__decorate([
+    (0, common_1.Post)('/mute'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [channel_dto_1.userBanMuteDto]),
+    __metadata("design:returntype", Promise)
+], ChannelController.prototype, "muteUser", null);
 __decorate([
     (0, common_1.Post)('/messages'),
     __param(0, (0, common_1.Body)()),

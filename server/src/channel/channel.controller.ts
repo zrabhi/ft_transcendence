@@ -14,6 +14,7 @@ import {
     createMessageChannelDto, 
     updateUserRoleDto, 
     userBanMuteDto} from './dto/channel.dto';
+import { setTimeout } from 'timers';
 
 @Controller('api/channels')
 export class ChannelController {
@@ -59,15 +60,16 @@ export class ChannelController {
     //     return await this.channelService.
     // }
 
-    // @Post('/ban')
-    // async banUser(@Body() userBanMuteDto:userBanMuteDto){
+    @Post('/ban')
+    async banUser(@Body() userBanMuteDto:userBanMuteDto){
+        return await this.channelService.banUser(userBanMuteDto);
+    }
 
-    // }
-
-    // @Post('/Mute')
-    // async muteUser(@Body() userBanDto:userBanDto){
-
-    // }
+    @Post('/mute')
+    async muteUser(@Body() userBanMuteDto:userBanMuteDto){
+        const channelMutedId = await this.channelService.muteUser(userBanMuteDto);
+        setTimeout(this.channelService.unmuteUser(channelMutedId.id).then, 30000);
+    }
 
     @Post('/messages')
     async createMessage(@Body() createMsgDto:createMessageChannelDto){

@@ -1,6 +1,6 @@
 import { ChannelService } from './channel.service';
 import { Response } from 'express';
-import { CreateChannelDto, createMessageChannelDto, updateUserRoleDto } from './dto/channel.dto';
+import { CreateChannelDto, createMessageChannelDto, updateUserRoleDto, userBanMuteDto } from './dto/channel.dto';
 export declare class ChannelController {
     private channelService;
     constructor(channelService: ChannelService);
@@ -20,6 +20,10 @@ export declare class ChannelController {
     setRole(channelId: string, updateUserRoleDto: updateUserRoleDto): Promise<{
         id: string;
     }>;
+    banUser(userBanMuteDto: userBanMuteDto): Promise<{
+        id: string;
+    }>;
+    muteUser(userBanMuteDto: userBanMuteDto): Promise<void>;
     createMessage(createMsgDto: createMessageChannelDto): Promise<{
         id: string;
     }>;

@@ -6,9 +6,6 @@ export declare class ChannelService {
     constructor(prismaService: PrismaService);
     addChannel(createChannelDto: CreateChannelDto): Promise<{
         id: string;
-        name: string;
-        type: import(".prisma/client").$Enums.Type;
-        password: string;
     }>;
     deleteChannelById(channelId: string, res: Response): Promise<{
         id: string;
@@ -26,4 +23,5 @@ export declare class ChannelService {
     addMsgToChannel(createMsgDto: createMessageChannelDto): Promise<{
         id: string;
     }>;
+    getChannelMessagesById(channelId: string): Promise<void>;
 }

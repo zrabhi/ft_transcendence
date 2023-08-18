@@ -73,4 +73,9 @@ export class ChannelController {
     async createMessage(@Body() createMsgDto:createMessageChannelDto){
         return await this.channelService.addMsgToChannel(createMsgDto);
     }
+
+    @Get('/messages/:channelId')
+    async ChannelMessages(@Param('channelId') channelId:string){
+        return await this.channelService.getChannelMessagesById(channelId);
+    }
 }

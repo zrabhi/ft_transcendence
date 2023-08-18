@@ -2,6 +2,7 @@ import {
     HttpException,
     HttpStatus,
     Injectable,
+    Param,
     } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Role} from '@prisma/client';
@@ -37,7 +38,8 @@ export class ChannelService {
                             isMute:false,
                         }
                     ]
-                }
+                },
+
             },
             select:{id: true}
         })
@@ -195,9 +197,17 @@ export class ChannelService {
             })
             return await this.prismaService.channel_message.create({
                 data:{
-                    channel_id:createMsgDto.user_id,
-                    user_id:createMsgDto.user_id,
-                    content:createMsgDto.content
+                    content:createMsgDto.content,
+                    user:{
+                        connect:{
+                            id:createMsgDto.user_id
+                        }
+                    },
+                    channel:{
+                        connect:{
+                            id:createMsgDto.channel_id
+                        }
+                    }
                 },
                 select:{
                     id:true
@@ -206,13 +216,30 @@ export class ChannelService {
         }
         catch(error)
         {
-            console.log(error);
             throw new HttpException({
                 status: HttpStatus.FORBIDDEN,
                 error: 'user cannot send message',
             }, HttpStatus.FORBIDDEN, {
                 cause:error
             });
+        }
+    }
+
+    async getChannelMessagesById(channelId:string){
+        const messages = await this.prismaService.channel_message.findMany({
+            where:{
+                channel_id:channelId
+            },
+            orderBy:{
+                created_at:'desc',
+            }
+        })
+        if (JSON.stringify(messages) === '[]')
+        {
+            throw new HttpException({
+                status: HttpStatus.NOT_FOUND,
+                error: 'messages not found',
+            }, HttpStatus.NOT_FOUND);
         }
     }
 }

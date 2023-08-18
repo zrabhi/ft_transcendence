@@ -38,7 +38,7 @@ let ChannelService = exports.ChannelService = class ChannelService {
                             isMute: false,
                         }
                     ]
-                }
+                },
             },
             select: { id: true }
         });
@@ -158,9 +158,17 @@ let ChannelService = exports.ChannelService = class ChannelService {
             });
             return await this.prismaService.channel_message.create({
                 data: {
-                    channel_id: createMsgDto.user_id,
-                    user_id: createMsgDto.user_id,
-                    content: createMsgDto.content
+                    content: createMsgDto.content,
+                    user: {
+                        connect: {
+                            id: createMsgDto.user_id
+                        }
+                    },
+                    channel: {
+                        connect: {
+                            id: createMsgDto.channel_id
+                        }
+                    }
                 },
                 select: {
                     id: true
@@ -168,13 +176,28 @@ let ChannelService = exports.ChannelService = class ChannelService {
             });
         }
         catch (error) {
-            console.log(error);
             throw new common_1.HttpException({
                 status: common_1.HttpStatus.FORBIDDEN,
                 error: 'user cannot send message',
             }, common_1.HttpStatus.FORBIDDEN, {
                 cause: error
             });
+        }
+    }
+    async getChannelMessagesById(channelId) {
+        const messages = await this.prismaService.channel_message.findMany({
+            where: {
+                channel_id: channelId
+            },
+            orderBy: {
+                created_at: 'desc',
+            }
+        });
+        if (JSON.stringify(messages) === '[]') {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.NOT_FOUND,
+                error: 'messages not found',
+            }, common_1.HttpStatus.NOT_FOUND);
         }
     }
 };

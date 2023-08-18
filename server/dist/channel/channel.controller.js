@@ -38,6 +38,9 @@ let ChannelController = exports.ChannelController = class ChannelController {
     async createMessage(createMsgDto) {
         return await this.channelService.addMsgToChannel(createMsgDto);
     }
+    async ChannelMessages(channelId) {
+        return await this.channelService.getChannelMessagesById(channelId);
+    }
 };
 __decorate([
     (0, common_1.Post)('/'),
@@ -83,6 +86,13 @@ __decorate([
     __metadata("design:paramtypes", [channel_dto_1.createMessageChannelDto]),
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "createMessage", null);
+__decorate([
+    (0, common_1.Get)('/messages/:channelId'),
+    __param(0, (0, common_1.Param)('channelId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ChannelController.prototype, "ChannelMessages", null);
 exports.ChannelController = ChannelController = __decorate([
     (0, common_1.Controller)('api/channels'),
     __metadata("design:paramtypes", [channel_service_1.ChannelService])

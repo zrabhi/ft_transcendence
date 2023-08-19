@@ -262,17 +262,20 @@ export class ChannelService {
         }
     }
 
-    // async kickUser(userbanmuteDto:userBanMuteDto){
-    //     try
-    //     {
-
-    //         await this.removeUserfromChannel(userbanmuteDto.banned_id, userbanmuteDto.channel_id);
-    //     }
-    //     catch(error)
-    //     {
-
-    //     }
-    // }
+    async kickUser(userbanmuteDto:userBanMuteDto){
+        this.function(userbanmuteDto);
+        try
+        {
+            return await this.removeUserfromChannel(userbanmuteDto.banned_id, userbanmuteDto.channel_id);
+        }
+        catch(error)
+        {
+            throw new HttpException({
+                status: HttpStatus.FORBIDDEN,
+                error:"You cannot kick This User", 
+            }, HttpStatus.FORBIDDEN);
+        }
+    }
 
     async addMsgToChannel(createMsgDto:createMessageChannelDto){
         try{

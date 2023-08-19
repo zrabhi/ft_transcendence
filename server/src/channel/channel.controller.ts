@@ -8,7 +8,6 @@ import {
     Post } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { Response } from 'express';
-import { Role } from '@prisma/client';
 import { 
     CreateChannelDto, 
     createMessageChannelDto, 
@@ -30,11 +29,6 @@ export class ChannelController {
         return await this.channelService.deleteChannelById(channelId, res);
     }
 
-    // @Post('/:channelId')
-    // async joinChannel(){
-    //     return await 
-    // }
-
     @Delete('/:channelId/:user_id')
     async leaveChannel(@Param('user_id') user_id:string, @Param('channelId') channelId:string){
         return await this.channelService.removeUserfromChannel(user_id, channelId);
@@ -50,15 +44,10 @@ export class ChannelController {
         return await this.channelService.updateUserRole(channelId, updateUserRoleDto);
     }
 
-    // @Patch('/ban')
-    // async banUser(@Body() userbanmuteDto:userBanMuteDto){
-    //     return await this.channelService
-    // }
-
-    // @Patch('/kick')
-    // async kickUser(@Body() userBanMuteDto:userBanMuteDto){
-    //     return await this.channelService.
-    // }
+    @Patch('/kick')
+    async kickUser(@Body() userBanMuteDto:userBanMuteDto){
+        return await this.channelService.kickUser(userBanMuteDto);
+    }
 
     @Post('/ban')
     async banUser(@Body() userBanMuteDto:userBanMuteDto){
@@ -68,7 +57,7 @@ export class ChannelController {
     @Post('/mute')
     async muteUser(@Body() userBanMuteDto:userBanMuteDto){
         const channelMutedId = await this.channelService.muteUser(userBanMuteDto);
-        setTimeout(this.channelService.unmuteUser(channelMutedId.id).then, 30000);
+        setTimeout(async () => { await this.channelService.unmuteUser(channelMutedId.id)}, 30000);
     }
 
     @Post('/messages')

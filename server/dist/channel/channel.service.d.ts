@@ -31,6 +31,9 @@ export declare class ChannelService {
     banUser(userbanmuteDto: userBanMuteDto): Promise<{
         id: string;
     }>;
+    kickUser(userbanmuteDto: userBanMuteDto): Promise<{
+        id: string;
+    }>;
     addMsgToChannel(createMsgDto: createMessageChannelDto): Promise<{
         id: string;
     }>;

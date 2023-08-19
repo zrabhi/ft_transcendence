@@ -237,6 +237,18 @@ let ChannelService = exports.ChannelService = class ChannelService {
             }, common_1.HttpStatus.BAD_REQUEST);
         }
     }
+    async kickUser(userbanmuteDto) {
+        this.function(userbanmuteDto);
+        try {
+            return await this.removeUserfromChannel(userbanmuteDto.banned_id, userbanmuteDto.channel_id);
+        }
+        catch (error) {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.FORBIDDEN,
+                error: "You cannot kick This User",
+            }, common_1.HttpStatus.FORBIDDEN);
+        }
+    }
     async addMsgToChannel(createMsgDto) {
         try {
             await this.prismaService.userRole.findFirstOrThrow({

@@ -20,6 +20,9 @@ export declare class ChannelController {
     setRole(channelId: string, updateUserRoleDto: updateUserRoleDto): Promise<{
         id: string;
     }>;
+    kickUser(userBanMuteDto: userBanMuteDto): Promise<{
+        id: string;
+    }>;
     banUser(userBanMuteDto: userBanMuteDto): Promise<{
         id: string;
     }>;

@@ -36,12 +36,15 @@ let ChannelController = exports.ChannelController = class ChannelController {
     async setRole(channelId, updateUserRoleDto) {
         return await this.channelService.updateUserRole(channelId, updateUserRoleDto);
     }
+    async kickUser(userBanMuteDto) {
+        return await this.channelService.kickUser(userBanMuteDto);
+    }
     async banUser(userBanMuteDto) {
         return await this.channelService.banUser(userBanMuteDto);
     }
     async muteUser(userBanMuteDto) {
         const channelMutedId = await this.channelService.muteUser(userBanMuteDto);
-        (0, timers_1.setTimeout)(this.channelService.unmuteUser(channelMutedId.id).then, 30000);
+        (0, timers_1.setTimeout)(async () => { await this.channelService.unmuteUser(channelMutedId.id); }, 30000);
     }
     async createMessage(createMsgDto) {
         return await this.channelService.addMsgToChannel(createMsgDto);
@@ -87,6 +90,13 @@ __decorate([
     __metadata("design:paramtypes", [String, channel_dto_1.updateUserRoleDto]),
     __metadata("design:returntype", Promise)
 ], ChannelController.prototype, "setRole", null);
+__decorate([
+    (0, common_1.Patch)('/kick'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [channel_dto_1.userBanMuteDto]),
+    __metadata("design:returntype", Promise)
+], ChannelController.prototype, "kickUser", null);
 __decorate([
     (0, common_1.Post)('/ban'),
     __param(0, (0, common_1.Body)()),

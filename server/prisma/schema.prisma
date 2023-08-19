@@ -18,7 +18,7 @@ model User {
   avatar               String   @default("../resources/avatar.png")
   cover                String   @default("../resources/cover.png")
   status               Status   @default(ONLINE)
-  country              String
+  country              String?
   win                  Int      @default(0)
   loss                 Int      @default(0)
   ladder_level         Int      @default(0)
@@ -46,7 +46,7 @@ model User {
 }
 
 model Match {
-  id           Int      @unique @default(autoincrement())
+  id           String      @unique @default(uuid())
   winner_id    String
   loser_id     String
   winner_score Int
@@ -58,8 +58,8 @@ model Match {
 }
 
 model Achievement{
-  id Int @unique @default(autoincrement())
-  userId String @unique
+  id                   String @unique @default(uuid())
+  userId               String @unique
   accountCreationAchie Boolean
   firstFriendAchie     Boolean  @default(false)
   firstGameAchie       Boolean  @default(false)
@@ -72,7 +72,7 @@ model Achievement{
 }
 
 model Friend {
-  id          Int      @unique @default(autoincrement())
+  id          String      @unique @default(uuid())
   sender_id   String
   reciever_id String
   state    State  
@@ -83,7 +83,7 @@ model Friend {
 }
 
 model Message {
-  id          Int      @unique @default(autoincrement())
+  id          String      @unique @default(uuid())
   sender_id   String
   reciever_id String
   content     String
@@ -94,47 +94,46 @@ model Message {
 }
 
 model Channel {
-  id   Int    @unique @default(autoincrement())
-  name String
-  type Type
-  password String
+  id       String    @unique @default(uuid())
+  name     String
+  type     Type
+  password String?
 
   messages Channel_message[] @relation("message")
-  roles UserRole[] @relation(name: "channelUser")
+  roles    UserRole[] @relation(name: "channelUser")
   restrictedUsers ChannelBlock[] @relation(name: "restrictedUser")
 }
 
 model Channel_message {
-  id         Int      @unique @default(autoincrement())
-  channel_id Int
+  id         String      @unique @default(uuid())
+  channel_id String
   user_id    String
   content    String
   created_at DateTime @default(now())
 
-  user    User    @relation(fields: [user_id], references: [id], name: "channelMessage")
-  channel Channel @relation(fields: [channel_id], references: [id], name: "message")
+  user    User    @relation(fields: [user_id], references: [id], name: "channelMessage", onDelete: Cascade)
+  channel Channel @relation(fields: [channel_id], references: [id], name: "message", onDelete: Cascade)
 }
 
 model UserRole{
-  id Int @unique @default(autoincrement())
-  userId String
-  channelId Int
+  id        String @unique @default(uuid())
+  userId    String
+  channelId String
   role Role
 
-  user User @relation(fields: [userId], references:[id], name: "userRole")
-  channel Channel @relation(fields: [channelId], references:[id], name: "channelUser")
+  user User @relation(fields: [userId], references:[id], name: "userRole", onDelete: Cascade)
+  channel Channel @relation(fields: [channelId], references:[id], name: "channelUser", onDelete: Cascade)
 }
 
 model ChannelBlock{
-  id Int @unique @default(autoincrement())
-  userId String
-  channelId Int
-  isBanned Boolean
-  isKicked Boolean
-  isMute Boolean
+  id        String @unique @default(uuid())
+  userId    String
+  channelId String
+  isBanned  Boolean @default(false)
+  isMute    Boolean @default(false)
 
-  user User @relation(fields: [userId], references:[id], name: "userChannelState")
-  channel Channel @relation(fields: [channelId], references:[id], name: "restrictedUser")
+  user User @relation(fields: [userId], references:[id], name: "userChannelState", onDelete: Cascade)
+  channel Channel @relation(fields: [channelId], references:[id], name: "restrictedUser", onDelete: Cascade)
 }
 
 enum State {

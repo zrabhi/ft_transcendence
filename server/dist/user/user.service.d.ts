@@ -16,6 +16,6 @@ export declare class UserService {
     achievementById(user_id: string): Promise<Achievement>;
     getMatchesByUserId(user_id: string): Promise<Match[]>;
     createMatch(createMatchDto: CreateMatchDto): Promise<{
-        id: number;
+        id: string;
     }>;
 }

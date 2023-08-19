@@ -1,40 +1,41 @@
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateChannelDto } from './dto/create-channel.dto';
-import { createUserRoleDto } from './dto/create-UserRole.dto';
-import { createMessageChannelDto } from './dto/create-Message-channel.dto';
+import { UserRole } from '@prisma/client';
+import { Response } from 'express';
+import { CreateChannelDto, createMessageChannelDto, updateUserRoleDto, userBanMuteDto } from './dto/channel.dto';
 export declare class ChannelService {
     private prismaService;
     constructor(prismaService: PrismaService);
     addChannel(createChannelDto: CreateChannelDto): Promise<{
         id: string;
     }>;
-    deleteChannelById(channelId: string): Promise<{
+    deleteChannelById(channelId: string, res: Response): Promise<{
         id: string;
     }>;
-    getAllChannelMembers(channelId: string): Promise<{
+    removeUserfromChannel(user_id: string, channel_id: string): Promise<{
+        id: string;
+    }>;
+    getMembersOfChannel(channelId: string): Promise<{
+        role: import(".prisma/client").$Enums.Role;
         userId: string;
     }[]>;
-    addUserChannel(createUserRole: createUserRoleDto): Promise<{
+    updateUserRole(channelId: string, updateUserRoleDto: updateUserRoleDto): Promise<{
         id: string;
     }>;
-    getChannelById(channelId: string): Promise<{
+    checkUserAvailability(userId: string): Promise<UserRole>;
+    banMutePossibility(bannerRole: string, bannedRole: string): Boolean;
+    function(userbanmuteDto: userBanMuteDto): Promise<void>;
+    muteUser(userbanmuteDto: userBanMuteDto): Promise<{
         id: string;
-        name: string;
-        type: import(".prisma/client").$Enums.Type;
-        password: string;
     }>;
-    createMessage(createMsgChanDto: createMessageChannelDto): Promise<{
+    unmuteUser(channelBlockId: string): Promise<void>;
+    banUser(userbanmuteDto: userBanMuteDto): Promise<{
         id: string;
-        channel_id: string;
-        user_id: string;
-        content: string;
-        created_at: Date;
     }>;
-    getMessagesByChannelId(channelId: string): Promise<{
+    kickUser(userbanmuteDto: userBanMuteDto): Promise<{
         id: string;
-        channel_id: string;
-        user_id: string;
-        content: string;
-        created_at: Date;
-    }[]>;
+    }>;
+    addMsgToChannel(createMsgDto: createMessageChannelDto): Promise<{
+        id: string;
+    }>;
+    getChannelMessagesById(channelId: string): Promise<void>;
 }

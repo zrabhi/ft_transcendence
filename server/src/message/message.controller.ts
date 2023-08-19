@@ -16,7 +16,7 @@ export class MessageController {
         return await this.messageService.getAllMessage();
     }
 
-    @Get('/:userId')
+    @Get('/:userId') // change it to username
     async getMessageByUserId(@Param('userId') userId:string){
         return await this.messageService.getMessageById(userId);
     }

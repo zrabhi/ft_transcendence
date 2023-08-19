@@ -16,6 +16,6 @@ export declare class UserController {
     getUserAchievement(user_id: string): Promise<Achievement>;
     getMatches(user_id: string): Promise<Match[]>;
     createMatch(createMatchDto: CreateMatchDto): Promise<{
-        id: number;
+        id: string;
     }>;
 }

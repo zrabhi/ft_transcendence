@@ -33,14 +33,14 @@ export class UserService {
     async addUser(createUserDto:CreateUserDto){
         let exist = !!await this.prismaService.user.findFirst({
             where: {
-                username: createUserDto.username,
+                OR:[{username: createUserDto.username}, {email: createUserDto.email}]
             }
         })
         if (exist)
         {
             throw new HttpException({
                 status: HttpStatus.FORBIDDEN,
-                error: `This Username:${createUserDto.username} already used`,
+                error: `This Username or email already used`,
             }, HttpStatus.FORBIDDEN, {
             })
         }

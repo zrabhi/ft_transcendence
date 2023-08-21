@@ -10,7 +10,7 @@ import { GoogleStrategy } from './auth/utils/GoogleStrategy';
 @Module({
 
   imports: [UserModule, PrismaModule, ChannelModule, MessageModule, AppModule, AuthModule],
-  controllers: [AuthController],
+  controllers: [],
 })
 
 export class AppModule {}

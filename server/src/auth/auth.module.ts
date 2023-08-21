@@ -5,10 +5,11 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthService } from './auth.service';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [ConfigModule.forRoot()],
-  providers: [GoogleStrategy, PrismaService, AuthService],
+  providers: [GoogleStrategy, PrismaService, AuthService, UserService],
   exports: [AuthService],
   controllers: [AuthController],
 })

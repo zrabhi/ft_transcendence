@@ -1,13 +1,16 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { GoogleStrategy } from './GoogleStrategy';
-import { GoogleAuthGuard } from './Guards';
-
+import { GoogleStrategy } from './utils/GoogleStrategy';
+import { PassportModule } from '@nestjs/passport';
+import { ConfigModule } from '@nestjs/config';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { AuthService } from './auth.service';
 
 @Module({
-  providers: [GoogleStrategy],
+  imports: [ConfigModule.forRoot()],
+  providers: [GoogleStrategy, PrismaService, AuthService],
+  exports: [AuthService],
   controllers: [AuthController],
 })
 
 export class AuthModule {}
-

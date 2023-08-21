@@ -5,9 +5,11 @@ import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
+import { GoogleStrategy } from './auth/utils/GoogleStrategy';
 
 @Module({
-  imports: [UserModule, PrismaModule, ChannelModule, MessageModule, AppModule],
+
+  imports: [UserModule, PrismaModule, ChannelModule, MessageModule, AppModule, AuthModule],
   controllers: [AuthController],
 })
 

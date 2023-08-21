@@ -1,19 +1,41 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { GoogleAuthGuard } from './Guards';
+import { Controller, Get, Req, Request, UseGuards } from '@nestjs/common';
+import { GoogleAuthGuard } from './utils/GoogleGuard';
+import passport from 'passport';
+import { AuthService } from './auth.service';
+import { GoogleStrategy } from './utils/GoogleStrategy';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('/api/auth')
 export class AuthController {
+  constructor(private authService: AuthService)
+  {
+
+  }
 
     @Get('google/login')
-    // @UseGuards(GoogleAuthGuard)
+    @UseGuards(GoogleAuthGuard)
     handleLogin()
     {
-        return {msg: "lGoogle authentification"}
+        return ;
+        // passport.authenticate('google', {
+        //     scope: ['profile']
+        // })
+        // return {msg: "lGoogle authentification"}
     }
-    @Get('google/redirect')
-    handleRedirect()
+
+    @Get('42/login')
+    handle42login()
     {
-        return ({msg:"OK"})
+        return ({msg: "42 login"})
+    }
+ // redirect fo 42 get request
+
+    @Get('google/redirect')
+    @UseGuards(GoogleAuthGuard)
+    handleRedirect(@Request() request)
+    {
+        // this.authService.signup(request);
+
+        return {}
     }
 }
-

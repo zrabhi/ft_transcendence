@@ -10,59 +10,136 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id Int @id @default(autoincrement())
-  username String @unique
-  password String
-  avatar  String
-  status  Status @default(OFFLINE)
-  win Int
-  loss  Int
-  ladder_level  Int
-  created_date  DateTime @default(now())
-  realtionSent Relation[] @relation("RelationPart1")
-  realtionRecieved Relation[] @relation("RelationPart2")
-  messagesSent  Message[] @relation("MessagesSent")
-  messagesReceived  Message[] @relation("MessagesReceived")
+  id                   String   @unique @default(uuid())
+  email                String   @unique
+  username             String   @unique
+  password             String
+  avatar               String   @default("../resources/avatar.png")
+  cover                String   @default("../resources/cover.png")
+  status               Status   @default(ONLINE)
+  country              String?
+  win                  Int      @default(0)
+  loss                 Int      @default(0)
+  ladder_level         Int      @default(0)
+  xp                   Int      @default(50)
+  totalGames           Int      @default(0)
+  discordHandler       String?
+  twitterHandler       String?
+  created_date         DateTime @default(now())
+
+  channelMessages Channel_message[] @relation(name: "channelMessage")
+
+  messagesSended   Message[] @relation(name: "messageSended")
+  messagesRecieved Message[] @relation(name: "messageRecieved")
+
+  matchWon Match[] @relation(name: "MatchWon")
+  matchLost  Match[] @relation(name: "MatchLost")
+
+  friendRequest Friend[] @relation(name: "friendRequest")
+  friendRecieve Friend[] @relation(name: "friendRecieve")
+
+  achievement Achievement?
+
+  roles UserRole[] @relation(name:"userRole")
+  channelState ChannelBlock[] @relation(name:"userChannelState")
 }
 
-model Achievement {
-  id Int @id @default(autoincrement())
-  user_id Int
-  achievement_one String
-  achievement_two String
-  achievement_three String
-}
-
-model MatchHistory {
-  id Int @id @default(autoincrement())
-  winner_Id  Int
-  loser_Id Int
+model Match {
+  id           String      @unique @default(uuid())
+  winner_id    String
+  loser_id     String
   winner_score Int
-  loser_score Int
-  played_at DateTime @default(now())
+  loser_score  Int
+  played_at    DateTime @default(now())
+
+  winner User @relation(fields: [winner_id], references: [id], name: "MatchWon")
+  loser  User @relation(fields: [loser_id], references: [id], name: "MatchLost")
+}
+
+model Achievement{
+  id                   String @unique @default(uuid())
+  userId               String @unique
+  accountCreationAchie Boolean
+  firstFriendAchie     Boolean  @default(false)
+  firstGameAchie       Boolean  @default(false)
+  threeGameInRowAchie  Boolean  @default(false)
+  firstWinAchie        Boolean  @default(false)
+  cleanSheetGameAchie  Boolean  @default(false)
+  tenGameInRowAchie    Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Friend {
+  id          String      @unique @default(uuid())
+  sender_id   String
+  reciever_id String
+  state    State  
+  created_at  DateTime @default(now())
+
+  sender   User @relation(fields: [sender_id], references: [id], name: "friendRequest")
+  reciever User @relation(fields: [reciever_id], references: [id], name: "friendRecieve")
 }
 
 model Message {
-  id       Int    @id @default(autoincrement())
-  content  String
-  senderId Int
-  receiverId Int
-  createdAt DateTime @default(now())
-  sender   User   @relation("MessagesSent", fields: [senderId], references: [id])
-  receiver User   @relation("MessagesReceived", fields: [receiverId], references: [id])
+  id          String      @unique @default(uuid())
+  sender_id   String
+  reciever_id String
+  content     String
+  created_at  DateTime @default(now())
+
+  sender      User     @relation(fields: [sender_id], references: [id], name: "messageSended")
+  reciever    User     @relation(fields: [reciever_id], references: [id], name: "messageRecieved")
 }
 
-model Relation {
-  id Int @id @default(autoincrement())
-  ruser1 Int
-  ruser2 Int
-  type Type
-  createdAt DateTime @default(now())
-  relationUserId1 User @relation("RelationPart1", fields: [ruser1], references: [id])
-  relationUserId2 User @relation("RelationPart2", fields: [ruser2], references: [id])
+model Channel {
+  id       String    @unique @default(uuid())
+  name     String
+  type     Type
+  password String?
 
+  messages Channel_message[] @relation("message")
+  roles    UserRole[] @relation(name: "channelUser")
+  restrictedUsers ChannelBlock[] @relation(name: "restrictedUser")
+}
+
+model Channel_message {
+  id         String      @unique @default(uuid())
+  channel_id String
+  user_id    String
+  content    String
+  created_at DateTime @default(now())
+
+  user    User    @relation(fields: [user_id], references: [id], name: "channelMessage", onDelete: Cascade)
+  channel Channel @relation(fields: [channel_id], references: [id], name: "message", onDelete: Cascade)
+}
+
+model UserRole{
+  id        String @unique @default(uuid())
+  userId    String
+  channelId String
+  role Role
+
+  user User @relation(fields: [userId], references:[id], name: "userRole", onDelete: Cascade)
+  channel Channel @relation(fields: [channelId], references:[id], name: "channelUser", onDelete: Cascade)
+}
+
+model ChannelBlock{
+  id        String @unique @default(uuid())
+  userId    String
+  channelId String
+  isBanned  Boolean @default(false)
+  isMute    Boolean @default(false)
+
+  user User @relation(fields: [userId], references:[id], name: "userChannelState", onDelete: Cascade)
+  channel Channel @relation(fields: [channelId], references:[id], name: "restrictedUser", onDelete: Cascade)
+}
+
+enum State {
+  FRIENDS
+  REQUESTER_BLOCK_RECIEVER
+  RECIEVER_BLOCK_REQUESTER
 }
 
 enum Status {
@@ -71,10 +148,14 @@ enum Status {
   INGAME
 }
 
+enum Role{
+  OWNER
+  ADMIN
+  MEMBER
+}
+
 enum Type {
-  NORELATION
-  ONEFRIENDTWO
-  TOWFRIENDONE
-  ONEBLOCKTWO
-  TWOBLOCKONE
+  PUBLIC
+  PRIVATE
+  PROTECTED
 }

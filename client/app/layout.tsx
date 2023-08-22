@@ -1,7 +1,7 @@
 import './globals.scss'
 import type { Metadata } from 'next'
 import { Montserrat } from 'next/font/google'
-import Footer from './../components/Footer'
+import Footer from '@/components/MainPage/Footer/Footer'
 
 export const metadata: Metadata = {
   title: 'Pong Game',

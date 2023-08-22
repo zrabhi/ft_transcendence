@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
-import Logo from './../components/Logo'
-import './styles/Navbar.scss'
+import Logo from '@/components/MainPage/Logo/Logo'
+import './Navbar.scss'
 import { useRef, useState } from 'react'
 import {BsList} from 'react-icons/Bs'
 import { FaTimes } from 'react-icons/fa'
@@ -16,7 +16,6 @@ const Navbar = () => {
   }
 
   return (
-    // <div>This is navbar</div>
     <header>
       <div className="container">
         <nav className="navbar">

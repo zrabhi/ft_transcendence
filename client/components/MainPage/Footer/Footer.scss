@@ -1,24 +1,24 @@
-@import './../../app/globals.scss';
+@import '@/app/globals.scss';
 
 .footer {
   text-align: center;
   letter-spacing: 1px;
   background-color: $blue-bg-color;
-  min-height: 2rem;
-  line-height: 2rem;
+  line-height: 3rem;
   text-transform: capitalize;
   border-radius: .5rem .5rem 0 0;
   width: 100%;
   margin-top: auto;
   p {
-    font-size: .7rem;
+    font-size: .9rem;
     color: $main-text-color;
     a {
       font-weight: 600;
       transition: .2s ease-in-out;
       margin: 0 .2rem;
+      color: $soft-gold-color;
       &:hover {
-        opacity: .5;
+        opacity: .7;
       }
     }
   }

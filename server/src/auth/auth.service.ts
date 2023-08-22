@@ -31,18 +31,15 @@ export class AuthService
                 error: `Invalide Credentails `,
             }, HttpStatus.FORBIDDEN, {
             })
-        }   
-
-       const matches =  await bcrypt.compare(user.password, body.password)
+        }
+        
+       const matches =  await bcrypt.compare(body.password, user.password)
        if (!matches)
        {
-            throw new HttpException({
-                status: HttpStatus.FORBIDDEN,
-                error: `password does not match`,
-            }, HttpStatus.FORBIDDEN, {
-            })
+        
+            return (false);
        }
-      return (user);
+     return (user);
     }
     async signup(@Request() user)
     {

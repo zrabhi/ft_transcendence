@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import HomeImage from './../public/home_image.png'
+import HomeImage from '@/public/home_image.png'
 const MainContent = () => {
   return (
     <div className="main-content">

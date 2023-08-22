@@ -1,6 +1,6 @@
 import React from 'react'
-import './style.scss'
-import Logo from '@/components/Logo'
+import './SideBar.scss'
+import Logo from '@/components/MainPage/Logo/Logo'
 import { CgHomeAlt , CgProfile, CgGames } from 'react-icons/cg'
 import { PiTelevisionFill, PiChatsFill } from 'react-icons/pi'
 import { IoMdSettings, IoMdExit } from 'react-icons/io'

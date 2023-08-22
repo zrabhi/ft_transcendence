@@ -1,6 +1,6 @@
 import React from 'react'
 import './style.scss'
-import SideBar from '@/components/SideBar/SideBar'
+import SideBar from '@/components/LoggedUser/SideBar/SideBar'
 
 export default function Profile() {
   return (

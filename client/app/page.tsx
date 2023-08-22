@@ -1,9 +1,9 @@
 // 'use client'
 import "../public/logo.svg"
 import './hero-section.scss'
-import Navbar from './../components/Navbar'
-import MainContent from './../components/MainContent'
-import ScrollDown from '../components/ScrollDown'
+import Navbar from '../components/MainPage/NavBar/Navbar'
+import MainContent from '../components/MainPage/MainContent/MainContent'
+import ScrollDown from '../components/MainPage/ScrollDown/ScrollDown'
 
 export default function Home() {
   return (

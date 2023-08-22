@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import "./style.scss";
 import "./../hero-section.scss";
-import { baseURL } from "./utils/service";
+import { baseURL, getRequest } from "./utils/service";
 import { postRequest } from "./utils/service";
 import { useCallback, useRef, useState } from "react";
 import { FaCheckSquare } from "react-icons/fa";
@@ -31,14 +31,12 @@ export default function SignIn() {
     message: "",
   });
 
-  const LogIn = useCallback(async () => {
-    setLoginLoading(true);
+  const LogIn = async () => {
     const response = await postRequest(
       `${baseURL}/signin`,
       JSON.stringify(loginInfo)
     );
     console.log(response);
-    setLoginLoading(false);
 
     if (response.error) return setLoginError(response);
     console.log("im hereee");
@@ -46,7 +44,24 @@ export default function SignIn() {
     localStorage.setItem("User", JSON.stringify(response));
     setUser(response);
     return true;
+  };
+
+  const LogInGoogle = useCallback(async () => {
+    setLoginLoading(true);
+    console.log("im hereee");
+    const response = await getRequest(
+      `${baseURL}/google/login`
+    );
+    console.log(response);
+    setLoginLoading(false);
+
+    if (response.error) return setLoginError(response);
+
+    localStorage.setItem("User", JSON.stringify(response));
+    setUser(response);
+    return true;
   }, [loginInfo]);
+  
 
   const handleCheckOne = () => {
     if (checkOne.current) checkOne.current.classList.toggle("hidden");
@@ -94,7 +109,11 @@ export default function SignIn() {
     console.log(loginInfo);
     LogIn();
   };
-
+  const handleClickGoogleButton = (e : any) => {
+    e.preventDefault();
+    console.log(loginInfo);
+    LogInGoogle();
+  }
   return (
     <div className="container-box">
       <Navbar />
@@ -175,14 +194,15 @@ export default function SignIn() {
                 <div className="auto-auth">
                   or you can sign in with
                   <div className="logos">
-                    <div className="google">
+                    <Link href="http://localhost:8080/api/auth/google/login" >
+                    <div className="google" onClick={handleClickGoogleButton}>
                       <Image
                         src={googleLogo}
                         width={24}
                         height={24}
                         alt="google icon"
                       />
-                    </div>
+                    </div> </Link>
                     <div className="school">
                       <Image
                         src={schoolLogo}

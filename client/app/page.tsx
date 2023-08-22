@@ -8,7 +8,6 @@ import { Routes, Route } from "react-router-dom";
 
 export default function Home() {
   return (
-    <Routes>
       <div className='home' >
         <div className="hero-section">
           <div className="container-box">
@@ -18,6 +17,5 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </Routes>
   )
 }

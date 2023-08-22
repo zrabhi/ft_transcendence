@@ -1,11 +1,12 @@
 import { Body, Controller, Get, Post, Req, Request, Res, Response, UseGuards } from '@nestjs/common';
 import { GoogleAuthGuard } from './utils/GoogleGuard';
-import passport from 'passport';
+import passport, { Profile } from 'passport';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './utils/GoogleStrategy';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthDto } from './dto/auth.dto';
 import { redirect } from 'react-router-dom';
+import { User } from './decorator/user-decorator';
 
 @Controller('/api/auth')
 export class AuthController {
@@ -27,9 +28,9 @@ export class AuthController {
     }
     @Get('google/login')
     @UseGuards(AuthGuard('google'))
-    handleGoogleLogin()
+   async handleGoogleLogin()
     {
-        return {msg :"google auth"}
+        return ;
     }
 
     @Get('42/login')
@@ -41,10 +42,15 @@ export class AuthController {
 
     @Get('google/redirect')
     @UseGuards(AuthGuard('google'))
-    async handleRedirect(@Req() request)
+    async handleRedirect(@User() user : Profile, @Request() request, @Response() response)
     {
+        const login = this.authService.login(user, response);
+        if (!login)
+             response.status(400).json({msg: 'Invalid Credencial'});
+        response.redirect("http://127.0.0.1:3000/profile");
+        // return { msg :"redirect"}
         // return this.authService.signup(request);
-        
+
         
     }
 }

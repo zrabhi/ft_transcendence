@@ -1,6 +1,6 @@
-export const baseURL = "http://localhost:8080/api/auth";
+export const baseURL = "http://127.0.0.1:8080/api/auth";
 
-
+import axios from "axios"
 export const postRequest = async (url: string, body: any) => {
 
     const response = await fetch(url, {
@@ -26,17 +26,17 @@ export const postRequest = async (url: string, body: any) => {
 };
 
 
-export const getRequest = async(url: string) =>
+export const getRequest = async (url: string) =>
 {
-  const response = await fetch(url);
-  const data = await response.json();
+  const response = await axios.get(url);
+  // const data = await response.json();
   let message;
-  if (!response.ok)
+  if (response.status != 200)
   {
     message = "AN Error occurred...";
-    if (data?.message)
-        message = data.message;
+    if (response.data?.message)
+        message = response.data.message;
     return ({error:true, message});
   }
-  return (data);
+  return (response.data);
 }

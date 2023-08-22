@@ -14,7 +14,7 @@ model User {
   id                   String   @unique @default(uuid())
   email                String   @unique
   username             String   @unique
-  password             String
+  password             String?   
   avatar               String   @default("../resources/avatar.png")
   cover                String   @default("../resources/cover.png")
   status               Status   @default(ONLINE)

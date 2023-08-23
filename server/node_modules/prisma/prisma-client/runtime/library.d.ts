@@ -113,11 +113,6 @@ export declare type ClientArgs = {
 
 export declare type ClientBuiltInProp = keyof DynamicClientExtensionThisBuiltin<never, never, never>;
 
-declare enum ClientEngineType {
-    Library = "library",
-    Binary = "binary"
-}
-
 export declare type Compute<T> = T extends Function ? T : {
     [K in keyof T]: T[K];
 } & unknown;
@@ -135,8 +130,6 @@ export declare type ComputedField = {
 export declare type ComputedFieldsMap = {
     [fieldName: string]: ComputedField;
 };
-
-export declare type ConnectorType = 'mysql' | 'mongodb' | 'sqlite' | 'postgresql' | 'sqlserver' | 'jdbc:sqlserver' | 'cockroachdb';
 
 export declare interface Context {
     /**
@@ -210,12 +203,6 @@ export declare type DataLoaderOptions<T> = {
 export declare type Datasource = {
     url?: string;
 };
-
-export declare interface DatasourceOverwrite {
-    name: string;
-    url?: string;
-    env?: string;
-}
 
 export declare type Datasources = {
     [name in string]: Datasource;
@@ -992,13 +979,14 @@ export declare interface EngineConfig {
     allowTriggerPanic?: boolean;
     prismaPath?: string;
     generator?: GeneratorConfig;
-    datasources?: DatasourceOverwrite[];
+    overrideDatasources: Datasources;
     showColors?: boolean;
     logQueries?: boolean;
     logLevel?: 'info' | 'warn';
     env: Record<string, string>;
     flags?: string[];
-    clientVersion?: string;
+    clientVersion: string;
+    engineVersion: string;
     previewFeatures?: string[];
     engineEndpoint?: string;
     activeProvider?: string;
@@ -1007,17 +995,17 @@ export declare interface EngineConfig {
      * The contents of the schema encoded into a string
      * @remarks only used for the purpose of data proxy
      */
-    inlineSchema?: string;
+    inlineSchema: string;
     /**
      * The contents of the datasource url saved in a string
      * @remarks only used for the purpose of data proxy
      */
-    inlineDatasources?: Record<string, InlineDatasource>;
+    inlineDatasources: GetPrismaClientConfig['inlineDatasources'];
     /**
      * The string hash that was produced for a given schema
      * @remarks only used for the purpose of data proxy
      */
-    inlineSchemaHash?: string;
+    inlineSchemaHash: string;
     /**
      * The helper for interaction with OTEL tracing
      * @remarks enabling is determined by the client and @prisma/instrumentation package
@@ -1056,11 +1044,6 @@ export declare type EngineSpanEvent = {
 export declare interface EnvValue {
     fromEnvVar: null | string;
     value: null | string;
-}
-
-export declare interface EnvValue_2 {
-    fromEnvVar: string | null;
-    value: string | null;
 }
 
 export declare type Equals<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? 1 : 0;
@@ -1220,7 +1203,7 @@ export declare type GetCountResult<A> = A extends {
 
 declare function getExtensionContext<T>(that: T): Context_2<T>;
 
-export declare type GetFindResult<P extends Payload, A> = {} extends A ? DefaultSelection<P> : A extends {
+export declare type GetFindResult<P extends Payload, A> = Equals<A, any> extends 1 ? DefaultSelection<P> : A extends {
     select: infer S extends object;
 } & Record<string, unknown> | {
     include: infer I extends object;
@@ -1247,28 +1230,25 @@ export declare type GetGroupByResult<P extends Payload, A> = A extends {
 export declare function getPrismaClient(config: GetPrismaClientConfig): {
     new (optionsArg?: PrismaClientOptions): {
         _runtimeDataModel: RuntimeDataModel;
-        _engine: Engine;
-        _fetcher: RequestHandler;
+        _requestHandler: RequestHandler;
         _connectionPromise?: Promise<any> | undefined;
         _disconnectionPromise?: Promise<any> | undefined;
         _engineConfig: EngineConfig;
         _clientVersion: string;
         _errorFormat: ErrorFormat;
-        _clientEngineType: ClientEngineType;
         _tracingHelper: TracingHelper;
         _metrics: MetricsClient;
         _middlewares: MiddlewareHandler<QueryMiddleware>;
         _previewFeatures: string[];
         _activeProvider: string;
-        _dataProxy: boolean;
         _extensions: MergedExtensionsList;
+        _engine: Engine;
         /**
          * A fully constructed/applied Client that references the parent
          * PrismaClient. This is used for Client extensions only.
          */
         _appliedParent: any;
         _createPrismaPromise: PrismaPromiseFactory;
-        getEngine(): Engine;
         /**
          * Hook a middleware into the client
          * @param middleware to hook
@@ -1276,10 +1256,6 @@ export declare function getPrismaClient(config: GetPrismaClientConfig): {
         $use(middleware: QueryMiddleware): void;
         $on(eventType: EngineEventType, callback: (event: any) => void): void;
         $connect(): Promise<void>;
-        /**
-         * @private
-         */
-        _runDisconnect(): Promise<void>;
         /**
          * Disconnect from the database
          */
@@ -1389,7 +1365,6 @@ export declare function getPrismaClient(config: GetPrismaClientConfig): {
 export declare type GetPrismaClientConfig = {
     runtimeDataModel: RuntimeDataModel;
     generator?: GeneratorConfig;
-    sqliteDatasourceOverrides?: DatasourceOverwrite[];
     relativeEnvPaths: {
         rootEnvPath?: string | null;
         schemaEnvPath?: string | null;
@@ -1398,39 +1373,37 @@ export declare type GetPrismaClientConfig = {
     dirname: string;
     filename?: string;
     clientVersion: string;
-    engineVersion?: string;
+    engineVersion: string;
     datasourceNames: string[];
     activeProvider: string;
-    /**
-     * True when `--data-proxy` is passed to `prisma generate`
-     * If enabled, we disregard the generator config engineType.
-     * It means that `--data-proxy` binds you to the Data Proxy.
-     */
-    dataProxy: boolean;
     /**
      * The contents of the schema encoded into a string
      * @remarks only used for the purpose of data proxy
      */
-    inlineSchema?: string;
+    inlineSchema: string;
     /**
      * A special env object just for the data proxy edge runtime.
      * Allows bundlers to inject their own env variables (Vercel).
      * Allows platforms to declare global variables as env (Workers).
      * @remarks only used for the purpose of data proxy
      */
-    injectableEdgeEnv?: LoadedEnv;
+    injectableEdgeEnv?: () => LoadedEnv;
     /**
      * The contents of the datasource url saved in a string.
      * This can either be an env var name or connection string.
      * It is needed by the client to connect to the Data Proxy.
      * @remarks only used for the purpose of data proxy
      */
-    inlineDatasources?: InlineDatasources;
+    inlineDatasources: {
+        [name in string]: {
+            url: EnvValue;
+        };
+    };
     /**
      * The string hash that was produced for a given schema
      * @remarks only used for the purpose of data proxy
      */
-    inlineSchemaHash?: string;
+    inlineSchemaHash: string;
     /**
      * A marker to indicate that the client was not generated via `prisma
      * generate` but was generated via `generate --postinstall` script instead.
@@ -1451,6 +1424,11 @@ export declare type GetPrismaClientConfig = {
      * in the current working directory. This usually means it has been bundled.
      */
     isBundled?: boolean;
+    /**
+     * A boolean that is `true` when the client was generated with --no-engine. At
+     * runtime, this means the client will be bound to be using the Data Proxy.
+     */
+    noEngine?: boolean;
 };
 
 export declare type GetResult<P extends Payload, A, O extends Operation = 'findUniqueOrThrow'> = {
@@ -1496,8 +1474,6 @@ export declare type HandleErrorParams = {
     transaction?: PrismaPromiseTransaction;
 };
 
-export declare type Headers_2 = Record<string, string | string[] | undefined>;
-
 /**
  * Defines High-Resolution Time.
  *
@@ -1511,16 +1487,6 @@ export declare type Headers_2 = Record<string, string | string[] | undefined>;
  * This is represented in HrTime format as [1609504210, 150000000].
  */
 export declare type HrTime = [number, number];
-
-export declare type InlineDatasource = {
-    url: NullableEnvValue;
-};
-
-export declare type InlineDatasources = {
-    [name in InternalDatasource['name']]: {
-        url: InternalDatasource['url'];
-    };
-};
 
 export declare type InteractiveTransactionInfo<Payload = unknown> = {
     /**
@@ -1571,14 +1537,6 @@ export declare type InternalArgs<R = {
         [K in keyof C]: () => C[K];
     };
 };
-
-export declare interface InternalDatasource {
-    name: string;
-    activeProvider: ConnectorType;
-    provider: ConnectorType;
-    url: EnvValue_2;
-    config: any;
-}
 
 export declare type InternalRequestParams = {
     /**
@@ -1899,6 +1857,17 @@ export declare type NeverToUnknown<T> = [T] extends [never] ? unknown : T;
  */
 declare function nodeFetch(url: string, options?: RequestOptions_2): Promise<RequestResponse>;
 
+declare class NodeHeaders {
+    readonly headers: Map<string, string>;
+    constructor(init?: Record<any, any>);
+    append(name: string, value: string): void;
+    delete(name: string): void;
+    get(name: string): string | null;
+    has(name: string): boolean;
+    set(name: string, value: string): void;
+    forEach(callbackfn: (value: string, key: string, parent: this) => void, thisArg?: any): void;
+}
+
 /**
  * @deprecated Please don´t rely on type checks to this error anymore.
  * This will become a regular `PrismaClientKnownRequestError` with code `P2025`
@@ -1908,11 +1877,6 @@ declare function nodeFetch(url: string, options?: RequestOptions_2): Promise<Req
 export declare class NotFoundError extends PrismaClientKnownRequestError {
     constructor(message: string, clientVersion: string);
 }
-
-export declare type NullableEnvValue = {
-    fromEnvVar: string | null;
-    value?: string | null;
-};
 
 declare class NullTypesEnumValue extends ObjectEnumValue {
     _getNamespace(): string;
@@ -2035,7 +1999,11 @@ export declare class PrismaClientKnownRequestError extends Error implements Erro
     get [Symbol.toStringTag](): string;
 }
 
-export declare interface PrismaClientOptions {
+export declare type PrismaClientOptions = {
+    /**
+     * Overwrites the primary datasource url from your schema.prisma file
+     */
+    datasourceUrl?: string;
     /**
      * Overwrites the datasource url from your schema.prisma file
      */
@@ -2073,7 +2041,7 @@ export declare interface PrismaClientOptions {
             allowTriggerPanic?: boolean;
         };
     };
-}
+};
 
 export declare class PrismaClientRustPanicError extends Error {
     clientVersion: string;
@@ -2305,7 +2273,7 @@ export declare type RequestResponse = {
     url: string;
     statusText?: string;
     status: number;
-    headers: Headers_2;
+    headers: NodeHeaders;
     text: () => Promise<string>;
     json: () => Promise<any>;
 };

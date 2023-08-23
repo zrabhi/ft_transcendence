@@ -13,7 +13,6 @@ import {
     createMessageChannelDto, 
     updateUserRoleDto, 
     userBanMuteDto} from './dto/channel.dto';
-import { setTimeout } from 'timers';
 
 @Controller('api/channels')
 export class ChannelController {

@@ -1,29 +1,17 @@
-FROM node:18-alpine AS base
+FROM node:18-alpine as dev
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY [ "package.json", "yarn.lock*", "./" ]
-
-FROM base AS dev
-
-ENV NODE_ENV=development
+COPY --chown=node:node package.json yarn.lock ./
 
 RUN yarn install --frozen-lockfile
 
-COPY . .
+COPY --chown=node:node . .
 
-CMD ["yarn", "start:dev"]
+RUN npx prisma generate
 
-FROM base AS prod
+WORKDIR /usr/src/app/server
 
-ENV NODE_ENV=production
+USER node
 
-RUN yarn install --frozen-lockfile --production
-
-COPY . .
-
-RUN yarn global add @nestjs/cli
-
-RUN yarn build
-
-CMD [ "yarn", "start:prod" ]
+CMD [ "yarn", "start:dev" ]

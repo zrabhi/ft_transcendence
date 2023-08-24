@@ -43,6 +43,20 @@ body {
   width: 97vw;
   margin: 2rem auto 0;
   border-radius: 2rem;
+  .section-part {
+    min-height: 90vh;
+  }
+}
+
+.not-found {
+  .container {
+    .content {
+      .link {
+        background-color: $blue-bg-color;
+        width: fit-content;
+      }
+    }
+  }
 }
 
 @media only screen and (max-width: 1024px) {
@@ -59,7 +73,6 @@ body {
 }
 
 /* End Global Rules */
-
 
 
 

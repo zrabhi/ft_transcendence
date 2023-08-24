@@ -19,9 +19,9 @@ export default function SideBar() {
         <div className="to-chat">
           <PiChatsFill size={24} className="icon" />
         </div>
-        <div className="to-live">
+        {/* <div className="to-live">
           <PiTelevisionFill size={24} className="icon" />
-        </div>
+        </div> */}
         <div className="to-game">
           <CgGames size={24} className="icon" />
         </div>

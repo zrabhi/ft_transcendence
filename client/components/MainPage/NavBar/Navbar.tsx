@@ -22,16 +22,16 @@ const Navbar = () => {
           <Logo />
           <ul ref={listRef} className='' >
             <li>
-              <Link className='link' href='#' >Home</Link>
+              <Link className='link' href='/' >Home</Link>
             </li>
             <li>
-              <Link className='link' href='#' >game history</Link>
+              <Link className='link' href='/game-history' >game history</Link>
             </li>
             <li>
-              <Link className='link' href='#' >instructions</Link>
+              <Link className='link' href='/instructions' >instructions</Link>
             </li>
             <li>
-              <Link className='link' href='#' >About us</Link>
+              <Link className='link' href='about-us' >About us</Link>
             </li>
               <Link href='/signin' >
                 <button className='

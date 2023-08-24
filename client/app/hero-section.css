@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Start Global Rules */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #090227;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  width: 92%;
+  margin: auto;
+}
+
+.container-box {
+  background: linear-gradient(to bottom, #2f245e, #251C48);
+  width: 97vw;
+  margin: 2rem auto 0;
+  border-radius: 2rem;
+}
+
+@media only screen and (max-width: 1024px) {
+  .container {
+    width: 96%;
+  }
+}
+@media only screen and (max-width: 768px) {
+  .container {
+    width: 98%;
+    padding: 1rem;
+  }
+}
+/* End Global Rules */
+/* Start Hero Section Rules */
+.hero-section {
+  padding-top: 2rem;
+}
+.hero-section .container-box {
+  background: linear-gradient(to bottom, #2f245e, #251C48);
+  width: 97vw;
+  margin: auto;
+  border-radius: 2rem;
+}
+.hero-section .container-box .main-content {
+  padding-top: 4rem;
+  color: #fff;
+  text-align: center;
+}
+.hero-section .container-box .main-content h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+.hero-section .container-box .main-content h2 {
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+}
+.hero-section .container-box .main-content p {
+  width: 60%;
+  margin: auto;
+  opacity: 0.6;
+}
+.hero-section .container-box .main-content .img {
+  margin-top: 4rem;
+}
+.hero-section .container-box .main-content .img img {
+  margin: auto;
+  border-radius: 2rem;
+  width: auto;
+  height: 400px;
+  filter: grayscale(100%);
+}
+@media (max-width: 572px) {
+  .hero-section .container-box .main-content .img {
+    display: none;
+  }
+}
+.hero-section .container-box .scroll-down {
+  margin-top: 4rem;
+  padding-bottom: 4rem;
+  text-align: center;
+}
+.hero-section .container-box .scroll-down p {
+  color: #fff;
+  text-transform: capitalize;
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  opacity: 0.5;
+}
+.hero-section .container-box .scroll-down svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: auto;
+  margin-top: 0.2rem;
+  color: #fff;
+  opacity: 0.5;
+}/*# sourceMappingURL=hero-section.css.map */

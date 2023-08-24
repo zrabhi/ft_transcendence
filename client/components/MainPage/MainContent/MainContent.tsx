@@ -1,5 +1,7 @@
 import Image from 'next/image'
 import HomeImage from '@/public/home_image.png'
+import './MainContent.scss'
+
 const MainContent = () => {
   return (
     <div className="main-content">

@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import GameHistoryImage from '@/public/game-history.gif'
+import GameHistoryImage from '@/public/images/game-history.gif'
 import './GameHistory.scss'
 
 export default function GameHistory() {

@@ -1,10 +1,10 @@
 import React from 'react'
 import './ProfileCard.scss'
 import Image from 'next/image'
-import CoverImage from '@/public/FetchCoverImage.png'
+import CoverImage from '@/public/images/FetchCoverImage.png'
 import { BsTwitter, BsDiscord } from 'react-icons/Bs'
 import ReactCountryFlag from 'react-country-flag'
-import Avatar from '@/public/DefaultAvatar.jpg'
+import Avatar from '@/public/images/DefaultAvatar.jpg'
 
 export default function ProfileCard() {
   return (

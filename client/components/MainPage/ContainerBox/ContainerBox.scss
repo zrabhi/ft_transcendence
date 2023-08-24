@@ -1,0 +1,33 @@
+@import '@/app/globals.scss';
+
+.container-box {
+  background: linear-gradient(to bottom, $grd-first-color, $grd-second-color);
+  width: 97vw;
+  min-height: 90vh;
+  border-radius: 2rem;
+  display: flex;
+  flex-direction: column;
+  
+  // Start Scroll Down
+  .scroll-down {
+    margin-top: 4rem;
+    padding-bottom: 4rem;
+    text-align: center;
+    p {
+      color: $main-text-color;
+      text-transform: capitalize;
+      font-weight: 600;
+      font-size: .8rem;
+      letter-spacing: 1px;
+      opacity: .5;
+    }
+    svg {
+      width: 1.2rem;
+      height: 1.2rem;
+      margin: auto;
+      margin-top: .2rem;
+      color: $main-text-color;
+      opacity: .5;
+    }
+  }
+}

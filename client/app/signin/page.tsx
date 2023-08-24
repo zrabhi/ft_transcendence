@@ -6,9 +6,9 @@ import './style.scss'
 import './../hero-section.scss'
 import { useRef } from 'react';
 import { FaCheckSquare } from 'react-icons/fa';
-import googleLogo from './../../public/google.png'
-import schoolLogo from './../../public/42.png'
-import GithubLogo from './../../public/github.png'
+import googleLogo from '@/public/images/google.png'
+import schoolLogo from '@/public/images/42.png'
+import GithubLogo from '@/public/images/github.png'
 
 export default function SignIn () {
 

@@ -44,11 +44,8 @@ export class UserService {
             }, HttpStatus.FORBIDDEN, {
             })
         }
-        console.log(createUserDto);
         
         createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
-        console.log("hasehd pass ", createUserDto.password);
-        
         try {
             return await this.prismaService.user.create({
                 data:

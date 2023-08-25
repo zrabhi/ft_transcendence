@@ -1,117 +1,155 @@
-import { HttpException, HttpStatus, Injectable, Request } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Request,
+  Res,
+} from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { AuthDto } from "./dto/auth.dto";
-import { UserService } from "src/user/user.service";
-import { CreateUserDto } from "src/user/dto/create-user.dto";
-
+import { AuthDto } from './dto/auth.dto';
+import { UserService } from 'src/user/user.service';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
+import { Profile } from 'passport';
+import { User } from './decorator/user-decorator';
 
 @Injectable()
-export class AuthService 
-{
-    constructor(private _prisma: PrismaService, private readonly _user: UserService,)
-    {
-    }
+export class AuthService {
+  constructor(
+    private _prisma: PrismaService,
+    private readonly _user: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-    async signin(body: AuthDto)
-    {
+  async signin(body: AuthDto) {
+    console.log(body);
 
-        console.log(body);
-        
-        // need seasion and jwt authentication
-        const user = await this._prisma.user.findFirst({
-            where: {
-                email: body.email,
-            },
-        });
-
-        if (!user)
+    const user = await this._prisma.user.findFirst({
+      where: {
+        email: body.email,
+      },
+    });
+    console.log("udrt", user);
+    
+    if (!user) {
+      throw new HttpException(
         {
-            throw new HttpException({
-                status: HttpStatus.FORBIDDEN,
-                error: `Invalide Credentails `,
-            }, HttpStatus.FORBIDDEN, {
-            })
-        }
-        
-       const matches =  await bcrypt.compare(body.password, user.password)
-       if (!matches)
-       {
-        
-            return (false);
-       }
-     return (user);
+          status: HttpStatus.FORBIDDEN,
+          error: `Credentails does not exist, please create an account `,
+        },
+        HttpStatus.FORBIDDEN,
+        {},
+      );
     }
+    if (body.password === user.password) 
+        return true;
+    // const matches = await bcrypt.compare(body.password, user.password);
+    // if (!matches) {
+    //   return false;
+    // }
+    return false;
+  }
 
-    async login(user, res)
-    {
-        const { name, emails, photos } = user;
-        console.log(name);
-        console.log(emails);
-        console.log(photos);
-        const userData: CreateUserDto= {
-            email: emails[0].value,
-            username: name.givenName,
-            // firstName: name.givenName,
-            // lastName: name.familyName,
-            avatar: photos[0].value,
-            cover: "",
-            password: ""
-        };
-       console.log(userData);
-       
-       
-       const user_search = await this._prisma.user.findFirst({
+  extractGoogleUserData(user: any): CreateUserDto {
+    const { name, emails, photos } = user;
+    console.log(name);
+    console.log(emails);
+    console.log(photos);
+    const userData: CreateUserDto = {
+      email: emails[0].value,
+      username: name.givenName,
+      avatar: photos[0].value,
+      cover: '',
+      password: '',
+    };
+    return userData;
+  }
+
+  extract42UserData(user: any) {
+    const { login, email, image } = user._json;
+    console.log(user._json.email);
+    
+    console.log(user._json.image.link);
+    
+    const userData: CreateUserDto = {
+      email: email,
+      username: login,
+      avatar: user._json.image.link,
+      cover: '',
+      password: '',
+    };
+    console.log("user data", userData);
+    
+    return userData;
+  }
+
+  extractUserGithubData(user:any)
+  {
+        console.log(user);
+        
+  }
+  async extractJwtToken(playload: any) {
+    const access_token  = await this.jwtService.signAsync(playload);
+    return access_token;
+  }
+    async login(user : CreateUserDto, @Res({ passthrough: true }) res: Response) : Promise<String> {
+    console.log('UserData: ', user);
+
+    try {
+      const user_search = await this._prisma.user.findFirst({
         where: {
-            email: userData.email,
-            },
+          email: user.email,
+        },
+      });
+      if (user_search) {
+        const User = await this._prisma.user.update({
+          where: {
+            id: user_search.id,
+          },
+          data: {
+            status: 'ONLINE',
+          },
         });
-        if (user_search)
-        {
-            const user_update = await this._prisma.user.update({
-                where: {
-                    id: user_search.id,
-                  },
-                data : {
-                    status: 'OFFLINE',
-                },
-            });
-            return user_update
-        } 
-        else
-            { 
-                const neUser = this.signup(userData, res);
-                console.log("new user in db", neUser);
-                
-                // throw new HttpException({
-                //         status: HttpStatus.FORBIDDEN,
-                //         error: `User must Singup `,
-                //     }, HttpStatus.FORBIDDEN, {
-                //     })
-            }
-            res.status(400);
-    }
+        console.log('user id ', User.id);
+        return await this.extractJwtToken({
+            id: User.id,
+            username: User.username,
+          });
+      } else {
+        
+        const newUserId = await this.signup(user, res);
+        const newUser = await this._user.findUserById(newUserId.id);
 
-    async signup(user: CreateUserDto, res)
-    {
-        try {
-            return await this._prisma.user.create({
-                data:
-                {
-                    email:user.email,
-                    username:user.username,
-                    achievement:{
-                        create:{
-                            accountCreationAchie:true,
-                        }
-                    }
-                },
-                select: {
-                    id: true,
-                }
-            });
-            
-        } catch (err) {console.log(err);
-        }
+        return await this.extractJwtToken({
+            id: newUser.id,
+            username: newUser.username,
+          });
+      }
+    } catch (err) {
+      console.log('catch error: ', err);
+      res.status(400);
     }
+  }
+  async signup(user: CreateUserDto, @Res() res: Response) {
+    try {
+      return await this._prisma.user.create({
+        data: {
+          email: user.email,
+          username: user.username,
+          achievement: {
+            create: {
+              accountCreationAchie: true,
+            },
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
 }

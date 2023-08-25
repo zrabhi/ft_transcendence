@@ -5,7 +5,8 @@ import { ChannelModule } from './channel/channel.module';
 import { MessageModule } from './message/message.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
-import { GoogleStrategy } from './auth/utils/GoogleStrategy';
+import { GoogleStrategy } from './auth/Strategys/GoogleStrategy';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({
 

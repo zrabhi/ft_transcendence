@@ -3,7 +3,7 @@ import Navbar from '@/components/MainPage/NavBar/Navbar';
 import Link from 'next/link'
 import Image from 'next/image';
 import './style.scss'
-import './../hero-section.scss'
+import '@/app/hero-section.scss'
 import { useRef } from 'react';
 import { FaCheckSquare } from 'react-icons/fa';
 import googleLogo from '@/public/images/google.png'

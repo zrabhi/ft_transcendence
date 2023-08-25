@@ -3,6 +3,7 @@ import Navbar from '@/components/MainPage/NavBar/Navbar'
 import MainContent from '@/components/MainPage/MainContent/MainContent'
 import GameHistory from '@/components/MainPage/GameHistory/GameHistory'
 import Instructions from '@/components/MainPage/Instructions/Instructions'
+import AboutUs from '@/components/MainPage/AboutUs/AboutUs'
 import './ContainerBox.scss'
 
 export default function ContainerBox({component}: any) {
@@ -13,6 +14,7 @@ export default function ContainerBox({component}: any) {
         {component === "MainContent" && <MainContent />}
         {component === "GameHistory" && <GameHistory />}
         {component === "instructions" && <Instructions />}
+        {component === "AboutUs" && <AboutUs />}
       </div>
     </div>
   )

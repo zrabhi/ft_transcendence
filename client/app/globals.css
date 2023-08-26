@@ -47,11 +47,4 @@ body {
     padding: 1rem;
   }
 }
-/* End Global Rules */
-.profile-page .profile {
-  margin-left: 6rem;
-}
-.profile-page .profile .profile-content {
-  min-height: 100vh;
-  padding: 2rem;
-}/*# sourceMappingURL=style.css.map */
+/* End Global Rules *//*# sourceMappingURL=globals.css.map */

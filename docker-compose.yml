@@ -2,6 +2,7 @@ version: '3.9'
 
 services:
   db:
+<<<<<<< HEAD
     container_name: postgres
     image: postgres
     restart: always
@@ -28,3 +29,15 @@ services:
 
 volumes:
   docker-nest-postgres:
+=======
+    image: postgres:15
+    restart: always
+    ports:
+      - '5432:5432'
+    env_file:
+      - ./server/.env
+    networks:
+      - Mynet
+networks:
+  Mynet:
+>>>>>>> origin/auth

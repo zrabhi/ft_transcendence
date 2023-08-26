@@ -1,49 +1,130 @@
-'use client'
-import Navbar from '@/components/MainPage/NavBar/Navbar';
-import Link from 'next/link'
-import Image from 'next/image';
+// 'use client'
+// import Navbar from '@/components/MainPage/NavBar/Navbar';
+// import './../hero-section.scss'
+// import { useRef } from 'react';
+// import { FaCheckSquare } from 'react-icons/fa';
+
+"use client";
+import Navbar from "@/components/MainPage/NavBar/Navbar";
 import './style.scss'
-import '@/app/hero-section.scss'
-import { useRef } from 'react';
-import { FaCheckSquare } from 'react-icons/fa';
-import googleLogo from '@/public/images/google.png'
-import schoolLogo from '@/public/images/42.png'
-import GithubLogo from '@/public/images/github.png'
+  import Link from "next/link";
+  import Image from "next/image";
+  import "./style.scss";
+  import "../../hero-section.scss";
+  import { baseURL, getRequest, postRequest } from "../../context/utils/service";
+  import { useCallback, useRef, useState } from "react";
+  import { FaCheckSquare } from "react-icons/fa";
+  import googleLogo from '@/public/images/google.png'
+  import schoolLogo from '@/public/images/42.png'
+  import GithubLogo from '@/public/images/github.png'
 
-export default function SignIn () {
 
+export default function SignIn() {
   //All refs
   const emailMessage = useRef<HTMLParagraphElement>(null);
   const passMessage = useRef<HTMLParagraphElement>(null);
   const checkOne = useRef<HTMLParagraphElement>(null); // for checkbox number 1
   const checkTwo = useRef<HTMLParagraphElement>(null); // for checkbox number 2
 
+  // useStates
+  const [loginInfo, setLoginInfo] = useState({
+    email: "",
+    password: "",
+  });
+  const [user, setUser] = useState(null);
+  const [isLoginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState({
+    error: false,
+    message: "",
+  });
+
+  const LogIn = async () => {
+    const response = await postRequest(
+      `${baseURL}/signin`,
+      JSON.stringify(loginInfo)
+    );
+    console.log(response);
+
+    if (response.error) return setLoginError(response);
+    console.log("im hereee");
+
+    localStorage.setItem("User", JSON.stringify(response));
+    setUser(response);
+    return true;
+  };
+
+  const LogInGoogle = useCallback(async () => {
+    setLoginLoading(true);
+    console.log("im hereee");
+    const response = await getRequest(
+      `${baseURL}/google/login`
+    );
+    console.log(response);
+    setLoginLoading(false);
+
+    if (response.error) return setLoginError(response);
+
+    localStorage.setItem("User", JSON.stringify(response));
+    setUser(response);
+    return true;
+  }, [loginInfo]);
+  
+
   const handleCheckOne = () => {
-    if (checkOne.current)
-      checkOne.current.classList.toggle("hidden");
-  }
+    if (checkOne.current) checkOne.current.classList.toggle("hidden");
+  };
 
   const handleCheckTwo = () => {
-    if (checkTwo.current)
-      checkTwo.current.classList.toggle("hidden");
-  }
+    if (checkTwo.current) checkTwo.current.classList.toggle("hidden");
+  };
 
-  const handleInvalidEmail = (e : any) => {
+  const handleInvalidEmail = (e: any) => {
     e.preventDefault();
-    if (e.target.validationMessage.length && emailMessage.current)
+    if (e.target.validationMessage.length && emailMessage.current) {
       emailMessage.current.innerText = e.target.validationMessage;
-  }
+      // setLoginInfo((prevData) => ({
+      //   ...loginInfo,
+      //   email: "",
+      // }));
+      console.log(loginInfo);
+    }
+  };
 
-  const handleInvalidPassword = (e : any) => {
-    e.preventDefault(); 
-    if (e.target.validationMessage.length && passMessage.current)
+  const handleEmailChange = (e: any) => {
+    setLoginInfo((prevData) => ({
+      ...loginInfo,
+      email: e.target.value,
+    }));
+    // console.log(loginInfo);
+  };
+
+  const handlePasswordChange = (e: any) => {
+    setLoginInfo((prevData) => ({
+      ...loginInfo,
+      password: e.target.value,
+    }));
+  };
+  const handleInvalidPassword = (e: any) => {
+    e.preventDefault();
+    if (e.target.validationMessage.length && passMessage.current) {
       passMessage.current.innerText = e.target.validationMessage;
-  }
+     }
+  };
 
+  const handleClickButton = (e: any) => {
+    e.preventDefault();
+    console.log(loginInfo);
+    LogIn();
+  };
+  const handleClickGoogleButton = (e : any) => {
+    e.preventDefault();
+    console.log(loginInfo);
+    LogInGoogle();
+  }
   return (
-    <div className='container-box'>
+    <div className="container-box">
       <Navbar />
-      <div className='container'>
+      <div className="container">
         <div className="signin-content">
           <div className="signin">
             <h2>Join the game!</h2>
@@ -51,14 +132,35 @@ export default function SignIn () {
             <div className="auth">
               <form action="">
                 <div className="email">
-                  <label className='label' htmlFor="emailInput" >email</label>
-                  <input className='input' id='emailInput' type="email" placeholder='email' autoFocus required onInvalid={handleInvalidEmail} />
-                  <div ref={emailMessage} className="error email-error">
-                  </div>
+                  <label className="label" htmlFor="emailInput">
+                    email
+                  </label>
+                  <input
+                    className="input"
+                    id="emailInput"
+                    type="email"
+                    placeholder="email"
+                    autoFocus
+                    required
+                    onInvalid={handleInvalidEmail}
+                    onChange={handleEmailChange}
+                  />
+
+                  <div ref={emailMessage} className="error email-error"></div>
                 </div>
                 <div className="pass">
-                  <label className='label' htmlFor="passwordInput">password</label>
-                  <input className='input' id='passwordInput' type='password' placeholder='password' required onInvalid={handleInvalidPassword}  ></input>
+                  <label className="label" htmlFor="passwordInput">
+                    password
+                  </label>
+                  <input
+                    className="input"
+                    id="passwordInput"
+                    type="password"
+                    placeholder="password"
+                    required
+                    onInvalid={handleInvalidPassword}
+                    onChange={handlePasswordChange}
+                  />
                   <div className="forgot-pass">
                     <Link href="#">Forgot your password?</Link>
                   </div>
@@ -67,15 +169,22 @@ export default function SignIn () {
                   </div>
                 </div>
                 <div className="checkbox">
-                  <input type="checkbox" name="terms" id="terms" value="terms" />
-                  <div className="check-icon" onClick={handleCheckOne} >
+                  <input
+                    type="checkbox"
+                    name="terms"
+                    id="terms"
+                    value="terms"
+                  />
+                  <div className="check-icon" onClick={handleCheckOne}>
                     <div ref={checkOne} className="icon hidden">
                       <FaCheckSquare size="16" />
                     </div>
                   </div>
-                  <label htmlFor="terms" onClick={handleCheckOne} >I agree to <Link href="#" >terms & conditions</Link> </label>
+                  <label htmlFor="terms" onClick={handleCheckOne}>
+                    I agree to <Link href="#">terms & conditions</Link>{" "}
+                  </label>
                 </div>
-                
+
                 <div className="checkbox">
                   <input type="checkbox" name="terms" id="news" value="news" />
                   <div className="check-icon" onClick={handleCheckTwo}>
@@ -83,38 +192,44 @@ export default function SignIn () {
                       <FaCheckSquare size="16" />
                     </div>
                   </div>
-                  <label htmlFor='news' onClick={handleCheckTwo} >I&apos;d like to being informed about latest news and tips</label>
+                  <label htmlFor="news" onClick={handleCheckTwo}>
+                    I&apos;d like to being informed about latest news and tips
+                  </label>
                 </div>
-                <button>
-                  sign in
-                </button>
+                <button onClick={handleClickButton}>{isLoginLoading ? "Longin into your account" : "sign in"}</button>
+          
                 <div className="auto-auth">
                   or you can sign in with
-                  <div className='logos'>
-                    <div className="google">
-                      <Image 
+                  <div className="logos">
+                    <Link href="http://127.0.0.1:8080/api/auth/google/login" >
+                    <div className="google" >
+                      <Image
                         src={googleLogo}
                         width={24}
                         height={24}
-                        alt='google icon'
+                        alt="google icon"
                       />
-                    </div>
+                    </div> </Link>
+                    <Link href="http://127.0.0.1:8080/api/auth/42/login" >
                     <div className="school">
-                      <Image 
+                      <Image
                         src={schoolLogo}
                         width={34}
                         height={24}
-                        alt='google icon'
+                        alt="google icon"
                       />
                     </div>
+                    </Link>
+                    <Link href="http://127.0.0.1:8080/api/auth/github/login" >
                     <div className="github">
-                      <Image 
-                          src={GithubLogo}
-                          width={24}
-                          height={24}
-                          alt='google icon'
+                      <Image
+                        src={GithubLogo}
+                        width={24}
+                        height={24}
+                        alt="google icon"
                       />
                     </div>
+                    </Link>
                   </div>
                 </div>
               </form>

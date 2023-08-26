@@ -1,18 +1,6 @@
-import { 
-    Body,
-    Controller,
-    Delete, 
-    Get, 
-    Param,
-    Patch,
-    Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ChannelService } from './channel.service';
-import { Response } from 'express';
-import { 
-    CreateChannelDto, 
-    createMessageChannelDto, 
-    updateUserRoleDto, 
-    userBanMuteDto} from './dto/channel.dto';
+import { CreateChannelDto, createMessageChannelDto, updateUserRoleDto, userBanMuteDto} from './dto/channel.dto';
 
 @Controller('api/channels')
 export class ChannelController {
@@ -24,8 +12,8 @@ export class ChannelController {
     }
 
     @Delete('/:channelId')
-    async deleteChannel(@Param('channelId') channelId:string, res:Response){
-        return await this.channelService.deleteChannelById(channelId, res);
+    async deleteChannel(@Param('channelId') channelId:string){
+        return await this.channelService.deleteChannelById(channelId);
     }
 
     @Delete('/:channelId/:user_id')
@@ -53,10 +41,11 @@ export class ChannelController {
         return await this.channelService.banUser(userBanMuteDto);
     }
 
-    @Post('/mute')
+    @Patch('/mute')
     async muteUser(@Body() userBanMuteDto:userBanMuteDto){
         const channelMutedId = await this.channelService.muteUser(userBanMuteDto);
-        setTimeout(async () => { await this.channelService.unmuteUser(channelMutedId.id)}, 30000);
+        await new Promise(resolve => setTimeout(resolve, 50000));
+        await this.channelService.unmuteUser(channelMutedId.userId);
     }
 
     @Post('/messages')

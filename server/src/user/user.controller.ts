@@ -6,7 +6,7 @@ import { CreateMatchDto } from './dto/create-match.dto';
 
 @Controller('/api')
 export class UserController {
-    constructor(private userService:UserService) {}
+    constructor(private userService: UserService) {}
 
     @Get('/users/')
     async getAllUsers():Promise<User[]>{

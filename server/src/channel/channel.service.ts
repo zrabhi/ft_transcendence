@@ -1,51 +1,55 @@
-import { 
-    HttpException,
-    HttpStatus,
-    Injectable,
-    Param,
-    } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Param } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Role, Type, UserRole} from '@prisma/client';
-import { Response } from 'express';
-import { 
-    CreateChannelDto, 
-    createMessageChannelDto, 
-    updateUserRoleDto, 
-    userBanMuteDto} from './dto/channel.dto';
+import { Role, Type, UserRole } from '@prisma/client';
+import { CreateChannelDto, createMessageChannelDto, updateUserRoleDto, userBanMuteDto } from './dto/channel.dto';
+import { Timeout } from '@nestjs/schedule';
 
 @Injectable()
 export class ChannelService {
     constructor (private prismaService:PrismaService){}
 
     async addChannel(createChannelDto:CreateChannelDto){
-        return await this.prismaService.channel.create({
-            data:{
-                name: createChannelDto.name,
-                type: createChannelDto.type,
-                roles:{
-                    create:[
-                        {
-                            userId:createChannelDto.owner_id,
-                            role:Role.OWNER
-                        }
-                    ]
+        try
+        {
+            await this.checkUserAvailability(createChannelDto.owner_id);
+            return await this.prismaService.channel.create({
+                data:{
+                    name: createChannelDto.name,
+                    type: createChannelDto.type,
+                    roles:{
+                        create:[
+                            {
+                                userId:createChannelDto.owner_id,
+                                role:Role.OWNER
+                            }
+                        ]
+                    },
+                    restrictedUsers:{
+                        create:[
+                            {
+                                userId:createChannelDto.owner_id,
+                                isBanned:false,
+                                isMute:false,
+                            }
+                        ]
+                    },
+    
                 },
-                restrictedUsers:{
-                    create:[
-                        {
-                            userId:createChannelDto.owner_id,
-                            isBanned:false,
-                            isMute:false,
-                        }
-                    ]
-                },
-
-            },
-            select:{id: true}
-        })
+                select:{id: true}
+            })
+        }
+        catch (error)
+        {
+            throw new HttpException({
+                status: HttpStatus.BAD_REQUEST,
+                error: 'The owner_id Provided not found',
+            }, HttpStatus.BAD_REQUEST, {
+                cause: error
+            });
+        }
     }
 
-    async deleteChannelById(channelId:string, res:Response){
+    async deleteChannelById(channelId:string){
         try{
             return await this.prismaService.channel.delete({
                 where:{
@@ -55,7 +59,12 @@ export class ChannelService {
             })
         } catch(error)
         {
-            res.status(HttpStatus.NO_CONTENT).json({error: 'No Content For this User'});
+            throw new HttpException({
+                status: HttpStatus.NO_CONTENT,
+                error: 'No Content For this Channel_Id',
+            }, HttpStatus.NO_CONTENT, {
+                cause:error
+            });
         }
     }
 
@@ -85,12 +94,12 @@ export class ChannelService {
         }
         catch (error)
         {
-        throw new HttpException({
-            status: HttpStatus.NO_CONTENT,
-            error: 'There is no content for this User Role',
-        }, HttpStatus.NO_CONTENT, {
-            cause: error
-        });
+            throw new HttpException({
+                status: HttpStatus.NO_CONTENT,
+                error: 'There is no content for this User Role',
+            }, HttpStatus.NO_CONTENT, {
+                cause: error
+            });
         }
     }
 
@@ -143,7 +152,7 @@ export class ChannelService {
         {
             throw new HttpException({
                 status: HttpStatus.BAD_REQUEST,
-                error: 'Invalid owner Id',
+                error: 'Invalid User Id',
             }, HttpStatus.BAD_REQUEST, {
                 cause:error
             });
@@ -169,47 +178,80 @@ export class ChannelService {
     }
 
     async function(userbanmuteDto:userBanMuteDto){
-        const banner = await this.checkUserAvailability(userbanmuteDto.banner_id);
-        const banned = await this.checkUserAvailability(userbanmuteDto.banned_id);
-
-        if (banner.channelId !== banned.channelId)
+        try
+        {
+            const banner = await this.checkUserAvailability(userbanmuteDto.banner_id);
+            const banned = await this.checkUserAvailability(userbanmuteDto.banned_id);
+            if (banner.channelId !== banned.channelId)
+            {
+                throw new HttpException({
+                    status: HttpStatus.BAD_REQUEST,
+                    error:"users belongs to two Different channelIds", 
+                }, HttpStatus.BAD_REQUEST);
+            }
+            if (!this.banMutePossibility(banner.role, banned.role))
+            {
+                throw new HttpException({
+                    status: HttpStatus.BAD_REQUEST,
+                    error:"You have not the privilege to ban this User", 
+                }, HttpStatus.BAD_REQUEST);
+            }
+        }catch(error)
         {
             throw new HttpException({
-                status: HttpStatus.BAD_REQUEST,
-                error:"users belongs to two Different channelIds", 
-            }, HttpStatus.BAD_REQUEST);
-        }
-        if (!this.banMutePossibility(banner.role, banned.role))
-        {
-            throw new HttpException({
-                status: HttpStatus.BAD_REQUEST,
-                error:"You have not the privilege to ban this User", 
-            }, HttpStatus.BAD_REQUEST);
+                status: HttpStatus.NOT_FOUND,
+                error: "Users requested not Found",
+            }, HttpStatus.NOT_FOUND);
         }
     }
     // don't forget to give a meaninful name to function
 
     async muteUser(userbanmuteDto:userBanMuteDto){
-        this.function(userbanmuteDto);
         try{
-            return await this.prismaService.channelBlock.create({
-                data:{
-                    isMute:true,
-                    user:{
-                        connect:{
-                            id:userbanmuteDto.banned_id,
-                        }
-                    },
-                    channel:{
-                        connect:{
-                            id:userbanmuteDto.channel_id
-                        }
-                    }
+            this.function(userbanmuteDto);
+            const found = await this.prismaService.channelBlock.findFirst({
+                where:{
+                    userId:userbanmuteDto.banned_id,
                 },
                 select:{
-                    id:true,
+                    id:true
                 }
             })
+            if (!found)
+            {
+                return await this.prismaService.channelBlock.create({
+                    data:{
+                        isMute:true,
+                        user:{
+                            connect:{
+                                id:userbanmuteDto.banned_id,
+                            }
+                        },
+                        channel:{
+                            connect:{
+                                id:userbanmuteDto.channel_id
+                            }
+                        }
+                    },
+                    select:{
+                        userId:true,
+                    }
+                })
+            }
+            else
+            {
+                return await this.prismaService.channelBlock.update({
+                    where:{
+                        id:found.id
+                    },
+                    data:{
+                        isMute:true
+                    },
+                    select:{
+                        userId:true,
+                    }
+                })
+            }
         }
         catch(error)
         {
@@ -220,20 +262,28 @@ export class ChannelService {
         }
     }
 
-    async unmuteUser(channelBlockId:string){
-            await this.prismaService.channelBlock.update({
-                where:{
-                    id:channelBlockId
-                },
-                data:{
-                    isMute:false,
-                }
-            })
+    async unmuteUser(user_id:string){
+        const user = await this.prismaService.channelBlock.findFirst({
+            where:{
+                userId:user_id,
+            },
+            select:{
+                id:true,
+            }
+        })
+        await this.prismaService.channelBlock.update({
+            where:{
+                id:user.id,
+            },
+            data:{
+                isMute:false,
+            }
+        })
     }
 
     async banUser(userbanmuteDto:userBanMuteDto){
-        this.function(userbanmuteDto);
         try{
+            this.function(userbanmuteDto);
             return await this.prismaService.channelBlock.create({
                 data:{
                     isBanned:true,
@@ -263,9 +313,9 @@ export class ChannelService {
     }
 
     async kickUser(userbanmuteDto:userBanMuteDto){
-        this.function(userbanmuteDto);
         try
         {
+            this.function(userbanmuteDto);
             return await this.removeUserfromChannel(userbanmuteDto.banned_id, userbanmuteDto.channel_id);
         }
         catch(error)

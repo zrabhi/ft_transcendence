@@ -12,7 +12,6 @@ export default function Home() {
           <div className="container-box">
             <Navbar />
             <MainContent />
-            <ScrollDown />
           </div>
         </div>
       </div>

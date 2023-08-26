@@ -2,8 +2,8 @@ import { IsAlphanumeric, IsEmail, IsNotEmpty, IsOptional, IsStrongPassword, MaxL
 
 
 export class CreateUserDto{
-    @IsNotEmpty()
-    @IsEmail()
+    // @IsNotEmpty()
+    // @IsEmail()
     email:string
     
     @IsOptional()
@@ -12,12 +12,13 @@ export class CreateUserDto{
     @IsOptional()
     cover: string
     
-    @MaxLength(20, {message: "The Username is too High."})
-    @MinLength(6, {message: "The Username is too low."})
-    @IsNotEmpty()
+    // @MaxLength(20, {message: "The Username is too High."})
+    // @MinLength(6, {message: "The Username is too low."})
+    // @IsNotEmpty()
     username:string
 
-    @IsStrongPassword()
-    @IsNotEmpty()
+    // @IsStrongPassword()
+    // @IsNotEmpty()
+    @IsOptional()
     password: string
 }

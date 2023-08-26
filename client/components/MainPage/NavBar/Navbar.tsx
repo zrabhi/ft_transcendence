@@ -33,7 +33,7 @@ const Navbar = () => {
             <li>
               <Link className='link' href='about-us' >About us</Link>
             </li>
-              <Link href='/signin' >
+              <Link href='/login' >
                 <button className='
                   signin-btn
                   px-4 py-2

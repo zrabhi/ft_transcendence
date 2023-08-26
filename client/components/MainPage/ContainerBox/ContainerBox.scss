@@ -7,8 +7,9 @@
   border-radius: 2rem;
   display: flex;
   flex-direction: column;
-  
-  // Start Scroll Down
+  .box {
+    min-height: 80vh;
+  }
   .scroll-down {
     margin-top: 4rem;
     padding-bottom: 4rem;

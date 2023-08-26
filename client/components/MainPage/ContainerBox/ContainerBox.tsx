@@ -10,7 +10,7 @@ export default function ContainerBox({component}: any) {
   return (
     <div className="container-box">
       <Navbar />
-      <div className="grow bottom-of-nav flex justify-center items-center ">
+      <div className="box flex justify-center items-center ">
         {component === "MainContent" && <MainContent />}
         {component === "GameHistory" && <GameHistory />}
         {component === "instructions" && <Instructions />}

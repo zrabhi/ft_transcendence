@@ -1,0 +1,275 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Start Global Rules */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #090227;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  width: 92%;
+  margin: auto;
+}
+
+.container-box {
+  background: linear-gradient(to bottom, #2f245e, #251C48);
+  width: 97vw;
+  margin: 2rem auto 0;
+  border-radius: 2rem;
+}
+
+@media only screen and (max-width: 1024px) {
+  .container {
+    width: 96%;
+  }
+}
+@media only screen and (max-width: 768px) {
+  .container {
+    width: 98%;
+    padding: 1rem;
+  }
+}
+/* End Global Rules */
+/* Start Global Rules */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  background-size: cover;
+}
+
+.signin-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4rem;
+  padding: 4rem 0;
+}
+.signin-content .img {
+  position: relative;
+}
+.signin-content .img::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(77, 22, 150, 0.6);
+}
+.signin-content .signin {
+  width: 30rem;
+  border-radius: 1rem;
+  padding: 2rem 1rem;
+  color: #fff;
+  border: 2px solid #4D4AC9;
+  position: relative;
+  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.3);
+}
+.signin-content .signin::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  background-color: #4D4AC9;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.4;
+  z-index: -1;
+  border-radius: 1rem;
+}
+.signin-content .signin h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+}
+.signin-content .signin p {
+  font-size: 0.9rem;
+  text-align: center;
+  opacity: 0.7;
+  margin-bottom: 2rem;
+}
+.signin-content .signin .auth {
+  padding: 1rem;
+  position: relative;
+}
+.signin-content .signin .auth form .label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: capitalize;
+  margin-left: 0.2rem;
+  margin-bottom: 0.2rem;
+  font-weight: bold;
+  opacity: 0.7;
+}
+.signin-content .signin .auth form .input {
+  outline: none;
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: rgba(77, 22, 150, 0.6);
+  font-size: 0.9rem;
+}
+.signin-content .signin .auth form .input::-moz-placeholder {
+  text-transform: capitalize;
+}
+.signin-content .signin .auth form .input::placeholder {
+  text-transform: capitalize;
+}
+.signin-content .signin .auth form .error {
+  margin-bottom: 1.2rem;
+  padding-left: 0.2rem;
+  font-size: 0.8rem;
+  color: #D43A48;
+}
+.signin-content .signin .auth form .pass {
+  position: relative;
+}
+.signin-content .signin .auth form .pass .forgot-pass a {
+  font-size: 0.8rem;
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 0.7rem;
+  font-weight: bold;
+  opacity: 0.7;
+}
+.signin-content .signin .auth form .pass .pass-strength {
+  margin-bottom: 1rem;
+}
+.signin-content .signin .auth form .pass .pass-strength .bar {
+  height: 3px;
+  width: 100%;
+  background-color: #fff;
+  margin-top: -1rem;
+  border-radius: 1rem;
+  position: relative;
+  display: none;
+}
+.signin-content .signin .auth form .pass .pass-strength .bar .green-bar {
+  width: 60%;
+  height: 3px;
+  border-radius: 1rem;
+  background-color: green;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.8;
+}
+.signin-content .signin .auth form .pass .pass-strength .text {
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+.signin-content .signin .auth form .checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+.signin-content .signin .auth form .checkbox input[type=checkbox] {
+  display: none;
+}
+.signin-content .signin .auth form .checkbox .check-icon {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #fff;
+  border-radius: 2px;
+  position: relative;
+}
+.signin-content .signin .auth form .checkbox .check-icon .icon {
+  position: absolute;
+  top: -0.1rem;
+  left: -0.1rem;
+}
+.signin-content .signin .auth form .checkbox label {
+  font-size: 0.8rem;
+  padding-left: 0.6rem;
+  cursor: pointer;
+}
+.signin-content .signin .auth form button {
+  background-color: #4D4AC9;
+  width: 100%;
+  padding: 0.6rem;
+  margin: 1.2rem auto;
+  text-transform: capitalize;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  position: relative;
+  transition: 0.2s ease-in-out;
+  cursor: pointer;
+}
+.signin-content .signin .auth form button:hover {
+  opacity: 0.8;
+}
+.signin-content .signin .auth form button::after {
+  content: "";
+  width: 100%;
+  height: 1px;
+  background-color: #fff;
+  position: absolute;
+  bottom: -0.5rem;
+  left: 0;
+  border-radius: 1px;
+  opacity: 0.5;
+}
+.signin-content .signin .auth form .auto-auth {
+  text-align: center;
+  padding-top: 1rem;
+}
+.signin-content .signin .auth form .auto-auth .logos {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.signin-content .signin .auth form .auto-auth .logos div {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+.signin-content .signin .auth form .auto-auth .logos div:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+.signin-content .signin .signupbtn {
+  text-align: center;
+}
+.signin-content .signin .signupbtn button {
+  text-transform: capitalize;
+}
+
+@media (max-width: 1200px) {
+  .signin-content {
+    justify-content: center;
+    align-items: center;
+  }
+  .signin-content .img {
+    display: none;
+  }
+}
+@media (max-width: 768px) {
+  .signin-content {
+    width: 100%;
+  }
+}/*# sourceMappingURL=style.css.map */

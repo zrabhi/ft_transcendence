@@ -7,6 +7,17 @@ $grd-second-color: #251C48; // for box gradient
 $main-text-color: #fff; // for text 
 $blue-bg-color: #4D4AC9; // some box need diff bg color
 $main-bg-color: #090227; // bg for body
+$error-color: #D43A48; // for error messages
+
+$subtle-gray-color: #999999; // for text
+$soft-gold-color: #D4AF37; // for text icons
+$deep-green-color: #006400; // for success messages
+$cool-teal-color: #00A3A3; // for info messages
+
+// $yellow-color: #FFD700; // for warning messages
+// $analog-color: #8A2BE2;
+// $light-blue-color: #add8e6;
+// $dark-purple-color: #4B0082;
 
 /* Start Global Rules */
 * {
@@ -17,11 +28,35 @@ $main-bg-color: #090227; // bg for body
 
 body {
   background-color: $main-bg-color;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .container {
   width: 92%;
   margin: auto;
+}
+
+.container-box {
+  background: linear-gradient(to bottom, $grd-first-color, $grd-second-color);
+  width: 97vw;
+  margin: 2rem auto 0;
+  border-radius: 2rem;
+  .section-part {
+    min-height: 90vh;
+  }
+}
+
+.not-found {
+  .container {
+    .content {
+      .link {
+        background-color: $blue-bg-color;
+        width: fit-content;
+      }
+    }
+  }
 }
 
 @media only screen and (max-width: 1024px) {
@@ -32,12 +67,12 @@ body {
 
 @media only screen and (max-width: 768px) {
   .container {
-    width: 100%;
+    width: 98%;
     padding: 1rem;
   }
 }
-/* End Global Rules */
 
+/* End Global Rules */
 
 
 

@@ -12,6 +12,7 @@ import { GithubGuard } from './Guards/GithubGuard';
 import { profile } from 'console';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtAuthGuard } from './Guards/AuthGurad';
+import { SeassionGuard } from './Guards/SeassionGuard';
 
 @Controller('/api/auth')
 export class AuthController {
@@ -47,7 +48,7 @@ export class AuthController {
     {
         return ({msg: "42 login"})
     }
-
+    
     @Get('/42/redirect')
     @UseGuards(FtGurad)
     async handleRedirectFt(@User() user : Profile, @Request() request, @Res() response: Response)

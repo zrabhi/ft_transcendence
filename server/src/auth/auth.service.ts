@@ -61,9 +61,7 @@ export class AuthService {
 
   extractGoogleUserData(user: any): CreateUserDto {
     const { name, emails, photos } = user;
-    console.log(name);
-    console.log(emails);
-    console.log(photos);
+   
     const userData: CreateUserDto = {
       email: emails[0].value,
       username: name.givenName,
@@ -75,6 +73,8 @@ export class AuthService {
   }
 
   extract42UserData(user: any) {
+    console.log(user);
+    
     const { login, email, image } = user._json;
     console.log(user._json.email);
     

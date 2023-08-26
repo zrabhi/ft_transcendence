@@ -4,7 +4,6 @@ import { GoogleGuard } from './Guards/GoogleGuard';
 import passport, { Profile } from 'passport';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './Strategys/GoogleStrategy';
-import { AuthGuard } from '@nestjs/passport';
 import { AuthDto } from './dto/auth.dto';
 import { redirect } from 'react-router-dom';
 import { User } from './decorator/user-decorator';
@@ -12,6 +11,7 @@ import { FtGurad } from './Guards/42Gurad';
 import { GithubGuard } from './Guards/GithubGuard';
 import { profile } from 'console';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { JwtAuthGuard } from './Guards/AuthGurad';
 
 @Controller('/api/auth')
 export class AuthController {
@@ -22,13 +22,17 @@ export class AuthController {
     @Post('signin')
     async handleSignin(@Body() body: AuthDto, @Res() response: Response)
     {                 
-        console.log(body);
+        try{
         const user = await this.authService.signin(body);
         console.log(user);
         if (!user)
             return response.status(400).json({msg: 'Invalid Credencial'});
         else 
+        {
+            response.cookie('access_token', user);
             return response.status(200).json({msg: 'ok'});
+        }
+    }   catch   (e) {   return  response.status(400).json({msg: 'Invalid Credencial Error   '   + e.message});}
     }
     @Get('google/login')
     @UseGuards(GoogleGuard)

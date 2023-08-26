@@ -24,6 +24,7 @@ export class AuthService {
   ) {}
 
   async signin(body: AuthDto) {
+    
     console.log(body);
 
     const user = await this._prisma.user.findFirst({
@@ -31,8 +32,9 @@ export class AuthService {
         email: body.email,
       },
     });
-    console.log("udrt", user);
     
+    console.log("udrt", user);
+
     if (!user) {
       throw new HttpException(
         {
@@ -44,7 +46,12 @@ export class AuthService {
       );
     }
     if (body.password === user.password) 
-        return true;
+    {
+      return await this.extractJwtToken({
+        id: user.id,
+        username: user.username,
+      });
+    }
     // const matches = await bcrypt.compare(body.password, user.password);
     // if (!matches) {
     //   return false;

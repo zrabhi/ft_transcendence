@@ -14,9 +14,9 @@ import { GithubStrategy } from './Strategys/GithubStrategy';
 @Module({
   imports: [ConfigModule.forRoot(), PassportModule, JwtModule.register({
     global: true,
-    secret: 'SECRET_KEY',
+    secret: process.env.JWT_SECRET,
     signOptions: {
-      expiresIn:'1h'
+      expiresIn:process.env.JWT_EXPIRATION,
     }
   })],
   providers: [GoogleStrategy, FtStrategy,GithubStrategy, JwtStrategy, PrismaService, AuthService, UserService],

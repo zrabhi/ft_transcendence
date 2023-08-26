@@ -1,13 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Achievement, Match, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CreateMatchDto } from './dto/create-match.dto';
+import { JwtAuthGuard } from 'src/auth/Guards/AuthGurad';
 
 @Controller('/api')
 export class UserController {
     constructor(private userService: UserService) {}
 
+    @UseGuards(JwtAuthGuard)
     @Get('/users/')
     async getAllUsers():Promise<User[]>{
         return await this.userService.findAllUsers();

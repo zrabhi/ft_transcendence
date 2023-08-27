@@ -1,9 +1,3 @@
-// 'use client'
-// import Navbar from '@/components/MainPage/NavBar/Navbar';
-// import './../hero-section.scss'
-// import { useRef } from 'react';
-// import { FaCheckSquare } from 'react-icons/fa';
-
 "use client";
 import Navbar from "@/components/MainPage/NavBar/Navbar";
 import './style.scss'
@@ -82,10 +76,6 @@ export default function SignIn() {
     e.preventDefault();
     if (e.target.validationMessage.length && emailMessage.current) {
       emailMessage.current.innerText = e.target.validationMessage;
-      // setLoginInfo((prevData) => ({
-      //   ...loginInfo,
-      //   email: "",
-      // }));
       console.log(loginInfo);
     }
   };
@@ -95,7 +85,6 @@ export default function SignIn() {
       ...loginInfo,
       email: e.target.value,
     }));
-    // console.log(loginInfo);
   };
 
   const handlePasswordChange = (e: any) => {
@@ -116,11 +105,7 @@ export default function SignIn() {
     console.log(loginInfo);
     LogIn();
   };
-  const handleClickGoogleButton = (e : any) => {
-    e.preventDefault();
-    console.log(loginInfo);
-    LogInGoogle();
-  }
+
   return (
     <div className="container-box">
       <Navbar />
@@ -196,7 +181,7 @@ export default function SignIn() {
                     I&apos;d like to being informed about latest news and tips
                   </label>
                 </div>
-                <button onClick={handleClickButton}>{isLoginLoading ? "Longin into your account" : "sign in"}</button>
+                <button onClick={handleClickButton}> sign in</button>
           
                 <div className="auto-auth">
                   or you can sign in with

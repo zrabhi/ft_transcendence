@@ -1,23 +1,16 @@
-// 'use client'
-// import Navbar from '@/components/MainPage/NavBar/Navbar';
-// import './../hero-section.scss'
-// import { useRef } from 'react';
-// import { FaCheckSquare } from 'react-icons/fa';
-
 "use client";
 import Navbar from "@/components/MainPage/NavBar/Navbar";
 import './style.scss'
-  import Link from "next/link";
-  import Image from "next/image";
-  import "./style.scss";
-  import "../../hero-section.scss";
-  import { baseURL, getRequest, postRequest } from "../../context/utils/service";
-  import { useCallback, useRef, useState } from "react";
-  import { FaCheckSquare } from "react-icons/fa";
-  import googleLogo from '@/public/images/google.png'
-  import schoolLogo from '@/public/images/42.png'
-  import GithubLogo from '@/public/images/github.png'
-
+import Link from "next/link";
+import Image from "next/image";
+import "./style.scss";
+import "../../hero-section.scss";
+import { baseURL, getRequest, postRequest } from "../../context/utils/service";
+import { useCallback, useRef, useState } from "react";
+import { FaCheckSquare } from "react-icons/fa";
+import googleLogo from '@/public/images/google.png'
+import schoolLogo from '@/public/images/42.png'
+import GithubLogo from '@/public/images/github.png'
 
 export default function SignIn() {
   //All refs
@@ -108,7 +101,7 @@ export default function SignIn() {
     e.preventDefault();
     if (e.target.validationMessage.length && passMessage.current) {
       passMessage.current.innerText = e.target.validationMessage;
-     }
+    }
   };
 
   const handleClickButton = (e: any) => {

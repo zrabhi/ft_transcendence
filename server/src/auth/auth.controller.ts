@@ -6,7 +6,6 @@ import { AuthService } from './auth.service';
 import { GoogleStrategy } from './Strategys/GoogleStrategy';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthDto } from './dto/auth.dto';
-import { redirect } from 'react-router-dom';
 import { User } from './decorator/user-decorator';
 import { FtGurad } from './Guards/42Gurad';
 import { GithubGuard } from './Guards/GithubGuard';
@@ -15,9 +14,9 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Controller('/api/auth')
 export class AuthController {
-  constructor(private authService: AuthService)
-  {
-  }
+    constructor(private authService: AuthService)
+    {
+    }
 
     @Post('signin')
     async handleSignin(@Body() body: AuthDto, @Res() response: Response)

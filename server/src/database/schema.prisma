@@ -28,6 +28,8 @@ model User {
   discordHandler       String?
   twitterHandler       String?
   created_date         DateTime @default(now())
+  tfa                   Boolean?  @default(false)
+  twoFactorAuthenticationSecret String?   
 
   channelMessages Channel_message[] @relation(name: "channelMessage")
 

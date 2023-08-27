@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Post, Req, Request, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  Request,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { GoogleGuard } from './Guards/GoogleGuard';
 import passport, { Profile } from 'passport';
@@ -16,85 +27,152 @@ import { SeassionGuard } from './Guards/SeassionGuard';
 
 @Controller('/api/auth')
 export class AuthController {
-  constructor(private authService: AuthService)
-  {
+  constructor(private authService: AuthService) {}
+
+  @Post('signin')
+  async handleSignin(@Body() body: AuthDto, @Res() response: Response) {
+    try {
+      const user = await this.authService.signin(body);
+      console.log(user);
+      if (!user)
+        return response.status(400).json({ msg: 'Invalid Credencial' });
+      else {
+        response.cookie('access_token', user);
+        return response
+          .status(200)
+          .json({ msg: 'u will be redirected to yout profile ' });
+      }
+    } catch (e) {
+      return response
+        .status(400)
+        .json({ msg: 'Invalid Credencial Error   ' + e.message });
+    }
+  }
+  @Get('google/login')
+  @UseGuards(GoogleGuard)
+  async handleGoogleLogin() {
+    return;
   }
 
-    @Post('signin')
-    async handleSignin(@Body() body: AuthDto, @Res() response: Response)
-    {                 
-        try{
-        const user = await this.authService.signin(body);
-        console.log(user);
-        if (!user)
-            return response.status(400).json({msg: 'Invalid Credencial'});
-        else 
-        {
-            response.cookie('access_token', user);
-            return response.status(200).json({msg: 'ok'});
-        }
-    }   catch   (e) {   return  response.status(400).json({msg: 'Invalid Credencial Error   '   + e.message});}
-    }
-    @Get('google/login')
-    @UseGuards(GoogleGuard)
-   async handleGoogleLogin()
-    {
-        return ;
-    }
+  @Get('42/login')
+  @UseGuards(FtGurad)
+  handle42login() {
+    return { msg: '42 login' };
+  }
 
-    @Get('42/login')
-    @UseGuards(FtGurad)
-    handle42login()
-    {
-        return ({msg: "42 login"})
+  @Get('/42/redirect')
+  @UseGuards(FtGurad)
+  async handleRedirectFt(
+    @User() user: Profile,
+    @Request() request,
+    @Res() response: Response,
+  ) {
+    try {
+      const userData = this.authService.extract42UserData(user);
+      const access_token = await this.authService.login(userData, response);
+      console.log(access_token);
+      response.cookie('access_token', access_token);
+      if (userData.password === '' || userData.email === '')
+        return response.redirect('http://127.0.0.1:3000/login/complete');
+      response.redirect('http://127.0.0.1:3000/profile');
+    } catch (err) {
+      response.status(400).json({ message: err.message });
     }
-    
-    @Get('/42/redirect')
-    @UseGuards(FtGurad)
-    async handleRedirectFt(@User() user : Profile, @Request() request, @Res() response: Response)
-    {
-        const userData  = this.authService.extract42UserData(user);
-        const access_token =  await this.authService.login(userData, response);
-        console.log(access_token);
-        response.cookie('access_token', access_token);
-        if (userData.password === '' || userData.email === '')
-            return response.redirect("http://127.0.0.1:3000");
-        response.redirect("http://127.0.0.1:3000/profile");
-    }
+  }
 
-    @Get('google/redirect')
-    @UseGuards(GoogleGuard)
-    async handleRedirectGoogle(@User() user : Profile, @Req() request, @Res() response)
-    {
-        const userData  = this.authService.extractGoogleUserData(user);
-        const access_token =  await this.authService.login(userData, response);
-        console.log(access_token);
-        response.cookie('access_token', access_token);
-        if (userData.password === '' || userData.email === '')
-            return response.redirect("http://127.0.0.1:3000");
-        response.redirect("http://127.0.0.1:3000/profile");
-        
+  @Get('google/redirect')
+  @UseGuards(GoogleGuard)
+  async handleRedirectGoogle(
+    @User() user: Profile,
+    @Req() request,
+    @Res() response,
+  ) {
+    try {
+      const userData = this.authService.extractGoogleUserData(user);
+      const access_token = await this.authService.login(userData, response);
+      console.log(access_token);
+      response.cookie('access_token', access_token);
+      if (userData.password === '' || userData.email === '')
+        return response.redirect('http://127.0.0.1:3000/login/complete');
+      response.redirect('http://127.0.0.1:3000/profile');
+    } catch (err) {
+      response.status(400).json({ message: err.message });
     }
+  }
 
-    @Get('github/login')
-    @UseGuards(GithubGuard)
-    handleGithublogin()
-    {
-        return ({msg: "Github login"})
+  @Get('github/login')
+  @UseGuards(GithubGuard)
+  handleGithublogin() {
+    return { msg: 'Github login' };
+  }
+  @Get('/github/redirect')
+  @UseGuards(GithubGuard)
+  async handleRedirectGithub(
+    @User() user: Profile,
+    @Request() request,
+    @Res() response,
+  ) {
+    try {
+      const userData = this.authService.extractUserGithubData(user);
+      const access_token = await this.authService.login(userData, response);
+      console.log(access_token);
+      response.cookie('access_token', access_token);
+      if (userData.password === '' || userData.email === '')
+        return response.redirect('http://127.0.0.1:3000/login/complete');
+      response.redirect('http://127.0.0.1:3000/profile');
+    } catch (err) {
+      response.status(400).json({ message: err.message });
     }
-    @Get('/github/redirect')
-    @UseGuards(GithubGuard)
-    async handleRedirectGithub(@User() user :Profile , @Request() request, @Res() response)
-    {
-        // const {login?, avatar_url?, email?, name } = user;
-        // const userData : CreateUserDto ={
-        //     email: user?.email,
-        //     username: login,
-        //     avatar: avatar_url,
-        //     cover: "",
-        //     password: ""
-        // }
-        console.log("github ",user);
-        response.redirect("http://127.0.0.1:3000/profile");
+  }
+
+  @Post('2fa/trun-on')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
+    console.log(request.user);
+
+    const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+      body.twoFactorAuthenticationCode,
+      request.user,
+    );
+    console.log('isCodeValid ', isCodeValid);
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Wrong authentication code');
     }
+    await this.authService.turnOnTwoFactorAuthentication(request.user.id);
+  }
+
+  // @Post('2fa/authenticate')
+  // @HttpCode(200)
+  // @UseGuards(JwtAuthGuard)
+  // async authenticate(@Request() request, @Body() body) {
+
+  //   try {
+  //     const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+  //       body.twoFactorAuthentication,
+  //       request.user,
+  //     );
+
+  //     if (!isCodeValid) {
+  //       throw new UnauthorizedException('Wrong authentication code');
+  //     }
+
+  //     return this.authService.loginWith2fa(request.user);
+  //   } catch (error) {
+  //     console.log('error is ' + error.message);
+  //   }
+  // }
+
+  @Post('2fa/generate')
+  @UseGuards(JwtAuthGuard)
+  async register(@Res() response, @Request() request) {
+    const { otpauthUrl } =
+      await this.authService.generateTwoFactorAuthenticationSecret(
+        request.user,
+      );
+
+    return response.json(
+      await this.authService.generateQrCodeDataURL(otpauthUrl),
+    );
+  }
 }

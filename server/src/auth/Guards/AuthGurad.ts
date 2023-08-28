@@ -15,10 +15,11 @@ import { ConfigService } from '@nestjs/config';
   
     async canActivate(context: ExecutionContext): Promise<boolean> {
       const request = context.switchToHttp().getRequest();
+      console.log(request.headers);
+      
       const response = context.switchToHttp().getResponse();
       const token = this.extractTokenFromHeader(request);
       if (!token) {
-        console.log("error " , token);
         throw new UnauthorizedException();
       }
       console.log(process.env.JWT_SECRET);
@@ -29,17 +30,14 @@ import { ConfigService } from '@nestjs/config';
           {
             secret: process.env.JWT_SECRET,
           }
-        );
-        // 💡 We're assigning the payload to the request object here
-        // so that we can access it in our route handlers
-        request['user'] = payload;
-        // console.log(request.body);
-        
-      } catch(err) {
-        // response.redirect("http://127.0.0.1:3000/login");
-        console.log("heree", err.message); 
-        
-        throw new UnauthorizedException();
+          );
+          // 💡 We're assigning the payload to the request object here
+          // so that we can access it in our route handlers
+          request['user'] = payload;
+          // console.log(request.body);
+          
+        } catch(err) {
+            throw new UnauthorizedException();
       }
       return true;
     }

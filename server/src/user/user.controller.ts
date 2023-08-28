@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Achievement, Match, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -45,5 +45,21 @@ export class UserController {
     @Post('/users/matches')
     async createMatch(@Body() createMatchDto:CreateMatchDto){
         return await this.userService.createMatch(createMatchDto);
+    }
+    @UseGuards(JwtAuthGuard)
+    @Put('/users')
+    async handleUpdate(@Body() user, @Req() req, @Res() response)
+    {
+        console.log("body is ", user); 
+        try{
+           await this.userService.updateUser(user, req);      
+            return  response.status(200).json({msg: "Information updated successfully"})
+        }catch(err){
+            console.log("im here nowwwww");
+            
+            response.status(400).json({msg: "Couldn't update Your information"});
+        }
+         
+        // return response.redirect('http://127.0.0.1:3000');  
     }
 }

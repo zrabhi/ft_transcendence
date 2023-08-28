@@ -1,17 +1,16 @@
 "use client";
 import Navbar from "@/components/MainPage/NavBar/Navbar";
 import './style.scss'
-  import Link from "next/link";
-  import Image from "next/image";
-  import "./style.scss";
-  import "../../hero-section.scss";
-  import { baseURL, getRequest, postRequest } from "../../context/utils/service";
-  import { useCallback, useRef, useState } from "react";
-  import { FaCheckSquare } from "react-icons/fa";
-  import googleLogo from '@/public/images/google.png'
-  import schoolLogo from '@/public/images/42.png'
-  import GithubLogo from '@/public/images/github.png'
-
+import Link from "next/link";
+import Image from "next/image";
+import "./style.scss";
+import "../../hero-section.scss";
+import { baseUrlAuth, getRequest, postRequest } from "../../context/utils/service";
+import { useCallback, useRef, useState } from "react";
+import { FaCheckSquare } from "react-icons/fa";
+import googleLogo from '@/public/images/google.png'
+import schoolLogo from '@/public/images/42.png'
+import GithubLogo from '@/public/images/github.png'
 
 export default function SignIn() {
   //All refs
@@ -34,7 +33,7 @@ export default function SignIn() {
 
   const LogIn = async () => {
     const response = await postRequest(
-      `${baseURL}/signin`,
+      `${baseUrlAuth}/signin`,
       JSON.stringify(loginInfo)
     );
     console.log(response);
@@ -51,7 +50,7 @@ export default function SignIn() {
     setLoginLoading(true);
     console.log("im hereee");
     const response = await getRequest(
-      `${baseURL}/google/login`
+      `${baseUrlAuth}/google/login`
     );
     console.log(response);
     setLoginLoading(false);
@@ -97,7 +96,7 @@ export default function SignIn() {
     e.preventDefault();
     if (e.target.validationMessage.length && passMessage.current) {
       passMessage.current.innerText = e.target.validationMessage;
-     }
+    }
   };
 
   const handleClickButton = (e: any) => {

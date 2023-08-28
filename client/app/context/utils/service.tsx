@@ -1,5 +1,5 @@
-export const baseURL = "http://127.0.0.1:8080/api/auth";
-
+export const baseUrlAuth = "http://127.0.0.1:8080/api/auth";
+export const baseUrlUsers ="http://127.0.0.1:8080/api"
 import axios from "axios"
 export const postRequest = async (url: string, body: any) => {
 
@@ -25,6 +25,30 @@ export const postRequest = async (url: string, body: any) => {
     return data;
 };
 
+export const putRequest = async (url: string, body: any) => {
+
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body,
+    credentials: "include",
+  });
+  const data = await response.json();
+  if (!response.ok)
+  {
+    console.log("im hereee");
+    
+    let message;
+    if (data?.message)
+        message = data.message;
+    else
+        message =  data;
+    return ({error:true, message});
+  }
+  return data;
+};
 
 export const getRequest = async (url: string) =>
 {

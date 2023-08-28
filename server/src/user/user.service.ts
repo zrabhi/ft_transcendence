@@ -152,7 +152,27 @@ export class UserService {
 
         }
     }
+    
+    async updateUser(body, req)
+    {
+        try{
+            const hashedPass = await bcrypt.hash(body.password, 10);
+            //  const matches = await bcrypt.compare(body.password, user.password);
+           return await this.prismaService.user.update({
+                where:{id:req.user.id},
+                data:{
+                    password:hashedPass,
+                    username:body.username
+                }
+            })
+            
+        }catch(error)
+        {
+                console.log("error: " + error);
+                
+        }
 
+    }
     // async updateUser(updateUserDto: UpdateUserDto){
     //     try {
     //         if (updateUserDto.username !== undefined)

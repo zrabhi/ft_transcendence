@@ -47,17 +47,14 @@ export class AuthService {
         {},
       );
     }
-    if (body.password === user.password) {
+    const matches = await bcrypt.compare(body.password, user.password);
+    if (matches) {
       return await this.extractJwtToken({
         id: user.id,
         username: user.username,
         setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
       });
     }
-    // const matches = await bcrypt.compare(body.password, user.password);
-    // if (!matches) {
-    //   return false;
-    // }
     return false;
   }
 

@@ -1,18 +1,21 @@
 import "@/public/images/logo.svg"
 import './hero-section.scss'
 import Navbar from './../components/MainPage/NavBar/Navbar'
-import MainContent from './../components/MainPage/MainContent/MainContent'
-import { Routes, Route } from "react-router-dom";
+import MainContent from './../components/MainPage/MainContent/MainContent';
+import '@radix-ui/themes/styles.css'
+import { Theme } from '@radix-ui/themes'
 
 export default function Home() {
   return (
       <div className='home' >
-        <div className="hero-section">
-          <div className="container-box">
-            <Navbar />
-            <MainContent />
+        <Theme>
+          <div className="hero-section">
+            <div className="container-box">
+              <Navbar />
+              <MainContent />
+            </div>
           </div>
-        </div>
+        </Theme>
       </div>
   )
 }

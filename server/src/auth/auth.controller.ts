@@ -16,7 +16,6 @@ import passport, { Profile } from 'passport';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './Strategys/GoogleStrategy';
 import { AuthDto } from './dto/auth.dto';
-import { redirect } from 'react-router-dom';
 import { User } from './decorator/user-decorator';
 import { FtGurad } from './Guards/42Gurad';
 import { GithubGuard } from './Guards/GithubGuard';
@@ -24,10 +23,11 @@ import { profile } from 'console';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtAuthGuard } from './Guards/AuthGurad';
 import { SeassionGuard } from './Guards/SeassionGuard';
+import { UserService } from 'src/user/user.service';
 
 @Controller('/api/auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private userService: UserService) {}
 
   @Post('signin')
   async handleSignin(@Body() body: AuthDto, @Res() response: Response) {
@@ -68,12 +68,15 @@ export class AuthController {
     @Res() response: Response,
   ) {
     try {
+      console.log(user);
+      
       const userData = this.authService.extract42UserData(user);
       const access_token = await this.authService.login(userData, response);
       console.log(access_token);
       response.cookie('access_token', access_token);
+      // const user = await this.userService.findUserById()
       if (userData.password === '' || userData.email === '')
-        return response.redirect('http://127.0.0.1:3000/login/complete');
+          return response.redirect('http://127.0.0.1:3000/login/complete');
       response.redirect('http://127.0.0.1:3000/profile');
     } catch (err) {
       response.status(400).json({ message: err.message });

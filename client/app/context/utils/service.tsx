@@ -52,15 +52,33 @@ export const putRequest = async (url: string, body: any) => {
 
 export const getRequest = async (url: string) =>
 {
-  const response = await axios.get(url);
-  // const data = await response.json();
-  let message;
-  if (response.status != 200)
+  const response = await fetch(url, {method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  credentials: "include",
+});
+
+const data = await response.json();
+  if (!response.ok)
   {
-    message = "AN Error occurred...";
-    if (response.data?.message)
-        message = response.data.message;
+    console.log("im hereee");
+    
+    let message;
+    if (data?.message)
+        message = data.message;
+    else
+        message =  data;
     return ({error:true, message});
   }
-  return (response.data);
+  return data;
+  // let message;
+  // if (response.status != 200)
+  // {
+  //   message = "AN Error occurred...";
+  //   if (response.data?.message)
+  //       message = response.data.message;
+  //   return ({error:true, message});
+  // }
+  // return (response.data);
 }

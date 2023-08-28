@@ -11,6 +11,7 @@ import { FaCheckSquare } from "react-icons/fa";
 import googleLogo from '@/public/images/google.png'
 import schoolLogo from '@/public/images/42.png'
 import GithubLogo from '@/public/images/github.png'
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   //All refs
@@ -30,6 +31,9 @@ export default function SignIn() {
     error: false,
     message: "",
   });
+  const router = useRouter();
+  const ErrorRef = useRef<HTMLDivElement>(null);
+
 
   const LogIn = async () => {
     const response = await postRequest(
@@ -38,7 +42,9 @@ export default function SignIn() {
     );
     console.log(response);
 
-    if (response.error) return setLoginError(response);
+    if (response.error) {
+    setLoginError(response);
+    return false;}
     console.log("im hereee");
 
     localStorage.setItem("User", JSON.stringify(response));
@@ -102,7 +108,9 @@ export default function SignIn() {
   const handleClickButton = (e: any) => {
     e.preventDefault();
     console.log(loginInfo);
-    LogIn();
+    if (!LogIn()) 
+        return ErrorRef.current!.innerHTML = "Invalid Credentials" ;
+    router.push('/profile');
   };
 
   return (
@@ -218,6 +226,7 @@ export default function SignIn() {
                 </div>
               </form>
             </div>
+            <div ref={ErrorRef} className="error email-error"></div>
             <div className="signupbtn">
               <button>create an account</button>
             </div>

@@ -1,12 +1,29 @@
-import React from 'react'
+"use client"
+import React, { useEffect, useState } from 'react'
 import './ProfileCard.scss'
 import Image from 'next/image'
 import CoverImage from '@/public/images/FetchCoverImage.png'
 import { BsTwitter, BsDiscord } from 'react-icons/Bs'
 import ReactCountryFlag from 'react-country-flag'
 import Avatar from '@/public/images/DefaultAvatar.jpg'
+import { baseUrlUsers, getRequest } from '@/app/context/utils/service'
 
 export default function ProfileCard() {
+
+  const [user, setUser] = useState();
+  useEffect(() => {
+
+    const Getuserdata = async () =>
+    {
+      const response = await getRequest(`${baseUrlUsers}/user`)
+      console.log(response);
+      setUser(response);
+    }
+
+    Getuserdata();
+  },[])
+
+
   return (
     <div className="profile-card">
       <div className="cover-img">
@@ -64,7 +81,7 @@ export default function ProfileCard() {
           </div>
         </div>
         <div className="username text-center m-2">
-          username
+          {user?.username}
         </div>
       </div>
     </div>

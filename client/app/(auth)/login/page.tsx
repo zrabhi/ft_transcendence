@@ -5,12 +5,13 @@ import Link from "next/link";
 import Image from "next/image";
 import "./style.scss";
 import "../../hero-section.scss";
-import { baseURL, getRequest, postRequest } from "../../context/utils/service";
+import { baseUrlAuth, getRequest, postRequest } from "../../context/utils/service";
 import { useCallback, useRef, useState } from "react";
 import { FaCheckSquare } from "react-icons/fa";
 import googleLogo from '@/public/images/google.png'
 import schoolLogo from '@/public/images/42.png'
 import GithubLogo from '@/public/images/github.png'
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   //All refs
@@ -30,15 +31,20 @@ export default function SignIn() {
     error: false,
     message: "",
   });
+  const router = useRouter();
+  const ErrorRef = useRef<HTMLDivElement>(null);
+
 
   const LogIn = async () => {
     const response = await postRequest(
-      `${baseURL}/signin`,
+      `${baseUrlAuth}/signin`,
       JSON.stringify(loginInfo)
     );
     console.log(response);
 
-    if (response.error) return setLoginError(response);
+    if (response.error) {
+    setLoginError(response);
+    return false;}
     console.log("im hereee");
 
     localStorage.setItem("User", JSON.stringify(response));
@@ -46,22 +52,6 @@ export default function SignIn() {
     return true;
   };
 
-  const LogInGoogle = useCallback(async () => {
-    setLoginLoading(true);
-    console.log("im hereee");
-    const response = await getRequest(
-      `${baseURL}/google/login`
-    );
-    console.log(response);
-    setLoginLoading(false);
-
-    if (response.error) return setLoginError(response);
-
-    localStorage.setItem("User", JSON.stringify(response));
-    setUser(response);
-    return true;
-  }, [loginInfo]);
-  
 
   const handleCheckOne = () => {
     if (checkOne.current) checkOne.current.classList.toggle("hidden");
@@ -75,10 +65,6 @@ export default function SignIn() {
     e.preventDefault();
     if (e.target.validationMessage.length && emailMessage.current) {
       emailMessage.current.innerText = e.target.validationMessage;
-      // setLoginInfo((prevData) => ({
-      //   ...loginInfo,
-      //   email: "",
-      // }));
       console.log(loginInfo);
     }
   };
@@ -88,7 +74,6 @@ export default function SignIn() {
       ...loginInfo,
       email: e.target.value,
     }));
-    // console.log(loginInfo);
   };
 
   const handlePasswordChange = (e: any) => {
@@ -104,16 +89,17 @@ export default function SignIn() {
     }
   };
 
-  const handleClickButton = (e: any) => {
-    e.preventDefault();
+  const handleClickButton = async(e: any) => {
+    // e.preventDefault();
     console.log(loginInfo);
-    LogIn();
+    const result = await LogIn();
+    if (result)
+        router.prefetch("/profile");
+    else
+    return ErrorRef.current!.innerHTML = "Invalid Credentials" ;
+    // router.push('/profile');
   };
-  const handleClickGoogleButton = (e : any) => {
-    e.preventDefault();
-    console.log(loginInfo);
-    LogInGoogle();
-  }
+
   return (
     <div className="container-box">
       <Navbar />
@@ -189,8 +175,8 @@ export default function SignIn() {
                     I&apos;d like to being informed about latest news and tips
                   </label>
                 </div>
-                <button onClick={handleClickButton}>{isLoginLoading ? "Longin into your account" : "sign in"}</button>
-          
+                <div ref={ErrorRef} className="errorRef email-error"></div>
+                <button onClick={handleClickButton}> sign in</button>
                 <div className="auto-auth">
                   or you can sign in with
                   <div className="logos">

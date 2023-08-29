@@ -1,7 +1,11 @@
-import React from 'react'
+"use client"
+import React, { useEffect, useState } from 'react'
 import './style.scss'
 import SideBar from '@/components/LoggedUser/SideBar/SideBar'
 import ProfileCard from '@/components/LoggedUser/Profile/ProfileCard/ProfileCard'
+import { useCookies } from 'react-cookie';
+import { baseUrlUsers, getRequest } from '../context/utils/service';
+import { useRouter } from "next/navigation";
 
 export default function Profile() {
   return (

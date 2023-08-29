@@ -10,7 +10,7 @@ async function bootstrap() {
   const corsOptions = {
     origin: 'http://127.0.0.1:3000', // Replace with your allowed origin
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    // credentials: true,
+    credentials: true,
   };
 
   app.enableCors(corsOptions);

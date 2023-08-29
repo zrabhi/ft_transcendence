@@ -10,16 +10,17 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { FtStrategy } from './Strategys/42Strategy';
 import { JwtStrategy } from './Strategys/JwtStrategy';
 import { GithubStrategy } from './Strategys/GithubStrategy';
+import { Jwt2faStrategy } from './Jwt2faAuth';
 
 @Module({
   imports: [ConfigModule.forRoot(), PassportModule, JwtModule.register({
     global: true,
-    secret: 'SECRET_KEY',
+    secret: process.env.JWT_SECRET,
     signOptions: {
-      expiresIn:'1h'
+      expiresIn:process.env.JWT_EXPIRATION,
     }
   })],
-  providers: [GoogleStrategy, FtStrategy,GithubStrategy, JwtStrategy, PrismaService, AuthService, UserService],
+  providers: [GoogleStrategy, FtStrategy,GithubStrategy, Jwt2faStrategy,  JwtStrategy, PrismaService, AuthService, UserService],
   exports: [AuthService],
   controllers: [AuthController],
 })

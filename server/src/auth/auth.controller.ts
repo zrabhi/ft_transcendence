@@ -69,14 +69,13 @@ export class AuthController {
   ) {
     try {
       console.log(user);
-      
+
       const userData = this.authService.extract42UserData(user);
-      const access_token = await this.authService.login(userData, response);
+      const {access_token, userSearch} = await this.authService.login(userData, response);
       console.log(access_token);
       response.cookie('access_token', access_token);
-      // const user = await this.userService.findUserById()
-      if (userData.password === '' || userData.email === '')
-          return response.redirect('http://127.0.0.1:3000/login/complete');
+      if (!userSearch.password || !userSearch.email)
+        return response.redirect('http://127.0.0.1:3000/login/complete');
       response.redirect('http://127.0.0.1:3000/profile');
     } catch (err) {
       response.status(400).json({ message: err.message });
@@ -92,10 +91,10 @@ export class AuthController {
   ) {
     try {
       const userData = this.authService.extractGoogleUserData(user);
-      const access_token = await this.authService.login(userData, response);
+      const {access_token, userSearch} = await this.authService.login(userData, response);
       console.log(access_token);
       response.cookie('access_token', access_token);
-      if (userData.password === '' || userData.email === '')
+      if (!userSearch.password || !userSearch.email)
         return response.redirect('http://127.0.0.1:3000/login/complete');
       response.redirect('http://127.0.0.1:3000/profile');
     } catch (err) {
@@ -117,10 +116,10 @@ export class AuthController {
   ) {
     try {
       const userData = this.authService.extractUserGithubData(user);
-      const access_token = await this.authService.login(userData, response);
+      const {access_token, userSearch} = await this.authService.login(userData, response);
       console.log(access_token);
       response.cookie('access_token', access_token);
-      if (userData.password === '' || userData.email === '')
+      if (!userSearch.password || !userSearch.email)
         return response.redirect('http://127.0.0.1:3000/login/complete');
       response.redirect('http://127.0.0.1:3000/profile');
     } catch (err) {

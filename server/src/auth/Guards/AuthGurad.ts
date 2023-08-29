@@ -34,10 +34,14 @@ import { ConfigService } from '@nestjs/config';
           // 💡 We're assigning the payload to the request object here
           // so that we can access it in our route handlers
           request['user'] = payload;
+          console.log("data from jwt   ",request.user);
+          
           // console.log(request.body);
           
         } catch(err) {
-            throw new UnauthorizedException();
+           console.log(err.message);
+           response.cookie('access_token', '');
+          throw new UnauthorizedException();
       }
       return true;
     }

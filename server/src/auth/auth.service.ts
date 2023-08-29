@@ -91,72 +91,67 @@ export class AuthService {
     return userData;
   }
 
-  extractUserGithubData(user: any) : CreateUserDto {
-    const { login,  avatar_url } = user._json;
+  extractUserGithubData(user: any): CreateUserDto {
+    const { login, avatar_url } = user._json;
     const userData = {
       email: 'zac.rabhi123@gmail.com',
       username: login + '12',
       avatar: avatar_url,
       cover: '',
       password: '',
-    }
+    };
     return userData;
   }
+
+
   async extractJwtToken(playload: any) {
     const access_token = await this.jwtService.signAsync(playload);
     return access_token;
   }
-  async login(
-    user: CreateUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<String> {
-    console.log('UserData: ', user);
 
+
+  async login(
+    profile: CreateUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     try {
-      const user_search = await this._prisma.user.findFirst({
+      let userSearch = null;
+      userSearch = await this._prisma.user.findFirst({
         where: {
-          email: user.email,
+          email: profile.email,
         },
       });
-      if (user_search) {
-        const User = await this._prisma.user.update({
+      if (userSearch)
+        await this._prisma.user.update({
           where: {
-            id: user_search.id,
+            id: userSearch.id,
           },
           data: {
             status: 'ONLINE',
-            tfa: false,
           },
         });
-        console.log('user id ', User.id);
-        return await this.extractJwtToken({
-          id: User.id,
-          username: User.username,
-        });
-      } else {
-        console.log("user ", user);
-        const newUserId = await this.signup(user, res);
-        
-        const newUser = await this._user.findUserById(newUserId.id);
-
-        return await this.extractJwtToken({
-          id: newUser.id,
-          username: newUser.username,
-        });
+      else {
+        const newUserId = await this.signup(profile, res);
+        userSearch = await this._user.findUserById(newUserId.id);
       }
-    } catch (err) {
-      throw new UnauthorizedException('username already exist');
-
-    }
+      const access_token = await this.extractJwtToken({
+        id: userSearch.id,
+        username: userSearch.username,
+      });
+      return { access_token, userSearch };
+    } catch (err) {}
   }
+
+
   async signup(user: CreateUserDto, @Res() res: Response) {
-    console.log("signup ", user);
-    
+    console.log('signup ', user);
+
     try {
       return await this._prisma.user.create({
         data: {
           email: user.email,
           username: user.username,
+          avatar: user.avatar,
           achievement: {
             create: {
               accountCreationAchie: true,
@@ -173,7 +168,6 @@ export class AuthService {
   }
 
   async generateTwoFactorAuthenticationSecret(user) {
-    
     const secret = authenticator.generateSecret();
     const otpauthUrl = authenticator.keyuri(
       user.id,
@@ -188,60 +182,70 @@ export class AuthService {
       otpauthUrl,
     };
   }
+
+
   async setTwoFactorAuthenticationSecret(secret: string, userId: string) {
     await this._prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          twoFactorAuthenticationSecret: secret,
-        },
-      });
+      where: {
+        id: userId,
+      },
+      data: {
+        twoFactorAuthenticationSecret: secret,
+      },
+    });
   }
 
   async turnOnTwoFactorAuthentication(userId: string) {
-      await this._prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          tfa: true,
-        },
-      });
+    await this._prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        tfa: true,
+      },
+    });
   }
 
   async generateQrCodeDataURL(otpAuthUrl: string) {
     return toDataURL(otpAuthUrl);
   }
 
-   isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user) {
-    console.log("token is ==> ", twoFactorAuthenticationCode, typeof twoFactorAuthenticationCode);
-    console.log("token is ==> ", user.setTwoFactorAuthenticationSecret, typeof user.setTwoFactorAuthenticationSecret);
+  isTwoFactorAuthenticationCodeValid(
+    twoFactorAuthenticationCode: string,
+    user,
+  ) {
+    console.log(
+      'token is ==> ',
+      twoFactorAuthenticationCode,
+      typeof twoFactorAuthenticationCode,
+    );
+    console.log(
+      'token is ==> ',
+      user.setTwoFactorAuthenticationSecret,
+      typeof user.setTwoFactorAuthenticationSecret,
+    );
     const optionsVerify = {
       token: twoFactorAuthenticationCode,
-       secret: "KRZWSDKKCZ3EWMZN"
+      secret: 'KRZWSDKKCZ3EWMZN',
+    };
+    try {
+      return authenticator.verify(optionsVerify);
+    } catch (err) {
+      console.log('error: ', err);
     }
-    try{
-    return authenticator.verify(optionsVerify);
-  }catch(err){
-    console.log("error: ", err);
-
-  }
   }
 
-  // async loginWith2fa(userWithoutPsw) 
+  // async loginWith2fa(userWithoutPsw)
   //     {
   //       const payload = {
   //         email: userWithoutPsw.id,
   //         isTwoFactorAuthenticationEnabled: !!userWithoutPsw.isTwoFactorAuthenticationEnabled,
   //         tfa: true,
   //       };
-    
+
   //       return {
   //         id: payload.email,
   //         access_token: this.jwtService.signAsync(payload),
   //       };
   //     }
-
 }
-

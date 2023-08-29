@@ -4,6 +4,8 @@ import { Achievement, Match, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { JwtAuthGuard } from 'src/auth/Guards/AuthGurad';
+import { PutUserDto } from './dto/put-user-dto';
+import { Request } from 'express';
 
 @Controller('/api')
 export class UserController {
@@ -16,9 +18,16 @@ export class UserController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('/users/:user_id')
-    async getUser(@Param('user_id') user_id:string):Promise<User>{
-        return await this.userService.findUserById(user_id);
+    @Get('/user/')
+    async getUser(@Req() req):Promise<User>{
+        return await this.userService.findUserById(req.user.id);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('user/:username')
+    async getUseByName(@Param('username') username:string):Promise<User>
+    {
+        return await this.userService.findUserName(username)
     }
 
     @UseGuards(JwtAuthGuard)
@@ -27,17 +36,19 @@ export class UserController {
         return await this.userService.addUser(createUserDto);
     }
     @UseGuards(JwtAuthGuard)
-    @Delete('/users/:user_id')
-    async deleteUser(@Param('user_id') user_id:string){
-        return await this.userService.deleteUserByUsername(user_id);
+    @Delete('/user')
+    async deleteUser(@Req() req){
+        return await this.userService.deleteUserByUsername(req.user.id);
     }
+
     @UseGuards(JwtAuthGuard)
-    @Get('/users/:user_id/achievement')
-    async getUserAchievement(@Param('user_id') user_id:string):Promise<Achievement>{
-        return await this.userService.achievementById(user_id);
+    @Get('/users/:username/achievement')
+    async getUserAchievement(@Param('username') username:string):Promise<Achievement>{
+        return await this.userService.achievementById(username);
     }
+
     @UseGuards(JwtAuthGuard)
-    @Get('/users/:user_id/matches')
+    @Get('/users/matches')
     async getMatches(@Param('user_id') user_id:string):Promise<Match[]>{
         return await this.userService.getMatchesByUserId(user_id);
     }
@@ -48,18 +59,14 @@ export class UserController {
     }
     @UseGuards(JwtAuthGuard)
     @Put('/users')
-    async handleUpdate(@Body() user, @Req() req, @Res() response)
+    async handleUpdate(@Body() user : PutUserDto, @Req() req, @Res() response)
     {
-        console.log("body is ", user); 
+        console.log("body is ", user);
         try{
-           await this.userService.updateUser(user, req);      
+            await this.userService.updateUser(user, req);
             return  response.status(200).json({msg: "Information updated successfully"})
         }catch(err){
-            console.log("im here nowwwww");
-            
             response.status(400).json({msg: "Couldn't update Your information"});
         }
-         
-        // return response.redirect('http://127.0.0.1:3000');  
     }
 }

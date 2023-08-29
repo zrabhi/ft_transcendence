@@ -1,11 +1,7 @@
 import { IsAlphanumeric, IsEmail, IsNotEmpty, IsOptional, IsStrongPassword, MaxLength, MinLength } from "class-validator"
 
-
-export class CreateUserDto{
-    @IsOptional()
-    @IsNotEmpty()
-    @IsEmail()
-    email:string
+export class PutUserDto{
+    
     
     @IsOptional()
     avatar:string

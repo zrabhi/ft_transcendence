@@ -31,10 +31,7 @@ export default function RootLayout(props) {
   const router = useRouter();
   useEffect(() => {
     if (cookie.access_token === "") {
-      console.log("in function cookie");
-
-      console.log(window.location.href.split("/"));
-
+     
       const pathname = window.location.href.split("/");
       if (
         pathname[3] != Urls.home ||

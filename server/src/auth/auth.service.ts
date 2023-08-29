@@ -27,7 +27,6 @@ export class AuthService {
   ) {}
 
   async signin(body: AuthDto) {
-    console.log(body);
 
     const user = await this._prisma.user.findFirst({
       where: {
@@ -35,7 +34,6 @@ export class AuthService {
       },
     });
 
-    console.log('udrt', user);
 
     if (!user) {
       throw new HttpException(
@@ -72,12 +70,9 @@ export class AuthService {
   }
 
   extract42UserData(user: any) {
-    console.log(user);
 
     const { login, email, image } = user._json;
-    console.log(user._json.email);
 
-    console.log(user._json.image.link);
 
     const userData: CreateUserDto = {
       email: email,
@@ -86,7 +81,6 @@ export class AuthService {
       cover: '',
       password: '',
     };
-    console.log('user data', userData);
 
     return userData;
   }
@@ -144,7 +138,6 @@ export class AuthService {
 
 
   async signup(user: CreateUserDto, @Res() res: Response) {
-    console.log('signup ', user);
 
     try {
       return await this._prisma.user.create({
@@ -214,16 +207,8 @@ export class AuthService {
     twoFactorAuthenticationCode: string,
     user,
   ) {
-    console.log(
-      'token is ==> ',
-      twoFactorAuthenticationCode,
-      typeof twoFactorAuthenticationCode,
-    );
-    console.log(
-      'token is ==> ',
-      user.setTwoFactorAuthenticationSecret,
-      typeof user.setTwoFactorAuthenticationSecret,
-    );
+
+
     const optionsVerify = {
       token: twoFactorAuthenticationCode,
       secret: 'KRZWSDKKCZ3EWMZN',
@@ -231,7 +216,6 @@ export class AuthService {
     try {
       return authenticator.verify(optionsVerify);
     } catch (err) {
-      console.log('error: ', err);
     }
   }
 

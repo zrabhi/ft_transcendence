@@ -61,7 +61,6 @@ export class UserController {
     @Put('/users')
     async handleUpdate(@Body() user : PutUserDto, @Req() req, @Res() response)
     {
-        console.log("body is ", user);
         try{
             await this.userService.updateUser(user, req);
             return  response.status(200).json({msg: "Information updated successfully"})

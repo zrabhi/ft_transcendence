@@ -142,7 +142,6 @@ export class UserService {
         },
       });
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -187,7 +186,6 @@ export class UserService {
         },
       });
     } catch (error) {
-      console.log('error: ' + error);
     }
   }
   // async updateUser(updateUserDto: UpdateUserDto){

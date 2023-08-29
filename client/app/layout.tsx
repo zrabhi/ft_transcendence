@@ -45,8 +45,6 @@ export default function RootLayout(props) {
       )
         return router.push("/login");
     }
-
-    // if (cookie.access_token === '')
   });
   return (
     <html lang="en">

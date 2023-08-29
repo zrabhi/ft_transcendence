@@ -1,11 +1,22 @@
-import React from 'react'
-import './SideBar.scss'
-import Logo from '@/components/MainPage/Logo/Logo'
-import { CgHomeAlt , CgProfile, CgGames } from 'react-icons/cg'
-import { PiTelevisionFill, PiChatsFill } from 'react-icons/pi'
-import { IoMdSettings, IoMdExit } from 'react-icons/io'
+"use client";
+import React from "react";
+import "./SideBar.scss";
+import Logo from "@/components/MainPage/Logo/Logo";
+import { CgHomeAlt, CgProfile, CgGames } from "react-icons/cg";
+import { PiTelevisionFill, PiChatsFill } from "react-icons/pi";
+import { IoMdSettings, IoMdExit } from "react-icons/io";
+import { useRouter } from "next/navigation";
+import { useCookies } from "react-cookie";
 
 export default function SideBar() {
+  const router = useRouter();
+  const [cookie, setCookie] = useCookies(['access_token']);
+
+  // Login out (updated by zac)
+  const handleSignOut = () => {
+    setCookie('access_token', '');
+    router.replace("/login");
+  };
   return (
     <div className="sidebar">
       <Logo />
@@ -30,10 +41,10 @@ export default function SideBar() {
         <div className="to-settings">
           <IoMdSettings size={24} className="icon" />
         </div>
-        <div className="to-signout">
+        <div className="to-signout" onClick={handleSignOut}>
           <IoMdExit size={24} className="icon" />
         </div>
       </div>
     </div>
-  )
+  );
 }

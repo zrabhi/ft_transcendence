@@ -52,22 +52,6 @@ export default function SignIn() {
     return true;
   };
 
-  const LogInGoogle = useCallback(async () => {
-    setLoginLoading(true);
-    console.log("im hereee");
-    const response = await getRequest(
-      `${baseUrlAuth}/google/login`
-    );
-    console.log(response);
-    setLoginLoading(false);
-
-    if (response.error) return setLoginError(response);
-
-    localStorage.setItem("User", JSON.stringify(response));
-    setUser(response);
-    return true;
-  }, [loginInfo]);
-  
 
   const handleCheckOne = () => {
     if (checkOne.current) checkOne.current.classList.toggle("hidden");
@@ -105,12 +89,15 @@ export default function SignIn() {
     }
   };
 
-  const handleClickButton = (e: any) => {
-    e.preventDefault();
+  const handleClickButton = async(e: any) => {
+    // e.preventDefault();
     console.log(loginInfo);
-    if (!LogIn()) 
-        return ErrorRef.current!.innerHTML = "Invalid Credentials" ;
-    router.push('/profile');
+    const result = await LogIn();
+    if (result)
+        router.prefetch("/profile");
+    else
+    return ErrorRef.current!.innerHTML = "Invalid Credentials" ;
+    // router.push('/profile');
   };
 
   return (
@@ -188,8 +175,8 @@ export default function SignIn() {
                     I&apos;d like to being informed about latest news and tips
                   </label>
                 </div>
+                <div ref={ErrorRef} className="errorRef email-error"></div>
                 <button onClick={handleClickButton}> sign in</button>
-          
                 <div className="auto-auth">
                   or you can sign in with
                   <div className="logos">
@@ -226,7 +213,6 @@ export default function SignIn() {
                 </div>
               </form>
             </div>
-            <div ref={ErrorRef} className="error email-error"></div>
             <div className="signupbtn">
               <button>create an account</button>
             </div>

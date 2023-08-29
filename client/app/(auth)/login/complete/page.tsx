@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Avatar1 from "@/public/images/avatar1.jpeg";
 import "./style.scss";
-
+import {useCookies} from "react-cookie"
 import {
   baseUrlUsers,
   postRequest,
@@ -20,12 +20,13 @@ export default function Complete() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [loginError, setLoginError] = useState({
+    const [loginError, setLoginError] = useState({
     error: false,
     message: "",
   });
   const router = useRouter();
-
+  const [cookie, setCookie] = useCookies(['access_token']);
+  
   const RouteList = {
     Profile: "/profile",
     Login: "/login",
@@ -34,6 +35,7 @@ export default function Complete() {
   const ErrorList = {
     Uauthorized: "Unauthorized",
   };
+
   const LogIn = async () => {
     const response = await putRequest(
       `${baseUrlUsers}/users`,
@@ -42,7 +44,6 @@ export default function Complete() {
     console.log(response);
 
     if (response.error) {
-      // console.log(loginError);
       setLoginError(response);
       return false;
     }
@@ -52,8 +53,14 @@ export default function Complete() {
     return true;
   };
 
+    useEffect(()=> {
+      if (cookie.access_token === '') 
+            router.push("/login");
+    })
   const handleSubmitClick = async (e: any) => {
     e.preventDefault();
+    console.log(cookie.access_token);
+
     // check username not exist in database
     // check password and confirm password match
     if (username.length < 6) {
@@ -70,12 +77,17 @@ export default function Complete() {
       return;
     } else {
       const result = await LogIn();
-      if (result) router.push("/profile");
-      // ErrorRef.current!.innerHTML = "Invalid Credentials" ;
-      if (loginError.message === ErrorList.Uauthorized)
-              router.push("/login");
-    }
+      if (result) 
+          router.push("/profile");
+      else
+        ErrorRef.current!.innerHTML = "Invalid Credentials" ;
+
+      // if (loginError.message === ErrorList.Uauthorized)
+      // {
+      //         router.push("/login");
+      // }
   };
+}
 
   return (
     <div className="complete-info">

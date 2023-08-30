@@ -95,7 +95,7 @@ export class AuthService {
     const { login, avatar_url } = user._json;
     const userData = {
       email: 'zac.rabhi123@gmail.com',
-      username: login + '12',
+      username: login + '12', // just for testing purpose 
       avatar: avatar_url,
       cover: '',
       password: '',

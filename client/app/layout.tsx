@@ -19,21 +19,15 @@ const roboto = Montserrat({
   display: "swap",
 });
 
-export default function RootLayout(props: any) {
-  const Urls = {
-    home: "",
-    gameHistory: "game-history",
-    instructions: "instructions",
-    aboutUs: "about-us",
-    login: "login",
-  };
-  const [cookie, setCookie] = useCookies(["access_token"]);
-  const router = useRouter();
-
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body className={roboto.className} suppressHydrationWarning={true}>
-        {props.children}
+        {children}
         <Footer />
       </body>
     </html>

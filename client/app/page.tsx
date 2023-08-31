@@ -8,14 +8,12 @@ import { Theme } from '@radix-ui/themes'
 export default function Home() {
   return (
       <div className='home' >
-        <Theme>
-          <div className="hero-section">
-            <div className="container-box">
-              <Navbar />
-              <MainContent />
-            </div>
+        <div className="hero-section">
+          <div className="container-box">
+            <Navbar />
+            <MainContent />
           </div>
-        </Theme>
+        </div>
       </div>
   )
 }

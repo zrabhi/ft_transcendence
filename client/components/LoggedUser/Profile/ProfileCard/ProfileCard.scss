@@ -28,6 +28,8 @@
       justify-content: space-between;
       gap: 2rem;
       position: relative;
+    }
+    .left {
       > div {
         width: 50%;
         font-size: .9rem;
@@ -51,11 +53,7 @@
         transform: translateX(-50%);
       }
     }
-    .left {
-    }
     .right {
-      .country {
-      }
       .social-media {
         .icons {
           width: 100%;

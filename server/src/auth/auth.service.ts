@@ -99,8 +99,14 @@ export class AuthService {
 
 
   async extractJwtToken(playload: any) {
-    const access_token = await this.jwtService.signAsync(playload);
-    return access_token;
+    try{  
+      const access_token = await this.jwtService.signAsync(playload);
+      return access_token;
+    }catch(err){
+      console.log("ac, access_toces");
+      console.log(err.message);
+      
+    }
   }
 
 
@@ -115,6 +121,7 @@ export class AuthService {
           email: profile.email,
         },
       });
+      
       if (userSearch)
         await this._prisma.user.update({
           where: {
@@ -127,15 +134,21 @@ export class AuthService {
       else {
         const newUserId = await this.signup(profile, res);
         userSearch = await this._user.findUserById(newUserId.id);
+        console.log(userSearch);
       }
+      console.log("ima here");
+      
       const access_token = await this.extractJwtToken({
         id: userSearch.id,
         username: userSearch.username,
       });
-      return { access_token, userSearch };
+      const data = {
+        access_token,
+        userSearch,
+      }
+      return data
     } catch (err) {}
   }
-
 
   async signup(user: CreateUserDto, @Res() res: Response) {
 

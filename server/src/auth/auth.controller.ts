@@ -112,7 +112,10 @@ export class AuthController {
   ) {
     try {
       const userData = this.authService.extractUserGithubData(user);
-      const {access_token, userSearch} = await this.authService.login(userData, response);
+      const data = await this.authService.login(userData, response);
+      console.log("data is " , data);
+      
+      const {access_token, userSearch} = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)
         return response.redirect('http://127.0.0.1:3000/login/complete');

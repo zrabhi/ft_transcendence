@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import ybadaouiImage from '@/public/authors/ybadaoui.jpeg'
 import zrabhiImage from '@/public/authors/zrabhi.jpeg'
@@ -5,9 +6,10 @@ import mmoumniImage from '@/public/authors/mmoumni.jpeg'
 import mkarimImage from '@/public/authors/mkarim.jpeg'
 import AuthorCard from './AuthorCard/AuthorCard'
 import './AboutUs.scss'
+import { motion } from 'framer-motion'
 
 export default function AboutUs() {
-
+  
   const authors = [
     {
       name: 'Youssef BADAOUI',
@@ -34,22 +36,54 @@ export default function AboutUs() {
       githubUrl: 'https://github.com/skeet1/',
     },
   ];
+  
+    const container = {
+      hidden: { opacity: 1, scale: 0 },
+      visible: {
+        opacity: 1,
+        scale: 1,
+        transition: {
+          delayChildren: 0.5,
+          staggerChildren: 0.4
+        }
+      }
+    };
+    
+    const item = {
+      hidden: { y: 20, opacity: 0 },
+      visible: {
+        y: 0,
+        opacity: 1
+      }
+    };
+
+  const MotionAuthCard = motion(AuthorCard);
 
   return (
     <div className="about-us">
-        <div className="authors">
+        <motion.div 
+          className="authors"
+          variants={container}
+          initial="hidden"
+          animate="visible"
+        >
           {
             authors.map((author, index) => (
-              <AuthorCard
-                key={index}
-                name={author.name}
-                imageSrc={author.imageSrc}
-                linkedinUrl={author.linkedinUrl}
-                githubUrl={author.githubUrl}
-              />
+              <motion.div 
+                key={index} 
+                variants={item}
+              >
+                <AuthorCard
+                  className="item"
+                  name={author.name}
+                  imageSrc={author.imageSrc}
+                  linkedinUrl={author.linkedinUrl}
+                  githubUrl={author.githubUrl}
+                />
+              </motion.div>
             ))
           }
-        </div>
+        </motion.div>
     </div>
   )
 }

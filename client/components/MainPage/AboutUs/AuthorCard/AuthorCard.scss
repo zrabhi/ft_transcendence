@@ -44,11 +44,12 @@
     hsl(269, 85%, 66%),
     hsl(314, 85%, 66%),
     hsl(359, 85%, 66%),
-  );
-  background-size: 300% 300%;
-  background-position: 0 50%;
-  animation: moveGradient 4s alternate infinite;
+    );
+    background-size: 300% 300%;
+    background-position: 0 50%;
+    animation: moveGradient 4s alternate infinite;
 }
+
 
 @keyframes moveGradient {
   50% {

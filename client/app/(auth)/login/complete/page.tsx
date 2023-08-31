@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Avatar1 from "@/public/images/avatar1.jpeg";
 import "./style.scss";
@@ -10,8 +10,12 @@ import {
   putRequest,
 } from "@/app/context/utils/service";
 import { useRouter } from "next/navigation";
+import { AuthContext } from "@/app/context/AuthContext";
 
 export default function Complete() {
+
+  const {updatingInfos, user, loginError} = useContext(AuthContext);
+
   const usernameRef = useRef<HTMLDivElement>(null);
   const passwordRef = useRef<HTMLDivElement>(null);
   const ErrorRef = useRef<HTMLDivElement>(null);
@@ -19,11 +23,7 @@ export default function Complete() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [user, setUser] = useState(null);
-    const [loginError, setLoginError] = useState({
-    error: false,
-    message: "",
-  });
+  
   const router = useRouter();
   const [cookie, setCookie] = useCookies(['access_token']);
   
@@ -36,25 +36,6 @@ export default function Complete() {
     Uauthorized: "Unauthorized",
   };
 
-  const LogIn = async () => {
-    const response = await putRequest(
-      `${baseUrlUsers}/users`,
-      JSON.stringify({ username, password })
-    );
-
-    if (response.error) {
-      setLoginError(response);
-      return false;
-    }
-
-    localStorage.setItem("User", JSON.stringify(response));
-    setUser(response);
-    return true;
-  };
-    useEffect(()=> {
-      if (cookie.access_token === '') 
-            router.push("/login");
-    })
   const handleSubmitClick = async (e: any) => {
     e.preventDefault();
 
@@ -73,17 +54,17 @@ export default function Complete() {
         "Password and confirm password do not match";
       return;
     } else {
-      const result = await LogIn();
+      const result = await updatingInfos(username, password);
       if (result) 
           router.push("/profile");
       else
+      {
+        console.log("error is", loginError);
+        
         ErrorRef.current!.innerHTML = "Invalid Credentials" ;
-
-      // if (loginError.message === ErrorList.Uauthorized)
-      // {
-      //         router.push("/login");
-      // }
-  };
+  
+      };
+}
 }
 
   return (
@@ -105,6 +86,7 @@ export default function Complete() {
                   id="username"
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Username"
+                  defaultValue={!user ? "Username" : user?.username}
                 />
               </div>
               <div ref={usernameRef} className="error username-error"></div>
@@ -132,7 +114,6 @@ export default function Complete() {
               {loginError && (
                 <div className="error pass-error">{loginError.message}</div>
               )}
-              {/* <div ref={ErrorRef} className='error pass-error'></div> */}
             </div>
             <div className="profile-box">
               <div className="current-pic">

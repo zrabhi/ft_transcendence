@@ -188,29 +188,4 @@ export class UserService {
     } catch (error) {
     }
   }
-  // async updateUser(updateUserDto: UpdateUserDto){
-  //     try {
-  //         if (updateUserDto.username !== undefined)
-  //         {
-  //             if (!!await this.prismaService.user.findFirst({
-  //                 where:{
-  //                     username:updateUserDto.username,
-  //                 }
-  //             }))
-  //             {
-  //                 throw new HttpException({
-  //                     status: HttpStatus.BAD_REQUEST,
-  //                     error: `These ${updateUserDto.username} already used try another one`,
-  //                 }, HttpStatus.BAD_REQUEST, {
-  //                 })
-  //             }
-  //         }
-  //         if (updateUserDto.Oldpassword !== undefined && updateUserDto.Newpassword && updateUserDto.Confirmedpassword)
-  //         {
-  //             if (updateUserDto.)
-  //         }
-  //     } catch(error) {
-
-  //     }
-  // }
 }

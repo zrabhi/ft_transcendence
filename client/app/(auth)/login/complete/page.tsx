@@ -41,7 +41,6 @@ export default function Complete() {
       `${baseUrlUsers}/users`,
       JSON.stringify({ username, password })
     );
-    console.log(response);
 
     if (response.error) {
       setLoginError(response);
@@ -52,14 +51,12 @@ export default function Complete() {
     setUser(response);
     return true;
   };
-
     useEffect(()=> {
       if (cookie.access_token === '') 
             router.push("/login");
     })
   const handleSubmitClick = async (e: any) => {
     e.preventDefault();
-    console.log(cookie.access_token);
 
     // check username not exist in database
     // check password and confirm password match

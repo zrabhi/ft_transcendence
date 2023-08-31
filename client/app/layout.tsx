@@ -19,37 +19,15 @@ const roboto = Montserrat({
   display: "swap",
 });
 
-export default function RootLayout(props) {
-  const Urls = {
-    home: "",
-    gameHistory: "game-history",
-    instructions: "instructions",
-    aboutUs: "about-us",
-    login: "login",
-  };
-  const [cookie, setCookie] = useCookies(["access_token"]);
-  const router = useRouter();
-  useEffect(() => {
-    if (cookie.access_token === "") {
-      console.log("in function cookie");
-
-      console.log(window.location.href.split("/"));
-
-      const pathname = window.location.href.split("/");
-      if (
-        pathname[3] != Urls.home ||
-        pathname[3] != Urls.gameHistory ||
-        pathname[3] != Urls.instructions ||
-        pathname[3] != Urls.aboutUs ||
-        pathname[3] != Urls.login
-      )
-        return router.push("/login");
-    }
-  });
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body className={roboto.className} suppressHydrationWarning={true}>
-        {props.children}
+        {children}
         <Footer />
       </body>
     </html>

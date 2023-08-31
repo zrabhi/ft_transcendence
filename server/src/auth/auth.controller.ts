@@ -32,16 +32,18 @@ export class AuthController {
   @Post('signin')
   async handleSignin(@Body() body: AuthDto, @Res() response: Response) {
     try {
-      const user = await this.authService.signin(body);
-      console.log(user);
-      if (!user)
+      console.log(body);
+      
+      const data = await this.authService.signin(body);
+      const {access_token, user} = data
+      if (access_token === '')
         return response.status(400).json({ msg: 'Invalid Credencial' });
-      else {
-        response.cookie('access_token', user);
-        return response
-          .status(200)
-          .json({ msg: 'u will be redirected to yout profile ' });
-      }
+      console.log(access_token);
+      response.cookie('access_token', access_token);
+      return response
+        .status(200)
+        .json(user);
+    
     } catch (e) {
       return response
         .status(400)
@@ -68,13 +70,13 @@ export class AuthController {
     @Res() response: Response,
   ) {
     try {
-      console.log(user);
 
       const userData = this.authService.extract42UserData(user);
-      const {access_token, userSearch} = await this.authService.login(userData, response);
-      console.log(access_token);
-      if (!userSearch.password || !userSearch.email)
+      const data = await this.authService.login(userData, response);
+      console.log("data is " , data);
+      const {access_token, userSearch} = data;
       response.cookie('access_token', access_token);
+      if (!userSearch.password || !userSearch.email)
         return response.redirect('http://127.0.0.1:3000/login/complete');
       response.redirect('http://127.0.0.1:3000/profile');
     } catch (err) {
@@ -91,8 +93,9 @@ export class AuthController {
   ) {
     try {
       const userData = this.authService.extractGoogleUserData(user);
-      const {access_token, userSearch} = await this.authService.login(userData, response);
-      console.log(access_token);
+      const data = await this.authService.login(userData, response);
+      console.log("data is " , data);
+      const {access_token, userSearch} = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)
         return response.redirect('http://127.0.0.1:3000/login/complete');
@@ -116,8 +119,10 @@ export class AuthController {
   ) {
     try {
       const userData = this.authService.extractUserGithubData(user);
-      const {access_token, userSearch} = await this.authService.login(userData, response);
-      console.log(access_token);
+      const data = await this.authService.login(userData, response);
+      console.log("data is " , data);
+      
+      const {access_token, userSearch} = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)
         return response.redirect('http://127.0.0.1:3000/login/complete');
@@ -131,13 +136,11 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
-    console.log(request.user);
 
     const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
       body.twoFactorAuthenticationCode,
       request.user,
     );
-    console.log('isCodeValid ', isCodeValid);
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
@@ -161,7 +164,6 @@ export class AuthController {
 
   //     return this.authService.loginWith2fa(request.user);
   //   } catch (error) {
-  //     console.log('error is ' + error.message);
   //   }
   // }
 

@@ -40,12 +40,10 @@ export default function SignIn() {
       `${baseUrlAuth}/signin`,
       JSON.stringify(loginInfo)
     );
-    console.log(response);
 
     if (response.error) {
     setLoginError(response);
     return false;}
-    console.log("im hereee");
 
     localStorage.setItem("User", JSON.stringify(response));
     setUser(response);
@@ -65,7 +63,6 @@ export default function SignIn() {
     e.preventDefault();
     if (e.target.validationMessage.length && emailMessage.current) {
       emailMessage.current.innerText = e.target.validationMessage;
-      console.log(loginInfo);
     }
   };
 
@@ -91,7 +88,6 @@ export default function SignIn() {
 
   const handleClickButton = async(e: any) => {
     // e.preventDefault();
-    console.log(loginInfo);
     const result = await LogIn();
     if (result)
         router.prefetch("/profile");

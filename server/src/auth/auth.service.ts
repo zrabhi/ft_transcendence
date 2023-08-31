@@ -17,6 +17,7 @@ import { Profile } from 'passport';
 import { User } from './decorator/user-decorator';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -27,16 +28,12 @@ export class AuthService {
   ) {}
 
   async signin(body: AuthDto) {
-    console.log(body);
 
     const user = await this._prisma.user.findFirst({
       where: {
         email: body.email,
       },
     });
-
-    console.log('udrt', user);
-
     if (!user) {
       throw new HttpException(
         {
@@ -48,14 +45,19 @@ export class AuthService {
       );
     }
     const matches = await bcrypt.compare(body.password, user.password);
+    let access_token = '';
     if (matches) {
-      return await this.extractJwtToken({
+       access_token =  await this.extractJwtToken({
         id: user.id,
         username: user.username,
         setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
       });
     }
-    return false;
+    const data = {
+      access_token,
+      user
+    }
+    return data;
   }
 
   extractGoogleUserData(user: any): CreateUserDto {
@@ -72,12 +74,9 @@ export class AuthService {
   }
 
   extract42UserData(user: any) {
-    console.log(user);
 
     const { login, email, image } = user._json;
-    console.log(user._json.email);
 
-    console.log(user._json.image.link);
 
     const userData: CreateUserDto = {
       email: email,
@@ -86,7 +85,6 @@ export class AuthService {
       cover: '',
       password: '',
     };
-    console.log('user data', userData);
 
     return userData;
   }
@@ -105,8 +103,14 @@ export class AuthService {
 
 
   async extractJwtToken(playload: any) {
-    const access_token = await this.jwtService.signAsync(playload);
-    return access_token;
+    try{  
+      const access_token = await this.jwtService.signAsync(playload);
+      return access_token;
+    }catch(err){
+      console.log("ac, access_toces");
+      console.log(err.message);
+      
+    }
   }
 
 
@@ -121,6 +125,7 @@ export class AuthService {
           email: profile.email,
         },
       });
+      
       if (userSearch)
         await this._prisma.user.update({
           where: {
@@ -133,18 +138,23 @@ export class AuthService {
       else {
         const newUserId = await this.signup(profile, res);
         userSearch = await this._user.findUserById(newUserId.id);
+        console.log(userSearch);
       }
+      console.log("ima here");
+      
       const access_token = await this.extractJwtToken({
         id: userSearch.id,
         username: userSearch.username,
       });
-      return { access_token, userSearch };
+      const data = {
+        access_token,
+        userSearch,
+      }
+      return data
     } catch (err) {}
   }
 
-
   async signup(user: CreateUserDto, @Res() res: Response) {
-    console.log('signup ', user);
 
     try {
       return await this._prisma.user.create({
@@ -214,16 +224,8 @@ export class AuthService {
     twoFactorAuthenticationCode: string,
     user,
   ) {
-    console.log(
-      'token is ==> ',
-      twoFactorAuthenticationCode,
-      typeof twoFactorAuthenticationCode,
-    );
-    console.log(
-      'token is ==> ',
-      user.setTwoFactorAuthenticationSecret,
-      typeof user.setTwoFactorAuthenticationSecret,
-    );
+
+
     const optionsVerify = {
       token: twoFactorAuthenticationCode,
       secret: 'KRZWSDKKCZ3EWMZN',
@@ -231,7 +233,6 @@ export class AuthService {
     try {
       return authenticator.verify(optionsVerify);
     } catch (err) {
-      console.log('error: ', err);
     }
   }
 

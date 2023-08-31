@@ -13,7 +13,6 @@ export const postRequest = async (url: string, body: any) => {
     const data = await response.json();
     if (!response.ok)
     {
-      console.log("im hereee");
       
       let message;
       if (data?.message)
@@ -38,7 +37,6 @@ export const putRequest = async (url: string, body: any) => {
   const data = await response.json();
   if (!response.ok)
   {
-    console.log("im hereee");
     
     let message;
     if (data?.message)
@@ -62,7 +60,6 @@ export const getRequest = async (url: string) =>
 const data = await response.json();
   if (!response.ok)
   {
-    console.log("im hereee");
     
     let message;
     if (data?.message)

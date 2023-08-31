@@ -10,11 +10,11 @@ import { useCookies } from "react-cookie";
 
 export default function SideBar() {
   const router = useRouter();
-  const [cookie, setCookie] = useCookies(['access_token']);
+  const [cookie, setCookie, remove] = useCookies(['access_token']);
 
   // Login out (updated by zac)
   const handleSignOut = () => {
-    setCookie('access_token', '');
+    remove('access_token');
     router.replace("/login");
   };
   return (

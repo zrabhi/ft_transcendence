@@ -17,6 +17,7 @@ import { Profile } from 'passport';
 import { User } from './decorator/user-decorator';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -33,8 +34,6 @@ export class AuthService {
         email: body.email,
       },
     });
-
-
     if (!user) {
       throw new HttpException(
         {
@@ -46,14 +45,19 @@ export class AuthService {
       );
     }
     const matches = await bcrypt.compare(body.password, user.password);
+    let access_token = '';
     if (matches) {
-      return await this.extractJwtToken({
+       access_token =  await this.extractJwtToken({
         id: user.id,
         username: user.username,
         setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
       });
     }
-    return false;
+    const data = {
+      access_token,
+      user
+    }
+    return data;
   }
 
   extractGoogleUserData(user: any): CreateUserDto {
@@ -89,7 +93,7 @@ export class AuthService {
     const { login, avatar_url } = user._json;
     const userData = {
       email: 'zac.rabhi123@gmail.com',
-      username: login + '12',
+      username: login + '12', // just for testing purpose 
       avatar: avatar_url,
       cover: '',
       password: '',

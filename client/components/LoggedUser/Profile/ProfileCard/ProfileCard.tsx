@@ -9,9 +9,9 @@ import Avatar from '@/public/images/DefaultAvatar.jpg'
 import { baseUrlUsers, getRequest } from '@/app/context/utils/service'
 import { useCookies } from 'react-cookie'
 
-export default function ProfileCard() {
+export default function ProfileCard(props: any) {
 
-
+  console.log("user now is ", props.user);
   return (
     <div className="profile-card">
       <div className="cover-img">
@@ -69,7 +69,8 @@ export default function ProfileCard() {
           </div>
         </div>
         <div className="username text-center m-2">
-          user name
+          {props.data &&
+          props.data.username}
         </div>
       </div>
     </div>

@@ -6,15 +6,17 @@ import Image from "next/image";
 import "./style.scss";
 import "../../hero-section.scss";
 import { baseUrlAuth, getRequest, postRequest } from "../../context/utils/service";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useContext, useRef, useState } from "react";
 import { FaCheckSquare } from "react-icons/fa";
 import googleLogo from '@/public/images/google.png'
 import schoolLogo from '@/public/images/42.png'
 import GithubLogo from '@/public/images/github.png'
 import { useRouter } from "next/navigation";
+import { AuthContext } from "@/app/context/AuthContext";
 
 export default function SignIn() {
   //All refs
+  const {user, loginError, LogIn} = useContext(AuthContext);
   const emailMessage = useRef<HTMLParagraphElement>(null);
   const passMessage = useRef<HTMLParagraphElement>(null);
   const checkOne = useRef<HTMLParagraphElement>(null); // for checkbox number 1
@@ -25,30 +27,14 @@ export default function SignIn() {
     email: "",
     password: "",
   });
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const [isLoginLoading, setLoginLoading] = useState(false);
-  const [loginError, setLoginError] = useState({
-    error: false,
-    message: "",
-  });
+  // const [loginError, setLoginError] = useState({
+  //   error: false,
+  //   message: "",
+  // });
   const router = useRouter();
   const ErrorRef = useRef<HTMLDivElement>(null);
-
-
-  const LogIn = async () => {
-    const response = await postRequest(
-      `${baseUrlAuth}/signin`,
-      JSON.stringify(loginInfo)
-    );
-
-    if (response.error) {
-    setLoginError(response);
-    return false;}
-
-    localStorage.setItem("User", JSON.stringify(response));
-    setUser(response);
-    return true;
-  };
 
 
   const handleCheckOne = () => {
@@ -87,12 +73,15 @@ export default function SignIn() {
   };
 
   const handleClickButton = async(e: any) => {
-    // e.preventDefault();
-    const result = await LogIn();
+    e.preventDefault();
+    const result = await LogIn(loginInfo);
     if (result)
-        router.prefetch("/profile");
-    else
-    return ErrorRef.current!.innerHTML = "Invalid Credentials" ;
+    {
+        console.log("user data ", user);
+        
+        router.push("/profile");
+    }
+    else return ErrorRef.current!.innerHTML = "Invalid Credentials" ;
     // router.push('/profile');
   };
 

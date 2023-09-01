@@ -2,26 +2,22 @@
 import React, { useEffect, useState } from 'react'
 import './ProfileCard.scss'
 import Image from 'next/image'
+import Link from 'next/link'
 import CoverImage from '@/public/images/FetchCoverImage.png'
 import { BsTwitter, BsDiscord } from 'react-icons/Bs'
 import Avatar from '@/public/images/DefaultAvatar.jpg'
 
 export default function ProfileCard(user: any) {
 
-  // console.log(typeof user.data.username, user.data.username);
+  // if (user.data && user.data.discordHandler) {
+  //   console.log('discordHandler is not null');
+  // }
+  // else {
+  //   console.log('discordHandler is null');
+  // }
 
   return (
     <div className="profile-card">
-      {/* <span className="span bg-slate-800 text-white block">
-        { user.data && user.data.avatar }
-        Image is : {user.data && user.data.avatar}
-        <Image 
-          src={user.data && user.data.avatar}
-          width={100}
-          height={100}
-          alt='image of uesr'
-        />
-      </span> */}
       <div className="cover-img">
         <Image
           src={CoverImage}
@@ -47,12 +43,31 @@ export default function ProfileCard(user: any) {
           <div className="social-media">
             <h4>social medias</h4>
             <div className="icons">
-              <div className="discord icon">
-                <BsDiscord />
-              </div>
-              <div className="twitter icon">
-                <BsTwitter />
-              </div>
+              {/* Discord  */}
+              { (user.data && user.data.discordHandler && user.data.discordHandler.length >= 0 ) ?
+                <div className="discord icon">
+                  <Link href={user.data && user.data.discordHandler} target='_blank'>
+                    <BsDiscord />
+                  </Link>
+                </div>
+                : 
+                <div className="discord icon grayscale pointer-none">
+                  <BsDiscord />
+                </div>
+              }
+
+              {/* Twitter */}
+              { (user.data && user.data.twitterHandler && user.data.twitterHandler.length >= 0 ) ?
+                <div className="discord icon">
+                  <Link href={user.data && user.data.twitterHandler} target='_blank'>
+                    <BsTwitter />
+                  </Link>
+                </div>
+                : 
+                <div className="discord icon grayscale pointer-none">
+                  <BsTwitter />
+                </div>
+              }
             </div>
           </div>
         </div>
@@ -61,7 +76,8 @@ export default function ProfileCard(user: any) {
         <div className="img relative w-4/5 mx-auto">
           <Image
             src={user.data && user.data.avatar && !user.data.avatar.includes('googleusercontent') ? user.data.avatar : Avatar}
-
+            width={200}
+            height={200}
             alt='Image of the user'
             className='rounded-full '
           />

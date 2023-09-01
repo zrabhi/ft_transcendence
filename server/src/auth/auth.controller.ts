@@ -67,7 +67,7 @@ export class AuthController {
   async handleRedirectFt(
     @User() user: Profile,
     @Request() request,
-    @Res() response: Response,
+    @Res() response,
   ) {
     try {
 

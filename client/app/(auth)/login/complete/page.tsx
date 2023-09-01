@@ -3,9 +3,11 @@ import { useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Avatar1 from "@/public/images/avatar1.jpeg";
 import "./style.scss";
-import {useCookies} from "react-cookie"
+import { useCookies } from "react-cookie";
 import {
   baseUrlUsers,
+  getRequest,
+  postFileRequest,
   postRequest,
   putRequest,
 } from "@/app/context/utils/service";
@@ -13,23 +15,40 @@ import { useRouter } from "next/navigation";
 import { AuthContext } from "@/app/context/AuthContext";
 
 export default function Complete() {
-
-  const {updatingInfos, user, loginError} = useContext(AuthContext);
+  const { updatingInfos, user, loginError } = useContext(AuthContext);
 
   const usernameRef = useRef<HTMLDivElement>(null);
   const passwordRef = useRef<HTMLDivElement>(null);
+
   const ErrorRef = useRef<HTMLDivElement>(null);
 
+  const [image, setImage] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  
+
   const router = useRouter();
-  const [cookie, setCookie] = useCookies(['access_token']);
-  
+  const [cookie, setCookie] = useCookies(["access_token"]);
+
   const RouteList = {
     Profile: "/profile",
     Login: "/login",
+  };
+
+  const uploadFile = async (e: any) => {
+    if (e.target.files && e.target.files[0]) {
+      console.log(e.target.files);
+      const data = {
+        file: e.target.files[0],
+      };
+      const formData = new FormData();
+      formData.append("file", e.target.files[0]);
+      const response = await postFileRequest(
+        `${baseUrlUsers}/avatar`,
+        formData
+      );
+      console.log("response is => ", response);
+    }
   };
 
   const ErrorList = {
@@ -55,17 +74,14 @@ export default function Complete() {
       return;
     } else {
       const result = await updatingInfos(username, password);
-      if (result) 
-          router.push("/profile");
-      else
-      {
+      if (result) router.push("/profile");
+      else {
         console.log("error is", loginError);
-        
-        ErrorRef.current!.innerHTML = "Invalid Credentials" ;
-  
-      };
-}
-}
+
+        ErrorRef.current!.innerHTML = "Invalid Credentials";
+      }
+    }
+  };
 
   return (
     <div className="complete-info">
@@ -126,6 +142,7 @@ export default function Complete() {
                   name="profile-pic"
                   id="profile-pic"
                   accept="image/*"
+                  onChange={uploadFile}
                 />
                 {/* <input type="file" name="profile-pic" id="profile-pic" accept='image/*' /> */}
               </div>

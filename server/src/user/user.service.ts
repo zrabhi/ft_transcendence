@@ -1,9 +1,13 @@
-import { HttpException, HttpStatus, Injectable, Param } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Param, StreamableFile } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Achievement, Match, Prisma, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateMatchDto } from './dto/create-match.dto';
+import { FileUserDto } from './dto/put-user-dto';
+import { readdir } from 'fs/promises';
+import { parse } from 'path';
+import { createReadStream } from 'fs';
 
 @Injectable()
 export class UserService {
@@ -188,6 +192,57 @@ export class UserService {
     } catch (error) {
     }
   }
+
+    async updateAvatarorCover(infos : FileUserDto, userId: string, toBeUpdated: string)
+    {
+        if (toBeUpdated === 'avatar')
+        {
+          try {
+            return await this.prismaService.user.update({
+              where: { id: userId },
+              data: {
+                  avatar:`http://127.0.0.1:8080/api/avatar/pictures/${infos.avatar}`,
+              },
+            });
+        }catch(err)
+        {
+          throw new HttpException(
+            {
+              status: HttpStatus.NOT_FOUND,
+              error: `Avatar image  error occured`,
+            },
+            HttpStatus.NOT_FOUND,
+          );
+        }
+      }
+      
+      else if (toBeUpdated === 'cover')
+      {
+        try {
+          return await this.prismaService.user.update({
+            where: { id: userId },
+            data: {
+                cover: `http://127.0.0.1:8080/api/cover/pictures/${infos.cover}`,
+            },
+          });
+      }catch(err)
+      {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: `Cover image  error occured`,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      }
+    }
+async getFileUpload(fileTarget, category)
+{
+	
+			const file = createReadStream(`./images/${category}/${fileTarget}`);
+			return new StreamableFile(file);
+		
   // async updateUser(updateUserDto: UpdateUserDto){
   //     try {
   //         if (updateUserDto.username !== undefined)
@@ -213,4 +268,5 @@ export class UserService {
 
   //     }
   // }
+}
 }

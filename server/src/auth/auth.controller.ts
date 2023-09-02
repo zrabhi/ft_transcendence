@@ -48,24 +48,30 @@ export class AuthController {
       return response
         .status(400)
         .json({ msg: 'Invalid Credencial Error   ' + e.message });
+      }
     }
-  }
-  @Get('google/login')
-  @UseGuards(GoogleGuard)
-  async handleGoogleLogin() {
-    return;
-  }
-
-  @Get('42/login')
-  @UseGuards(FtGurad)
-  handle42login() {
-    return { msg: '42 login' };
-  }
-
-  @Get('/42/redirect')
-  @UseGuards(FtGurad)
-  async handleRedirectFt(
-    @User() user: Profile,
+    @Get('google/login')
+    @UseGuards(GoogleGuard)
+    async handleGoogleLogin() {
+      return;
+    }
+    
+    @Get('42/login')
+    @UseGuards(FtGurad)
+    handle42login() {
+      return ;
+    }
+    
+    @Get('github/login')
+    @UseGuards(GithubGuard)
+    handleGithublogin() {
+      return ;
+    }
+    
+    @Get('/42/redirect')
+    @UseGuards(FtGurad)
+    async handleRedirectFt(
+      @User() user: Profile,
     @Request() request,
     @Res() response,
   ) {
@@ -105,11 +111,6 @@ export class AuthController {
     }
   }
 
-  @Get('github/login')
-  @UseGuards(GithubGuard)
-  handleGithublogin() {
-    return { msg: 'Github login' };
-  }
   @Get('/github/redirect')
   @UseGuards(GithubGuard)
   async handleRedirectGithub(

@@ -16,13 +16,13 @@ import { AuthContext } from "@/app/context/AuthContext";
 
 export default function Complete() {
   const { updatingInfos, user, loginError } = useContext(AuthContext);
-
   const usernameRef = useRef<HTMLDivElement>(null);
   const passwordRef = useRef<HTMLDivElement>(null);
 
+  const avatar : any = useRef();
   const ErrorRef = useRef<HTMLDivElement>(null);
 
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -36,19 +36,30 @@ export default function Complete() {
   };
 
   const uploadFile = async (e: any) => {
+    const reader = new FileReader();
+    reader.onload = async function(ev) {
     if (e.target.files && e.target.files[0]) {
+      avatar.current.src =  e.target!.result as string;
+      setImage(ev.target!.result);
       console.log(e.target.files);
       const data = {
         file: e.target.files[0],
       };
       const formData = new FormData();
+
       formData.append("file", e.target.files[0]);
       const response = await postFileRequest(
         `${baseUrlUsers}/avatar`,
         formData
       );
       console.log("response is => ", response);
+      Avatar1.src = "http://127.0.0.1:8080/api/avatar/pictures/zrabhi64730d93-31e2-481e-984d-d41bb2f47a82.jpeg"
+      // const Object = await fetch(`${baseUrlUsers}/avatar/pictures/googleee926abf-f0a6-4994-8b09-662ef8dcd05d.png`,{method: "GET"})
+      // console.log(Object);
+      
     }
+  }
+  reader.readAsDataURL(e.target.files[0]);
   };
 
   const ErrorList = {
@@ -133,7 +144,8 @@ export default function Complete() {
             </div>
             <div className="profile-box">
               <div className="current-pic">
-                <Image src={Avatar1} alt="avatar" />
+                
+                <img ref={avatar} src={image} alt="avatar" />
               </div>
               <div className="upload-pic">
                 <span>upload new photo</span>

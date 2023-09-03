@@ -1,22 +1,26 @@
 "use client";
 import Navbar from "@/components/MainPage/NavBar/Navbar";
-import './style.scss'
+import "./style.scss";
 import Link from "next/link";
 import Image from "next/image";
 import "./style.scss";
 import "../../hero-section.scss";
-import { baseUrlAuth, getRequest, postRequest } from "../../context/utils/service";
+import {
+  baseUrlAuth,
+  getRequest,
+  postRequest,
+} from "../../context/utils/service";
 import { useCallback, useContext, useRef, useState } from "react";
 import { FaCheckSquare } from "react-icons/fa";
-import googleLogo from '@/public/images/google.png'
-import schoolLogo from '@/public/images/42.png'
-import GithubLogo from '@/public/images/github.png'
+import googleLogo from "@/public/images/google.png";
+import schoolLogo from "@/public/images/42.png";
+import GithubLogo from "@/public/images/github.png";
 import { useRouter } from "next/navigation";
 import { AuthContext } from "@/app/context/AuthContext";
 
 export default function SignIn() {
   //All refs
-  const {user, loginError, LogIn} = useContext(AuthContext);
+  const { user, loginError, LogIn } = useContext(AuthContext);
   const emailMessage = useRef<HTMLParagraphElement>(null);
   const passMessage = useRef<HTMLParagraphElement>(null);
   const checkOne = useRef<HTMLParagraphElement>(null); // for checkbox number 1
@@ -35,7 +39,6 @@ export default function SignIn() {
   // });
   const router = useRouter();
   const ErrorRef = useRef<HTMLDivElement>(null);
-
 
   const handleCheckOne = () => {
     if (checkOne.current) checkOne.current.classList.toggle("hidden");
@@ -72,16 +75,14 @@ export default function SignIn() {
     }
   };
 
-  const handleClickButton = async(e: any) => {
+  const handleClickButton = async (e: any) => {
     e.preventDefault();
     const result = await LogIn(loginInfo);
-    if (result)
-    {
-        console.log("user data ", user);
-        
-        router.push("/profile");
-    }
-    else return ErrorRef.current!.innerHTML = "Invalid Credentials" ;
+    if (result) {
+      console.log("user data ", user);
+
+      router.push("/profile");
+    } else return (ErrorRef.current!.innerHTML = "Invalid Credentials");
     // router.push('/profile');
   };
 
@@ -165,34 +166,35 @@ export default function SignIn() {
                 <div className="auto-auth">
                   or you can sign in with
                   <div className="logos">
-                    <Link href="http://127.0.0.1:8080/api/auth/google/login" >
-                    <div className="google" >
-                      <Image
-                        src={googleLogo}
-                        width={24}
-                        height={24}
-                        alt="google icon"
-                      />
-                    </div> </Link>
-                    <Link href="http://127.0.0.1:8080/api/auth/42/login" >
-                    <div className="school">
-                      <Image
-                        src={schoolLogo}
-                        width={34}
-                        height={24}
-                        alt="google icon"
-                      />
-                    </div>
+                    <Link href="http://127.0.0.1:8080/api/auth/google/login">
+                      <div className="google">
+                        <Image
+                          src={googleLogo}
+                          width={24}
+                          height={24}
+                          alt="google icon"
+                        />
+                      </div>{" "}
                     </Link>
-                    <Link href="http://127.0.0.1:8080/api/auth/github/login" >
-                    <div className="github">
-                      <Image
-                        src={GithubLogo}
-                        width={24}
-                        height={24}
-                        alt="google icon"
-                      />
-                    </div>
+                    <Link href="http://127.0.0.1:8080/api/auth/42/login">
+                      <div className="school">
+                        <Image
+                          src={schoolLogo}
+                          width={34}
+                          height={24}
+                          alt="google icon"
+                        />
+                      </div>
+                    </Link>
+                    <Link href="http://127.0.0.1:8080/api/auth/github/login">
+                      <div className="github">
+                        <Image
+                          src={GithubLogo}
+                          width={24}
+                          height={24}
+                          alt="google icon"
+                        />
+                      </div>
                     </Link>
                   </div>
                 </div>

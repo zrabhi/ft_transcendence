@@ -5,8 +5,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { FileUserDto } from './dto/put-user-dto';
-import { readdir } from 'fs/promises';
-import { parse } from 'path';
 import { createReadStream } from 'fs';
 
 @Injectable()

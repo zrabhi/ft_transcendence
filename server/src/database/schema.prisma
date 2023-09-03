@@ -11,6 +11,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+enum State {
+  FRIENDS
+  REQUESTER_BLOCK_RECIEVER
+  RECIEVER_BLOCK_REQUESTER
+}
+
+enum Status {
+  OFFLINE
+  ONLINE
+  INGAME
+}
+
+enum Role{
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum Type {
+  PUBLIC
+  PRIVATE
+  PROTECTED
+}
+
 model User {
   id                              String   @unique @default(uuid())
   email                           String   @unique
@@ -162,26 +187,3 @@ model ChannelBlock{
   isMute    Boolean @default(false)
 }
 
-enum State {
-  FRIENDS
-  REQUESTER_BLOCK_RECIEVER
-  RECIEVER_BLOCK_REQUESTER
-}
-
-enum Status {
-  OFFLINE
-  ONLINE
-  INGAME
-}
-
-enum Role{
-  OWNER
-  ADMIN
-  MEMBER
-}
-
-enum Type {
-  PUBLIC
-  PRIVATE
-  PROTECTED
-}

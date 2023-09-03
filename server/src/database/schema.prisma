@@ -55,7 +55,10 @@ model User {
   tfa                             Boolean?  @default(false)
   twoFactorAuthenticationSecret   String?   
 
-  channelMessages                 Channel_message[] @relation(name: "MsgSender")
+  channelMessages                 ChannelMessage[] @relation(name: "MsgSender")
+
+  userBan                         UserBlock[]        @relation(name: "userblock")
+  banedUser                       UserBlock[]        @relation(name: "blockeduser")
 
   messagesSended                  Message[] @relation(name: "messageSended")
   messagesRecieved                Message[] @relation(name: "messageRecieved")
@@ -68,11 +71,23 @@ model User {
 
   achievement                     Achievement?
 
-  roles                           UserRole[] @relation(name:"userRole")
+  Channels                        ChannelMembers[] @relation(name:"userToChannel")
   
-  channelState                    ChannelBlock[] @relation(name:"userChannelState")
+  ChannelBan                    ChannelBan[]    @relation(name:"userBaned")
 
-  created_date                    DateTime @default(now())
+  created_date                    DateTime        @default(now())
+}
+
+model UserBlock {
+  id          String      @unique @default(uuid())
+
+  userId      String      
+  user        User        @relation(fields: [userId], references: [id], name: "userblock")
+
+  bannedUserId String
+  bannedUser   User       @relation(fields: [bannedUserId], references: [id], name: "blockeduser")
+
+  created_date  DateTime  @default(now())
 }
 
 model Match {
@@ -103,6 +118,8 @@ model Achievement{
   firstWinAchie        Boolean  @default(false)
   cleanSheetGameAchie  Boolean  @default(false)
   tenGameInRowAchie    Boolean  @default(false)
+
+  created_at           DateTime @default(now())
 }
 
 model Friend {
@@ -134,21 +151,21 @@ model Message {
 }
 
 model Channel {
-  id       String    @unique @default(uuid())
-  name     String
-  type     Type
-  password String?
+  id                String    @unique @default(uuid())
+  name              String
+  type              Type
+  password          String?
 
-  messages Channel_message[] @relation("message")
+  messages          ChannelMessage[] @relation("message")
 
-  roles    UserRole[] @relation(name: "channelUser")
+  members           ChannelMembers[]  @relation(name: "channelMembers")
   
-  restrictedUsers ChannelBlock[] @relation(name: "restrictedUser")
+  banedUsers        ChannelBan[]      @relation(name: "channelBan")
   
-  created_at DateTime @default(now())
+  created_at        DateTime @default(now())
 }
 
-model Channel_message {
+model ChannelMessage {
   id         String      @unique @default(uuid())
 
   channel_id String
@@ -162,28 +179,27 @@ model Channel_message {
   created_at DateTime @default(now())
 }
 
-model UserRole{
+model ChannelMembers{
   id        String @unique @default(uuid())
 
   userId    String
-  user User @relation(fields: [userId], references:[id], name: "userRole", onDelete: Cascade)
+  user      User @relation(fields: [userId], references:[id], name: "userToChannel", onDelete: Cascade)
 
   channelId String
-  channel Channel @relation(fields: [channelId], references:[id], name: "channelUser", onDelete: Cascade)
+  channel   Channel @relation(fields: [channelId], references:[id], name: "channelMembers", onDelete: Cascade)
   
   role Role
 }
 
-model ChannelBlock{
-  id        String @unique @default(uuid())
+model ChannelBan{
+  id          String @unique @default(uuid())
 
-  userId    String
-  user User @relation(fields: [userId], references:[id], name: "userChannelState", onDelete: Cascade)
+  userId      String
+  user        User @relation(fields: [userId], references:[id], name: "userBaned", onDelete: Cascade)
 
-  channelId String
-  channel Channel @relation(fields: [channelId], references:[id], name: "restrictedUser", onDelete: Cascade)
-  
-  isBanned  Boolean @default(false)
-  isMute    Boolean @default(false)
+  channelId   String
+  channel     Channel @relation(fields: [channelId], references:[id], name: "channelBan", onDelete: Cascade)
+
+  created_at  DateTime @default(now()) 
 }
 

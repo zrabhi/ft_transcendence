@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Param, StreamableFile } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Param, StreamableFile } from '@nestjs/common';
 import { PrismaService } from "../prisma/prisma.service";
 import { Achievement, Match, Prisma, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -7,6 +7,7 @@ import { CreateMatchDto } from './dto/create-match.dto';
 import { FileUserDto } from './dto/put-user-dto';
 import { createReadStream } from 'fs';
 
+@Injectable()
 export class userRepository {
 
     constructor(private prismaService: PrismaService) { }

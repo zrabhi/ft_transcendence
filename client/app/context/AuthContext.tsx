@@ -36,14 +36,14 @@ export const AuthProvider = ({ children }: {
             return true;
         })();
 
-    }, []);
+    }, [user]);
 
     const updatingInfos = async (username : string, password: string ) => {
         const response = await putRequest(
           `${baseUrlUsers}/users`,
           JSON.stringify({ username, password })
         );
-    
+ 
         if (response.error) {
           setLoginError(response);
           return false;

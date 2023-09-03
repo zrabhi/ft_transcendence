@@ -240,8 +240,34 @@ export class UserService {
 async getFileUpload(fileTarget, category)
 {
 	
-			const file = createReadStream(`./images/${category}/${fileTarget}`);
-			return new StreamableFile(file);
+  let userFile: any = undefined;
+  const assets = await readdir(`./images/${category}`);
+  // loop over the files in './uploads' and set the userFile var to the needed file 
+  for (const file of assets) {
+    const {base} = parse(file)
+    if (base === fileTarget) {
+      userFile = file;
+      break;
+    }
+  }
+  if (userFile) {
+    console.log("file found");
+    return true
+    // const file = createReadStream(`./uploads/${category}/${userFile}`);
+    // return new StreamableFile(file);
+  }
+  else
+  {
+
+    console.log("file not found");
+    return false
+    // const file = createReadStream(`./uploads/${category}/default.png`);
+    // return new StreamableFile(file);
+  }
+
+
+			// const file = createReadStream(`./images/${category}/${fileTarget}`);
+			// return new StreamableFile(file);
 		
   // async updateUser(updateUserDto: UpdateUserDto){
   //     try {

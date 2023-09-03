@@ -17,7 +17,7 @@ model User {
   username                        String   @unique
   password                        String?
   avatar                          String   @default("http://127.0.0.1:8080/api/avatar/pictures/default.jpeg")
-  cover                           String   @default("../resources/cover.png")
+  cover                           String   @default("http://127.0.0.1:8080/api/cover/pictures/default.png")
   status                          Status   @default(ONLINE)
   country                         String?
   win                             Int      @default(0)
@@ -145,7 +145,7 @@ model UserRole{
 
   channelId String
   channel Channel @relation(fields: [channelId], references:[id], name: "channelUser", onDelete: Cascade)
-  
+
   role Role
 }
 
@@ -157,7 +157,7 @@ model ChannelBlock{
 
   channelId String
   channel Channel @relation(fields: [channelId], references:[id], name: "restrictedUser", onDelete: Cascade)
-  
+
   isBanned  Boolean @default(false)
   isMute    Boolean @default(false)
 }

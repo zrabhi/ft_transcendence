@@ -19,3 +19,12 @@ export class PutUserDto{
     @IsOptional()
     password: string
 }
+
+export class FileUserDto {
+
+    @IsOptional()
+    avatar: string
+
+    @IsOptional()
+    cover: string
+}

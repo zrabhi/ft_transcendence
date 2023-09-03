@@ -2,15 +2,19 @@
 import React, { useEffect, useState } from 'react'
 import './ProfileCard.scss'
 import Image from 'next/image'
+import Link from 'next/link'
 import CoverImage from '@/public/images/FetchCoverImage.png'
 import { BsTwitter, BsDiscord } from 'react-icons/Bs'
-import ReactCountryFlag from 'react-country-flag'
 import Avatar from '@/public/images/DefaultAvatar.jpg'
-import { baseUrlUsers, getRequest } from '@/app/context/utils/service'
-import { useCookies } from 'react-cookie'
 
-export default function ProfileCard() {
+export default function ProfileCard(user: any) {
 
+  // if (user.data && user.data.discordHandler) {
+  //   console.log('discordHandler is not null');
+  // }
+  // else {
+  //   console.log('discordHandler is null');
+  // }
 
   return (
     <div className="profile-card">
@@ -24,35 +28,46 @@ export default function ProfileCard() {
         <div className="left">
           <div className="total-games">
             <h4>total games</h4>
-            15
+            {
+              user.data && user.data.totalGames
+            }
           </div>
           <div className="state">
             <h4>stats</h4>
-            Fetch: State Logo
+            {
+              // user.data && user.data.avatar 
+            }
           </div>
         </div>
         <div className="right">
-          <div className="country">
-            <h4>country</h4>
-            <div className="flag">
-              <ReactCountryFlag svg
-                countryCode='MA'
-                style={{
-                  fontSize: '2rem',
-                  lineHeight:'2rem'
-                }}
-              />
-            </div>
-          </div>
           <div className="social-media">
             <h4>social medias</h4>
             <div className="icons">
-              <div className="discord icon">
-                <BsDiscord />
-              </div>
-              <div className="twitter icon">
-                <BsTwitter />
-              </div>
+              {/* Discord  */}
+              { (user.data && user.data.discordHandler && user.data.discordHandler.length >= 0 ) ?
+                <div className="discord icon">
+                  <Link href={user.data && user.data.discordHandler} target='_blank'>
+                    <BsDiscord />
+                  </Link>
+                </div>
+                : 
+                <div className="discord icon grayscale pointer-none">
+                  <BsDiscord />
+                </div>
+              }
+
+              {/* Twitter */}
+              { (user.data && user.data.twitterHandler && user.data.twitterHandler.length >= 0 ) ?
+                <div className="discord icon">
+                  <Link href={user.data && user.data.twitterHandler} target='_blank'>
+                    <BsTwitter />
+                  </Link>
+                </div>
+                : 
+                <div className="discord icon grayscale pointer-none">
+                  <BsTwitter />
+                </div>
+              }
             </div>
           </div>
         </div>
@@ -60,7 +75,9 @@ export default function ProfileCard() {
       <div className="user">
         <div className="img relative w-4/5 mx-auto">
           <Image
-            src={Avatar}
+            src={user.data && user.data.avatar && !user.data.avatar.includes('googleusercontent') ? user.data.avatar : Avatar}
+            width={200}
+            height={200}
             alt='Image of the user'
             className='rounded-full '
           />
@@ -69,7 +86,8 @@ export default function ProfileCard() {
           </div>
         </div>
         <div className="username text-center m-2">
-          user name
+          {user.data &&
+          user.data.username}
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import Footer from "@/components/MainPage/Footer/Footer";
 import { useCookies } from "react-cookie";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { AuthProvider } from "./context/AuthContext";
 
 const metadata: Metadata = {
   title: "Pong Game",
@@ -27,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={roboto.className} suppressHydrationWarning={true}>
+        <AuthProvider>
         {children}
+        </AuthProvider>
         <Footer />
       </body>
     </html>

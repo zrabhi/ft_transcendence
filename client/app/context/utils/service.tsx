@@ -1,31 +1,45 @@
 export const baseUrlAuth = "http://127.0.0.1:8080/api/auth";
-export const baseUrlUsers ="http://127.0.0.1:8080/api"
-import axios from "axios"
-export const postRequest = async (url: string, body: any) => {
+export const baseUrlUsers = "http://127.0.0.1:8080/api";
+import axios from "axios";
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body,
-    });
-    const data = await response.json();
-    if (!response.ok)
-    {
-      
-      let message;
-      if (data?.message)
-          message = data.message;
-      else
-          message =  data;
-      return ({error:true, message});
-    }
-    return data;
+export const postRequest = async (url: string, body: any) => {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body,
+  });
+  console.log(response);
+
+  const data = await response.json();
+  if (!response.ok) {
+    let message;
+    if (data?.message) message = data.message;
+    else message = data;
+    return { error: true, message };
+  }
+  return data;
 };
 
-export const putRequest = async (url: string, body: any) => {
+export const postFileRequest = async (url: string, body: any) => {
+  const response = await fetch(url, {
+    method: "POST",
+    body,
+    credentials: "include",
+  });
+  console.log(response);
 
+  const data = await response.json();
+  if (!response.ok) {
+    let message;
+    if (data?.message) message = data.message;
+    else message = data;
+    return { error: true, message };
+  }
+  return data;
+};
+export const putRequest = async (url: string, body: any) => {
   const response = await fetch(url, {
     method: "PUT",
     headers: {
@@ -35,38 +49,30 @@ export const putRequest = async (url: string, body: any) => {
     credentials: "include",
   });
   const data = await response.json();
-  if (!response.ok)
-  {
-    
+  if (!response.ok) {
     let message;
-    if (data?.message)
-        message = data.message;
-    else
-        message =  data;
-    return ({error:true, message});
+    if (data?.message) message = data.message;
+    else message = data;
+    return { error: true, message };
   }
   return data;
 };
 
-export const getRequest = async (url: string) =>
-{
-  const response = await fetch(url, {method: "GET",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  credentials: "include",
-});
+export const getRequest = async (url: string) => {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
 
-const data = await response.json();
-  if (!response.ok)
-  {
-    
+  const data = await response.json();
+  if (!response.ok) {
     let message;
-    if (data?.message)
-        message = data.message;
-    else
-        message =  data;
-    return ({error:true, message});
+    if (data?.message) message = data.message;
+    else message = data;
+    return { error: true, message };
   }
   return data;
   // let message;
@@ -78,4 +84,4 @@ const data = await response.json();
   //   return ({error:true, message});
   // }
   // return (response.data);
-}
+};

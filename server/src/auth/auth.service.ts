@@ -161,7 +161,6 @@ export class AuthService {
         data: {
           email: user.email,
           username: user.username,
-          avatar: user.avatar,
           achievement: {
             create: {
               accountCreationAchie: true,

@@ -33,15 +33,14 @@ export const strorageCover = {
     filename: (req, file, cb) => {
       const filename: string =
         path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
-        const extension: string = path.parse(file.originalname).ext;
-        cb(null, `${filename}${extension}`);
-      }   
-    }),
-    fileFilter : (req, file, cb) =>{
-          if (!file.originalname.match(/\.(jpg|jpeg|png)$/))
-              return cb(null, false);
-          cb(null, true);
-    }
+      const extension: string = path.parse(file.originalname).ext;
+      cb(null, `${filename}${extension}`);
+    },
+  }),
+  fileFilter: (req, file, cb) => {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) return cb(null, false);
+    cb(null, true);
+  },
 };
 
 export const strorageAvatar = {
@@ -57,11 +56,10 @@ export const strorageAvatar = {
       cb(null, `${filename}${extension}`);
     },
   }),
-  fileFilter : (req, file, cb) =>{
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/))
-        return cb(null, false);
+  fileFilter: (req, file, cb) => {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) return cb(null, false);
     cb(null, true);
-}
+  },
 };
 
 @Controller('/api')
@@ -128,17 +126,17 @@ export class UserController {
     }
   }
 
-  // avatar imagesss 
+  // avatar imagesss
 
   @UseGuards(JwtAuthGuard)
   @Post('avatar')
-  @UseInterceptors(
-    FileInterceptor('file', strorageAvatar))
+  @UseInterceptors(FileInterceptor('file', strorageAvatar))
   async uploadAvatart(
     @UploadedFile() file: Express.Multer.File,
     @Res() response: Response,
-    @Req() req
+    @Req() req,
   ) {
+<<<<<<< HEAD
     if (!file)
     return  response.status(400).json({msg: "File is not Image"})
    try{
@@ -148,9 +146,22 @@ export class UserController {
    {
     response.status(400).json({ message: err.message })
     console.log("image rro", err.message);
+=======
+    if (!file) return response.status(400).json({ msg: 'File is not Image' });
+    try {
+      this.userService.updateAvatarorCover(
+        { avatar: file.filename, cover: '' },
+        req.user.id,
+        'avatar',
+      );
+      return response.status(200).json(file);
+    } catch (err) {
+      response.status(400).json({ message: err.message });
+      console.log('image rro', err.message);
+>>>>>>> 89ae20e17d8f9dfe089f8fd22ed70656fd3c6190
 
-    throw new err;
-   }
+      throw new err();
+    }
   }
 
   //cover imagess
@@ -160,23 +171,33 @@ export class UserController {
   async uploadCover(
     @UploadedFile() file: Express.Multer.File,
     @Res() response: Response,
-    @Req() req
+    @Req() req,
   ) {
+<<<<<<< HEAD
     if (!file)
      return  response.status(400).json({msg: "File is not Image"})
     try{
       this.userRepository.updateAvatarorCover({avatar: '', cover:file.filename}, req.user.id, 'cover')
+=======
+    if (!file) return response.status(400).json({ msg: 'File is not Image' });
+    try {
+      this.userService.updateAvatarorCover(
+        { avatar: '', cover: file.filename },
+        req.user.id,
+        'cover',
+      );
+>>>>>>> 89ae20e17d8f9dfe089f8fd22ed70656fd3c6190
       return response.status(200).json(file);
-    }catch(err)
-     {
-      console.log("image rro", err.message);
-      throw new err;
-     }
+    } catch (err) {
+      console.log('image rro', err.message);
+      throw new err();
+    }
     return response.status(200).json(file.path);
   }
   /// this route in my opinion cant be proteted , pictures can be accessed from everywhere
   // @UseGuards(JwtAuthGuard)
   @Get('cover/pictures/:filename')
+<<<<<<< HEAD
   async getCover(@Param('filename') filename: string, @Res() res)
   {
     //Not complete
@@ -190,5 +211,17 @@ export class UserController {
     // TODO: return fileStream or ceart one in frontend 
     // return await this.userRepository.getFileUpload(filename, 'avatars')
       res.sendFile(filename, {root: './images/avatars'})
+=======
+  async getCover(@Param('filename') filename: string, @Res() res) {
+    // if (await this.userService.getFileUpload(filename, 'covers'))
+    //   res.sendFile(filename, { root: './images/covers' });
+    res.sendFile(filename, { root: './images/covers' });
+  }
+  @Get('avatar/pictures/:filename')
+  async getAvatar(@Param('filename') filename: string, @Res() res) {
+    // if (await this.userService.getFileUpload(filename, 'avatars'))
+    //   res.sendFile(filename, { root: './images/avatars' });
+    res.sendFile(filename, { root: './images/avatars' });
+>>>>>>> 89ae20e17d8f9dfe089f8fd22ed70656fd3c6190
   }
 }

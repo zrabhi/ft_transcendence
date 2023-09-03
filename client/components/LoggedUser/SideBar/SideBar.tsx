@@ -7,6 +7,7 @@ import { PiTelevisionFill, PiChatsFill } from "react-icons/pi";
 import { IoMdSettings, IoMdExit } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
+import Link from 'next/link'
 
 export default function SideBar() {
   const router = useRouter();
@@ -39,7 +40,9 @@ export default function SideBar() {
       </div>
       <div className="sidebar-footer">
         <div className="to-settings">
-          <IoMdSettings size={24} className="icon" />
+          <Link href="profile/settings">
+            <IoMdSettings size={24} className="icon" />
+          </Link>
         </div>
         <div className="to-signout" onClick={handleSignOut}>
           <IoMdExit size={24} className="icon" />

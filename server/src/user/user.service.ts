@@ -192,8 +192,6 @@ export class UserService {
     } catch (error) {
     }
   }
-<<<<<<< HEAD
-=======
 
     async updateAvatarorCover(infos : FileUserDto, userId: string, toBeUpdated: string)
     {
@@ -270,6 +268,5 @@ async getFileUpload(fileTarget, category)
 
   //     }
   // }
->>>>>>> 83996920d01dffb38b21ec33d67590125b3174fa
 }
 }

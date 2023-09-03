@@ -186,7 +186,7 @@ export class UserController {
   async getAvatar(@Param('filename') filename: string, @Res() res)
   {
     //Not complete
-    // TODO: return fileStream or ceart one in frontend 
+    // TODO: return fileStream or create one in frontend
     // return await this.userService.getFileUpload(filename, 'avatars')
       res.sendFile(filename, {root: './images/avatars'})
   }

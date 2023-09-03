@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useRef, useState } from "react";
+import { SetStateAction, useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Avatar1 from "@/public/images/avatar1.jpeg";
 import "./style.scss";
@@ -22,7 +22,8 @@ export default function Complete() {
   const avatar : any = useRef();
   const ErrorRef = useRef<HTMLDivElement>(null);
 
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState("http://127.0.0.1:8080/api/avatar/pictures/default.jpeg");
+  const [cover, setCover] = useState("http://127.0.0.1:8080/api/cover/pictures/default.png");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -40,7 +41,7 @@ export default function Complete() {
     reader.onload = async function(ev) {
     if (e.target.files && e.target.files[0]) {
       avatar.current.src =  e.target!.result as string;
-      setImage(ev.target!.result);
+      setImage(ev.target!.result as string);
       console.log(e.target.files);
       const data = {
         file: e.target.files[0],
@@ -53,10 +54,6 @@ export default function Complete() {
         formData
       );
       console.log("response is => ", response);
-      Avatar1.src = "http://127.0.0.1:8080/api/avatar/pictures/zrabhi64730d93-31e2-481e-984d-d41bb2f47a82.jpeg"
-      // const Object = await fetch(`${baseUrlUsers}/avatar/pictures/googleee926abf-f0a6-4994-8b09-662ef8dcd05d.png`,{method: "GET"})
-      // console.log(Object);
-      
     }
   }
   reader.readAsDataURL(e.target.files[0]);
@@ -144,7 +141,6 @@ export default function Complete() {
             </div>
             <div className="profile-box">
               <div className="current-pic">
-                
                 <img ref={avatar} src={image} alt="avatar" />
               </div>
               <div className="upload-pic">

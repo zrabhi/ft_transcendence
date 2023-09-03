@@ -215,7 +215,7 @@ export class UserService {
           );
         }
       }
-      
+
       else if (toBeUpdated === 'cover')
       {
         try {

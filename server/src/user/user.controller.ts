@@ -14,7 +14,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+
+import { userRepository } from './user.repository';
 import { Achievement, Match, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CreateMatchDto } from './dto/create-match.dto';
@@ -65,35 +66,35 @@ export const strorageAvatar = {
 
 @Controller('/api')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userRepository: userRepository) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('/users/')
   async getAllUsers(): Promise<User[]> {
-    return await this.userService.findAllUsers();
+    return await this.userRepository.findAllUsers();
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/user/')
   async getUser(@Req() req): Promise<User> {
-    return await this.userService.findUserById(req.user.id);
+    return await this.userRepository.findUserById(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('user/:username')
   async getUseByName(@Param('username') username: string): Promise<User> {
-    return await this.userService.findUserName(username);
+    return await this.userRepository.findUserName(username);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('/users/')
   async createUser(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.addUser(createUserDto);
+    return await this.userRepository.addUser(createUserDto);
   }
   @UseGuards(JwtAuthGuard)
   @Delete('/user')
   async deleteUser(@Req() req) {
-    return await this.userService.deleteUserByUsername(req.user.id);
+    return await this.userRepository.deleteUserByUsername(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -101,24 +102,24 @@ export class UserController {
   async getUserAchievement(
     @Param('username') username: string,
   ): Promise<Achievement> {
-    return await this.userService.achievementById(username);
+    return await this.userRepository.achievementById(username);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/users/matches')
   async getMatches(@Param('user_id') user_id: string): Promise<Match[]> {
-    return await this.userService.getMatchesByUserId(user_id);
+    return await this.userRepository.getMatchesByUserId(user_id);
   }
   @UseGuards(JwtAuthGuard)
   @Post('/users/matches')
   async createMatch(@Body() createMatchDto: CreateMatchDto) {
-    return await this.userService.createMatch(createMatchDto);
+    return await this.userRepository.createMatch(createMatchDto);
   }
   @UseGuards(JwtAuthGuard)
   @Put('/users')
   async handleUpdate(@Body() user: PutUserDto, @Req() req, @Res() response) {
     try {
-      await this.userService.updateUser(user, req);
+      await this.userRepository.updateUser(user, req);
       return response
         .status(200)
         .json({ msg: 'Information updated successfully' });
@@ -141,7 +142,7 @@ export class UserController {
     if (!file)
     return  response.status(400).json({msg: "File is not Image"})
    try{
-    this.userService.updateAvatarorCover({avatar: file.filename, cover:''}, req.user.id, 'avatar')
+    this.userRepository.updateAvatarorCover({avatar: file.filename, cover:''}, req.user.id, 'avatar')
     return response.status(200).json(file);
   }catch(err)
    {
@@ -164,7 +165,7 @@ export class UserController {
     if (!file)
      return  response.status(400).json({msg: "File is not Image"})
     try{
-      this.userService.updateAvatarorCover({avatar: '', cover:file.filename}, req.user.id, 'cover')
+      this.userRepository.updateAvatarorCover({avatar: '', cover:file.filename}, req.user.id, 'cover')
       return response.status(200).json(file);
     }catch(err)
      {
@@ -180,14 +181,14 @@ export class UserController {
   {
     //Not complete
     // TODO: return fileStream or ceart one in frontend 
-    // return this.userService.getFileUpload(filename, 'avatars')
+    // return this.userRepository.getFileUpload(filename, 'avatars')
   }
   @Get('avatar/pictures/:filename')
   async getAvatar(@Param('filename') filename: string, @Res() res)
   {
     //Not complete
     // TODO: return fileStream or ceart one in frontend 
-    // return await this.userService.getFileUpload(filename, 'avatars')
+    // return await this.userRepository.getFileUpload(filename, 'avatars')
       res.sendFile(filename, {root: './images/avatars'})
   }
 }

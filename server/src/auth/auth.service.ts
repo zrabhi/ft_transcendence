@@ -118,6 +118,7 @@ export class AuthService {
     profile: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+    
     try {
       let userSearch = null;
       userSearch = await this._prisma.user.findFirst({
@@ -127,21 +128,22 @@ export class AuthService {
       });
       
       if (userSearch)
-        await this._prisma.user.update({
-          where: {
-            id: userSearch.id,
-          },
-          data: {
-            status: 'ONLINE',
-          },
-        });
-      else {
-        const newUserId = await this.signup(profile, res);
-        userSearch = await this._user.findUserById(newUserId.id);
-        console.log(userSearch);
-      }
-      console.log("ima here");
-      
+      await this._prisma.user.update({
+    where: {
+      id: userSearch.id,
+    },
+    data: {
+      status: 'ONLINE',
+    },
+  });
+  else {
+    console.log("fucntion");
+    const newUserId = await this.signup(profile, res);
+    userSearch = await this._user.findUserById(newUserId.id);
+    console.log(userSearch);
+  }
+  console.log("ima here");
+  
       const access_token = await this.extractJwtToken({
         id: userSearch.id,
         username: userSearch.username,

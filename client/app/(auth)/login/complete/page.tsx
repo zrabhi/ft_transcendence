@@ -42,7 +42,7 @@ export default function Complete() {
     if (e.target.files && e.target.files[0]) {
       avatar.current.src =  e.target!.result as string;
       setImage(ev.target!.result as string);
-      console.log(e.target.files);
+      // console.log(e.target.files);
       const data = {
         file: e.target.files[0],
       };
@@ -53,7 +53,7 @@ export default function Complete() {
         `${baseUrlUsers}/avatar`,
         formData
       );
-      console.log("response is => ", response);
+      // console.log("response is => ", response);
     }
   }
   reader.readAsDataURL(e.target.files[0]);
@@ -68,6 +68,9 @@ export default function Complete() {
 
     // check username not exist in database
     // check password and confirm password match
+    usernameRef.current!.innerHTML = "";
+    passwordRef.current!.innerHTML = "";
+    ErrorRef.current!.innerHTML = "";
     if (username.length < 6) {
       usernameRef.current!.innerHTML = "Username must be at least 6 characters";
       return;
@@ -84,8 +87,6 @@ export default function Complete() {
       const result = await updatingInfos(username, password);
       if (result) router.push("/profile");
       else {
-        console.log("error is", loginError);
-
         ErrorRef.current!.innerHTML = "Invalid Credentials";
       }
     }
@@ -110,6 +111,7 @@ export default function Complete() {
                   id="username"
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Username"
+                  autoComplete="off"
                   defaultValue={!user ? "Username" : user?.username}
                 />
               </div>
@@ -120,6 +122,7 @@ export default function Complete() {
                   type="password"
                   name="password"
                   id="password"
+                  autoComplete="off"
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
                 />
@@ -130,6 +133,7 @@ export default function Complete() {
                   type="password"
                   name="confirm-password"
                   id="confirm-password"
+                  autoComplete="off"
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm Password"
                 />
@@ -150,6 +154,7 @@ export default function Complete() {
                   name="profile-pic"
                   id="profile-pic"
                   accept="image/*"
+                  autoComplete="off"
                   onChange={uploadFile}
                 />
                 {/* <input type="file" name="profile-pic" id="profile-pic" accept='image/*' /> */}
@@ -160,6 +165,7 @@ export default function Complete() {
                 className="w-full p-2 uppercase font-semibold rounded-lg tracking-wider "
                 type="submit"
                 value="submit"
+                autoComplete="off"
                 onClick={handleSubmitClick}
               />
             </div>

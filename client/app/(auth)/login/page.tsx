@@ -79,7 +79,7 @@ export default function SignIn() {
     e.preventDefault();
     const result = await LogIn(loginInfo);
     if (result) {
-      console.log("user data ", user);
+      // console.log("user data ", user);
 
       router.push("/profile");
     } else return (ErrorRef.current!.innerHTML = "Invalid Credentials");
@@ -107,6 +107,7 @@ export default function SignIn() {
                     placeholder="email"
                     autoFocus
                     required
+                    autoComplete='off'
                     onInvalid={handleInvalidEmail}
                     onChange={handleEmailChange}
                   />
@@ -123,6 +124,7 @@ export default function SignIn() {
                     type="password"
                     placeholder="password"
                     required
+                    autoComplete='off'
                     onInvalid={handleInvalidPassword}
                     onChange={handlePasswordChange}
                   />
@@ -138,6 +140,7 @@ export default function SignIn() {
                     type="checkbox"
                     name="terms"
                     id="terms"
+                    autoComplete='off'
                     value="terms"
                   />
                   <div className="check-icon" onClick={handleCheckOne}>
@@ -151,7 +154,13 @@ export default function SignIn() {
                 </div>
 
                 <div className="checkbox">
-                  <input type="checkbox" name="terms" id="news" value="news" />
+                  <input 
+                    type="checkbox" 
+                    name="terms" 
+                    id="news" 
+                    value="news"
+                    autoComplete="off"
+                  />
                   <div className="check-icon" onClick={handleCheckTwo}>
                     <div ref={checkTwo} className="icon hidden">
                       <FaCheckSquare size="16" />

@@ -35,12 +35,12 @@ export class AuthController {
   @Post('signin')
   async handleSignin(@Body() body: AuthDto, @Res() response: Response) {
     try {
-      console.log(body);
+      // console.log(body);
       const data = await this.authService.signin(body);
       const { access_token, user } = data;
       if (access_token === '')
         return response.status(400).json({ msg: 'Invalid Credencial' });
-      console.log(access_token);
+      // console.log(access_token);
       response.cookie('access_token', access_token);
       return response.status(200).json(user);
     } catch (e) {
@@ -77,7 +77,7 @@ export class AuthController {
     try {
       const userData = this.authService.extract42UserData(user);
       const data = await this.authService.login(userData, response);
-      console.log(`data is `, data);
+      // console.log(`data is `, data);
       const { access_token, userSearch } = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)
@@ -98,7 +98,7 @@ export class AuthController {
     try {
       const userData = this.authService.extractGoogleUserData(user);
       const data = await this.authService.login(userData, response);
-      console.log(`data is `, data);
+      // console.log(`data is `, data);
       const { access_token, userSearch } = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)
@@ -119,7 +119,7 @@ export class AuthController {
     try {
       const userData = this.authService.extractUserGithubData(user);
       const data = await this.authService.login(userData, response);
-      console.log(`data is `, data);
+      // console.log(`data is `, data);
       const { access_token, userSearch } = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)

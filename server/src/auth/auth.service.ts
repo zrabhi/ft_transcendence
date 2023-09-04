@@ -108,8 +108,8 @@ export class AuthService {
       const access_token = await this.jwtService.signAsync(playload);
       return access_token;
     }catch(err){
-      console.log("ac, access_toces");
-      console.log(err.message);
+      // console.log("ac, access_toces");
+      // console.log(err.message);
       
     }
   }
@@ -162,6 +162,7 @@ export class AuthService {
         data: {
           email: user.email,
           username: user.username,
+          avatar:user.avatar,
           achievement: {
             create: {
               accountCreationAchie: true,
@@ -234,7 +235,7 @@ export class AuthService {
     try {
       return authenticator.verify(optionsVerify);
     } catch (err) {
-      console.log(err.message);
+      // console.log(err.message);
     }
   }
 

@@ -145,7 +145,7 @@ export class UserService {
         },
       });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   }
 
@@ -190,7 +190,7 @@ export class UserService {
         },
       });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   }
   async updateAvatarorCover(
@@ -207,7 +207,7 @@ export class UserService {
           },
         });
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
       {
         throw new HttpException(

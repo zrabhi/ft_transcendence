@@ -1,7 +1,6 @@
 @import '@/app/globals.scss';
 
 .setting-page {
-  margin-left: 6rem;
   padding: 2rem;
   background-color: $main-bg-color;
   .settings {
@@ -11,8 +10,20 @@
     border-radius: .2rem;
     border-radius: 1rem;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    a {
+      background-color: $blue-bg-color;
+      transition: .1s ease-in-out;
+      font-weight: 600;
+      &:hover {
+        opacity: .8;
+      }
+      &:active {
+        transform: scale(1.05) translateY(2px);
+      }
+    }
     .setting-box {
       width: 60%;
       background-color: $box-bg-color;

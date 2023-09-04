@@ -10,7 +10,7 @@ export const postRequest = async (url: string, body: any) => {
     },
     body,
   });
-  console.log(response);
+  // console.log(response);
 
   const data = await response.json();
   if (!response.ok) {
@@ -28,7 +28,7 @@ export const postFileRequest = async (url: string, body: any) => {
     body,
     credentials: "include",
   });
-  console.log(response);
+  // console.log(response);
 
   const data = await response.json();
   if (!response.ok) {

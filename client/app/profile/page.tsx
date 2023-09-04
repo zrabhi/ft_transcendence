@@ -11,13 +11,6 @@ import { AuthContext } from '@/app/context/AuthContext'
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
 
-  console.log("user ==>", user);
-
-  // useEffect(() =>{
-  //     // getUserData();
-  //     console.log("user now is ", user);
-
-  // },[])
   return (
     <div className="profile-page text-white">
       <SideBar />

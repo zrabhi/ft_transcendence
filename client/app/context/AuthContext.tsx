@@ -28,10 +28,10 @@ export const AuthProvider = ({ children }: {
                 setLoginError(response);
                 return false;
             }
-            console.log("response", response);
+            // console.log("response", response);
 
             setUser(response);
-            console.log("context", user);
+            // console.log("context", user);
 
             return true;
         })();
@@ -39,21 +39,19 @@ export const AuthProvider = ({ children }: {
     }, [user]);
 
     const updatingInfos = async (username : string, password: string ) => {
-        const response = await putRequest(
-          `${baseUrlUsers}/users`,
-          JSON.stringify({ username, password })
-        );
- 
-        if (response.error) {
-          setLoginError(response);
-          return false;
-        }
+    const response = await putRequest(
+        `${baseUrlUsers}/users`,
+        JSON.stringify({ username, password })
+    );
+    if (response.error) {
+        setLoginError(response);
+        return false;
+    }
 
-        console.log("response", response);
+        // console.log("response", response);
         setUser(response);
         return true;
-      };
-      
+    };
     const LogIn = useCallback(async (loginInfo: any) => {
         const response = await postRequest(
             `${baseUrlAuth}/signin`,
@@ -66,10 +64,10 @@ export const AuthProvider = ({ children }: {
         }
 
         localStorage.setItem("User", JSON.stringify(response));
-        console.log("response", response);
+        // console.log("response", response);
 
         setUser(response);
-        console.log("context", user);
+        // console.log("context", user);
 
         return true;
     }, []);

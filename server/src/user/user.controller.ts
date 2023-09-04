@@ -51,7 +51,7 @@ export const strorageAvatar = {
         path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
       const extension: string = path.parse(file.originalname).ext;
 
-      console.log(file);
+      // console.log(file);
 
       cb(null, `${filename}${extension}`);
     },
@@ -146,7 +146,7 @@ export class UserController {
       return response.status(200).json(file);
     } catch (err) {
       response.status(400).json({ message: err.message });
-      console.log('image rro', err.message);
+      // console.log('image rro', err.message);
 
       throw new err();
     }
@@ -170,7 +170,7 @@ export class UserController {
       );
       return response.status(200).json(file);
     } catch (err) {
-      console.log('image rro', err.message);
+      // console.log('image rro', err.message);
       throw new err();
     }
     return response.status(200).json(file.path);

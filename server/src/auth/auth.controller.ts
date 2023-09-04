@@ -27,60 +27,58 @@ import { UserService } from 'src/user/user.service';
 
 @Controller('/api/auth')
 export class AuthController {
-  constructor(private authService: AuthService, private userService: UserService) {}
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+  ) {}
 
   @Post('signin')
   async handleSignin(@Body() body: AuthDto, @Res() response: Response) {
     try {
       console.log(body);
-      
       const data = await this.authService.signin(body);
-      const {access_token, user} = data
+      const { access_token, user } = data;
       if (access_token === '')
         return response.status(400).json({ msg: 'Invalid Credencial' });
       console.log(access_token);
       response.cookie('access_token', access_token);
-      return response
-        .status(200)
-        .json(user);
-    
+      return response.status(200).json(user);
     } catch (e) {
       return response
         .status(400)
         .json({ msg: 'Invalid Credencial Error   ' + e.message });
-      }
     }
-    @Get('google/login')
-    @UseGuards(GoogleGuard)
-    async handleGoogleLogin() {
-      return;
-    }
-    
-    @Get('42/login')
-    @UseGuards(FtGurad)
-    handle42login() {
-      return ;
-    }
-    
-    @Get('github/login')
-    @UseGuards(GithubGuard)
-    handleGithublogin() {
-      return ;
-    }
-    
-    @Get('/42/redirect')
-    @UseGuards(FtGurad)
-    async handleRedirectFt(
-      @User() user: Profile,
+  }
+  @Get('google/login')
+  @UseGuards(GoogleGuard)
+  async handleGoogleLogin() {
+    return;
+  }
+
+  @Get('42/login')
+  @UseGuards(FtGurad)
+  handle42login() {
+    return;
+  }
+
+  @Get('github/login')
+  @UseGuards(GithubGuard)
+  handleGithublogin() {
+    return;
+  }
+
+  @Get('/42/redirect')
+  @UseGuards(FtGurad)
+  async handleRedirectFt(
+    @User() user: Profile,
     @Request() request,
     @Res() response,
   ) {
     try {
-
       const userData = this.authService.extract42UserData(user);
       const data = await this.authService.login(userData, response);
-      console.log("data is " , data);
-      const {access_token, userSearch} = data;
+      console.log(`data is `, data);
+      const { access_token, userSearch } = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)
         return response.redirect('http://127.0.0.1:3000/login/complete');
@@ -100,8 +98,8 @@ export class AuthController {
     try {
       const userData = this.authService.extractGoogleUserData(user);
       const data = await this.authService.login(userData, response);
-      console.log("data is " , data);
-      const {access_token, userSearch} = data;
+      console.log(`data is `, data);
+      const { access_token, userSearch } = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)
         return response.redirect('http://127.0.0.1:3000/login/complete');
@@ -121,9 +119,8 @@ export class AuthController {
     try {
       const userData = this.authService.extractUserGithubData(user);
       const data = await this.authService.login(userData, response);
-      console.log("data is " , data);
-      
-      const {access_token, userSearch} = data;
+      console.log(`data is `, data);
+      const { access_token, userSearch } = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)
         return response.redirect('http://127.0.0.1:3000/login/complete');
@@ -137,7 +134,6 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
-
     const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
       body.twoFactorAuthenticationCode,
       request.user,

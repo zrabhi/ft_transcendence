@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   HttpException,
   HttpStatus,
@@ -17,7 +19,6 @@ import { Profile } from 'passport';
 import { User } from './decorator/user-decorator';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
-import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -47,7 +48,7 @@ export class AuthService {
     const matches = await bcrypt.compare(body.password, user.password);
     let access_token = '';
     if (matches) {
-       access_token =  await this.extractJwtToken({
+        access_token =  await this.extractJwtToken({
         id: user.id,
         username: user.username,
         setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
@@ -138,9 +139,9 @@ export class AuthService {
       else {
         const newUserId = await this.signup(profile, res);
         userSearch = await this._user.findUserById(newUserId.id);
-        console.log(userSearch);
+        // console.log(userSearch);
       }
-      console.log("ima here");
+      // console.log("ima here");
       
       const access_token = await this.extractJwtToken({
         id: userSearch.id,
@@ -221,8 +222,9 @@ export class AuthService {
 
   isTwoFactorAuthenticationCodeValid(
     twoFactorAuthenticationCode: string,
-    user,
-  ) {
+    user: any,
+    )
+    {
 
 
     const optionsVerify = {
@@ -232,6 +234,7 @@ export class AuthService {
     try {
       return authenticator.verify(optionsVerify);
     } catch (err) {
+      console.log(err.message);
     }
   }
 

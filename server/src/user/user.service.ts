@@ -1,12 +1,17 @@
-import { Injectable } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+import { HttpException, HttpStatus, Injectable, Param } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Achievement, Match, Prisma, User } from '@prisma/client';
+import { CreateUserDto } from './dto/create-user.dto';
+import * as bcrypt from 'bcrypt';
+import { CreateMatchDto } from './dto/create-match.dto';
+import { error } from 'console';
+import { readdir } from 'fs';
+import { parse } from 'path';
+import { FileUserDto } from './dto/put-user-dto';
 
 @Injectable()
 export class UserService {
-<<<<<<< HEAD
-  constructor(private prismaService: PrismaService) { }
-  
-=======
   constructor(private prismaService: PrismaService) {}
 
   async findAllUsers(): Promise<User[]> {
@@ -32,7 +37,7 @@ export class UserService {
   }
 
   async addUser(createUserDto: CreateUserDto) {
-    let exist = !!(await this.prismaService.user.findFirst({
+    const exist = !!(await this.prismaService.user.findFirst({
       where: {
         OR: [
           { username: createUserDto.username },
@@ -99,29 +104,27 @@ export class UserService {
     }
   }
 
-  async findUserName(username: string):  Promise<User> 
-  {
+  async findUserName(username: string): Promise<User> {
     try {
-        return await this.prismaService.user.findUniqueOrThrow({
-          where: {
-            username: username,
-          },
-        });
-      } catch (error) {
-        throw new HttpException(
-          {
-            status: HttpStatus.NOT_FOUND,
-            error: `This username :${username} is not found.`,
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
+      return await this.prismaService.user.findUniqueOrThrow({
+        where: {
+          username: username,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: `This username :${username} is not found.`,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
   async achievementById(username: string): Promise<Achievement> {
     try {
-        const user = await this.findUserName(username)
-        return await this.prismaService.achievement.findUnique({
+      const user = await this.findUserName(username);
+      return await this.prismaService.achievement.findUnique({
         where: {
           id: user.id,
         },
@@ -142,6 +145,7 @@ export class UserService {
         },
       });
     } catch (error) {
+      console.log(error);
     }
   }
 
@@ -186,43 +190,43 @@ export class UserService {
         },
       });
     } catch (error) {
+      console.log(error);
     }
   }
-
-    async updateAvatarorCover(infos : FileUserDto, userId: string, toBeUpdated: string)
-    {
-        if (toBeUpdated === 'avatar')
-        {
-          try {
-            return await this.prismaService.user.update({
-              where: { id: userId },
-              data: {
-                  avatar:`http://127.0.0.1:8080/api/avatar/pictures/${infos.avatar}`,
-              },
-            });
-        }catch(err)
-        {
-          throw new HttpException(
-            {
-              status: HttpStatus.NOT_FOUND,
-              error: `Avatar image  error occured`,
-            },
-            HttpStatus.NOT_FOUND,
-          );
-        }
+  async updateAvatarorCover(
+    infos: FileUserDto,
+    userId: string,
+    toBeUpdated: string,
+  ) {
+    if (toBeUpdated === 'avatar') {
+      try {
+        return await this.prismaService.user.update({
+          where: { id: userId },
+          data: {
+            avatar: `http://127.0.0.1:8080/api/avatar/pictures/${infos.avatar}`,
+          },
+        });
+      } catch (err) {
+        console.log(err);
       }
-
-      else if (toBeUpdated === 'cover')
       {
-        try {
-          return await this.prismaService.user.update({
-            where: { id: userId },
-            data: {
-                cover: `http://127.0.0.1:8080/api/cover/pictures/${infos.cover}`,
-            },
-          });
-      }catch(err)
-      {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: `Avatar image  error occured`,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+    } else if (toBeUpdated === 'cover') {
+      try {
+        return await this.prismaService.user.update({
+          where: { id: userId },
+          data: {
+            cover: `http://127.0.0.1:8080/api/cover/pictures/${infos.cover}`,
+          },
+        });
+      } catch (err) {
         throw new HttpException(
           {
             status: HttpStatus.NOT_FOUND,
@@ -231,65 +235,27 @@ export class UserService {
           HttpStatus.NOT_FOUND,
         );
       }
-      }
-    }
-async getFileUpload(fileTarget, category)
-{
-	
-  let userFile: any = undefined;
-  const assets = await readdir(`./images/${category}`);
-  // loop over the files in './uploads' and set the userFile var to the needed file 
-  for (const file of assets) {
-    const {base} = parse(file)
-    if (base === fileTarget) {
-      userFile = file;
-      break;
     }
   }
-  if (userFile) {
-    console.log("file found");
-    return true
-    // const file = createReadStream(`./uploads/${category}/${userFile}`);
-    // return new StreamableFile(file);
-  }
-  else
-  {
-
-    console.log("file not found");
-    return false
-    // const file = createReadStream(`./uploads/${category}/default.png`);
-    // return new StreamableFile(file);
-  }
-
-
-			// const file = createReadStream(`./images/${category}/${fileTarget}`);
-			// return new StreamableFile(file);
-		
-  // async updateUser(updateUserDto: UpdateUserDto){
-  //     try {
-  //         if (updateUserDto.username !== undefined)
-  //         {
-  //             if (!!await this.prismaService.user.findFirst({
-  //                 where:{
-  //                     username:updateUserDto.username,
-  //                 }
-  //             }))
-  //             {
-  //                 throw new HttpException({
-  //                     status: HttpStatus.BAD_REQUEST,
-  //                     error: `These ${updateUserDto.username} already used try another one`,
-  //                 }, HttpStatus.BAD_REQUEST, {
-  //                 })
-  //             }
-  //         }
-  //         if (updateUserDto.Oldpassword !== undefined && updateUserDto.Newpassword && updateUserDto.Confirmedpassword)
-  //         {
-  //             if (updateUserDto.)
-  //         }
-  //     } catch(error) {
-
+  // async getFileUpload(fileTarget, category) {
+  //   let userFile: any = undefined;
+  //   const assets = await readdir(`./images/${category}`);
+  //   // loop over the files in './uploads' and set the userFile var to the needed file 
+  //   for (const file of assets) {
+  //     const {base} = parse(file)
+  //     if (base === fileTarget) {
+  //       userFile = file;
+  //       break;
   //     }
+  //   }
+  //   if (userFile) {
+  //     console.log("file found");
+  //     return true
+  //   }
+  //   else
+  //   {
+  //     console.log("file not found");
+  //     return false
+  //   }
   // }
-}
->>>>>>> 89ae20e17d8f9dfe089f8fd22ed70656fd3c6190
 }

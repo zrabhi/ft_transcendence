@@ -15,17 +15,17 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 
-import { userRepository } from './user.repository';
 import { Achievement, Match, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { JwtAuthGuard } from 'src/auth/Guards/AuthGurad';
 import { PutUserDto } from './dto/put-user-dto';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import path = require('path');
+import { UserService } from './user.service';
 
 export const strorageCover = {
   storage: diskStorage({
@@ -64,35 +64,35 @@ export const strorageAvatar = {
 
 @Controller('/api')
 export class UserController {
-  constructor(private userRepository: userRepository) {}
+  constructor(private userService: UserService) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('/users/')
   async getAllUsers(): Promise<User[]> {
-    return await this.userRepository.findAllUsers();
+    return await this.userService.findAllUsers();
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/user/')
   async getUser(@Req() req): Promise<User> {
-    return await this.userRepository.findUserById(req.user.id);
+    return await this.userService.findUserById(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('user/:username')
   async getUseByName(@Param('username') username: string): Promise<User> {
-    return await this.userRepository.findUserName(username);
+    return await this.userService.findUserName(username);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('/users/')
   async createUser(@Body() createUserDto: CreateUserDto) {
-    return await this.userRepository.addUser(createUserDto);
+    return await this.userService.addUser(createUserDto);
   }
   @UseGuards(JwtAuthGuard)
   @Delete('/user')
   async deleteUser(@Req() req) {
-    return await this.userRepository.deleteUserByUsername(req.user.id);
+    return await this.userService.deleteUserByUsername(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -100,24 +100,24 @@ export class UserController {
   async getUserAchievement(
     @Param('username') username: string,
   ): Promise<Achievement> {
-    return await this.userRepository.achievementById(username);
+    return await this.userService.achievementById(username);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/users/matches')
   async getMatches(@Param('user_id') user_id: string): Promise<Match[]> {
-    return await this.userRepository.getMatchesByUserId(user_id);
+    return await this.userService.getMatchesByUserId(user_id);
   }
   @UseGuards(JwtAuthGuard)
   @Post('/users/matches')
   async createMatch(@Body() createMatchDto: CreateMatchDto) {
-    return await this.userRepository.createMatch(createMatchDto);
+    return await this.userService.createMatch(createMatchDto);
   }
   @UseGuards(JwtAuthGuard)
   @Put('/users')
   async handleUpdate(@Body() user: PutUserDto, @Req() req, @Res() response) {
     try {
-      await this.userRepository.updateUser(user, req);
+      await this.userService.updateUser(user, req);
       return response
         .status(200)
         .json({ msg: 'Information updated successfully' });
@@ -136,17 +136,6 @@ export class UserController {
     @Res() response: Response,
     @Req() req,
   ) {
-<<<<<<< HEAD
-    if (!file)
-    return  response.status(400).json({msg: "File is not Image"})
-   try{
-    this.userRepository.updateAvatarorCover({avatar: file.filename, cover:''}, req.user.id, 'avatar')
-    return response.status(200).json(file);
-  }catch(err)
-   {
-    response.status(400).json({ message: err.message })
-    console.log("image rro", err.message);
-=======
     if (!file) return response.status(400).json({ msg: 'File is not Image' });
     try {
       this.userService.updateAvatarorCover(
@@ -158,7 +147,6 @@ export class UserController {
     } catch (err) {
       response.status(400).json({ message: err.message });
       console.log('image rro', err.message);
->>>>>>> 89ae20e17d8f9dfe089f8fd22ed70656fd3c6190
 
       throw new err();
     }
@@ -173,12 +161,6 @@ export class UserController {
     @Res() response: Response,
     @Req() req,
   ) {
-<<<<<<< HEAD
-    if (!file)
-     return  response.status(400).json({msg: "File is not Image"})
-    try{
-      this.userRepository.updateAvatarorCover({avatar: '', cover:file.filename}, req.user.id, 'cover')
-=======
     if (!file) return response.status(400).json({ msg: 'File is not Image' });
     try {
       this.userService.updateAvatarorCover(
@@ -186,7 +168,6 @@ export class UserController {
         req.user.id,
         'cover',
       );
->>>>>>> 89ae20e17d8f9dfe089f8fd22ed70656fd3c6190
       return response.status(200).json(file);
     } catch (err) {
       console.log('image rro', err.message);
@@ -197,21 +178,6 @@ export class UserController {
   /// this route in my opinion cant be proteted , pictures can be accessed from everywhere
   // @UseGuards(JwtAuthGuard)
   @Get('cover/pictures/:filename')
-<<<<<<< HEAD
-  async getCover(@Param('filename') filename: string, @Res() res)
-  {
-    //Not complete
-    // TODO: return fileStream or ceart one in frontend 
-    // return this.userRepository.getFileUpload(filename, 'avatars')
-  }
-  @Get('avatar/pictures/:filename')
-  async getAvatar(@Param('filename') filename: string, @Res() res)
-  {
-    //Not complete
-    // TODO: return fileStream or ceart one in frontend 
-    // return await this.userRepository.getFileUpload(filename, 'avatars')
-      res.sendFile(filename, {root: './images/avatars'})
-=======
   async getCover(@Param('filename') filename: string, @Res() res) {
     // if (await this.userService.getFileUpload(filename, 'covers'))
     //   res.sendFile(filename, { root: './images/covers' });
@@ -222,6 +188,5 @@ export class UserController {
     // if (await this.userService.getFileUpload(filename, 'avatars'))
     //   res.sendFile(filename, { root: './images/avatars' });
     res.sendFile(filename, { root: './images/avatars' });
->>>>>>> 89ae20e17d8f9dfe089f8fd22ed70656fd3c6190
   }
 }

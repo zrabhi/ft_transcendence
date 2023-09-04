@@ -5,3 +5,5 @@ all needed components will be exist under folder called components
 each component has own folder,
 so component's folder has two files CompName.tsx CompName.scss
 
+
+

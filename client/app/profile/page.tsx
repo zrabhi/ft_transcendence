@@ -6,12 +6,12 @@ import ProfileCard from "@/components/LoggedUser/Profile/ProfileCard/ProfileCard
 import { useCookies } from "react-cookie";
 import { baseUrlUsers, getRequest } from "../context/utils/service";
 import { useRouter } from "next/navigation";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from '@/app/context/AuthContext'
 
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
 
-  console.log("user ==>", user);
+  // console.log("user ==>", user);
 
   // useEffect(() =>{
   //     // getUserData();

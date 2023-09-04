@@ -14,6 +14,12 @@ export class PutUserDto{
     @IsNotEmpty()
     username:string
 
+    @IsOptional()
+    discord: string
+
+    @IsOptional()
+    twitter: string
+    
     @IsStrongPassword()
     @IsNotEmpty()
     @IsOptional()

@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
+  // eslint-disable-next-line prettier/prettier
   constructor(private readonly userService: UserService, private readonly authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

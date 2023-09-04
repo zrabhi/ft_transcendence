@@ -39,6 +39,7 @@ export const postFileRequest = async (url: string, body: any) => {
   }
   return data;
 };
+
 export const putRequest = async (url: string, body: any) => {
   const response = await fetch(url, {
     method: "PUT",

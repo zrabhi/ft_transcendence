@@ -10,10 +10,21 @@ import { Avatar } from "@radix-ui/themes";
 import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
 
 export default function Settings() {
+  // use context to get user data
   const { getUserData, user, updateUserInfo } = useContext(AuthContext);
-
+  
+  // to check if 2fa is enabled or not
   const [tfaDisabled, setTfaDisabled] = useState(true);
+  
+  // informations can updated by the user
+  const [username, setUsername] = useState(user?.data?.username || '');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [discord, setDiscord] = useState(user?.data?.discord || '');
+  const [twitter, setTwitter] = useState(user?.data?.twitter || '');
 
+  // those created by zRabhi i didn't understand all of them
   const [upadte, setUpdate] = useState(false)
   const [error, setError] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
@@ -24,21 +35,17 @@ export default function Settings() {
   const passwordRef = useRef<HTMLDivElement>(null);
   const updatedRef = useRef<HTMLParagraphElement>(null);
 
-  const [confirmPassword, setConfirmPassword] = useState("");
-
+  // those also created by zRabhi for upload images
   const [avatar, setAvatar] = useState<any>();
   const [cover, setCover] = useState<any>();
 
+  // data that will be sent to the server
   const [infos, setInfos] = useState({
     username: null,
     password: null,
     discord: null,
     twitter: null,
   });
-  // TODO:userInformation updatinggg
-
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
 
   const handleAvatarClick = () => {
     if (avatarInputRef.current) {
@@ -46,9 +53,8 @@ export default function Settings() {
     }
   };
 
-  const handlePasswordChange = (e: any) => {
-    setPassword(e.target.value);
-
+  const handleNewPassword = (e: any) => {
+    setNewPassword(e.target.value);
     setInfos((predData) => ({
       ...infos,
       password: e.target.value,
@@ -56,10 +62,26 @@ export default function Settings() {
   };
 
   const handleUsernameChange = (e: any) => {
-    setUserName(e.target.value);
+    setUsername(e.target.value);
     setInfos((predData) => ({
       ...infos,
       username: e.target.value,
+    }));
+  };
+
+  const handleDiscordChange = (e: any) => {
+    setDiscord(e.target.value);
+    setInfos((predData) => ({
+      ...infos,
+      discord: e.target.value,
+    }));
+  };
+
+  const handleTwitterChange = (e: any) => {
+    setTwitter(e.target.value);
+    setInfos((predData) => ({
+      ...infos,
+      twitter: e.target.value,
     }));
   };
 
@@ -69,10 +91,6 @@ export default function Settings() {
     }
   };
 
-  const [username, setUsername] = useState(user?.data?.username || '');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const handleImageUpdate = async (type: string) => {
     ErrorRef.current!.innerHTML = "";
     const formData = new FormData();
@@ -104,16 +122,32 @@ export default function Settings() {
     updatedRef.current!.innerHTML = "";
   };
 
-  const handleClick = async (e: any) => {
-    resetRefs();
+  const checkCurrentPassword = async (password: string) => {
+    // here we should check if the current password is correct or not
+    // if it's correct we return true else we return false
+    return false;
+  }
 
-    if (infos.username && userName.length < 6)
-      usernameRef.current!.innerHTML = "Username must be at least 6 characters";
-    else if (infos.password && password.length < 8)
+  const handleSubmitClick = async (e: any) => {
+    e.preventDefault();
+    resetRefs();
+    setError(false);
+    if (!checkCurrentPassword(currentPassword)) {
+      passwordRef.current!.innerHTML = "Invalid current password";
+      return ;
+    }
+    if (username.length < 4) {
+      usernameRef.current!.innerHTML = "Username must be at least 4 characters";
+      setError(true);
+    }
+    if (newPassword.length < 8) {
       passwordRef.current!.innerHTML = "Password must be at least 8 characters";
-    else if (infos.password && password && confirmPassword != password)
-      passwordRef.current!.innerHTML =
-        "Password and confirm password do not match";
+      setError(true);
+    }
+    if (newPassword !== confirmNewPassword) {
+      passwordRef.current!.innerHTML = "Passwords don't match";
+      setError(true);
+    }
     if (avatar) 
       await handleImageUpdate("avatar");
     if (cover) 
@@ -148,7 +182,7 @@ export default function Settings() {
                     <input type="text" name="username" id="username" placeholder='enter your username'
                     autoComplete='off'
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={handleUsernameChange}
                     />
                   </div>
                   <div className="input">
@@ -157,6 +191,7 @@ export default function Settings() {
                       type="password" name="current-password" 
                       id="current-password" placeholder='entery your current password' 
                       autoComplete='off'
+                      onChange={(e) => setCurrentPassword(e.target.value)}
                     />
                   </div>
                   <div ref={usernameRef} className="error username-error"></div>
@@ -167,7 +202,7 @@ export default function Settings() {
                       name="password"
                       id="password"
                       placeholder="entery your password"
-                      onChange={handlePasswordChange}
+                      onChange={handleNewPassword}
                     />
                   </div>
                   <div className="input">
@@ -178,7 +213,7 @@ export default function Settings() {
                       id="confirm-password"
                       placeholder="re-enter your password"
                       autoComplete="off"
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      onChange={(e) => setConfirmNewPassword(e.target.value)}
                     />
                   </div>
                   <div ref={passwordRef} className="error pass-error"></div>
@@ -237,6 +272,7 @@ export default function Settings() {
                       id="discord"
                       autoComplete="off"
                       placeholder="enter your discord link"
+                      onChange={handleDiscordChange}
                     />
                   </div>
                   <div className="input">
@@ -247,17 +283,18 @@ export default function Settings() {
                       id="twitter"
                       autoComplete="off"
                       placeholder="Enter your twitter link"
+                      onChange={handleTwitterChange}
                     />
                   </div>
                 </form>
               </div>
-              <input
+              <button
                 className="submit"
-                type="submit"
-                value="submit"
-                onClick={handleClick}
-              />
-              <div ref={updatedRef} className="updated pass-error"></div>
+                onClick={handleSubmitClick}
+              >
+                submit
+              </button>
+              <div ref={updatedRef} className="submit-msg updated pass-error"></div>
             </div>
           </div>
         </div>

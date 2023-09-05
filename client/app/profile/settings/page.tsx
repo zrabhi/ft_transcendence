@@ -194,7 +194,6 @@ export default function Settings() {
                       onChange={(e) => setCurrentPassword(e.target.value)}
                     />
                   </div>
-                  <div ref={usernameRef} className="error username-error"></div>
                   <div className="input">
                     <label htmlFor="password">password</label>
                     <input
@@ -216,7 +215,6 @@ export default function Settings() {
                       onChange={(e) => setConfirmNewPassword(e.target.value)}
                     />
                   </div>
-                  <div ref={passwordRef} className="error pass-error"></div>
                 </form>
                 <div className="update-imgs">
                   <div className="update-avatar">
@@ -251,7 +249,6 @@ export default function Settings() {
                       </span>
                     </div>
                   </div>
-                <div ref={ErrorRef} className="errorRef email-error"></div>
                 </div>
               </div>
               <div className="tfa-box">

@@ -17,6 +17,20 @@ export default function Profile() {
       <div className="profile">
         <div className="profile-content">
           <ProfileCard data={user} />
+          <div className="profile-boxes">
+            <div className="box recent-activities">
+            </div>
+            <div className="box achievements">
+            </div>
+            <div className="box statistics">
+            </div>
+            <div className="box games-history">
+            </div>
+            <div className="box friends">
+            </div>
+            <div className="box leaderboard">
+            </div>
+          </div>
         </div>
       </div>
     </div>

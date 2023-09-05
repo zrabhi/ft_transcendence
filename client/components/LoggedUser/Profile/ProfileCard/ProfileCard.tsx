@@ -9,18 +9,13 @@ import Avatar from '@/public/images/DefaultAvatar.jpg'
 
 export default function ProfileCard(user: any) {
 
-  // if (user.data && user.data.discordHandler) {
-  //   console.log('discordHandler is not null');
-  // }
-  // else {
-  //   console.log('discordHandler is null');
-  // }
-
   return (
     <div className="profile-card">
       <div className="cover-img">
-        <img
+        <Image
           src={user.data && user.data.cover? user.data.cover : CoverImage}
+          width={100}
+          height={100}
           alt='cover image'
         />
       </div>

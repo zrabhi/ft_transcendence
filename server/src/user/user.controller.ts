@@ -74,8 +74,12 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/user/')
-  async getUser(@Req() req): Promise<User> {
-    return await this.userService.findUserById(req.user.id);
+  async getUser(@Req() req, @Res() res): Promise<User> {
+    console.log("im hereee");
+    const user  = await this.userService.findUserById(req.user.id);
+    if (user)
+        return res.status(200).json(user);
+    return res.status(400).json({msg:"ko"})
   }
 
   @UseGuards(JwtAuthGuard)

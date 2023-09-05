@@ -53,7 +53,6 @@ export default function Complete() {
         `${baseUrlUsers}/avatar`,
         formData
       );
-      // console.log("response is => ", response);
     }
   }
   reader.readAsDataURL(e.target.files[0]);
@@ -66,8 +65,6 @@ export default function Complete() {
   const handleSubmitClick = async (e: any) => {
     e.preventDefault();
 
-    // check username not exist in database
-    // check password and confirm password match
     usernameRef.current!.innerHTML = "";
     passwordRef.current!.innerHTML = "";
     ErrorRef.current!.innerHTML = "";

@@ -125,8 +125,33 @@ export class UserController {
       response.status(400).json({ msg: "Couldn't update Your information" });
     }
   }
-
+  @UseGuards(JwtAuthGuard)
+  @Put('users/changeUserName')
+  async handleUserNameChange(@Body() user: PutUserDto, @Req() req, @Res() Res)
+  {
+   
+    try {
+        await this.userService.UpdateUserName(user, req.user.id)
+        Res.status(200).json({msg: "Updated succefully"}) ;
+      }catch(err)
+    {
+        console.log(err);
+        
+    }
+  }
+  @UseGuards(JwtAuthGuard)
+  @Put('users/update')
+  async HandleUpdate(@Body() user: PutUserDto, @Res() res, @Req() req)
+  { 
+    console.log(user);
+    const User =   await this.userService.UpdateAllInfos(user, req.user.id);
+    console.log(User);
+    return user;
+    
+    // res.status(200).json({msg:"Ok"});
+  }
   // avatar imagesss
+          
 
   @UseGuards(JwtAuthGuard)
   @Post('avatar')

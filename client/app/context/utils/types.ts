@@ -19,7 +19,33 @@ export interface User {
   twoFactorAuthenticationSecret: string;
 }
 
+export const userInit = {
+  id: "",
+  email: "",
+  username: "",
+  password: "",
+  avatar: "",
+  cover: "",
+  status: "",
+  country: "",
+  win: 0,
+  loss: 0,
+  ladder_level: 0,
+  xp: 0,
+  totalGames: 0,
+  discordHandler: "",
+  twitterHandler: "",
+  created_date: "",
+  tfa: false,
+  twoFactorAuthenticationSecret: "",
+}
+
 export interface LoginError {
   error: boolean;
   message: string;
+}
+
+export const LoginErrorInit : LoginError = {
+  error: false,
+  message:"",
 }

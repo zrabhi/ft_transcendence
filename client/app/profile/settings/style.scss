@@ -1,5 +1,37 @@
 @import '@/app/globals.scss';
 
+
+.error {
+  margin-bottom: 1.2rem;
+  padding-left: .2rem;
+  font-size: .8rem;
+  color: $error-color;
+}
+.errorRef{
+  margin-bottom: 1.2rem;
+  padding-left: .2rem;
+  text-align: center;
+  font-size: .8rem;
+  color: $error-color;
+}
+
+.updated
+{
+  margin-bottom: 1.2rem;
+  padding-left: 2.5rem;
+  font-size: .8rem;
+  color: $deep-green-color;
+}
+
+.updatedRef
+{
+  margin-bottom: 1.2rem;
+  padding-left: .5rem;
+  text-align: center;
+  font-size: .8rem;
+  color: $deep-green-color;;
+}
+
 .setting-page {
   padding: 2rem;
   background-color: $main-bg-color;

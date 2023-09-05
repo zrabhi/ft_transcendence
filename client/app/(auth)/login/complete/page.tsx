@@ -22,7 +22,7 @@ export default function Complete() {
   const avatar : any = useRef();
   const ErrorRef = useRef<HTMLDivElement>(null);
 
-  const [image, setImage] = useState("http://127.0.0.1:8080/api/avatar/pictures/default.jpeg");
+  const [image, setImage] = useState("");
   const [cover, setCover] = useState("http://127.0.0.1:8080/api/cover/pictures/default.png");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -42,10 +42,6 @@ export default function Complete() {
     if (e.target.files && e.target.files[0]) {
       avatar.current.src =  e.target!.result as string;
       setImage(ev.target!.result as string);
-      // console.log(e.target.files);
-      const data = {
-        file: e.target.files[0],
-      };
       const formData = new FormData();
 
       formData.append("file", e.target.files[0]);

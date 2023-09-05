@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { baseUrlUsers, getRequest, postRequest, putRequest } from './utils/service';
-import { LoginError, User } from './utils/types';
+import { LoginError, User, userInit, LoginErrorInit} from './utils/types';
 import { baseUrlAuth } from './utils/service';
 import { useCookies } from 'react-cookie';
 import { useRouter } from 'next/navigation';
@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }: {
     children: React.ReactNode
 }) => {
 
-    const [user, setUser] = useState<User>();
+    const [user, setUser] = useState<User>(userInit);
     const [loginError, setLoginError] = useState<LoginError>();
     const router = useRouter();
     const [cookie, setCookie] = useCookies(['access_token']);
@@ -31,8 +31,6 @@ export const AuthProvider = ({ children }: {
             // console.log("response", response);
 
             setUser(response);
-            // console.log("context", user);
-
             return true;
         })();
 
@@ -52,6 +50,20 @@ export const AuthProvider = ({ children }: {
         setUser(response);
         return true;
     };
+
+
+    const updateUserInfo = async (body: any) =>
+    {   
+        const response = await putRequest(`${baseUrlUsers}/users/update`, JSON.stringify(body)) 
+        if (response.error) {
+            setLoginError(response);
+            return false;
+        }
+        console.log("response", response);
+        setUser(response);
+        return true;
+    }
+
     const LogIn = useCallback(async (loginInfo: any) => {
         const response = await postRequest(
             `${baseUrlAuth}/signin`,
@@ -64,7 +76,7 @@ export const AuthProvider = ({ children }: {
         }
 
         localStorage.setItem("User", JSON.stringify(response));
-        // console.log("response", response);
+        console.log("response", response);
 
         setUser(response);
         // console.log("context", user);
@@ -72,8 +84,22 @@ export const AuthProvider = ({ children }: {
         return true;
     }, []);
 
+    const HandleClickUpdate = useCallback(async (UpdateInfo: any) => 
+    {
+        setLoginError(LoginErrorInit);
+        const response = await putRequest(`${baseUrlUsers}/users/update`, UpdateInfo);
+
+        if (response.error) {
+            setLoginError(response);
+            return false;
+        }
+        console.log("Updated Succefully!!");
+        
+        return true;
+    },[])
+
     return (
-        <AuthContext.Provider value={{ user: user, loginError: loginError, LogIn, updatingInfos}}>
+        <AuthContext.Provider value={{ user: user, loginError: loginError, LogIn, updatingInfos, updateUserInfo}}>
             {children}
         </AuthContext.Provider>
     );

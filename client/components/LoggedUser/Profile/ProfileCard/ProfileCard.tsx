@@ -19,8 +19,8 @@ export default function ProfileCard(user: any) {
   return (
     <div className="profile-card">
       <div className="cover-img">
-        <Image
-          src={CoverImage}
+        <img
+          src={user.data && user.data.cover? user.data.cover : CoverImage}
           alt='cover image'
         />
       </div>

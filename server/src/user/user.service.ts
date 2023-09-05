@@ -8,7 +8,7 @@ import { CreateMatchDto } from './dto/create-match.dto';
 import { error } from 'console';
 import { readdir } from 'fs';
 import { parse } from 'path';
-import { FileUserDto } from './dto/put-user-dto';
+import { FileUserDto, PutUserDto } from './dto/put-user-dto';
 
 @Injectable()
 export class UserService {
@@ -237,10 +237,65 @@ export class UserService {
       }
     }
   }
+
+  async UpdateUserName(user: PutUserDto, UserId: string) {
+    try {
+      return await this.prismaService.user.update({
+        where: { id: UserId },
+        data: {
+          username: user.username,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  
+  async UpdateAllInfos(user: PutUserDto, userId: string) {
+
+    let hashedPass = null;
+    if (user.password)
+         hashedPass = await bcrypt.hash(user.password, 10);
+    try {
+      if (user.username && user.password) {
+        console.log('In both!!!!');
+
+        return await this.prismaService.user.update({
+          where: { id: userId },
+          data: {
+            username: user.username,
+            password: hashedPass,
+          },
+        });
+      }
+      else if  (user.username) {
+        console.log('UserName');
+        return await this.prismaService.user.update({
+          where: { id: userId },
+          data: {
+            username: user.username,
+          },
+        });
+      }
+      else if (user.password) {
+        console.log('only password');
+        return await this.prismaService.user.update({
+          where: { id: userId },
+          data: {
+            password: hashedPass,
+          },
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   // async getFileUpload(fileTarget, category) {
   //   let userFile: any = undefined;
   //   const assets = await readdir(`./images/${category}`);
-  //   // loop over the files in './uploads' and set the userFile var to the needed file 
+  //   // loop over the files in './uploads' and set the userFile var to the needed file
   //   for (const file of assets) {
   //     const {base} = parse(file)
   //     if (base === fileTarget) {

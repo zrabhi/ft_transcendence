@@ -117,6 +117,7 @@ export class AuthController {
     @Res() response,
   ) {
     try {
+      
       const userData = this.authService.extractUserGithubData(user);
       const data = await this.authService.login(userData, response);
       // console.log(`data is `, data);

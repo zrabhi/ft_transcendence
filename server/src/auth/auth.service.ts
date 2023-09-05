@@ -119,6 +119,7 @@ export class AuthService {
     profile: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+    
     try {
       let userSearch = null;
       userSearch = await this._prisma.user.findFirst({
@@ -162,7 +163,11 @@ export class AuthService {
         data: {
           email: user.email,
           username: user.username,
+<<<<<<< HEAD
           avatar:user.avatar,
+=======
+          avatar: user.avatar,
+>>>>>>> 322bb68968893650c279160348a15a17dbe2db6a
           achievement: {
             create: {
               accountCreationAchie: true,

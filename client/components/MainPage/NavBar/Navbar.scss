@@ -26,10 +26,6 @@ header {
           background-color: $blue-bg-color;
         }
       }
-      // .active {
-      //   border-radius: .5rem;
-      //   background-color: $blue-bg-color;
-      // }
     }
     .signin-btn {
       background-color: $blue-bg-color;
@@ -39,7 +35,7 @@ header {
       border-radius: .5rem;
       transition: .2s ease-in-out;
       &:hover {
-        background-color: rgb(77 74 201 / .8);
+        opacity: .8;
       }
     }
     .close-list {

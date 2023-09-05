@@ -63,7 +63,8 @@ export default function Complete() {
 
     usernameRef.current!.innerHTML = "";
     passwordRef.current!.innerHTML = "";
-    ErrorRef.current!.innerHTML = "";
+    // if (ErrorRef.current!.innerHTML)
+    //   ErrorRef.current!.innerHTML = "";
     if (username.length < 6) {
       usernameRef.current!.innerHTML = "Username must be at least 6 characters";
       return;

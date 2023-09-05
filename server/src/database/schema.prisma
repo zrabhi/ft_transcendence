@@ -129,10 +129,10 @@ model FriendRequest {
   id          String      @unique @default(uuid())
 
   requester_id   String
-  requester   User @relation(fields: [requester_id], references: [id], name: "friendRequest")
+  requester   User @relation(fields: [requester_id], references: [id], name: "friendRequest", onDelete: Cascade)
   
   requested_id String
-  requested User @relation(fields: [requested_id], references: [id], name: "friendRequested")
+  requested User @relation(fields: [requested_id], references: [id], name: "friendRequested", onDelete: Cascade)
   
   state    State
 
@@ -145,10 +145,10 @@ model Friendship {
   id             String    @unique   @default(uuid())
 
   user_id      String
-  user         User   @relation(fields: [user_id], references: [id], name: "friends")
+  user         User   @relation(fields: [user_id], references: [id], name: "friends", onDelete: Cascade)
 
   friend_id    String
-  friend       User   @relation(fields: [friend_id], references: [id], name: "friendOf")
+  friend       User   @relation(fields: [friend_id], references: [id], name: "friendOf", onDelete: Cascade)
 
   created_at  DateTime  @default(now())
 }
@@ -157,10 +157,10 @@ model Message {
   id          String      @unique @default(uuid())
 
   sender_id   String
-  sender      User     @relation(fields: [sender_id], references: [id], name: "messageSended")
+  sender      User     @relation(fields: [sender_id], references: [id], name: "messageSended", onDelete: Cascade)
   
   reciever_id String
-  reciever    User     @relation(fields: [reciever_id], references: [id], name: "messageRecieved")
+  reciever    User     @relation(fields: [reciever_id], references: [id], name: "messageRecieved", onDelete: Cascade)
 
   content     String
   

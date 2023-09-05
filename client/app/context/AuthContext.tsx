@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: {
     useEffect(() =>{
         if (cookie.access_token === '' || !cookie.access_token) 
             router.replace("/login");
-        },[])
+        },[])   
     useEffect(() => {
         (async () => {
             const response = await getRequest(`${baseUrlUsers}/user`)
@@ -28,12 +28,11 @@ export const AuthProvider = ({ children }: {
                 setLoginError(response);
                 return false;
             }
-            // console.log("response", response);
+            console.log("response", response);
 
             setUser(response);
             return true;
-        })();
-
+        });
     }, [user]);
 
     const updatingInfos = async (username : string, password: string ) => {

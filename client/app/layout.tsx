@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={roboto.className} suppressHydrationWarning={true}>
         <AuthProvider>
-        {children}
+          {children}
         </AuthProvider>
         <Footer />
       </body>

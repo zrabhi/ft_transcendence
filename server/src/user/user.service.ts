@@ -292,6 +292,42 @@ export class UserService {
     }
   }
 
+  async getAllUserRank() {
+    const rankedUser = await this.prismaService.user.findMany({
+      orderBy:{
+        xp:'desc',
+      },
+      select:{
+        id:true,
+        username:true,
+        xp:true,
+      }
+    })
+    return rankedUser;
+  }
+
+  async getUserRankById(user_id:string) {
+      const user = await this.prismaService.user.findUnique({
+        where:{
+          id:user_id,
+        }
+      })
+      if (!user){
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: `User Not Found`,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      const rankedUsers = await this.getAllUserRank();
+      let index = rankedUsers.findIndex((usr) => usr.id === user_id);
+      if (index === 0)
+        return 1;
+      return index;
+  }
+
   // async getFileUpload(fileTarget, category) {
   //   let userFile: any = undefined;
   //   const assets = await readdir(`./images/${category}`);

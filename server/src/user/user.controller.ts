@@ -218,4 +218,23 @@ export class UserController {
     //   res.sendFile(filename, { root: './images/avatars' });
     res.sendFile(filename, { root: './images/avatars' });
   }
+
+  /// --------------------------------------------------Ranking--------------------------------------------------
+
+  @Get('/users/rank/:user_id')
+  async getUserRank(@Param('user_id') user_id:string, @Res() res){
+    try{
+      const userRank = await this.userService.getUserRankById(user_id);
+      return res.json({user_id, userRank});
+    }
+    catch(error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: `UserNotFound`,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
 }

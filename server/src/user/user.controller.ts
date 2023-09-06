@@ -237,4 +237,20 @@ export class UserController {
       );
     }
   }
+  
+  @Get('/users/rank/')
+  async getUsersRank(){
+    return await this.userService.getUsersRank();
+  }
+  
+  /// --------------------------------------------------
+
+  // searching route
+  // get country route
+  // 
+  // To-Do //
+  // GET /api/users/friends/:user_id
+  // GET /api/users/friendRequest/outgoing/:user_id
+  // GET /api/users/friendRequest/incoming/:user_id
+  // 
 }

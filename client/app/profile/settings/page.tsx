@@ -4,11 +4,7 @@ import { useState, useRef, useContext } from "react";
 import Link from "next/link";
 import { AuthContext } from "@/app/context/AuthContext";
 import "./style.scss";
-import {
-  baseUrlUsers,
-  postCheckRequest,
-  postFileRequest,
-} from "@/app/context/utils/service";
+import { baseUrlUsers, postFileRequest } from "@/app/context/utils/service";
 import { StaticImageData } from "next/image";
 import { Avatar } from "@radix-ui/themes";
 import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
@@ -16,28 +12,31 @@ import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
 export default function Settings() {
   // use context to get user data
   const { getUserData, user, updateUserInfo } = useContext(AuthContext);
-
+  
   // to check if 2fa is enabled or not
   const [tfaDisabled, setTfaDisabled] = useState(true);
-
+  
   // informations can updated by the user
-  const [username, setUsername] = useState(user?.data?.username || "");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [discord, setDiscord] = useState(user?.data?.discord || "");
-  const [twitter, setTwitter] = useState(user?.data?.twitter || "");
+  const [username, setUsername] = useState(user?.data?.username || '');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [discord, setDiscord] = useState(user?.data?.discord || '');
+  const [twitter, setTwitter] = useState(user?.data?.twitter || '');
+
+  const usernameMsgRef = useRef<HTMLParagraphElement>(null);
+  const passwordMsgRef = useRef<HTMLParagraphElement>(null);
+  const passwordMatchMsgRef = useRef<HTMLParagraphElement>(null);
 
   // those created by zRabhi i didn't understand all of them
-  const [upadte, setUpdate] = useState(false);
+  const [upadte, setUpdate] = useState(false)
   const [error, setError] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const coverInputRef = useRef<HTMLInputElement | null>(null);
-  const passwordMessage = useRef<HTMLParagraphElement>(null);
-  const usernameRef = useRef<HTMLDivElement>(null);
   const ErrorRef = useRef<HTMLParagraphElement>(null);
-  const passwordRef = useRef<HTMLDivElement>(null);
-  const updatedRef = useRef<HTMLParagraphElement>(null);
+  const currPasswordRef = useRef<HTMLDivElement>(null);
+  const updateMsgRef = useRef<HTMLParagraphElement>(null);
+
 
   // those also created by zRabhi for upload images
   const [avatar, setAvatar] = useState<any>();
@@ -119,60 +118,65 @@ export default function Settings() {
     setCover(e.target.files[0]);
   };
 
-  const resetRefs = () => {
-    usernameRef.current!.innerHTML = "";
-    passwordRef.current!.innerHTML = "";
-    passwordRef.current!.innerHTML = "";
-    updatedRef.current!.innerHTML = "";
-  };
-
   const checkCurrentPassword = async (password: string) => {
-    const response = await postCheckRequest(
-      `${baseUrlUsers}/user/checkPassword`,
-      JSON.stringify({ password })
-    );
-    if (response.error) {
-      setError(true);
-      console.log(response);
-      return false;
-    }
-    console.log(response);
+    // check if current password is valid
+    return false;
+  }
+
+  const isStrongPassword = (password: string) => {
     return true;
+  }
+
+  const isValidUsername = (username: string) => {
+    if (username.length > 0) {
+      if (username.length < 4) {
+        usernameMsgRef.current!.innerHTML = "Username must be at least 4 characters";
+        setError(true);
+      } else if (username.length > 20) {
+        usernameMsgRef.current!.innerHTML = "Username must be at most 20 characters";
+        setError(true);
+      } 
+    }
+    return true;
+  }
+
+  const resetRefs = () => {
+    usernameMsgRef.current!.innerHTML = "";
+    passwordMsgRef.current!.innerHTML = "";
+    passwordMatchMsgRef.current!.innerHTML = "";
+    // updateMsgRef.current!.innerHTML = "";
   };
 
   const handleSubmitClick = async (e: any) => {
     e.preventDefault();
     resetRefs();
     setError(false);
-    if (!(await checkCurrentPassword(currentPassword))) {
-      passwordRef.current!.innerHTML = "Invalid current password";
-      return;
+    if (!checkCurrentPassword(currentPassword)) {
+      currPasswordRef.current!.innerHTML = "Invalid current password";
+      return ;
     }
-    // return ;
-    if (username.length < 4) {
-      usernameRef.current!.innerHTML = "Username must be at least 4 characters";
-      setError(true);
+    if (!isValidUsername(username)) {
+      usernameMsgRef.current!.innerHTML = "Invalid username";
     }
-    if (newPassword.length < 8) {
-      passwordRef.current!.innerHTML = "Password must be at least 8 characters";
-      setError(true);
+    if (isStrongPassword(newPassword)) {
+      passwordMsgRef.current!.innerHTML = "password it's not strong enough";
     }
     if (newPassword !== confirmNewPassword) {
-      passwordRef.current!.innerHTML = "Passwords don't match";
+      passwordMatchMsgRef.current!.innerHTML = "Passwords don't match";
       setError(true);
     }
-    if (avatar) await handleImageUpdate("avatar");
-    if (cover) await handleImageUpdate("cover");
-    if (!error)
-      updatedRef.current!.innerHTML = "Informations updated succefully";
+    if (avatar) 
+      await handleImageUpdate("avatar");
+    if (cover) 
+      await handleImageUpdate("cover");
+    
   };
 
   return (
     <>
       <div className="setting-page min-h-screen">
         <div className="settings">
-          <Link
-            className="
+          <Link className='
             btn
             text-white 
             text-xl 
@@ -182,11 +186,8 @@ export default function Settings() {
             capitalize
             rounded-lg
             my-8
-            "
-            href="/profile"
-          >
-            go to profile
-          </Link>
+            ' 
+            href='/profile'>go to profile</Link>
           <div className="setting-box">
             <h3 className="mx-auto">Update your Informations</h3>
             <div className="forms">
@@ -194,28 +195,22 @@ export default function Settings() {
                 <form action="">
                   <div className="input">
                     <label htmlFor="username">username</label>
-                    <input
-                      type="text"
-                      name="username"
-                      id="username"
-                      placeholder="enter your username"
-                      autoComplete="off"
-                      value={username}
-                      onChange={handleUsernameChange}
+                    <input type="text" name="username" id="username" placeholder='enter your username'
+                    autoComplete='off'
+                    value={username}
+                    onChange={handleUsernameChange}
                     />
                   </div>
+                  <div ref={usernameMsgRef} className="error"></div>
                   <div className="input">
                     <label htmlFor="current-password">current password</label>
-                    <input
-                      type="password"
-                      name="current-password"
-                      id="current-password"
-                      placeholder="entery your current password"
-                      autoComplete="off"
+                    <input 
+                      type="password" name="current-password" 
+                      id="current-password" placeholder='entery your current password' 
+                      autoComplete='off'
                       onChange={(e) => setCurrentPassword(e.target.value)}
                     />
                   </div>
-                  <div ref={usernameRef} className="error username-error"></div>
                   <div className="input">
                     <label htmlFor="password">password</label>
                     <input
@@ -226,6 +221,7 @@ export default function Settings() {
                       onChange={handleNewPassword}
                     />
                   </div>
+                  <p ref={passwordMsgRef} className="error"></p>
                   <div className="input">
                     <label htmlFor="confirm-password">confirm password</label>
                     <input
@@ -237,7 +233,7 @@ export default function Settings() {
                       onChange={(e) => setConfirmNewPassword(e.target.value)}
                     />
                   </div>
-                  <div ref={passwordRef} className="error pass-error"></div>
+                  <p ref={passwordMatchMsgRef} className="error"></p>
                 </form>
                 <div className="update-imgs">
                   <div className="update-avatar">
@@ -272,7 +268,6 @@ export default function Settings() {
                       </span>
                     </div>
                   </div>
-                  <div ref={ErrorRef} className="errorRef email-error"></div>
                 </div>
               </div>
               <div className="tfa-box">
@@ -309,13 +304,13 @@ export default function Settings() {
                   </div>
                 </form>
               </div>
-              <button className="submit" onClick={handleSubmitClick}>
+              <button
+                className="submit"
+                onClick={handleSubmitClick}
+              >
                 submit
               </button>
-              <div
-                ref={updatedRef}
-                className="submit-msg updated pass-error"
-              ></div>
+              <div ref={updateMsgRef} className="submit-msg updated pass-error"></div>
             </div>
           </div>
         </div>

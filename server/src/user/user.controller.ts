@@ -74,8 +74,11 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/user/')
-  async getUser(@Req() req): Promise<User> {
-    return await this.userService.findUserById(req.user.id);
+  async getUser(@Req() req, @Res() res): Promise<User> {
+    const user  = await this.userService.findUserById(req.user.id);
+    if (user)
+        return res.status(200).json(user);
+    return res.status(400).json({msg:"ko"})
   }
 
   @UseGuards(JwtAuthGuard)
@@ -225,4 +228,38 @@ export class UserController {
       console.log(err);
     }
   }
+  /// --------------------------------------------------Ranking--------------------------------------------------
+
+  @Get('/users/rank/:user_id')
+  async getUserRank(@Param('user_id') user_id:string, @Res() res){
+    try{
+      const userRank = await this.userService.getUserRankById(user_id);
+      return res.json({user_id, userRank});
+    }
+    catch(error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: `UserNotFound`,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+  
+  @Get('/users/rank/')
+  async getUsersRank(){
+    return await this.userService.getUsersRank();
+  }
+  
+  /// --------------------------------------------------
+
+  // searching route
+  // get country route
+  // 
+  // To-Do //
+  // GET /api/users/friends/:user_id
+  // GET /api/users/friendRequest/outgoing/:user_id
+  // GET /api/users/friendRequest/incoming/:user_id
+  // 
 }

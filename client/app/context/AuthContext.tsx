@@ -18,19 +18,23 @@ export const AuthProvider = ({ children }: {
     const [cookie, setCookie] = useCookies(['access_token']);
     const [currentWindow, setCurrentWindow] = useState("");
 
-    useEffect(() => { async () => {
+    // useEffect(() =>{
+    //     if (cookie.access_token === '' || !cookie.access_token) 
+    //         router.replace("/login");
+    //     },[cookie.access_token, router])
+    useEffect(() => {
+        (async () => {
             const response = await getRequest(`${baseUrlUsers}/user`)
             if (response.error) {
                 setLoginError(response);
                 router.replace("/login");
                 return false;
             }
-            // console.log("respons e", response);
+            // console.log("response", response);
 
             setUser(response);
             return true;
-        };
-
+        });
     }, [user]);
 
     const updatingInfos = async (username : string, password: string ) => {

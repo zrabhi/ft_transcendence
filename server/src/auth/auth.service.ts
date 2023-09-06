@@ -14,7 +14,7 @@ import { AuthDto } from './dto/auth.dto';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { Response } from 'express';
+import { Response, response } from 'express';
 import { Profile } from 'passport';
 import { User } from './decorator/user-decorator';
 import { authenticator } from 'otplib';
@@ -28,7 +28,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signin(body: AuthDto) {
+  async signin(body: AuthDto) :Promise<any> {
 
     const user = await this._prisma.user.findFirst({
       where: {
@@ -90,7 +90,7 @@ export class AuthService {
     return userData;
   }
 
-  async extractJwtToken(playload: any) {
+  async extractJwtToken(playload: any) : Promise<string> {
     try{  
       const access_token = await this.jwtService.signAsync(playload);
       return access_token;
@@ -105,6 +105,7 @@ export class AuthService {
     profile: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+
     
     try {
       let userSearch = null;
@@ -115,6 +116,8 @@ export class AuthService {
       });
       
       if (userSearch)
+      {
+        
         await this._prisma.user.update({
           where: {
             id: userSearch.id,
@@ -123,14 +126,23 @@ export class AuthService {
             status: 'ONLINE',
           },
         });
+      }
       else {
+        try{
         const newUserId = await this.signup(profile, res);
         userSearch = await this._user.findUserById(newUserId.id);
+        }catch(err)
+        {
+          
+          
+        } 
       }
+    
       
       const access_token = await this.extractJwtToken({
         id: userSearch.id,
         username: userSearch.username,
+        setTwoFactorAuthenticationSecret: userSearch.twoFactorAuthenticationSecret,
       });
       const data = {
         access_token,
@@ -141,8 +153,6 @@ export class AuthService {
   }
 
   async signup(user: CreateUserDto, @Res() res: Response) {
-
-    try {
       return await this._prisma.user.create({
         data: {
           email: user.email,
@@ -158,9 +168,7 @@ export class AuthService {
           id: true,
         },
       });
-    } catch (err) {
-      throw new UnauthorizedException('username already exist');
-    }
+  
   }
 
   async generateTwoFactorAuthenticationSecret(user) {

@@ -1,0 +1,72 @@
+@import './app/globals.scss';
+
+.search-bar {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 1rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  position: relative;
+  .icon {
+    background-color: $main-text-color;
+    border-radius: 1rem;
+    padding: .2rem;
+    width: $icon-width;
+    height: $icon-width;
+    svg {
+      width: 100%;
+      height: 100%;
+      color: $main-bg-color;
+      cursor: pointer;
+    }
+  }
+  .search-box {
+    transform: translateX(100rem);
+    input {
+      outline: none;
+      border: none;
+      background: $main-text-color;
+      font-size: .9rem;
+      color: $main-bg-color;
+      padding: .2rem .6rem;
+      border-radius: 1rem;
+      width: 20rem;
+    }
+    &.open {
+      animation: showBox 1s ease-in-out;
+      animation-fill-mode: forwards;
+    }
+    &.close {
+      animation: hideBox 1s ease-in-out;
+      animation-fill-mode: forwards;
+    }
+  }
+}
+
+@keyframes showBox {
+  0% {
+    transform: translateX(100rem);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-1rem);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0rem);
+  }
+}
+
+@keyframes hideBox {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-1rem);
+  }
+  100% {
+    transform: translateX(100rem);
+    opacity: 0;
+  }
+}

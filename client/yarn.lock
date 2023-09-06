@@ -170,11 +170,6 @@
   dependencies:
     glob "7.1.7"
 
-"@next/font@^13.4.12":
-  version "13.4.12"
-  resolved "https://registry.npmjs.org/@next/font/-/font-13.4.12.tgz"
-  integrity sha512-w/ygNFuscvvFKFTMoIqhU8Kaq1wM6x4XEu9bwzJaj8G7aloH866TUPeCgiKf+M/ACpMKfRahQa06REcg6T3CyA==
-
 "@next/swc-darwin-x64@13.4.12":
   version "13.4.12"
   resolved "https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-13.4.12.tgz"

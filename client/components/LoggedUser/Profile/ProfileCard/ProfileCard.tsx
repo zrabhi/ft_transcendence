@@ -9,23 +9,18 @@ import Avatar from '@/public/images/DefaultAvatar.jpg'
 
 export default function ProfileCard(user: any) {
 
-  // if (user.data && user.data.discordHandler) {
-  //   console.log('discordHandler is not null');
-  // }
-  // else {
-  //   console.log('discordHandler is null');
-  // }
-
   return (
     <div className="profile-card">
       <div className="cover-img">
-        <img
+        <Image
           src={user.data && user.data.cover? user.data.cover : CoverImage}
+          width={100}
+          height={100}
           alt='cover image'
         />
       </div>
       <div className="info">
-        <div className="left">
+        <div className="first">
           <div className="total-games">
             <h4>total games</h4>
             {
@@ -39,7 +34,7 @@ export default function ProfileCard(user: any) {
             }
           </div>
         </div>
-        <div className="right">
+        <div className="second">
           <div className="social-media">
             <h4>social medias</h4>
             <div className="icons">
@@ -74,10 +69,10 @@ export default function ProfileCard(user: any) {
       </div>
       <div className="user">
         <div className="img relative w-4/5 mx-auto">
-          <img
+          <Image
             src={user.data && user.data.avatar && !user.data.avatar.includes('googleusercontent') ? user.data.avatar : Avatar}
-            width={200}
-            height={200}
+            width={500}
+            height={500}
             alt='Image of the user'
             className='rounded-full '
           />

@@ -77,7 +77,7 @@ export class AuthController {
     try {
       const userData = this.authService.extract42UserData(user);
       const data = await this.authService.login(userData, response);
-      // console.log(`data is `, data);
+      console.log(`data is `, data);
       const { access_token, userSearch } = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)

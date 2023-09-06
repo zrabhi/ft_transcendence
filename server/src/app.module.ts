@@ -6,12 +6,11 @@ import { AuthController } from './auth/auth.controller';
 import { GoogleStrategy } from './auth/Strategys/GoogleStrategy';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
-import { RankModule } from './rank/rank.module';
 import { ChatModule } from './chat/chat.module';
 
 @Module({
 
-  imports: [UserModule, PrismaModule, AppModule, AuthModule, RankModule, ChatModule],
+  imports: [UserModule, PrismaModule, AppModule, AuthModule, ChatModule],
   controllers: [],
 })
 

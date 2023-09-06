@@ -1,13 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable, Param } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Achievement, Match, Prisma, User } from '@prisma/client';
+import { Achievement, Match, Prisma, State, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateMatchDto } from './dto/create-match.dto';
-import { error } from 'console';
-import { readdir } from 'fs';
-import { parse } from 'path';
 import { FileUserDto, PutUserDto } from './dto/put-user-dto';
 
 @Injectable()
@@ -19,21 +16,11 @@ export class UserService {
   }
 
   async findUserById(user_id: string): Promise<User> {
-    try {
-      return await this.prismaService.user.findUniqueOrThrow({
-        where: {
-          id: user_id,
-        },
-      });
-    } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: `This User_id:${user_id} is not found.`,
-        },
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    return await this.prismaService.user.findUniqueOrThrow({
+      where: {
+        id: user_id,
+      },
+    });
   }
 
   async addUser(createUserDto: CreateUserDto) {
@@ -121,6 +108,7 @@ export class UserService {
       );
     }
   }
+
   async achievementById(username: string): Promise<Achievement> {
     try {
       const user = await this.findUserName(username);
@@ -291,6 +279,154 @@ export class UserService {
       console.log(err);
     }
   }
+
+  async getAllUserRank() {
+    const rankedUser = await this.prismaService.user.findMany({
+      orderBy:{
+        xp:'desc',
+      },
+      select:{
+        id:true,
+        username:true,
+        xp:true,
+      }
+    })
+    return rankedUser;
+  }
+
+  async getUserRankById(user_id:string) {
+      const user = await this.prismaService.user.findFirstOrThrow({
+        where:{
+          id:user_id,
+        }
+      })
+      const rankedUsers = await this.getAllUserRank();
+      let index = rankedUsers.findIndex((usr) => usr.id === user_id);
+      if (index === 0)
+        return 1;
+      return index;
+  }
+
+  async getUsersRank(){
+    const rankedUsers = await this.getAllUserRank();
+    const Users = [];
+    let index = 0;
+
+    for (let user of rankedUsers){
+      user['index'] = index++; 
+      Users.push(user);
+    }
+    return Users;
+  }
+  
+  async createFriendship(user_one_id:string, user_two_id:string){
+      const userOne = await this.findUserById(user_one_id);
+      const userTwo = await this.findUserById(user_two_id);
+
+      const isFriend = await this.prismaService.friendship.findFirst({
+        where:{
+          OR:[{user_id:userOne.id, friend_id:userTwo.id},
+            {user_id:userTwo.id, friend_id:userOne.id}],
+        }
+      })
+      if (isFriend)
+        return ;
+      await this.prismaService.friendship.create({
+        data:{
+          user_id: userOne.id,
+          friend_id: userTwo.id,
+        }
+      })
+  }
+  
+  async deleteFriendship(user_one:string, user_two:string){
+    const userOne = await this.findUserById(user_one);
+    const userTwo = await this.findUserById(user_two);
+  
+    const friendshipId = await this.prismaService.friendship.findFirstOrThrow({
+      where:{
+        OR:[{user_id:user_one, friend_id:user_two},
+            {user_id:user_two, friend_id:user_one}],
+      },
+    });
+    await this.prismaService.friendship.delete({
+      where:{
+        id:friendshipId.id,
+      }
+    })
+  }
+
+  async getFriendsByUserId(user_id:string){
+    return await this.prismaService.friendship.findMany({
+      where:{
+        user_id:user_id,
+      }
+    })
+  }
+  
+  async updateFriendRequestState(user_one_id:string, user_two_id:string, state:State){
+    const userOne = await this.findUserById(user_one_id);
+    const userTwo = await this.findUserById(user_two_id);
+    
+    const FriendRequestId = await this.prismaService.friendRequest.findFirstOrThrow({
+      where:{
+        requester_id: userOne.id,
+        requested_id: userTwo.id,
+      },
+    })
+
+    return await this.prismaService.friendRequest.update({
+      where:{
+        id:FriendRequestId.id,
+      },
+      data:{
+        updated_at: new Date(),
+        state: state,
+      },
+    })
+  }
+
+
+  async blockUser(user_blocker_id:string, user_blocked_id:string)
+  {
+    const blocker = await this.findUserById(user_blocker_id);
+    const blocked = await this.findUserById(user_blocked_id);
+
+    await this.prismaService.userBlock.create({
+      data:{
+        blockerId:blocker.id,
+        blockedId:blocked.id,
+      }
+    });
+  }
+
+  async unblockUser(blockerId:string, blockedId:string){
+    const blocked = await this.findUserById(blockedId);
+    const blocker = await this.findUserById(blockerId)
+  
+    const blockRelaId = await this.prismaService.userBlock.findFirstOrThrow({
+      where:{
+        blockerId:blocker.id,
+        blockedId:blocked.id,
+      }
+    })
+    await this.prismaService.userBlock.delete({
+      where:{
+        id:blockRelaId.id,
+      },
+    })
+  }
+
+  async searchUserStartWithPrefix(usernamePrefix:string){
+    return await this.prismaService.user.findMany({
+      where:{
+        username:{
+          startsWith:usernamePrefix,
+        }
+      },
+    })
+  }
+
 
   // async getFileUpload(fileTarget, category) {
   //   let userFile: any = undefined;

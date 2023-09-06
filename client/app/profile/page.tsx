@@ -9,6 +9,7 @@ import HeaderBar from "@/components/LoggedUser/Profile/HeaderBar/HeaderBar";
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
 
+  
   return (
     <div className="profile-page text-white">
       <SideBar />

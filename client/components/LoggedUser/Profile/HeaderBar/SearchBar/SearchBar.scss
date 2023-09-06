@@ -7,11 +7,10 @@
   gap: 1rem;
   overflow: hidden;
   border-radius: 1rem;
-  position: relative;
   .icon {
     background-color: $main-text-color;
     border-radius: 1rem;
-    padding: .2rem;
+    padding: .3rem;
     width: $icon-width;
     height: $icon-width;
     svg {
@@ -28,8 +27,10 @@
       border: none;
       background: $main-text-color;
       font-size: .9rem;
+      font-weight: 600;
+      letter-spacing: .05rem;
       color: $main-bg-color;
-      padding: .2rem .6rem;
+      padding: .4rem .8rem;
       border-radius: 1rem;
       width: 20rem;
     }

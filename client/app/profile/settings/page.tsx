@@ -95,14 +95,14 @@ export default function Settings() {
   };
 
   const handleImageUpdate = async (type: string) => {
-    typeErrorRef.current!.innerHTML = "";
+    // typeErrorRef.current!.innerHTML = "";
     const formData = new FormData();
     if (type === "avatar") formData.append("file", avatar);
     if (type === "cover") formData.append("file", cover);
     const response = await postFileRequest(`${baseUrlUsers}/${type}`, formData);
     if (response.error) {
       setError(true);
-      typeErrorRef.current!.innerHTML = "Invalid file type or format";
+      // typeErrorRef.current!.innerHTML = "Invalid file type or format";
       return false;
     }
     return true;

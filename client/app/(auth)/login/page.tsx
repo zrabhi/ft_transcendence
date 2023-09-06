@@ -210,9 +210,6 @@ export default function SignIn() {
                 </div>
               </form>
             </div>
-            <div className="signupbtn">
-              <button>create an account</button>
-            </div>
           </div>
         </div>
       </div>

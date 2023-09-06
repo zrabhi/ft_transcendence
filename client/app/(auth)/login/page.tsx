@@ -79,11 +79,10 @@ export default function SignIn() {
     e.preventDefault();
     const result = await LogIn(loginInfo);
     if (result) {
-      // console.log("user data ", user);
-
+      console.log(`informations added successfully`);
       router.push("/profile");
     } else return (ErrorRef.current!.innerHTML = "Invalid Credentials");
-    // router.push('/profile');
+
   };
 
   return (
@@ -108,6 +107,7 @@ export default function SignIn() {
                     autoFocus
                     required
                     autoComplete='off'
+                    defaultValue=''
                     onInvalid={handleInvalidEmail}
                     onChange={handleEmailChange}
                   />
@@ -125,6 +125,7 @@ export default function SignIn() {
                     placeholder="password"
                     required
                     autoComplete='off'
+                    defaultValue=''
                     onInvalid={handleInvalidPassword}
                     onChange={handlePasswordChange}
                   />

@@ -124,6 +124,10 @@ export default function Settings() {
   }
 
   const isStrongPassword = (password: string) => {
+    if (password.length < 8) {
+      passwordMsgRef.current!.innerHTML = "password it's not strong enough";
+      return false;
+    }
     return true;
   }
 
@@ -131,10 +135,10 @@ export default function Settings() {
     if (username.length > 0) {
       if (username.length < 4) {
         usernameMsgRef.current!.innerHTML = "Username must be at least 4 characters";
-        setError(true);
+        return false;
       } else if (username.length > 20) {
         usernameMsgRef.current!.innerHTML = "Username must be at most 20 characters";
-        setError(true);
+        return false;
       } 
     }
     return true;
@@ -145,6 +149,8 @@ export default function Settings() {
     passwordMsgRef.current!.innerHTML = "";
     passwordMatchMsgRef.current!.innerHTML = "";
     updateMsgRef.current!.innerHTML = "";
+    updateMsgRef.current!.classList.remove("success");
+    updateMsgRef.current!.classList.add("error");
   };
 
   const isNothingToUpdate = () => {
@@ -158,13 +164,15 @@ export default function Settings() {
         !cover
       ) {
       return true;
-    } 
+    }
+    return false;
   }
 
   const handleSubmitClick = async (e: any) => {
     e.preventDefault();
     resetRefs();
     setError(false);
+    console.log(isNothingToUpdate())
     if (isNothingToUpdate()) {
       updateMsgRef.current!.innerHTML = "Nothing to update";
       return ;
@@ -174,20 +182,23 @@ export default function Settings() {
       return ;
     }
     if (!isValidUsername(username)) {
-      usernameMsgRef.current!.innerHTML = "Invalid username";
+      return ;
     }
-    if (isStrongPassword(newPassword)) {
+    if (newPassword.length && !isStrongPassword(newPassword)) {
       passwordMsgRef.current!.innerHTML = "password it's not strong enough";
+      return ;
     }
     if (newPassword !== confirmNewPassword) {
       passwordMatchMsgRef.current!.innerHTML = "Passwords don't match";
-      setError(true);
+      return ;
     }
     if (avatar) 
       await handleImageUpdate("avatar");
     if (cover) 
       await handleImageUpdate("cover");
-    
+    updateMsgRef.current!.innerHTML = "Updated successfully";
+    updateMsgRef.current!.classList.remove("error");
+    updateMsgRef.current!.classList.add("success");
   };
 
   return (
@@ -328,7 +339,7 @@ export default function Settings() {
               >
                 submit
               </button>
-              <div ref={updateMsgRef} className="submit-msg updated pass-error"></div>
+              <div ref={updateMsgRef} className="submit-msg updated error"></div>
             </div>
           </div>
         </div>

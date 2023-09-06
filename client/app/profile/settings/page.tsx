@@ -27,15 +27,15 @@ export default function Settings() {
   const usernameMsgRef = useRef<HTMLParagraphElement>(null);
   const passwordMsgRef = useRef<HTMLParagraphElement>(null);
   const passwordMatchMsgRef = useRef<HTMLParagraphElement>(null);
+  const currPasswordRef = useRef<HTMLDivElement>(null);
+  const updateMsgRef = useRef<HTMLParagraphElement>(null);
 
   // those created by zRabhi i didn't understand all of them
   const [upadte, setUpdate] = useState(false)
   const [error, setError] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const coverInputRef = useRef<HTMLInputElement | null>(null);
-  const ErrorRef = useRef<HTMLParagraphElement>(null);
-  const currPasswordRef = useRef<HTMLDivElement>(null);
-  const updateMsgRef = useRef<HTMLParagraphElement>(null);
+  const typeErrorRef = useRef<HTMLParagraphElement>(null);
 
 
   // those also created by zRabhi for upload images
@@ -95,14 +95,14 @@ export default function Settings() {
   };
 
   const handleImageUpdate = async (type: string) => {
-    ErrorRef.current!.innerHTML = "";
+    typeErrorRef.current!.innerHTML = "";
     const formData = new FormData();
     if (type === "avatar") formData.append("file", avatar);
     if (type === "cover") formData.append("file", cover);
     const response = await postFileRequest(`${baseUrlUsers}/${type}`, formData);
     if (response.error) {
       setError(true);
-      ErrorRef.current!.innerHTML = "Invalid file type or format";
+      typeErrorRef.current!.innerHTML = "Invalid file type or format";
       return false;
     }
     return true;
@@ -147,10 +147,28 @@ export default function Settings() {
     updateMsgRef.current!.innerHTML = "";
   };
 
+  const isNothingToUpdate = () => {
+    if (
+        username.length === 0 && 
+        newPassword.length === 0 && 
+        confirmNewPassword.length === 0 && 
+        discord.length === 0 && 
+        twitter.length === 0 && 
+        !avatar && 
+        !cover
+      ) {
+      return true;
+    } 
+  }
+
   const handleSubmitClick = async (e: any) => {
     e.preventDefault();
     resetRefs();
     setError(false);
+    if (isNothingToUpdate()) {
+      updateMsgRef.current!.innerHTML = "Nothing to update";
+      return ;
+    }
     if (!checkCurrentPassword(currentPassword)) {
       currPasswordRef.current!.innerHTML = "Invalid current password";
       return ;

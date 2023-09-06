@@ -77,14 +77,15 @@ export class AuthController {
     try {
       const userData = this.authService.extract42UserData(user);
       const data = await this.authService.login(userData, response);
-      // console.log(`data is `, data);
+      console.log(`data is `, data);
       const { access_token, userSearch } = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)
         return response.redirect('http://127.0.0.1:3000/login/complete');
       response.redirect('http://127.0.0.1:3000/profile');
-    } catch (err) {
-      response.status(400).json({ message: err.message });
+    } catch (err) 
+    {
+      response.redirect('http://127.0.0.1:3000/login');
     }
   }
 

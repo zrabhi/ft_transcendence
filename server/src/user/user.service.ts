@@ -5,11 +5,7 @@ import { Achievement, Match, Prisma, State, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateMatchDto } from './dto/create-match.dto';
-import { error, time } from 'console';
-import { readdir, stat } from 'fs';
-import { parse } from 'path';
 import { FileUserDto, PutUserDto } from './dto/put-user-dto';
-import { createFriendRequest } from './dto/createFriendRequest.dto';
 
 @Injectable()
 export class UserService {
@@ -112,6 +108,7 @@ export class UserService {
       );
     }
   }
+
   async achievementById(username: string): Promise<Achievement> {
     try {
       const user = await this.findUserName(username);
@@ -429,32 +426,6 @@ export class UserService {
       },
     })
   }
- 
-  // Come Back Later
-  // async createFriendRequest(createFriendRequest:createFriendRequest){
-  //   const userOne = await this.findUserById(createFriendRequest.requester_id);
-  //   const userTwo = await this.findUserById(createFriendRequest.requested_id);
-
-  //   try {
-  //     await this.prismaService.friendRequest.create({
-  //       data:{
-  //         requester_id:createFriendRequest.requester_id,
-  //         requested_id:createFriendRequest.requested_id,
-  //         state:createFriendRequest.state,
-  //       }
-  //     })
-  //   }
-  //   catch(error)
-  //   {
-
-  //   }
-  // }
-
-  // data:{
-  //   requester_id:userOne.id,
-  //   requested_id:userTwo.id,
-  //   state: State.PENDING,
-  // },
 
 
   // async getFileUpload(fileTarget, category) {

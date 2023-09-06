@@ -119,6 +119,7 @@ export class AuthService {
     profile: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+
     
     try {
       let userSearch = null;
@@ -129,6 +130,8 @@ export class AuthService {
       });
       
       if (userSearch)
+      {
+        
         await this._prisma.user.update({
           where: {
             id: userSearch.id,
@@ -137,12 +140,18 @@ export class AuthService {
             status: 'ONLINE',
           },
         });
+      }
       else {
+        try{
         const newUserId = await this.signup(profile, res);
         userSearch = await this._user.findUserById(newUserId.id);
-        // console.log(userSearch);
+        }catch(err)
+        {
+          
+          
+        } 
       }
-      // console.log("ima here");
+    
       
       const access_token = await this.extractJwtToken({
         id: userSearch.id,
@@ -157,8 +166,6 @@ export class AuthService {
   }
 
   async signup(user: CreateUserDto, @Res() res: Response) {
-
-    try {
       return await this._prisma.user.create({
         data: {
           email: user.email,
@@ -174,9 +181,7 @@ export class AuthService {
           id: true,
         },
       });
-    } catch (err) {
-      throw new UnauthorizedException('username already exist');
-    }
+  
   }
 
   async generateTwoFactorAuthenticationSecret(user) {

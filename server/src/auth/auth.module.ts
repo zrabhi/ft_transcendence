@@ -20,7 +20,7 @@ import { Jwt2faStrategy } from './Jwt2faAuth';
       expiresIn:process.env.JWT_EXPIRATION,
     }
   })],
-  providers: [GoogleStrategy, FtStrategy,GithubStrategy, Jwt2faStrategy,  JwtStrategy, PrismaService, AuthService, UserService],
+  providers: [GoogleStrategy, FtStrategy, Jwt2faStrategy,  JwtStrategy, PrismaService, AuthService, UserService],
   exports: [AuthService],
   controllers: [AuthController],
 })

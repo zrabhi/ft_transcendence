@@ -84,7 +84,7 @@ export class AuthController {
         return response.redirect('http://127.0.0.1:3000/login/complete');
       response.redirect('http://127.0.0.1:3000/profile');
     } catch (err) {
-      response.status(400).json({ message: err.message });
+      response.redirect('http://127.0.0.1:3000/login');
     }
   }
 

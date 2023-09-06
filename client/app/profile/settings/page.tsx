@@ -24,16 +24,21 @@ export default function Settings() {
   const [discord, setDiscord] = useState(user?.data?.discord || '');
   const [twitter, setTwitter] = useState(user?.data?.twitter || '');
 
+  const usernameMsgRef = useRef<HTMLParagraphElement>(null);
+  const passwordMsgRef = useRef<HTMLParagraphElement>(null);
+  const passwordMatchMsgRef = useRef<HTMLParagraphElement>(null);
+
   // those created by zRabhi i didn't understand all of them
   const [upadte, setUpdate] = useState(false)
   const [error, setError] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const coverInputRef = useRef<HTMLInputElement | null>(null);
-  const passwordMessage = useRef<HTMLParagraphElement>(null);
-  const usernameRef = useRef<HTMLDivElement>(null);
   const ErrorRef = useRef<HTMLParagraphElement>(null);
   const passwordRef = useRef<HTMLDivElement>(null);
-  const updatedRef = useRef<HTMLParagraphElement>(null);
+  const usernameRef = useRef<HTMLDivElement>(null);
+  const passwordMessage = useRef<HTMLParagraphElement>(null);
+  const updateMsgRef = useRef<HTMLParagraphElement>(null);
+
 
   // those also created by zRabhi for upload images
   const [avatar, setAvatar] = useState<any>();
@@ -115,45 +120,56 @@ export default function Settings() {
     setCover(e.target.files[0]);
   };
 
-  const resetRefs = () => {
-    usernameRef.current!.innerHTML = "";
-    passwordRef.current!.innerHTML = "";
-    passwordRef.current!.innerHTML = "";
-    updatedRef.current!.innerHTML = "";
-  };
+  // const resetRefs = () => {
+  //   usernameRef.current!.innerHTML = "";
+  //   passwordRef.current!.innerHTML = "";
+  //   passwordRef.current!.innerHTML = "";
+  //   updatedRef.current!.innerHTML = "";
+  // };
 
   const checkCurrentPassword = async (password: string) => {
-    // here we should check if the current password is correct or not
-    // if it's correct we return true else we return false
+    return false;
+  }
+
+  const isStrongPassword = (password: string) => {
     return false;
   }
 
   const handleSubmitClick = async (e: any) => {
     e.preventDefault();
-    resetRefs();
     setError(false);
     if (!checkCurrentPassword(currentPassword)) {
       passwordRef.current!.innerHTML = "Invalid current password";
       return ;
     }
-    if (username.length < 4) {
-      usernameRef.current!.innerHTML = "Username must be at least 4 characters";
-      setError(true);
+    if (username.length > 0) {
+      if (username.length < 4) {
+        usernameMsgRef.current!.innerHTML = "Username must be at least 4 characters";
+        setError(true);
+      }
+      if (username.length > 20) {
+        usernameMsgRef.current!.innerHTML = "Username must be at most 20 characters";
+        setError(true);
+      }
+      // and check if the username already taken
     }
-    if (newPassword.length < 8) {
-      passwordRef.current!.innerHTML = "Password must be at least 8 characters";
-      setError(true);
+    // if (newPassword.length < 8) {
+    //   passwordRef.current!.innerHTML = "Password must be at least 8 characters";
+    //   setError(true);
+    // }
+    if (isStrongPassword(newPassword)) {
+      passwordMsgRef.current!.innerHTML = "password it's not strong enough";
     }
     if (newPassword !== confirmNewPassword) {
-      passwordRef.current!.innerHTML = "Passwords don't match";
+      passwordMatchMsgRef.current!.innerHTML = "Passwords don't match";
       setError(true);
     }
     if (avatar) 
       await handleImageUpdate("avatar");
     if (cover) 
       await handleImageUpdate("cover");
-    if (!error)
-        updatedRef.current!.innerHTML = "Informations updated succefully"
+    // if (!error)
+    //     updatedRef.current!.innerHTML = "Informations updated succefully"
   };
 
   return (
@@ -185,6 +201,7 @@ export default function Settings() {
                     onChange={handleUsernameChange}
                     />
                   </div>
+                  <div ref={usernameMsgRef} className="error"></div>
                   <div className="input">
                     <label htmlFor="current-password">current password</label>
                     <input 
@@ -204,6 +221,7 @@ export default function Settings() {
                       onChange={handleNewPassword}
                     />
                   </div>
+                  <p ref={passwordMsgRef} className="error"></p>
                   <div className="input">
                     <label htmlFor="confirm-password">confirm password</label>
                     <input
@@ -215,6 +233,7 @@ export default function Settings() {
                       onChange={(e) => setConfirmNewPassword(e.target.value)}
                     />
                   </div>
+                  <p ref={passwordMatchMsgRef} className="error"></p>
                 </form>
                 <div className="update-imgs">
                   <div className="update-avatar">
@@ -291,7 +310,7 @@ export default function Settings() {
               >
                 submit
               </button>
-              <div ref={updatedRef} className="submit-msg updated pass-error"></div>
+              <div ref={updateMsgRef} className="submit-msg updated pass-error"></div>
             </div>
           </div>
         </div>

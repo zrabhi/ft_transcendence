@@ -71,8 +71,8 @@ export default function ProfileCard(user: any) {
         <div className="img relative w-4/5 mx-auto">
           <Image
             src={user.data && user.data.avatar && !user.data.avatar.includes('googleusercontent') ? user.data.avatar : Avatar}
-            width={200}
-            height={200}
+            width={500}
+            height={500}
             alt='Image of the user'
             className='rounded-full '
           />

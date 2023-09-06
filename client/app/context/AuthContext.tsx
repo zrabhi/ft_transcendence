@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: {
     useEffect(() =>{
         if (cookie.access_token === '' || !cookie.access_token) 
             router.replace("/login");
-        },[])
+        },[cookie.access_token, router])
     useEffect(() => {
         (async () => {
             const response = await getRequest(`${baseUrlUsers}/user`)

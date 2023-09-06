@@ -1,0 +1,21 @@
+@import '@/app/globals.scss';
+
+.header-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  background-color: lightcoral;
+  margin-bottom: 2rem;
+  .icon {
+    svg {
+      width: 2rem;
+      height: 2rem;
+      color: white;
+      cursor: pointer;
+      &:hover {
+        fill: black;
+      }
+    }
+  }
+}

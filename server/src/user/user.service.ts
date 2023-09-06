@@ -359,7 +359,7 @@ export class UserService {
     })
   }
 
-  async getFriendByUserId(user_id:string){
+  async getFriendsByUserId(user_id:string){
     return await this.prismaService.friendship.findMany({
       where:{
         user_id:user_id,
@@ -420,6 +420,15 @@ export class UserService {
     })
   }
 
+  async searchUserStartWithPrefix(usernamePrefix:string){
+    return await this.prismaService.user.findMany({
+      where:{
+        username:{
+          startsWith:usernamePrefix,
+        }
+      },
+    })
+  }
  
   // Come Back Later
   // async createFriendRequest(createFriendRequest:createFriendRequest){

@@ -90,19 +90,6 @@ export class AuthService {
     return userData;
   }
 
-  extractUserGithubData(user: any): CreateUserDto {
-    const { login, avatar_url } = user._json;
-    const userData = {
-      email: 'zac.rabhi123@gmail.com',
-      username: login + '12', // just for testing purpose 
-      avatar: avatar_url,
-      cover: '',
-      password: '',
-    };
-    return userData;
-  }
-
-
   async extractJwtToken(playload: any) {
     try{  
       const access_token = await this.jwtService.signAsync(playload);
@@ -110,7 +97,6 @@ export class AuthService {
     }catch(err){
       // console.log("ac, access_toces");
       // console.log(err.message);
-      
     }
   }
 
@@ -140,9 +126,7 @@ export class AuthService {
       else {
         const newUserId = await this.signup(profile, res);
         userSearch = await this._user.findUserById(newUserId.id);
-        // console.log(userSearch);
       }
-      // console.log("ima here");
       
       const access_token = await this.extractJwtToken({
         id: userSearch.id,

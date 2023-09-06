@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { HttpException, HttpStatus, Injectable, Param } from '@nestjs/common';
+import { Body, HttpException, HttpStatus, Injectable, Param } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Achievement, Match, Prisma, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -251,12 +251,9 @@ export class UserService {
     }
   }
 
-  
   async UpdateAllInfos(user: PutUserDto, userId: string) {
-
     let hashedPass = null;
-    if (user.password)
-         hashedPass = await bcrypt.hash(user.password, 10);
+    if (user.password) hashedPass = await bcrypt.hash(user.password, 10);
     try {
       if (user.username && user.password) {
         console.log('In both!!!!');
@@ -268,8 +265,7 @@ export class UserService {
             password: hashedPass,
           },
         });
-      }
-      else if  (user.username) {
+      } else if (user.username) {
         console.log('UserName');
         return await this.prismaService.user.update({
           where: { id: userId },
@@ -277,8 +273,7 @@ export class UserService {
             username: user.username,
           },
         });
-      }
-      else if (user.password) {
+      } else if (user.password) {
         console.log('only password');
         return await this.prismaService.user.update({
           where: { id: userId },
@@ -289,6 +284,25 @@ export class UserService {
       }
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  async passWordCheck(@Body() Body, userId: string) {
+    try {
+
+      const user = await this.findUserById(userId);
+      return await bcrypt.compare(Body.password, user.password);
+
+    } catch (err) {
+        console.log(err);
+        
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: `This User_id:${userId} is not found.`,
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 

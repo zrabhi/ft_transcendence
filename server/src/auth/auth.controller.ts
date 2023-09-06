@@ -33,7 +33,7 @@ export class AuthController {
   ) {}
 
   @Post('signin')
-  async handleSignin(@Body() body: AuthDto, @Res() response: Response) {
+  async handleSignin(@Body() body: AuthDto, @Res() response) {
     try {
       // console.log(body);
       const data = await this.authService.signin(body);
@@ -41,7 +41,11 @@ export class AuthController {
       if (access_token === '')
         return response.status(400).json({ msg: 'Invalid Credencial' });
       // console.log(access_token);
+      console.log(access_token);
+      
       response.cookie('access_token', access_token);
+      console.log("ime hereee");
+      
       return response.status(200).json(user);
     } catch (e) {
       return response
@@ -61,11 +65,11 @@ export class AuthController {
     return;
   }
 
-  @Get('github/login')
-  @UseGuards(GithubGuard)
-  handleGithublogin() {
-    return;
-  }
+  // @Get('github/login')
+  // @UseGuards(GithubGuard)
+  // handleGithublogin() {
+  //   return;
+  // }
 
   @Get('/42/redirect')
   @UseGuards(FtGurad)
@@ -84,7 +88,7 @@ export class AuthController {
         return response.redirect('http://127.0.0.1:3000/login/complete');
       response.redirect('http://127.0.0.1:3000/profile');
     } catch (err) {
-      response.status(400).json({ message: err.message });
+        response.redirect('http://127.0.0.1:3000/login')
     }
   }
 
@@ -105,29 +109,7 @@ export class AuthController {
         return response.redirect('http://127.0.0.1:3000/login/complete');
       response.redirect('http://127.0.0.1:3000/profile');
     } catch (err) {
-      response.status(400).json({ message: err.message });
-    }
-  }
-
-  @Get('/github/redirect')
-  @UseGuards(GithubGuard)
-  async handleRedirectGithub(
-    @User() user: Profile,
-    @Request() request,
-    @Res() response,
-  ) {
-    try {
-      
-      const userData = this.authService.extractUserGithubData(user);
-      const data = await this.authService.login(userData, response);
-      // console.log(`data is `, data);
-      const { access_token, userSearch } = data;
-      response.cookie('access_token', access_token);
-      if (!userSearch.password || !userSearch.email)
-        return response.redirect('http://127.0.0.1:3000/login/complete');
-      response.redirect('http://127.0.0.1:3000/profile');
-    } catch (err) {
-      response.status(400).json({ message: err.message });
+      response.redirect('http://127.0.0.1:3000/login')
     }
   }
 

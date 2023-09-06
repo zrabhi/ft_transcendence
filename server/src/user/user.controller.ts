@@ -127,31 +127,25 @@ export class UserController {
   }
   @UseGuards(JwtAuthGuard)
   @Put('users/changeUserName')
-  async handleUserNameChange(@Body() user: PutUserDto, @Req() req, @Res() Res)
-  {
-   
+  async handleUserNameChange(@Body() user: PutUserDto, @Req() req, @Res() Res) {
     try {
-        await this.userService.UpdateUserName(user, req.user.id)
-        Res.status(200).json({msg: "Updated succefully"}) ;
-      }catch(err)
-    {
-        console.log(err);
-        
+      await this.userService.UpdateUserName(user, req.user.id);
+      Res.status(200).json({ msg: 'Updated succefully' });
+    } catch (err) {
+      console.log(err);
     }
   }
   @UseGuards(JwtAuthGuard)
   @Put('users/update')
-  async HandleUpdate(@Body() user: PutUserDto, @Res() res, @Req() req)
-  { 
+  async HandleUpdate(@Body() user: PutUserDto, @Res() res, @Req() req) {
     console.log(user);
-    const User =   await this.userService.UpdateAllInfos(user, req.user.id);
+    const User = await this.userService.UpdateAllInfos(user, req.user.id);
     console.log(User);
     return user;
-    
+
     // res.status(200).json({msg:"Ok"});
   }
   // avatar imagesss
-          
 
   @UseGuards(JwtAuthGuard)
   @Post('avatar')
@@ -212,6 +206,23 @@ export class UserController {
   async getAvatar(@Param('filename') filename: string, @Res() res) {
     // if (await this.userService.getFileUpload(filename, 'avatars'))
     //   res.sendFile(filename, { root: './images/avatars' });
+
     res.sendFile(filename, { root: './images/avatars' });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('user/checkPassword')
+  async handlePasswordCheck(@Res() res, @Req() req, @Body() body) {
+    try {
+      const checker = await this.userService.passWordCheck(
+        body,
+        req.user.id,
+      );
+      if (!checker) return res.status(400).json({ msg: 'Incorrect Password' });
+      return res.status(200).json({ msg: 'Password Correct' });
+      // passwrod check for you if if matches return true else in doesn not matche
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

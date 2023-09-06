@@ -34,9 +34,7 @@ export default function Settings() {
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const coverInputRef = useRef<HTMLInputElement | null>(null);
   const ErrorRef = useRef<HTMLParagraphElement>(null);
-  const passwordRef = useRef<HTMLDivElement>(null);
-  const usernameRef = useRef<HTMLDivElement>(null);
-  const passwordMessage = useRef<HTMLParagraphElement>(null);
+  const currPasswordRef = useRef<HTMLDivElement>(null);
   const updateMsgRef = useRef<HTMLParagraphElement>(null);
 
 
@@ -120,43 +118,46 @@ export default function Settings() {
     setCover(e.target.files[0]);
   };
 
-  // const resetRefs = () => {
-  //   usernameRef.current!.innerHTML = "";
-  //   passwordRef.current!.innerHTML = "";
-  //   passwordRef.current!.innerHTML = "";
-  //   updatedRef.current!.innerHTML = "";
-  // };
-
   const checkCurrentPassword = async (password: string) => {
+    // check if current password is valid
     return false;
   }
 
   const isStrongPassword = (password: string) => {
-    return false;
+    return true;
   }
 
-  const handleSubmitClick = async (e: any) => {
-    e.preventDefault();
-    setError(false);
-    if (!checkCurrentPassword(currentPassword)) {
-      passwordRef.current!.innerHTML = "Invalid current password";
-      return ;
-    }
+  const isValidUsername = (username: string) => {
     if (username.length > 0) {
       if (username.length < 4) {
         usernameMsgRef.current!.innerHTML = "Username must be at least 4 characters";
         setError(true);
-      }
-      if (username.length > 20) {
+      } else if (username.length > 20) {
         usernameMsgRef.current!.innerHTML = "Username must be at most 20 characters";
         setError(true);
-      }
-      // and check if the username already taken
+      } 
     }
-    // if (newPassword.length < 8) {
-    //   passwordRef.current!.innerHTML = "Password must be at least 8 characters";
-    //   setError(true);
-    // }
+    return true;
+  }
+
+  const resetRefs = () => {
+    usernameMsgRef.current!.innerHTML = "";
+    passwordMsgRef.current!.innerHTML = "";
+    passwordMatchMsgRef.current!.innerHTML = "";
+    updateMsgRef.current!.innerHTML = "";
+  };
+
+  const handleSubmitClick = async (e: any) => {
+    e.preventDefault();
+    resetRefs();
+    setError(false);
+    if (!checkCurrentPassword(currentPassword)) {
+      currPasswordRef.current!.innerHTML = "Invalid current password";
+      return ;
+    }
+    if (!isValidUsername(username)) {
+      usernameMsgRef.current!.innerHTML = "Invalid username";
+    }
     if (isStrongPassword(newPassword)) {
       passwordMsgRef.current!.innerHTML = "password it's not strong enough";
     }
@@ -168,8 +169,7 @@ export default function Settings() {
       await handleImageUpdate("avatar");
     if (cover) 
       await handleImageUpdate("cover");
-    // if (!error)
-    //     updatedRef.current!.innerHTML = "Informations updated succefully"
+    
   };
 
   return (

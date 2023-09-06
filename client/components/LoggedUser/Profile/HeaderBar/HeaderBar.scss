@@ -4,18 +4,9 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 1rem;
-  background-color: lightcoral;
+  gap: .8rem;
+  background-color: $blue-bg-color;
+  padding: .5rem;
   margin-bottom: 2rem;
-  .icon {
-    svg {
-      width: 2rem;
-      height: 2rem;
-      color: white;
-      cursor: pointer;
-      &:hover {
-        fill: black;
-      }
-    }
-  }
+  border-radius: 1rem;
 }

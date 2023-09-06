@@ -7,3 +7,6 @@ so component's folder has two files CompName.tsx CompName.scss
 
 
 
+// useEffect(() => {
+/ 
+//         }, [cookie]);

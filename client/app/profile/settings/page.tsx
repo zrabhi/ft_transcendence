@@ -4,7 +4,11 @@ import { useState, useRef, useContext } from "react";
 import Link from "next/link";
 import { AuthContext } from "@/app/context/AuthContext";
 import "./style.scss";
-import { baseUrlUsers, postFileRequest } from "@/app/context/utils/service";
+import {
+  baseUrlUsers,
+  postCheckRequest,
+  postFileRequest,
+} from "@/app/context/utils/service";
 import { StaticImageData } from "next/image";
 import { Avatar } from "@radix-ui/themes";
 import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
@@ -12,20 +16,20 @@ import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
 export default function Settings() {
   // use context to get user data
   const { getUserData, user, updateUserInfo } = useContext(AuthContext);
-  
+
   // to check if 2fa is enabled or not
   const [tfaDisabled, setTfaDisabled] = useState(true);
-  
+
   // informations can updated by the user
-  const [username, setUsername] = useState(user?.data?.username || '');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
-  const [discord, setDiscord] = useState(user?.data?.discord || '');
-  const [twitter, setTwitter] = useState(user?.data?.twitter || '');
+  const [username, setUsername] = useState(user?.data?.username || "");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [discord, setDiscord] = useState(user?.data?.discord || "");
+  const [twitter, setTwitter] = useState(user?.data?.twitter || "");
 
   // those created by zRabhi i didn't understand all of them
-  const [upadte, setUpdate] = useState(false)
+  const [upadte, setUpdate] = useState(false);
   const [error, setError] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const coverInputRef = useRef<HTMLInputElement | null>(null);
@@ -123,19 +127,28 @@ export default function Settings() {
   };
 
   const checkCurrentPassword = async (password: string) => {
-    // here we should check if the current password is correct or not
-    // if it's correct we return true else we return false
-    return false;
-  }
+    const response = await postCheckRequest(
+      `${baseUrlUsers}/user/checkPassword`,
+      JSON.stringify({ password })
+    );
+    if (response.error) {
+      setError(true);
+      console.log(response);
+      return false;
+    }
+    console.log(response);
+    return true;
+  };
 
   const handleSubmitClick = async (e: any) => {
     e.preventDefault();
     resetRefs();
     setError(false);
-    if (!checkCurrentPassword(currentPassword)) {
+    if (!(await checkCurrentPassword(currentPassword))) {
       passwordRef.current!.innerHTML = "Invalid current password";
-      return ;
+      return;
     }
+    // return ;
     if (username.length < 4) {
       usernameRef.current!.innerHTML = "Username must be at least 4 characters";
       setError(true);
@@ -148,19 +161,18 @@ export default function Settings() {
       passwordRef.current!.innerHTML = "Passwords don't match";
       setError(true);
     }
-    if (avatar) 
-      await handleImageUpdate("avatar");
-    if (cover) 
-      await handleImageUpdate("cover");
+    if (avatar) await handleImageUpdate("avatar");
+    if (cover) await handleImageUpdate("cover");
     if (!error)
-        updatedRef.current!.innerHTML = "Informations updated succefully"
+      updatedRef.current!.innerHTML = "Informations updated succefully";
   };
 
   return (
     <>
       <div className="setting-page min-h-screen">
         <div className="settings">
-          <Link className='
+          <Link
+            className="
             btn
             text-white 
             text-xl 
@@ -170,8 +182,11 @@ export default function Settings() {
             capitalize
             rounded-lg
             my-8
-            ' 
-            href='/profile'>go to profile</Link>
+            "
+            href="/profile"
+          >
+            go to profile
+          </Link>
           <div className="setting-box">
             <h3 className="mx-auto">Update your Informations</h3>
             <div className="forms">
@@ -179,18 +194,24 @@ export default function Settings() {
                 <form action="">
                   <div className="input">
                     <label htmlFor="username">username</label>
-                    <input type="text" name="username" id="username" placeholder='enter your username'
-                    autoComplete='off'
-                    value={username}
-                    onChange={handleUsernameChange}
+                    <input
+                      type="text"
+                      name="username"
+                      id="username"
+                      placeholder="enter your username"
+                      autoComplete="off"
+                      value={username}
+                      onChange={handleUsernameChange}
                     />
                   </div>
                   <div className="input">
                     <label htmlFor="current-password">current password</label>
-                    <input 
-                      type="password" name="current-password" 
-                      id="current-password" placeholder='entery your current password' 
-                      autoComplete='off'
+                    <input
+                      type="password"
+                      name="current-password"
+                      id="current-password"
+                      placeholder="entery your current password"
+                      autoComplete="off"
                       onChange={(e) => setCurrentPassword(e.target.value)}
                     />
                   </div>
@@ -251,7 +272,7 @@ export default function Settings() {
                       </span>
                     </div>
                   </div>
-                <div ref={ErrorRef} className="errorRef email-error"></div>
+                  <div ref={ErrorRef} className="errorRef email-error"></div>
                 </div>
               </div>
               <div className="tfa-box">
@@ -288,13 +309,13 @@ export default function Settings() {
                   </div>
                 </form>
               </div>
-              <button
-                className="submit"
-                onClick={handleSubmitClick}
-              >
+              <button className="submit" onClick={handleSubmitClick}>
                 submit
               </button>
-              <div ref={updatedRef} className="submit-msg updated pass-error"></div>
+              <div
+                ref={updatedRef}
+                className="submit-msg updated pass-error"
+              ></div>
             </div>
           </div>
         </div>

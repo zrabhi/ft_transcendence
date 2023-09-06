@@ -63,7 +63,7 @@ export default function Complete() {
 
     usernameRef.current!.innerHTML = "";
     passwordRef.current!.innerHTML = "";
-    ErrorRef.current!.innerHTML = "";
+    // ErrorRef.current!.innerHTML = "";
     if (username.length < 6) {
       usernameRef.current!.innerHTML = "Username must be at least 6 characters";
       return;
@@ -138,7 +138,7 @@ export default function Complete() {
             </div>
             <div className="profile-box">
               <div className="current-pic">
-                <img ref={avatar} src={image} alt="avatar" />
+                <img ref={avatar} src={user.avatar} alt="avatar" />
               </div>
               <div className="upload-pic">
                 <span>upload new photo</span>

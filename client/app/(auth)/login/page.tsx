@@ -195,16 +195,6 @@ export default function SignIn() {
                         />
                       </div>
                     </Link>
-                    <Link href="http://127.0.0.1:8080/api/auth/github/login">
-                      <div className="github">
-                        <Image
-                          src={GithubLogo}
-                          width={24}
-                          height={24}
-                          alt="google icon"
-                        />
-                      </div>
-                    </Link>
                   </div>
                 </div>
               </form>

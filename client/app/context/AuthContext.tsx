@@ -17,14 +17,10 @@ export const AuthProvider = ({ children }: {
     const router = useRouter();
     const [cookie, setCookie] = useCookies(['access_token']);
 
-    useEffect(() =>{
-        if (cookie.access_token === '' || !cookie.access_token) 
-            router.replace("/login");
-<<<<<<< HEAD
-        },[])   
-=======
-        },[cookie.access_token, router])
->>>>>>> 63f0f622ea492f95e40f4fca139f57c815d881c0
+    // useEffect(() =>{
+    //     if (cookie.access_token === '' || !cookie.access_token) 
+    //         router.replace("/login");
+    //     },[cookie.access_token, router])
     useEffect(() => {
         (async () => {
             const response = await getRequest(`${baseUrlUsers}/user`)

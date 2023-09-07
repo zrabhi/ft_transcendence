@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }: {
             const response = await getRequest(`${baseUrlUsers}/user`)
             if (response.error) {
                 setLoginError(response);
-                router.replace("/login");
                 return false;
             }
             // console.log("response", response);
@@ -46,8 +45,6 @@ export const AuthProvider = ({ children }: {
     );
     if (response.error) {
         setLoginError(response);
-        console.log("response", response);
-        console.log("in return falsee!!!");
         return false;
     }
         setUser(response);
@@ -58,8 +55,6 @@ export const AuthProvider = ({ children }: {
     const updateUserInfo = useCallback(async  (body: any) =>
     {   
         const response = await putRequest(`${baseUrlUsers}/users/update`, JSON.stringify(body))
-        console.log(response);
-         
         if (response.error) {
             setLoginError(response);
             return false;

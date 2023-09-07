@@ -206,7 +206,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Put('/user')
   async handleUpdate(@Body() user: PutUserDto, @Req() req, @Res() response) {
-    console.log("im hereee");
     
     try {
       await this.userService.updateUser(user, req);
@@ -224,7 +223,6 @@ export class UserController {
   @Put('users/update')
   async HandleUpdate(@Body() user: PutUserDto, @Res() res, @Req() req) {
     const User = await this.userService.UpdateAllInfos(user, req.user.id);
-     
     return user;
     // res.status(200).json({msg:"Ok"});
   }

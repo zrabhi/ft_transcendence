@@ -14,8 +14,8 @@ export default function AchievementItem ({ achievement }: any) {
       <div className="icon">
         <Image
           src={firstVictory}
-          width={50}
-          height={50}
+          width={30}
+          height={30}
           alt="achievement image"
         />
       </div>

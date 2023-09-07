@@ -116,10 +116,10 @@ model Match {
 }
 
 model Achievement{
-  id                   String @unique @default(uuid())
+  id                    String @unique @default(uuid())
 
-  userId               String @unique
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String @unique
+  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   accountCreationAchie Boolean
   firstFriendAchie     Boolean  @default(false)

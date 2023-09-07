@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: {
             setUser(response);
             return true;
         });
-    }, [user]);
+    }, [user, router]);
 
     const updatingInfos = async (username : string, password: string ) => {
     const response = await putRequest(

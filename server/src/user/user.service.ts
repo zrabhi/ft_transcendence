@@ -143,10 +143,7 @@ export class UserService {
     } catch (error) {}
   }
 
-  async getMatchesByUserId(
-    @Param('user_id') user_id: string,
-  ): Promise<Match[]> {
-    try {
+  async getMatchesByUserId(user_id:string): Promise<Match[]> {
       return await this.prismaService.match.findMany({
         where: {
           OR: [{ winner_id: user_id }, { loser_id: user_id }],
@@ -155,13 +152,9 @@ export class UserService {
           played_at: 'desc',
         },
       });
-    } catch (error) {
-      // console.log(error);
-    }
   }
 
   async createMatch(createMatchDto: CreateMatchDto) {
-    try {
       await this.prismaService.user.update({
         where: { id: createMatchDto.winner_id },
         data: {
@@ -187,7 +180,6 @@ export class UserService {
           id: true,
         },
       });
-    } catch (error) {}
   }
 
   async updateUser(body, req) {
@@ -355,6 +347,30 @@ export class UserService {
     return Users;
   }
   
+  async getAvatarById(user_id:string){
+    return await this.prismaService.user.findFirstOrThrow({
+      where:{
+        id:user_id,
+      },
+      select:{
+        id:true,
+        avatar: true,
+      }
+    })
+  }
+
+  async getCoverById(user_id:string){
+    return await this.prismaService.user.findFirstOrThrow({
+      where:{
+        id:user_id,
+      },
+      select:{
+        id:true,
+        cover:true,
+      }
+    })
+  }
+
   async createFriendship(user_one_id:string, user_two_id:string){
       const userOne = await this.findUserById(user_one_id);
       const userTwo = await this.findUserById(user_two_id);

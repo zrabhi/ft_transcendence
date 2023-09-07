@@ -129,9 +129,6 @@ export default function SignIn() {
                     onInvalid={handleInvalidPassword}
                     onChange={handlePasswordChange}
                   />
-                  <div className="forgot-pass">
-                    <Link href="#">Forgot your password?</Link>
-                  </div>
                   <div className="error pass-strength">
                     <div ref={passMessage} className="text"></div>
                   </div>
@@ -199,9 +196,6 @@ export default function SignIn() {
                   </div>
                 </div>
               </form>
-            </div>
-            <div className="signupbtn">
-              <button>create an account</button>
             </div>
           </div>
         </div>

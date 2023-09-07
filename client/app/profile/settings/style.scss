@@ -1,37 +1,5 @@
 @import '@/app/globals.scss';
 
-
-.error {
-  margin-bottom: 1.2rem;
-  padding-left: .2rem;
-  font-size: .8rem;
-  color: $error-color;
-}
-.errorRef{
-  margin-bottom: 1.2rem;
-  padding-left: .2rem;
-  text-align: center;
-  font-size: .8rem;
-  color: $error-color;
-}
-
-.updated
-{
-  margin-bottom: 1.2rem;
-  padding-left: 2.5rem;
-  font-size: .8rem;
-  color: $deep-green-color;
-}
-
-.updatedRef
-{
-  margin-bottom: 1.2rem;
-  padding-left: .5rem;
-  text-align: center;
-  font-size: .8rem;
-  color: $deep-green-color;;
-}
-
 .setting-page {
   padding: 2rem;
   background-color: $main-bg-color;
@@ -86,6 +54,7 @@
               letter-spacing: .05rem;
               opacity: .8;
               display: block;
+              margin-top: .8rem;
             }
             input {
               display: block;
@@ -197,8 +166,6 @@
                 border-radius: .3rem;
                 background-color: $box-bg-color;
                 width: 100%;
-                min-width: 18rem;
-                max-width: 100%;
                 font-size: .9rem;
                 border: 1px solid $blue-bg-color;
                 transition: all .2s ease-in-out;
@@ -252,4 +219,13 @@
       }
     }
   }
+  .error {
+    padding-left: .2rem;
+    font-size: .8rem;
+    color: $error-color;
+  }
+  .success {
+    padding-left: .2rem;
+    font-size: .8rem;
+    color: $success-color;}
 }

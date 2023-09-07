@@ -324,6 +324,30 @@ export class UserService {
     return Users;
   }
   
+  async getAvatarById(user_id:string){
+    return await this.prismaService.user.findFirstOrThrow({
+      where:{
+        id:user_id,
+      },
+      select:{
+        id:true,
+        avatar: true,
+      }
+    })
+  }
+
+  async getCoverById(user_id:string){
+    return await this.prismaService.user.findFirstOrThrow({
+      where:{
+        id:user_id,
+      },
+      select:{
+        id:true,
+        cover:true,
+      }
+    })
+  }
+
   async createFriendship(user_one_id:string, user_two_id:string){
       const userOne = await this.findUserById(user_one_id);
       const userTwo = await this.findUserById(user_two_id);

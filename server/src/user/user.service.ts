@@ -91,6 +91,7 @@ export class UserService {
     }
   }
 
+   /// find user witth unique username
   async findUserName(username: string): Promise<User> {
     try {
       return await this.prismaService.user.findUniqueOrThrow({
@@ -99,13 +100,35 @@ export class UserService {
         },
       });
     } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: `This username :${username} is not found.`,
+      // throw new HttpException(
+      //   {
+      //     status: HttpStatus.NOT_FOUND,
+      //     error: `This username :${username} is not found.`,
+      //   },
+      //   HttpStatus.NOT_FOUND,
+      // );
+  }
+
+  }
+
+
+  /// find user witth unique email
+  async findUserEmail(email: string) : Promise<User>
+  {
+    try {
+      return await this.prismaService.user.findUniqueOrThrow({
+        where: {
+          email: email,
         },
-        HttpStatus.NOT_FOUND,
-      );
+      });
+    } catch (error) {
+      // throw new HttpException(
+      //   {
+      //     status: HttpStatus.NOT_FOUND,
+      //     error: `This username :${username} is not found.`,
+      //   },
+      //   HttpStatus.NOT_FOUND,
+      // );
     }
   }
 

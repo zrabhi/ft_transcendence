@@ -101,58 +101,8 @@ export class AuthService {
   }
 
 
-  async login(
-    profile: CreateUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
 
-    
-    try {
-      let userSearch = null;
-      userSearch = await this._prisma.user.findFirst({
-        where: {
-          email: profile.email,
-        },
-      });
-      
-      if (userSearch)
-      {
-        
-        await this._prisma.user.update({
-          where: {
-            id: userSearch.id,
-          },
-          data: {
-            status: 'ONLINE',
-          },
-        });
-      }
-      else {
-        try{
-        const newUserId = await this.signup(profile, res);
-        userSearch = await this._user.findUserById(newUserId.id);
-        }catch(err)
-        {
-          
-          
-        } 
-      }
-    
-      
-      const access_token = await this.extractJwtToken({
-        id: userSearch.id,
-        username: userSearch.username,
-        setTwoFactorAuthenticationSecret: userSearch.twoFactorAuthenticationSecret,
-      });
-      const data = {
-        access_token,
-        userSearch,
-      }
-      return data
-    } catch (err) {}
-  }
-
-  async signup(user: CreateUserDto, @Res() res: Response) {
+  async signup(user: CreateUserDto) {
       return await this._prisma.user.create({
         data: {
           email: user.email,

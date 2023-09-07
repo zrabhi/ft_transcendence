@@ -24,6 +24,11 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtAuthGuard } from './Guards/AuthGurad';
 import { SeassionGuard } from './Guards/SeassionGuard';
 import { UserService } from 'src/user/user.service';
+const HOSTNAME : string = process.env.HOSTNAME;
+const LOGIN: string = process.env.HOSTNAME + process.env.LOGIN;
+const COMPLETE : string = process.env.HOSTNAME + process.env.COMPLETE;
+const PROFILE : string = process.env.HOSTNAME +  process.env.PROFILE;
+
 
 @Controller('/api/auth')
 export class AuthController {
@@ -66,41 +71,44 @@ async handleSignin(@Body() body: AuthDto, @Res() response) {
   @Get('/42/redirect')
   @UseGuards(FtGurad)
   async handleRedirectFt(
-    @User() user: Profile,
-    @Request() request,
+    @User() user,
     @Res() response,
   ) {
-    try {
-      const userData = this.authService.extract42UserData(user);
-      const data = await this.authService.login(userData, response);
-      const { access_token, userSearch } = data;
+    try {      
+      const access_token = await this.authService.extractJwtToken(
+          {
+            id : user.id,
+            username: user.username,
+            setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
+          })
       response.cookie('access_token', access_token);
-      if (!userSearch.password || !userSearch.email)
-        return response.redirect('http://127.0.0.1:3000/login/complete');
-      response.redirect('http://127.0.0.1:3000/profile');
+      if (!user.password)
+          return response.redirect(COMPLETE);
+      response.redirect(PROFILE);
     } catch (err) {
-      response.redirect('http://127.0.0.1:3000/login');
+      response.redirect(LOGIN);
     }
   }
 
   @Get('google/redirect')
   @UseGuards(GoogleGuard)
   async handleRedirectGoogle(
-    @User() user: Profile,
-    @Req() request,
+    @User() user,
     @Res() response,
   ) {
-    try {
-      const userData = this.authService.extractGoogleUserData(user);
-      const data = await this.authService.login(userData, response);
-      // console.log(`data is `, data);
-      const { access_token, userSearch } = data;
+    try {      
+      const access_token = await this.authService.extractJwtToken(
+          {
+            id : user.id,
+            username: user.username,
+            setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
+          })
       response.cookie('access_token', access_token);
-      if (!userSearch.password || !userSearch.email)
-        return response.redirect('http://127.0.0.1:3000/login/complete');
-      response.redirect('http://127.0.0.1:3000/profile');
+      if (!user.password)
+          return response.redirect(COMPLETE);
+      response.redirect(PROFILE);
     } catch (err) {
-      response.redirect('http://127.0.0.1:3000/login')
+      response.redirect(LOGIN);
     }
   }
 

@@ -92,6 +92,7 @@ export class UserController {
   async createUser(@Body() createUserDto: CreateUserDto) {
     return await this.userService.addUser(createUserDto);
   }
+
   @UseGuards(JwtAuthGuard)
   @Delete('/user')
   async deleteUser(@Req() req) {
@@ -131,7 +132,8 @@ export class UserController {
       );
     }
   }
-  @UseGuards(JwtAuthGuard)
+
+  // @UseGuards(JwtAuthGuard)
   @Post('/users/matches')
   async createMatch(@Body() createMatchDto: CreateMatchDto) {
     return await this.userService.createMatch(createMatchDto);

@@ -132,7 +132,6 @@ export class UserService {
   }
 
   async createMatch(createMatchDto: CreateMatchDto) {
-    try {
       await this.prismaService.user.update({
         where: { id: createMatchDto.winner_id },
         data: {
@@ -158,7 +157,6 @@ export class UserService {
           id: true,
         },
       });
-    } catch (error) {}
   }
 
   async updateUser(body, req) {

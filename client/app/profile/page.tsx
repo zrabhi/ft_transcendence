@@ -9,6 +9,7 @@ import Achievement from "@/interfaces/Achievement";
 import UserStatistics from "@/interfaces/UserStatistics";
 import AchievementItem from "@/components/LoggedUser/Profile/Achievement/AchievementItem";
 import GameData from "@/components/LoggedUser/Profile/GameData/GameData";
+import Statistics from "@/components/LoggedUser/Profile/Statistics/Statistics";
 
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
@@ -177,6 +178,7 @@ export default function Profile() {
               <h4>
                 statistics
               </h4>
+              <Statistics />
               {/* NUMBER OF WINS AND LOSES A GAMES HAVE BEEN PLAYED BY THE USER  */}
             </div>
             <div className="box games-history">

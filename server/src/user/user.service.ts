@@ -23,6 +23,13 @@ export class UserService {
     });
   }
 
+  // async checkUserNames(user: PutUserDto, userId: string)
+  // {
+    
+
+
+  // }
+
   async addUser(createUserDto: CreateUserDto) {
     const exist = !!(await this.prismaService.user.findFirst({
       where: {
@@ -183,7 +190,6 @@ export class UserService {
   }
 
   async updateUser(body, req) {
-    try {
       const hashedPass = await bcrypt.hash(body.password, 10);
       return await this.prismaService.user.update({
         where: { id: req.user.id },
@@ -192,9 +198,7 @@ export class UserService {
           username: body.username,
         },
       });
-    } catch (error) {
-      // console.log(error);
-    }
+   
   }
   async updateAvatarorCover(
     infos: FileUserDto,

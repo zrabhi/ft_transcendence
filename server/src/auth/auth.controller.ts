@@ -75,6 +75,8 @@ async handleSignin(@Body() body: AuthDto, @Res() response) {
     @Res() response,
   ) {
     try {      
+      console.log("user auth", user);
+      
       const access_token = await this.authService.extractJwtToken(
           {
             id : user.id,

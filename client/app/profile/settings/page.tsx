@@ -4,7 +4,7 @@ import { useState, useRef, useContext } from "react";
 import Link from "next/link";
 import { AuthContext } from "@/app/context/AuthContext";
 import "./style.scss";
-import { baseUrlUsers, postFileRequest } from "@/app/context/utils/service";
+import { baseUrlUsers, postCheckRequest, postFileRequest } from "@/app/context/utils/service";
 import { StaticImageData } from "next/image";
 import { Avatar } from "@radix-ui/themes";
 import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
@@ -27,7 +27,7 @@ export default function Settings() {
   const usernameMsgRef = useRef<HTMLParagraphElement>(null);
   const passwordMsgRef = useRef<HTMLParagraphElement>(null);
   const passwordMatchMsgRef = useRef<HTMLParagraphElement>(null);
-  const currPasswordRef = useRef<HTMLDivElement>(null);
+  const currPasswordRef = useRef<HTMLParagraphElement>(null);
   const updateMsgRef = useRef<HTMLParagraphElement>(null);
 
   // those created by zRabhi i didn't understand all of them
@@ -119,10 +119,17 @@ export default function Settings() {
   };
 
   const checkCurrentPassword = async (password: string) => {
-    // check if current password is valid
-    return true;
+      const response = await postCheckRequest(
+        `${baseUrlUsers}/user/checkPassword`,
+        JSON.stringify({ password })
+      );
+      if (response.error) {
+        setError(true);
+        console.log(response);
+        return false;
+      }
+      return true;
   }
-
   const isStrongPassword = (password: string) => {
     if (password.length < 8) {
       passwordMsgRef.current!.innerHTML = "password it's not strong enough";
@@ -177,8 +184,8 @@ export default function Settings() {
       updateMsgRef.current!.innerHTML = "Nothing to update";
       return ;
     }
-    if (!checkCurrentPassword(currentPassword)) {
-      currPasswordRef.current!.innerHTML = "Invalid current password";
+    if (! await checkCurrentPassword(currentPassword)) {
+      currPasswordRef.current!.innerHTML= "Invalid current password";
       return ;
     }
     if (!isValidUsername(username)) {

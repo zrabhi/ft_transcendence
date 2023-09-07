@@ -26,6 +26,7 @@ import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import path = require('path');
 import { UserService } from './user.service';
+import { log } from 'console';
 
 export const strorageCover = {
   storage: diskStorage({
@@ -73,13 +74,30 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('userNameCheck')
+  async handleNickNameCheck(@Req() req, @Res() res)
+  {
+    try{
+
+
+    }catch(err)
+    {
+
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/user/')
   async getUser(@Req() req, @Res() res): Promise<User> {
-    const user  = await this.userService.findUserById(req.user.id);
+   try{ const user  = await this.userService.findUserById(req.user.id);
     if (user)
         return res.status(200).json(user);
-    return res.status(400).json({msg:"ko"})
-  }
+    return res.status(400).json({msg:"ko"})}
+    catch(err)
+    {
+      return res.status(400).json({msg:"user not found"})}
+      
+    }
 
   @UseGuards(JwtAuthGuard)
   @Get('user/:username')
@@ -172,18 +190,6 @@ export class UserController {
   }
 
 
-  @UseGuards(JwtAuthGuard)
-  @Put('/users')
-  async handleUpdate(@Body() user: PutUserDto, @Req() req, @Res() response) {
-    try {
-      await this.userService.updateUser(user, req);
-      return response
-        .status(200)
-        .json({ msg: 'Information updated successfully' });
-    } catch (err) {
-      response.status(400).json({ msg: "Couldn't update Your information" });
-    }
-  }
 
   @UseGuards(JwtAuthGuard)
   @Put('users/changeUserName')
@@ -196,12 +202,29 @@ export class UserController {
     }
   }
 
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/user')
+  async handleUpdate(@Body() user: PutUserDto, @Req() req, @Res() response) {
+    console.log("im hereee");
+    
+    try {
+      await this.userService.updateUser(user, req);
+      return response
+        .status(200)
+        .json('Information updated successfully' );
+    } catch (err) {
+      return response
+      .status(400)
+      .json( 'Username you chosed already exist' );
+    }
+  }
+
   @UseGuards(JwtAuthGuard)
   @Put('users/update')
   async HandleUpdate(@Body() user: PutUserDto, @Res() res, @Req() req) {
-    console.log(user);
     const User = await this.userService.UpdateAllInfos(user, req.user.id);
-    console.log(User);
+     
     return user;
     // res.status(200).json({msg:"Ok"});
   }

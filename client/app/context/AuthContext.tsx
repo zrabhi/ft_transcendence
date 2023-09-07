@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }: {
     //     if (cookie.access_token === '' || !cookie.access_token) 
     //         router.replace("/login");
     //     },[cookie.access_token, router])
+    
     useEffect(() => {
         (async () => {
             const response = await getRequest(`${baseUrlUsers}/user`)
@@ -34,28 +35,31 @@ export const AuthProvider = ({ children }: {
 
             setUser(response);
             return true;
-        });
-    }, [user, router]);
+        })();
+    }, [user]);
 
-    const updatingInfos = async (username : string, password: string ) => {
+    const updatingInfos = useCallback(async  (username : string, password: string ) => {
+
     const response = await putRequest(
-        `${baseUrlUsers}/users`,
+        `${baseUrlUsers}/user`,
         JSON.stringify({ username, password })
     );
     if (response.error) {
         setLoginError(response);
+        console.log("response", response);
+        console.log("in return falsee!!!");
         return false;
     }
-
-        // console.log("response", response);
         setUser(response);
         return true;
-    };
+    }, []);
 
 
-    const updateUserInfo = async (body: any) =>
+    const updateUserInfo = useCallback(async  (body: any) =>
     {   
-        const response = await putRequest(`${baseUrlUsers}/users/update`, JSON.stringify(body)) 
+        const response = await putRequest(`${baseUrlUsers}/users/update`, JSON.stringify(body))
+        console.log(response);
+         
         if (response.error) {
             setLoginError(response);
             return false;
@@ -63,7 +67,7 @@ export const AuthProvider = ({ children }: {
         console.log("response", response);
         setUser(response);
         return true;
-    }
+    }, [])
 
     const LogIn = useCallback(async (loginInfo: any) => {
         const response = await postRequest(
@@ -72,13 +76,11 @@ export const AuthProvider = ({ children }: {
         )
 
         if (response.error) {
+            console.log(response);
+            
             setLoginError(response);
             return false;
         }
-
-        localStorage.setItem("User", JSON.stringify(response));
-        console.log("response", response);
-
         setUser(response);
         // console.log("context", user);
 

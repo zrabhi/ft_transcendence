@@ -4,13 +4,27 @@
 // font-family: 'Rubik Iso', cursive;
 
 .achievement-item {
-  .name {
-    font-size: 1.2rem;
-    color: $soft-gold-color;
-    font-family: 'Rubic Iso', cursive;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  .icon {
+    background-color: #fff;
+    padding: .5rem;
+    border-radius: 50%;
+    overflow: hidden;
   }
-  .desc {
-    font-size: 1rem;
-    font-family: 'Playfair Display SC', serif;
+  .content {
+    flex-grow: 1;
+    .name {
+      font-size: 1.5rem;
+      color: $soft-gold-color;
+      font-family: 'Rubic Iso', cursive;
+    }
+    .desc {
+      font-size: 1rem;
+      font-family: 'Playfair Display SC', serif;
+    }
   }
 }

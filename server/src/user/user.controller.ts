@@ -106,16 +106,37 @@ export class UserController {
     return await this.userService.achievementById(username);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('/users/matches')
-  async getMatches(@Param('user_id') user_id: string): Promise<Match[]> {
-    return await this.userService.getMatchesByUserId(user_id);
+  // @UseGuards(JwtAuthGuard)
+  @Get('/users/matches/:user_id')
+  async getMatches(@Param('user_id') user_id: string, @Res() res){
+    try{
+      const allUserMatches = await this.userService.getMatchesByUserId(user_id);
+      const againstMatches = [];
+      for (const match of allUserMatches){
+        if (match.loser_id == user_id)
+          againstMatches.push({against:match.winner_id, result:'Lose'})
+        else
+          againstMatches.push({against:match.loser_id, result:'Win'})
+      }
+      res.status(200).json(againstMatches);
+    }
+    catch(error)
+    {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: `UserNotFound`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
   @UseGuards(JwtAuthGuard)
   @Post('/users/matches')
   async createMatch(@Body() createMatchDto: CreateMatchDto) {
     return await this.userService.createMatch(createMatchDto);
   }
+  
   @UseGuards(JwtAuthGuard)
   @Put('/users')
   async handleUpdate(@Body() user: PutUserDto, @Req() req, @Res() response) {
@@ -251,7 +272,6 @@ export class UserController {
   async getUsersRank(){
     return await this.userService.getUsersRank();
   }
-  
   /// --------------------------------------------------
 
   // searching route

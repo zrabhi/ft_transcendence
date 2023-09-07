@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }: {
     const [loginError, setLoginError] = useState<LoginError>();
     const router = useRouter();
     const [cookie, setCookie] = useCookies(['access_token']);
+    const [currentWindow, setCurrentWindow] = useState("");
 
     // useEffect(() =>{
     //     if (cookie.access_token === '' || !cookie.access_token) 
@@ -26,14 +27,15 @@ export const AuthProvider = ({ children }: {
             const response = await getRequest(`${baseUrlUsers}/user`)
             if (response.error) {
                 setLoginError(response);
+                router.replace("/login");
                 return false;
             }
-            console.log("response", response);
+            // console.log("response", response);
 
             setUser(response);
             return true;
         });
-    }, [user]);
+    }, [user, router]);
 
     const updatingInfos = async (username : string, password: string ) => {
     const response = await putRequest(

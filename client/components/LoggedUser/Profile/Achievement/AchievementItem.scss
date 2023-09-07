@@ -1,0 +1,16 @@
+@import '@/app/globals.scss';
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display+SC:ital,wght@0,400;0,700;0,900;1,400;1,900&family=Rubik+Iso&display=swap');
+// font-family: 'Playfair Display SC', serif;
+// font-family: 'Rubik Iso', cursive;
+
+.achievement-item {
+  .name {
+    font-size: 1.2rem;
+    color: $soft-gold-color;
+    font-family: 'Rubic Iso', cursive;
+  }
+  .desc {
+    font-size: 1rem;
+    font-family: 'Playfair Display SC', serif;
+  }
+}

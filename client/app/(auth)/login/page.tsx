@@ -129,9 +129,6 @@ export default function SignIn() {
                     onInvalid={handleInvalidPassword}
                     onChange={handlePasswordChange}
                   />
-                  <div className="forgot-pass">
-                    <Link href="#">Forgot your password?</Link>
-                  </div>
                   <div className="error pass-strength">
                     <div ref={passMessage} className="text"></div>
                   </div>
@@ -191,16 +188,6 @@ export default function SignIn() {
                         <Image
                           src={schoolLogo}
                           width={34}
-                          height={24}
-                          alt="google icon"
-                        />
-                      </div>
-                    </Link>
-                    <Link href="http://127.0.0.1:8080/api/auth/github/login">
-                      <div className="github">
-                        <Image
-                          src={GithubLogo}
-                          width={24}
                           height={24}
                           alt="google icon"
                         />

@@ -10,7 +10,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { Response } from 'express';
+import {Response} from 'Express'
 import { GoogleGuard } from './Guards/GoogleGuard';
 import passport, { Profile } from 'passport';
 import { AuthService } from './auth.service';
@@ -33,17 +33,18 @@ export class AuthController {
   ) {}
 
   @Post('signin')
-  async handleSignin(@Body() body: AuthDto, @Res() response: Response) {
+async handleSignin(@Body() body: AuthDto, @Res() response) {
     try {
-      // console.log(body);
+
       const data = await this.authService.signin(body);
-      const { access_token, user } = data;
+      const {access_token, user} = data
       if (access_token === '')
         return response.status(400).json({ msg: 'Invalid Credencial' });
-      // console.log(access_token);
+      console.log(access_token);
       response.cookie('access_token', access_token);
+      // response.end("ok");
       return response.status(200).json(user);
-    } catch (e) {
+      } catch (e) {
       return response
         .status(400)
         .json({ msg: 'Invalid Credencial Error   ' + e.message });
@@ -61,11 +62,6 @@ export class AuthController {
     return;
   }
 
-  @Get('github/login')
-  @UseGuards(GithubGuard)
-  handleGithublogin() {
-    return;
-  }
 
   @Get('/42/redirect')
   @UseGuards(FtGurad)
@@ -77,7 +73,6 @@ export class AuthController {
     try {
       const userData = this.authService.extract42UserData(user);
       const data = await this.authService.login(userData, response);
-      console.log(`data is `, data);
       const { access_token, userSearch } = data;
       response.cookie('access_token', access_token);
       if (!userSearch.password || !userSearch.email)
@@ -105,29 +100,7 @@ export class AuthController {
         return response.redirect('http://127.0.0.1:3000/login/complete');
       response.redirect('http://127.0.0.1:3000/profile');
     } catch (err) {
-      response.status(400).json({ message: err.message });
-    }
-  }
-
-  @Get('/github/redirect')
-  @UseGuards(GithubGuard)
-  async handleRedirectGithub(
-    @User() user: Profile,
-    @Request() request,
-    @Res() response,
-  ) {
-    try {
-      
-      const userData = this.authService.extractUserGithubData(user);
-      const data = await this.authService.login(userData, response);
-      // console.log(`data is `, data);
-      const { access_token, userSearch } = data;
-      response.cookie('access_token', access_token);
-      if (!userSearch.password || !userSearch.email)
-        return response.redirect('http://127.0.0.1:3000/login/complete');
-      response.redirect('http://127.0.0.1:3000/profile');
-    } catch (err) {
-      response.status(400).json({ message: err.message });
+      response.redirect('http://127.0.0.1:3000/login')
     }
   }
 

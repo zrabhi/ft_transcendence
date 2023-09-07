@@ -14,7 +14,7 @@ import { AuthDto } from './dto/auth.dto';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { Response } from 'express';
+import { Response, response } from 'express';
 import { Profile } from 'passport';
 import { User } from './decorator/user-decorator';
 import { authenticator } from 'otplib';
@@ -28,7 +28,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signin(body: AuthDto) {
+  async signin(body: AuthDto) :Promise<any> {
 
     const user = await this._prisma.user.findFirst({
       where: {
@@ -90,27 +90,13 @@ export class AuthService {
     return userData;
   }
 
-  extractUserGithubData(user: any): CreateUserDto {
-    const { login, avatar_url } = user._json;
-    const userData = {
-      email: 'zac.rabhi123@gmail.com',
-      username: login + '12', // just for testing purpose 
-      avatar: avatar_url,
-      cover: '',
-      password: '',
-    };
-    return userData;
-  }
-
-
-  async extractJwtToken(playload: any) {
+  async extractJwtToken(playload: any) : Promise<string> {
     try{  
       const access_token = await this.jwtService.signAsync(playload);
       return access_token;
     }catch(err){
       // console.log("ac, access_toces");
       // console.log(err.message);
-      
     }
   }
 
@@ -156,6 +142,7 @@ export class AuthService {
       const access_token = await this.extractJwtToken({
         id: userSearch.id,
         username: userSearch.username,
+        setTwoFactorAuthenticationSecret: userSearch.twoFactorAuthenticationSecret,
       });
       const data = {
         access_token,

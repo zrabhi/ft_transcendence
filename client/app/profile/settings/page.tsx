@@ -120,7 +120,7 @@ export default function Settings() {
 
   const checkCurrentPassword = async (password: string) => {
     // check if current password is valid
-    return false;
+    return true;
   }
 
   const isStrongPassword = (password: string) => {
@@ -224,10 +224,14 @@ export default function Settings() {
                 <form action="">
                   <div className="input">
                     <label htmlFor="username">username</label>
-                    <input type="text" name="username" id="username" placeholder='enter your username'
-                    autoComplete='off'
-                    value={username}
-                    onChange={handleUsernameChange}
+                    <input 
+                      type="text" 
+                      name="username" 
+                      id="username" 
+                      placeholder='enter your username'
+                      autoComplete='off'
+                      value={username}
+                      onChange={handleUsernameChange}
                     />
                   </div>
                   <div ref={usernameMsgRef} className="error"></div>

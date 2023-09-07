@@ -9,6 +9,12 @@ import Avatar from '@/public/images/DefaultAvatar.jpg'
 
 export default function ProfileCard(user: any) {
 
+  const handleImageClick = () => {
+    console.log('image clicked')
+    console.log(user.data && user.data.avatar);
+    console.log(`usernmea : ${user.data && user.data.username}}`);
+  }
+
   return (
     <div className="profile-card">
       <div className="cover-img">
@@ -75,6 +81,7 @@ export default function ProfileCard(user: any) {
             height={500}
             alt='Image of the user'
             className='rounded-full '
+            onClick={handleImageClick}
           />
           <div className="level w-8 h-8 rounded-full flex justify-center items-center absolute bottom-2 right-2">
           4

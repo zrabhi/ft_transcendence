@@ -138,7 +138,40 @@ export class UserController {
   async createMatch(@Body() createMatchDto: CreateMatchDto) {
     return await this.userService.createMatch(createMatchDto);
   }
-  
+
+  @Get('/users/avatar/:user_id')
+  async getUserAvatar(@Param('user_id') user_id:string, @Res() res:Response)
+  {
+    try{
+      const userAvatar = await this.userService.getAvatarById(user_id);
+      res.status(200).json(userAvatar);
+    }
+    catch(error)
+    {
+      throw new HttpException({
+        status: HttpStatus.BAD_REQUEST,
+        error: 'User Avatar Not Found',
+      },HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('/users/cover/:user_id')
+  async getUserConver(@Param('user_id') user_id:string, @Res() res:Response)
+  {
+    try{
+      const userCover = await this.userService.getCoverById(user_id);
+      res.status(200).json(userCover);
+    }
+    catch(error)
+    {
+      throw new HttpException({
+        status: HttpStatus.BAD_REQUEST,
+        error: 'User Avatar Not Found',
+      },HttpStatus.BAD_REQUEST);
+    }
+  }
+
+
   @UseGuards(JwtAuthGuard)
   @Put('/users')
   async handleUpdate(@Body() user: PutUserDto, @Req() req, @Res() response) {
@@ -151,6 +184,7 @@ export class UserController {
       response.status(400).json({ msg: "Couldn't update Your information" });
     }
   }
+
   @UseGuards(JwtAuthGuard)
   @Put('users/changeUserName')
   async handleUserNameChange(@Body() user: PutUserDto, @Req() req, @Res() Res) {
@@ -161,6 +195,7 @@ export class UserController {
       console.log(err);
     }
   }
+
   @UseGuards(JwtAuthGuard)
   @Put('users/update')
   async HandleUpdate(@Body() user: PutUserDto, @Res() res, @Req() req) {
@@ -168,7 +203,6 @@ export class UserController {
     const User = await this.userService.UpdateAllInfos(user, req.user.id);
     console.log(User);
     return user;
-
     // res.status(200).json({msg:"Ok"});
   }
   // avatar imagesss
@@ -220,6 +254,7 @@ export class UserController {
     }
     return response.status(200).json(file.path);
   }
+
   /// this route in my opinion cant be proteted , pictures can be accessed from everywhere
   // @UseGuards(JwtAuthGuard)
   @Get('cover/pictures/:filename')
@@ -228,6 +263,7 @@ export class UserController {
     //   res.sendFile(filename, { root: './images/covers' });
     res.sendFile(filename, { root: './images/covers' });
   }
+
   @Get('avatar/pictures/:filename')
   async getAvatar(@Param('filename') filename: string, @Res() res) {
     // if (await this.userService.getFileUpload(filename, 'avatars'))
@@ -274,14 +310,6 @@ export class UserController {
   async getUsersRank(){
     return await this.userService.getUsersRank();
   }
-  /// --------------------------------------------------
 
-  // searching route
-  // get country route
-  // 
-  // To-Do //
-  // GET /api/users/friends/:user_id
-  // GET /api/users/friendRequest/outgoing/:user_id
-  // GET /api/users/friendRequest/incoming/:user_id
-  // 
+
 }

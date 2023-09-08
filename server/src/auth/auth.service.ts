@@ -46,7 +46,7 @@ export class AuthService {
       );
     }
     const matches = await bcrypt.compare(body.password, user.password);
-    let access_token = '';
+    let access_token = undefined;
     if (matches) {
         access_token =  await this.extractJwtToken({
         id: user.id,
@@ -55,7 +55,7 @@ export class AuthService {
       });
     }
     const data = {
-      access_token,
+      matches,
       user
     }
     return data;
@@ -166,17 +166,24 @@ export class AuthService {
 
   isTwoFactorAuthenticationCodeValid(
     twoFactorAuthenticationCode: string,
-    user: any,
-    )
+    user: any)
     {
-
+      console.log(twoFactorAuthenticationCode);
+      
+      console.log(user.setTwoFactorAuthenticationSecret);
+      
 
     const optionsVerify = {
       token: twoFactorAuthenticationCode,
-      secret: 'KRZWSDKKCZ3EWMZN',
+      secret: user.setTwoFactorAuthenticationSecret,
     };
+    console.log(optionsVerify);
+    
     try {
-      return authenticator.verify(optionsVerify);
+      return  authenticator.verify({
+        token: twoFactorAuthenticationCode,
+        secret: user.setTwoFactorAuthenticationSecret,
+      });
     } catch (err) {
       // console.log(err.message);
     }

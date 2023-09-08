@@ -1,8 +1,11 @@
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import './style.scss';
 
 export default function TfaPage() {
+  useEffect(() =>{
+    
+  })
   return (
     <div className="tfa-page">
       <div className="content">
@@ -10,7 +13,7 @@ export default function TfaPage() {
         <p>Take these few steps to enable two-factor authentication and make your account more secure</p>
         <div className="qr-code">
           <div className="qr-code-box">
-            
+
           </div>
         </div>
         <div className="input-code">

@@ -8,6 +8,7 @@ export const postRequest = async (url: string, body: any) => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: 'include',
     body,
   });
   // console.log(response);

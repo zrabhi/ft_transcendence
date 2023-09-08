@@ -22,7 +22,19 @@ export const AuthProvider = ({ children }: {
     //     if (cookie.access_token === '' || !cookie.access_token) 
     //         router.replace("/login");
     //     },[cookie.access_token, router])
-    
+
+    const fetchUserData = async () => {
+        const response = await getRequest(`${baseUrlUsers}/user`)
+        if (response.error) {
+            setLoginError(response);
+            router.replace("/login");
+            return false;
+        }
+        // console.log("response", response);
+
+        setUser(response);
+    };
+
     useEffect(() => {
         (async () => {
             const response = await getRequest(`${baseUrlUsers}/user`)
@@ -36,7 +48,8 @@ export const AuthProvider = ({ children }: {
             setUser(response);
             return true;
         })();
-    }, [user]);
+    }, []);
+     
 
     const updatingInfos = useCallback(async  (username : string, password: string ) => {
 
@@ -46,8 +59,6 @@ export const AuthProvider = ({ children }: {
     );
     if (response.error) {
         setLoginError(response);
-        console.log("response", response);
-        console.log("in return falsee!!!");
         return false;
     }
         setUser(response);
@@ -76,14 +87,10 @@ export const AuthProvider = ({ children }: {
         )
 
         if (response.error) {
-            console.log(response);
-            
             setLoginError(response);
             return false;
         }
-        setUser(response);
-        // console.log("context", user);
-
+        setUser(response)
         return true;
     }, []);
 

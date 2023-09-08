@@ -24,12 +24,6 @@ export default function AboutUs() {
       githubUrl: 'https://github.com/zrabhi/',
     },
     {
-      name: 'Mohamed MOUMNI',
-      imageSrc: mmoumniImage,
-      linkedinUrl: 'https://www.linkedin.com/in/mmoumni/',
-      githubUrl: 'https://github.com/Mohamed-Moumni/',
-    },
-    {
       name: 'Mohamed KARIM',
       imageSrc: mkarimImage,
       linkedinUrl: 'https://www.linkedin.com/in/skeet1/',

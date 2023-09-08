@@ -139,15 +139,19 @@ export class UserService {
     }
   }
 
-  async achievementById(username: string): Promise<Achievement> {
+  async achievementById(userId: string): Promise<Achievement> {
     try {
-      const user = await this.findUserName(username);
+      console.log("in start fucntion");
+      
       return await this.prismaService.achievement.findUnique({
         where: {
-          id: user.id,
+          userId: userId,
         },
       });
-    } catch (error) {}
+    } catch (error) {
+      
+      
+    }
   }
 
   async getMatchesByUserId(user_id:string): Promise<Match[]> {
@@ -159,6 +163,7 @@ export class UserService {
           played_at: 'desc',
         },
       });
+
   }
 
   async createMatch(createMatchDto: CreateMatchDto) {

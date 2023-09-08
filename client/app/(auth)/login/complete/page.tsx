@@ -21,7 +21,7 @@ export default function Complete() {
   const usernameRef = useRef<HTMLDivElement>(null);
   const passwordRef = useRef<HTMLDivElement>(null);
 
-  const avatar : any = useRef(user.avatar);
+  const avatar  = useRef<HTMLImageElement>(user.avatar);
   const ErrorRef = useRef<HTMLDivElement>(null);
 
   const [image, setImage] = useState(user.avatar);
@@ -45,7 +45,6 @@ export default function Complete() {
       avatar.current.src =  e.target!.result as string;
       setImage(ev.target!.result as string);
       const formData = new FormData();
-
       formData.append("file", e.target.files[0]);
       const response = await postFileRequest(
         `${baseUrlUsers}/avatar`,
@@ -86,8 +85,6 @@ export default function Complete() {
             usernameRef.current!.innerHTML = response.message;
         else
             passwordRef.current!.innerHTML = "Password is not strong enough";
-        // console.log("response", response);
-        // console.log(loginError);
         return false;
     }
       return true;
@@ -171,7 +168,7 @@ export default function Complete() {
             <div className="profile-box">
               <div className="current-pic">
                 <Image
-                  src={user?.avatar} 
+                  src={user.avatar} 
                   ref={avatar}
                   width={200}
                   height={200}

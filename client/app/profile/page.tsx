@@ -11,42 +11,42 @@ import AchievementItem from "@/components/LoggedUser/Profile/Achievement/Achieve
 import GameData from "@/components/LoggedUser/Profile/GameData/GameData";
 import Statistics from "@/components/LoggedUser/Profile/Statistics/Statistics";
 import Leaderboard from "@/components/LoggedUser/Profile/Leaderboard/Leaderboard";
+import { baseUrlUsers, getRequest } from "../context/utils/service";
+import { GameHistory } from "@/interfaces/GameHistory";
 
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
 
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [statistics, setStatistics] = useState<UserStatistics[]>([]);
+  const [gameHistory, setGamesHistory] = useState<GameHistory[]>([])
 
   // ZAC here you will fetch the data from the server and set it in state
-  // useEffect(() => {
-  //   // Fetch user achievements and set them in state
-  //   const fetchAchievements = async () => {
-  //     try {
-  //       const userAchievements = await fetchUserAchievements(user.data.id);
-  //       setAchievements(userAchievements);
-  //     } catch (error) {
-  //       // Handle errors
-  //     }
-  //   };
-  //   // Fetch user games history and set it in state
-  //   const fetchGamesHistory = async () => {
-  //     try {
-  //       const userGamesHistory = await fetchUserGamesHistory(user.data.id);
-  //       setGamesHistory(userGamesHistory);
-  //     } catch (error) {
-  //       // Handle errors
-  //     }
-  //   };
+  const fetchAchievements = async () =>
+  {
+    const userAchievements = await getRequest(`${baseUrlUsers}/user/achievement`);
+    console.log(userAchievements);
+    setAchievements(userAchievements);
+    console.log(achievements);
+    
+  } 
 
-  //   // Call the functions to fetch data when user data is available
-  //   if (user) {
-  //     fetchAchievements();
-  //     fetchGamesHistory();
-  //   }
-  // }, [user]); // Only run when 'user' changes
+  const fetchGamesHistory = async () => {
+    const userGamesHistory = await getRequest(`${baseUrlUsers}/user/matches`);
+    console.log("history ", userGamesHistory);
+    setGamesHistory(userGamesHistory);  
+  }
+  useEffect( () =>
+  {
+    (async () => {
+      /// if there is no achievement the return is null 
+          await fetchAchievements();
+      /// If there is no gameHistory the return is an empty array 
+          await fetchGamesHistory();
 
-  // examples for test
+    })()
+  },[])
+
   const userStatistics = {
     totalWins: 50,
     totalLosses: 20,
@@ -54,6 +54,7 @@ export default function Profile() {
     ladderRank: 3,
     achievements: [
       {
+        key: 'A',
         name: 'First Victory',
         description: 'Win your first game.',
       },

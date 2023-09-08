@@ -80,7 +80,6 @@ model User {
   friendOf                        Friendship[] @relation(name: "friendOf")
 
   achievement                     Achievement?
-
   memberof                        ChannelMembers[] @relation(name:"userToChannel")
   
   ChannelBan                      ChannelBan[]    @relation(name:"userBaned")

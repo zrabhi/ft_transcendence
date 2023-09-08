@@ -61,6 +61,8 @@ export const putRequest = async (url: string, body: any) => {
 };
 
 export const getRequest = async (url: string) => {
+  console.log("url", url);
+  
   const response = await fetch(url, {
     method: "GET",
     headers: {
@@ -68,7 +70,8 @@ export const getRequest = async (url: string) => {
     },
     credentials: "include",
   });
-
+  
+  
   const data = await response.json();
   if (!response.ok) {
     let message;
@@ -77,15 +80,6 @@ export const getRequest = async (url: string) => {
     return { error: true, message };
   }
   return data;
-  // let message;
-  // if (response.status != 200)
-  // {
-  //   message = "AN Error occurred...";
-  //   if (response.data?.message)
-  //       message = response.data.message;
-  //   return ({error:true, message});
-  // }
-  // return (response.data);
 };
 
 export const postCheckRequest = async (url: string, body : any) =>

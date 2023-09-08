@@ -83,7 +83,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/user/')
+  @Get('/user')
   async getUser(@Req() req, @Res() res): Promise<User> {
     try {
       const user = await this.userService.findUserById(req.user.id);
@@ -95,9 +95,9 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('user/:username')
-  async getUseByName(@Param('username') username: string): Promise<User> {
-    return await this.userService.findUserName(username);
+  @Get('user/username')
+  async getUseByName(@Req() req): Promise<User> {
+    return await this.userService.findUserName(req.user.username);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -113,23 +113,42 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/users/:username/achievement')
-  async getUserAchievement(
-    @Param('username') username: string,
-  ): Promise<Achievement> {
-    return await this.userService.achievementById(username);
+  @Get('/user/achievement')
+  async getUserAchievement(@Req() req, @Res() res) {
+    const achievements = await this.userService.achievementById(req.user.id); 
+    console.log(achievements);
+
+    res.status(200).json(achievements);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  @Get('/users/matches/:user_id')
-  async getMatches(@Param('user_id') user_id: string, @Res() res) {
+  @UseGuards(JwtAuthGuard)
+  @Get('/user/matches')
+  async getMatches(@Req() req, @Res() res) {
     try {
-      const allUserMatches = await this.userService.getMatchesByUserId(user_id);
+      const allUserMatches = await this.userService.getMatchesByUserId(
+        req.user.id,
+      );
       const againstMatches = [];
       for (const match of allUserMatches) {
-        if (match.loser_id == user_id)
-          againstMatches.push({ against: match.winner_id, result: 'Lose' });
-        else againstMatches.push({ against: match.loser_id, result: 'Win' });
+        if (match.loser_id == req.user.id) {
+          const loser = await this.userService.findUserById(req.user.id);
+          const winner = await this.userService.findUserById(match.loser_id);
+          againstMatches.push({
+            winnerScore: match.winner_score,
+            loserScore: match.loser_score,
+            loser: loser,
+            winner: winner,
+          });
+        } else {
+          const loser = await this.userService.findUserById(match.loser_id);
+          const winner = await this.userService.findUserById(match.winner_id);
+          againstMatches.push({
+            winnerScore: match.winner_score,
+            loserScore: match.loser_score,
+            loser: loser,
+            winner: winner,
+          });
+        }
       }
       res.status(200).json(againstMatches);
     } catch (error) {

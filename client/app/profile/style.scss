@@ -19,17 +19,19 @@
           border-radius: .5rem;
           padding: 1rem;
           overflow-y: auto;
-          scrollbar-width: thin; /* For Firefox */
-          scrollbar-color: $soft-gold-color $blue-bg-color;
-          &::-webkit-scrollbar {
-            width: .5rem;
-          }
-          &::-webkit-scrollbar-thumb {
-            background-color: $soft-gold-color;
-            border-radius: .5rem;
-          }
-          &::-webkit-scrollbar-track {
-            background-color: $blue-bg-color;
+          &:not(.not-scroll) {
+            scrollbar-width: thin; /* For Firefox */
+            scrollbar-color: $soft-gold-color $blue-bg-color;
+            &::-webkit-scrollbar {
+              width: .5rem;
+            }
+            &::-webkit-scrollbar-thumb {
+              background-color: $soft-gold-color;
+              border-radius: .5rem;
+            }
+            &::-webkit-scrollbar-track {
+              background-color: $blue-bg-color;
+            }
           }
           h4 {
             font-size: 1.4rem;

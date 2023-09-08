@@ -10,6 +10,7 @@ import UserStatistics from "@/interfaces/UserStatistics";
 import AchievementItem from "@/components/LoggedUser/Profile/Achievement/AchievementItem";
 import GameData from "@/components/LoggedUser/Profile/GameData/GameData";
 import Statistics from "@/components/LoggedUser/Profile/Statistics/Statistics";
+import Leaderboard from "@/components/LoggedUser/Profile/Leaderboard/Leaderboard";
 
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
@@ -205,6 +206,7 @@ export default function Profile() {
                 leaderboard
               </h4>
               {/* LIST OF USERS WITH THE HIGHEST WIN GAMES */}
+              {/* <Leaderboard /> */}
             </div>
           </div>
         </div>

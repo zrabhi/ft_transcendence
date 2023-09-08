@@ -206,7 +206,7 @@ export default function Profile() {
                 leaderboard
               </h4>
               {/* LIST OF USERS WITH THE HIGHEST WIN GAMES */}
-              {/* <Leaderboard /> */}
+              <Leaderboard />
             </div>
           </div>
         </div>

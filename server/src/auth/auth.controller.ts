@@ -24,6 +24,7 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtAuthGuard } from './Guards/AuthGurad';
 import { SeassionGuard } from './Guards/SeassionGuard';
 import { UserService } from 'src/user/user.service';
+import { AuthGuard } from '@nestjs/passport';
 const HOSTNAME : string = process.env.HOSTNAME;
 const LOGIN: string = process.env.HOSTNAME + process.env.LOGIN;
 const COMPLETE : string = process.env.HOSTNAME + process.env.COMPLETE;
@@ -37,24 +38,32 @@ export class AuthController {
     private userService: UserService,
   ) {}
 
+
   @Post('signin')
-async handleSignin(@Body() body: AuthDto, @Res() response) {
+  async handleSignin(@Body() body: AuthDto, @Res() response: Response) {
     try {
 
       const data = await this.authService.signin(body);
-      const {access_token, user} = data
-      if (access_token === '')
-        return response.status(400).json({ msg: 'Invalid Credencial' });
-      console.log(access_token);
-      response.cookie('access_token', access_token);
+      const {matches, user} = data
+      if (matches)
+      {
+        const  access_token =  await this.authService.extractJwtToken({
+          id: user.id,
+          username: user.username,
+          setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
+        });
+        response.cookie('acces_token', access_token);
+        return response.status(200).json(user);
+    }
+    return response.status(400).json({ msg: 'Invalid Credencial' });
       // response.end("ok");
-      return response.status(200).json(user);
       } catch (e) {
       return response
         .status(400)
-        .json({ msg: 'Invalid Credencial Error   ' + e.message });
+        .json({ msg: 'Invalid Credencial Error '});
     }
   }
+
   @Get('google/login')
   @UseGuards(GoogleGuard)
   async handleGoogleLogin() {
@@ -75,14 +84,14 @@ async handleSignin(@Body() body: AuthDto, @Res() response) {
     @Res() response,
   ) {
     try {      
-      console.log("user auth", user);
+      console.log("user auth", user); 
       
       const access_token = await this.authService.extractJwtToken(
-          {
-            id : user.id,
-            username: user.username,
-            setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
-          })
+      {
+        id : user.id,
+        username: user.username,
+        setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
+      })
       response.cookie('access_token', access_token);
       if (!user.password)
           return response.redirect(COMPLETE);
@@ -122,6 +131,8 @@ async handleSignin(@Body() body: AuthDto, @Res() response) {
       body.twoFactorAuthenticationCode,
       request.user,
     );
+    console.log(isCodeValid);
+    
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
@@ -148,8 +159,8 @@ async handleSignin(@Body() body: AuthDto, @Res() response) {
   //   }
   // }
 
-  @Post('2fa/generate')
   @UseGuards(JwtAuthGuard)
+  @Post('2fa/generate')
   async register(@Res() response, @Request() request) {
     const { otpauthUrl } =
       await this.authService.generateTwoFactorAuthenticationSecret(

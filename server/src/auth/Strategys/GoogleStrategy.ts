@@ -22,12 +22,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
   extractGoogleUserData(user: any): CreateUserDto {
-    const { name, emails, photos } = user;
+    const { name, emails} = user;
 
     const userData: CreateUserDto = {
       email: emails[0].value,
       username: name.givenName,
-      avatar: photos[0].value,
+      avatar: "http://127.0.0.1:8080/api/avatar/pictures/default.jpeg",
       cover: '',
       password: '',
     };
@@ -45,6 +45,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       let userCheck = await this.userService.findUserEmail(user.email);
       console.log(userCheck);
       if (!userCheck) {
+          /// TODO:error here when trying to autheficate with two users have the same name with googleAccount
         const newUser = await this.authService.signup(user);
         userCheck = await this.userService.findUserById(newUser.id);
       }

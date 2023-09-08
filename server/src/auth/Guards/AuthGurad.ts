@@ -13,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
 export class JwtAuthGuard implements CanActivate {
   constructor(private jwtService: JwtService, private config: ConfigService) {}
 
+  
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
@@ -28,6 +29,7 @@ export class JwtAuthGuard implements CanActivate {
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
+      console.log(payload);
       request['user'] = payload;
     } catch (err) {
       response.cookie('access_token', '');

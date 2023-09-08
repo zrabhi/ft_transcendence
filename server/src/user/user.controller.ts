@@ -228,6 +228,7 @@ export class UserController {
     return user;
     // res.status(200).json({msg:"Ok"});
   }
+  
   // avatar imagesss
 
   @UseGuards(JwtAuthGuard)

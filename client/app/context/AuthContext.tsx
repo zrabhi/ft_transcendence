@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }: {
             setLoginError(response);
             return false;
         }
-        console.log("response", response);
+        // console.log("response", response);
         setUser(response);
         return true;
     }, [])

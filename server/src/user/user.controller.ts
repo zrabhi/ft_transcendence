@@ -75,29 +75,24 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('userNameCheck')
-  async handleNickNameCheck(@Req() req, @Res() res)
-  {
-    try{
-
-
-    }catch(err)
-    {
-
+  async handleNickNameCheck(@Req() req, @Res() res) {
+    try {
+    } catch (err) {
+      // console.log(err);
     }
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/user/')
   async getUser(@Req() req, @Res() res): Promise<User> {
-   try{ const user  = await this.userService.findUserById(req.user.id);
-    if (user)
-        return res.status(200).json(user);
-    return res.status(400).json({msg:"ko"})}
-    catch(err)
-    {
-      return res.status(400).json({msg:"user not found"})}
-      
+    try {
+      const user = await this.userService.findUserById(req.user.id);
+      if (user) return res.status(200).json(user);
+      return res.status(400).json({ msg: 'ko' });
+    } catch (err) {
+      return res.status(400).json({ msg: 'user not found' });
     }
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('user/:username')
@@ -127,20 +122,17 @@ export class UserController {
 
   // @UseGuards(JwtAuthGuard)
   @Get('/users/matches/:user_id')
-  async getMatches(@Param('user_id') user_id: string, @Res() res){
-    try{
+  async getMatches(@Param('user_id') user_id: string, @Res() res) {
+    try {
       const allUserMatches = await this.userService.getMatchesByUserId(user_id);
       const againstMatches = [];
-      for (const match of allUserMatches){
+      for (const match of allUserMatches) {
         if (match.loser_id == user_id)
-          againstMatches.push({against:match.winner_id, result:'Lose'})
-        else
-          againstMatches.push({against:match.loser_id, result:'Win'})
+          againstMatches.push({ against: match.winner_id, result: 'Lose' });
+        else againstMatches.push({ against: match.loser_id, result: 'Win' });
       }
       res.status(200).json(againstMatches);
-    }
-    catch(error)
-    {
+    } catch (error) {
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
@@ -158,38 +150,36 @@ export class UserController {
   }
 
   @Get('/users/avatar/:user_id')
-  async getUserAvatar(@Param('user_id') user_id:string, @Res() res:Response)
-  {
-    try{
+  async getUserAvatar(@Param('user_id') user_id: string, @Res() res: Response) {
+    try {
       const userAvatar = await this.userService.getAvatarById(user_id);
       res.status(200).json(userAvatar);
-    }
-    catch(error)
-    {
-      throw new HttpException({
-        status: HttpStatus.BAD_REQUEST,
-        error: 'User Avatar Not Found',
-      },HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: 'User Avatar Not Found',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
   @Get('/users/cover/:user_id')
-  async getUserConver(@Param('user_id') user_id:string, @Res() res:Response)
-  {
-    try{
+  async getUserConver(@Param('user_id') user_id: string, @Res() res: Response) {
+    try {
       const userCover = await this.userService.getCoverById(user_id);
       res.status(200).json(userCover);
-    }
-    catch(error)
-    {
-      throw new HttpException({
-        status: HttpStatus.BAD_REQUEST,
-        error: 'User Avatar Not Found',
-      },HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: 'User Avatar Not Found',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
-
-
 
   @UseGuards(JwtAuthGuard)
   @Put('users/changeUserName')
@@ -198,24 +188,18 @@ export class UserController {
       await this.userService.UpdateUserName(user, req.user.id);
       Res.status(200).json({ msg: 'Updated succefully' });
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
-
 
   @UseGuards(JwtAuthGuard)
   @Put('/user')
   async handleUpdate(@Body() user: PutUserDto, @Req() req, @Res() response) {
-    
     try {
       await this.userService.updateUser(user, req);
-      return response
-        .status(200)
-        .json('Information updated successfully' );
+      return response.status(200).json('Information updated successfully');
     } catch (err) {
-      return response
-      .status(400)
-      .json( 'Username you chosed already exist' );
+      return response.status(400).json('Username you chosed already exist');
     }
   }
 
@@ -226,7 +210,6 @@ export class UserController {
     return user;
     // res.status(200).json({msg:"Ok"});
   }
-  
   // avatar imagesss
 
   @UseGuards(JwtAuthGuard)
@@ -248,7 +231,6 @@ export class UserController {
     } catch (err) {
       response.status(400).json({ message: err.message });
       // console.log('image rro', err.message);
-
       throw new err();
     }
   }
@@ -298,10 +280,7 @@ export class UserController {
   @Post('user/checkPassword')
   async handlePasswordCheck(@Res() res, @Req() req, @Body() body) {
     try {
-      const checker = await this.userService.passWordCheck(
-        body,
-        req.user.id,
-      );
+      const checker = await this.userService.passWordCheck(body, req.user.id);
       if (!checker) return res.status(400).json({ msg: 'Incorrect Password' });
       return res.status(200).json({ msg: 'Password Correct' });
       // passwrod check for you if if matches return true else in doesn not matche
@@ -312,12 +291,11 @@ export class UserController {
   /// --------------------------------------------------Ranking--------------------------------------------------
 
   @Get('/users/rank/:user_id')
-  async getUserRank(@Param('user_id') user_id:string, @Res() res){
-    try{
+  async getUserRank(@Param('user_id') user_id: string, @Res() res) {
+    try {
       const userRank = await this.userService.getUserRankById(user_id);
-      return res.json({user_id, userRank});
-    }
-    catch(error) {
+      return res.json({ user_id, userRank });
+    } catch (error) {
       throw new HttpException(
         {
           status: HttpStatus.NOT_FOUND,
@@ -327,11 +305,8 @@ export class UserController {
       );
     }
   }
-  
   @Get('/users/rank/')
-  async getUsersRank(){
+  async getUsersRank() {
     return await this.userService.getUsersRank();
   }
-
-
 }

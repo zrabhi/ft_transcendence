@@ -110,7 +110,7 @@ export default function Settings() {
 
   const changeAvatar = async (e: any) => {
     setAvatar(e.target.files[0]);
-    console.log("avaatr ", avatar);
+    // console.log("avaatr ", avatar);
   };
 
   const changeCover = (e: any) => {
@@ -177,7 +177,7 @@ export default function Settings() {
     e.preventDefault();
     resetRefs();
     setError(false);
-    console.log(isNothingToUpdate())
+    // console.log(isNothingToUpdate())
     if (isNothingToUpdate()) {
       updateMsgRef.current!.innerHTML = "Nothing to update";
       return ;

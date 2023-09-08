@@ -254,7 +254,7 @@ export class UserService {
         },
       });
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
 
@@ -263,7 +263,7 @@ export class UserService {
     if (user.password) hashedPass = await bcrypt.hash(user.password, 10);
     try {
       if (user.username && user.password) {
-        console.log('In both!!!!');
+        // console.log('In both!!!!');
 
         return await this.prismaService.user.update({
           where: { id: userId },
@@ -273,7 +273,7 @@ export class UserService {
           },
         });
       } else if (user.username) {
-        console.log('UserName');
+        // console.log('UserName');
         return await this.prismaService.user.update({
           where: { id: userId },
           data: {
@@ -281,7 +281,7 @@ export class UserService {
           },
         });
       } else if (user.password) {
-        console.log('only password');
+        // console.log('only password');
         return await this.prismaService.user.update({
           where: { id: userId },
           data: {
@@ -290,7 +290,7 @@ export class UserService {
         });
       }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
   async passWordCheck(@Body() Body, userId: string) {
@@ -300,8 +300,7 @@ export class UserService {
       return await bcrypt.compare(Body.password, user.password);
 
     } catch (err) {
-        console.log(err);
-        
+        // console.log(err);
       throw new HttpException(
         {
           status: HttpStatus.NOT_FOUND,

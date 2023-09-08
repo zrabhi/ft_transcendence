@@ -86,8 +86,8 @@ export default function Complete() {
             usernameRef.current!.innerHTML = response.message;
         else
             passwordRef.current!.innerHTML = "Password is not strong enough";
-        console.log("response", response);
-        console.log(loginError);
+        // console.log("response", response);
+        // console.log(loginError);
         return false;
     }
       return true;
@@ -95,8 +95,8 @@ export default function Complete() {
   
   const errorsChecks  = () =>
   {
-    if (loginError.message)
-      console.log(true);    
+    // if (loginError.message)
+      // console.log(true);    
   }
 
   const reset = () =>
@@ -106,8 +106,7 @@ export default function Complete() {
   }
 
   const handleSubmitClick = async (e: any) => {
-    console.log(avatar);
-
+    // console.log(avatar);
     e.preventDefault();
     reset();
     if (username.length < 6) {
@@ -115,11 +114,11 @@ export default function Complete() {
       return;
     }
     if (!passwordCheck())
-       return ;
+      return ;
     const result = await updatingInfos(username, password);
     if (result)
-           router.push("/profile");
-}
+      router.push("/profile");
+  };
 
   return (
     <div className="complete-info">
@@ -141,7 +140,6 @@ export default function Complete() {
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Username"
                   autoComplete="off"
-                  defaultValue={!user ? "Username" : user?.username}
                 />
               </div>
               <div ref={usernameRef} className="error username-error"></div>

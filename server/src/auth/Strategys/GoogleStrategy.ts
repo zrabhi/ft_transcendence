@@ -43,7 +43,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     {
       const user = this.extractGoogleUserData(profile);
       let userCheck = await this.userService.findUserEmail(user.email);
-      console.log(userCheck);
+      // console.log(userCheck);
       if (!userCheck) {
           /// TODO:error here when trying to autheficate with two users have the same name with googleAccount
         const newUser = await this.authService.signup(user);

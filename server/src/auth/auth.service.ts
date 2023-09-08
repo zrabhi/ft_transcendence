@@ -168,16 +168,16 @@ export class AuthService {
     twoFactorAuthenticationCode: string,
     user: any)
     {
-      console.log(twoFactorAuthenticationCode);
+      // console.log(twoFactorAuthenticationCode);
       
-      console.log(user.setTwoFactorAuthenticationSecret);
+      // console.log(user.setTwoFactorAuthenticationSecret);
       
 
     const optionsVerify = {
       token: twoFactorAuthenticationCode,
       secret: user.setTwoFactorAuthenticationSecret,
     };
-    console.log(optionsVerify);
+    // console.log(optionsVerify);
     
     try {
       return  authenticator.verify({

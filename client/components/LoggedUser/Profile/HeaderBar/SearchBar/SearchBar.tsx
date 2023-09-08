@@ -25,7 +25,7 @@ export default function SearchBar() {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      console.log('searching...', searchValue);
+      // console.log('searching...', searchValue);
       const url = `/searches/search?query=${searchValue}`;
       router.push(url);
     }

@@ -84,7 +84,7 @@ export class AuthController {
     @Res() response,
   ) {
     try {      
-      console.log("user auth", user); 
+      // console.log("user auth", user); 
       
       const access_token = await this.authService.extractJwtToken(
       {
@@ -131,7 +131,7 @@ export class AuthController {
       body.twoFactorAuthenticationCode,
       request.user,
     );
-    console.log(isCodeValid);
+    // console.log(isCodeValid);
     
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');

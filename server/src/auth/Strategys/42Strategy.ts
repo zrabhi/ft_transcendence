@@ -38,13 +38,11 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
   ) {
     const user = this.extract42UserData(profile);
     let userCheck = await this.userService.findUserEmail(user.email);
-    console.log(userCheck);
-    
     if (!userCheck)
-      {
-        const newUser = await this.authService.signup(user);
-        userCheck  = await this.userService.findUserById(newUser.id);
-      }
+    {
+      const newUser = await this.authService.signup(user);
+      userCheck  = await this.userService.findUserById(newUser.id);
+    }
     return done(null, userCheck);
   }
 }

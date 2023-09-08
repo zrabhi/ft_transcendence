@@ -15,9 +15,9 @@ export default function Statistics() {
     labels: ['Wins', 'Loses', 'Draws'],
     datasets: [
       {
-        data: [30, 50, 20],
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+        data: [30, 50, 20],      
+        backgroundColor: ['#63E260', '#FF6666', '#FFFF7F'], // Customize colors here
+        hoverBackgroundColor: ['#63E260', '#FF6666', '#FFFF7F'], 
       },
     ],
   };

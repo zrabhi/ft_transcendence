@@ -109,7 +109,6 @@ export default function Settings() {
   };
 
   const changeAvatar = async (e: any) => {
-    console.log(e.target.files);
     setAvatar(e.target.files[0]);
     console.log("avaatr ", avatar);
   };
@@ -125,7 +124,6 @@ export default function Settings() {
       );
       if (response.error) {
         setError(true);
-        console.log(response);
         return false;
       }
       return true;

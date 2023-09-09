@@ -37,7 +37,6 @@ export default function Settings() {
   const coverInputRef = useRef<HTMLInputElement | null>(null);
   const typeErrorRef = useRef<HTMLParagraphElement>(null);
 
-
   // those also created by zRabhi for upload images
   const [avatar, setAvatar] = useState<any>();
   const [cover, setCover] = useState<any>();
@@ -276,21 +275,26 @@ export default function Settings() {
                 <div className="update-imgs">
                   <div className="update-avatar">
                     <h4>update avatar</h4>
-                    <div className="input">
-                      <input
-                        ref={avatarInputRef}
-                        type="file"
-                        name="avatar"
-                        id="avatar"
-                        autoComplete="off"
-                        onChange={changeAvatar}
-                      />
-                      <span id="avatarSpan" onClick={handleAvatarClick}>
-                        upload new avatar picture
-                      </span>
+                    <div className="upload">
+                      <div className="avatar bg-slate-600 text-2xl">
+                        {/* Here insert current image before Update and after update insert new image  */}
+                      </div>
+                      <div className="input">
+                        <input
+                          ref={avatarInputRef}
+                          type="file"
+                          name="avatar"
+                          id="avatar"
+                          autoComplete="off"
+                          onChange={changeAvatar}
+                        />
+                        <span id="avatarSpan" onClick={handleAvatarClick}>
+                          upload new avatar picture
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="update-cover">
+                  {/* <div className="update-cover">
                     <h4>update cover</h4>
                     <div className="input">
                       <input
@@ -305,7 +309,7 @@ export default function Settings() {
                         upload new cover picture
                       </span>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="tfa-box">

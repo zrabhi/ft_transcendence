@@ -17,6 +17,13 @@ export const AuthProvider = ({ children }: {
     const router = useRouter();
     const [cookie, setCookie] = useCookies(['access_token']);
     const [currentWindow, setCurrentWindow] = useState("");
+    const Urls = {
+        home: "",
+        gameHistory: "game-history",
+        instructions: "instructions",
+        aboutUs: "about-us",
+        login: "login",};
+
 
     // useEffect(() =>{
     //     if (cookie.access_token === '' || !cookie.access_token) 
@@ -36,19 +43,25 @@ export const AuthProvider = ({ children }: {
     };
 
     useEffect(() => {
+      const pathname = window.location.href.split("/");
+      
+      if ( pathname[3] === Urls.home || pathname[3] === Urls.gameHistory ||
+        pathname[3] === Urls.instructions ||
+        pathname[3] === Urls.aboutUs)
+        return ;
         (async () => {
             const response = await getRequest(`${baseUrlUsers}/user`)
             if (response.error) {
                 setLoginError(response);
                 return false;
             }
-            // console.log("response", response);
+           
 
             setUser(response);
             return true;
         })();
     }, []);
-     
+
 
     const updatingInfos = useCallback(async  (username : string, password: string ) => {
 
@@ -72,7 +85,6 @@ export const AuthProvider = ({ children }: {
             setLoginError(response);
             return false;
         }
-        // console.log("response", response);
         setUser(response);
         return true;
     }, [])

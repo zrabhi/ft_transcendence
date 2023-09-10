@@ -218,7 +218,7 @@ export class UserController {
       await this.userService.updateUser(user, req);
       return response.status(200).json('Information updated successfully');
     } catch (err) {
-      return response.status(400).json('Username you chosed already exist');
+      return response.status(401).json('Username you chosed already exist');
     }
   }
 
@@ -323,6 +323,7 @@ export class UserController {
         HttpStatus.NOT_FOUND,
       );
     }
+    
   }
   @Get('/users/rank/')
   async getUsersRank() {

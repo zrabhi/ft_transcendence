@@ -5,14 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { AuthContext } from "@/app/context/AuthContext";
 import "./style.scss";
-import { baseUrlUsers, postCheckRequest, postFileRequest } from "@/app/context/utils/service";
+import { baseUrlUsers, postCheckRequest, postFileRequest, putRequest } from "@/app/context/utils/service";
 import { StaticImageData } from "next/image";
 import { Avatar } from "@radix-ui/themes";
 import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
 
 export default function Settings() {
   // use context to get user data
-  const { getUserData, user, updateUserInfo, tfaDisabled } = useContext(AuthContext);
+  const {user, updateUserInfo, tfaDisabled,handleDisable2fa } = useContext(AuthContext);
 
   // to check if 2fa is enabled or not
 
@@ -338,7 +338,7 @@ export default function Settings() {
                 {tfaDisabled ? (
                   <Link href="/profile/settings/tfa">Enable 2FA</Link>
                 ) : (
-                  <Link href="/profile/settings/tfa">Disable 2FA</Link>
+                  <Link href="/profile/settings" onClick={handleDisable2fa}>Disable 2FA</Link>
                 )}
               </div>
               <div className="social-form">

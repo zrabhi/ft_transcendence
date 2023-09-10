@@ -101,6 +101,12 @@ export const AuthProvider = ({ children }: {
         return true;
     }, []);
 
+    const handleDisable2fa = async () =>
+  {
+    const response =  await putRequest(`${baseUrlUsers}/user/disable2fa`, "");
+    setTfaDisabled(true);
+    console.log(response);
+  }
     const HandleClickUpdate = useCallback(async (UpdateInfo: any) =>
     {
         setLoginError(LoginErrorInit);
@@ -114,7 +120,7 @@ export const AuthProvider = ({ children }: {
     },[])
 
     return (
-        <AuthContext.Provider value={{ user: user, loginError: loginError, LogIn, updatingInfos, updateUserInfo, tfaDisabled}}>
+        <AuthContext.Provider value={{ user: user, loginError: loginError, LogIn, updatingInfos, updateUserInfo, tfaDisabled, handleDisable2fa}}>
             {children}
         </AuthContext.Provider>
     );

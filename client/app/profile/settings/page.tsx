@@ -134,6 +134,8 @@ export default function Settings() {
         `${baseUrlUsers}/user/checkPassword`,
         JSON.stringify({ password })
       );
+      console.log(response);
+      
       if (response.error) {
         setError(true);
         return false;
@@ -189,12 +191,12 @@ export default function Settings() {
     e.preventDefault();
     resetRefs();
     setError(false);
-    // console.log(isNothingToUpdate())
     if (isNothingToUpdate()) {
       updateMsgRef.current!.innerHTML = "Nothing to update";
       return ;
     }
-    if (! await checkCurrentPassword(currentPassword)) {
+     const access = await checkCurrentPassword(currentPassword)
+     if (!access){
       currPasswordRef.current!.innerHTML= "Invalid current password";
       return ;
     }
@@ -213,6 +215,8 @@ export default function Settings() {
       await handleImageUpdate("avatar");
     if (cover)
       await handleImageUpdate("cover");
+    if (infos.username || infos.password )
+      await updateUserInfo(infos)
     updateMsgRef.current!.innerHTML = "Updated successfully";
     updateMsgRef.current!.classList.remove("error");
     updateMsgRef.current!.classList.add("success");

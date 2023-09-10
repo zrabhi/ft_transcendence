@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: {
 
 
     const updateUserInfo = useCallback(async  (body: any) =>
-    {   
+    {
         const response = await putRequest(`${baseUrlUsers}/users/update`, JSON.stringify(body))
         if (response.error) {
             setLoginError(response);
@@ -91,17 +91,15 @@ export const AuthProvider = ({ children }: {
         return true;
     }, []);
 
-    const HandleClickUpdate = useCallback(async (UpdateInfo: any) => 
+    const HandleClickUpdate = useCallback(async (UpdateInfo: any) =>
     {
         setLoginError(LoginErrorInit);
         const response = await putRequest(`${baseUrlUsers}/users/update`, UpdateInfo);
 
         if (response.error) {
-            setLoginError(response);
             return false;
         }
         console.log("Updated Succefully!!");
-        
         return true;
     },[])
 

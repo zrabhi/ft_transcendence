@@ -121,13 +121,14 @@ export class AuthController {
     } catch (err) {
       response.redirect(LOGIN);
     }
-    
   }
 
-  @Post('2fa/trun-on')
+  @Post('2fa/turn-on')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
+    console.log(body);
+
     const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
       body.twoFactorAuthenticationCode,
       request.user,
@@ -163,11 +164,11 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('2fa/generate')
   async register(@Res() response, @Request() request) {
+
     const { otpauthUrl } =
       await this.authService.generateTwoFactorAuthenticationSecret(
         request.user,
       );
-
     return response.json(
       await this.authService.generateQrCodeDataURL(otpauthUrl),
     );

@@ -135,7 +135,7 @@ export default function Settings() {
         JSON.stringify({ password })
       );
       console.log(response);
-      
+
       if (response.error) {
         setError(true);
         return false;

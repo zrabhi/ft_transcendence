@@ -323,7 +323,6 @@ export class UserController {
         HttpStatus.NOT_FOUND,
       );
     }
-    
   }
   @Get('/users/rank/')
   async getUsersRank() {

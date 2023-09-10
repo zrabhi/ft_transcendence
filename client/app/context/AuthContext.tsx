@@ -44,8 +44,8 @@ export const AuthProvider = ({ children }: {
 
     useEffect(() => {
       const pathname = window.location.href.split("/");
-      
-      if ( pathname[3] === Urls.home || pathname[3] === Urls.gameHistory ||
+
+      if (pathname[3] === Urls.home || pathname[3] === Urls.gameHistory ||
         pathname[3] === Urls.instructions ||
         pathname[3] === Urls.aboutUs)
         return ;
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }: {
                 setLoginError(response);
                 return false;
             }
-           
+
 
             setUser(response);
             return true;

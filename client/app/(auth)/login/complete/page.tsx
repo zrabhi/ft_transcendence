@@ -70,7 +70,7 @@ export default function Complete() {
         "Password and confirm password do not match";
       return false
     }
-    return true; 
+    return true;
   }
 
   const updatingInfos = async  (username : string, password: string ) => {
@@ -89,7 +89,7 @@ export default function Complete() {
     }
       return true;
 };
-  
+
   const errorsChecks  = () =>
   {
     // if (loginError.message)

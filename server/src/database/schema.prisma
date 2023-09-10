@@ -81,7 +81,7 @@ model User {
 
   achievement                     Achievement?
   memberof                        ChannelMembers[] @relation(name:"userToChannel")
-  
+
   ChannelBan                      ChannelBan[]    @relation(name:"userBaned")
 
   created_date                    DateTime        @default(now())
@@ -163,12 +163,12 @@ model Message {
 
   sender_id   String
   sender      User     @relation(fields: [sender_id], references: [id], name: "messageSended", onDelete: Cascade)
-  
+
   reciever_id String
   reciever    User     @relation(fields: [reciever_id], references: [id], name: "messageRecieved", onDelete: Cascade)
 
   content     String
-  
+
   created_at  DateTime @default(now())
 }
 
@@ -181,9 +181,9 @@ model Channel {
   messages          ChannelMessage[] @relation("message")
 
   members           ChannelMembers[]  @relation(name: "channelMembers")
-  
+
   banedUsers        ChannelBan[]      @relation(name: "channelBan")
-  
+
   created_at        DateTime @default(now())
 }
 
@@ -195,9 +195,9 @@ model ChannelMessage {
 
   user_id    String
   user    User    @relation(fields: [user_id], references: [id], name: "MsgSender", onDelete: Cascade)
-  
+
   content    String
-  
+
   created_at DateTime @default(now())
 }
 
@@ -209,7 +209,7 @@ model ChannelMembers{
 
   channelId String
   channel   Channel @relation(fields: [channelId], references:[id], name: "channelMembers", onDelete: Cascade)
-  
+
   role Role
 }
 

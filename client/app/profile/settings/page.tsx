@@ -12,10 +12,9 @@ import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
 
 export default function Settings() {
   // use context to get user data
-  const { getUserData, user, updateUserInfo } = useContext(AuthContext);
+  const { getUserData, user, updateUserInfo, tfaDisabled } = useContext(AuthContext);
 
   // to check if 2fa is enabled or not
-  const [tfaDisabled, setTfaDisabled] = useState(true);
 
   // informations can updated by the user
   const [username, setUsername] = useState(user?.data?.username || '');
@@ -104,7 +103,6 @@ export default function Settings() {
     const response = await postFileRequest(`${baseUrlUsers}/${type}`, formData);
     if (response.error) {
       setError(true);
-      // typeErrorRef.current!.innerHTML = "Invalid file type or format";
       return false;
     }
     return true;

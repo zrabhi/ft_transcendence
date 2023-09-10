@@ -70,6 +70,7 @@ export default function TfaPage() {
       setErrorMsg("");
       await codeVerifitacion(code);
     }
+
   return (
     <div className="tfa-page">
       <div className="content">

@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }: {
 }) => {
 
     const [user, setUser] = useState<User>(userInit);
+    const [tfaDisabled, setTfaDisabled] = useState(true);
     const [loginError, setLoginError] = useState<LoginError>();
     const router = useRouter();
     const [cookie, setCookie] = useCookies(['access_token']);
@@ -37,8 +38,6 @@ export const AuthProvider = ({ children }: {
             router.replace("/login");
             return false;
         }
-        // console.log("response", response);
-
         setUser(response);
     };
 
@@ -55,8 +54,7 @@ export const AuthProvider = ({ children }: {
                 setLoginError(response);
                 return false;
             }
-
-
+            response.tfa === false ? setTfaDisabled(true): setTfaDisabled(false);
             setUser(response);
             return true;
         })();
@@ -116,7 +114,7 @@ export const AuthProvider = ({ children }: {
     },[])
 
     return (
-        <AuthContext.Provider value={{ user: user, loginError: loginError, LogIn, updatingInfos, updateUserInfo}}>
+        <AuthContext.Provider value={{ user: user, loginError: loginError, LogIn, updatingInfos, updateUserInfo, tfaDisabled}}>
             {children}
         </AuthContext.Provider>
     );

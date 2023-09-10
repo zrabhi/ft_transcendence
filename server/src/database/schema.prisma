@@ -90,7 +90,7 @@ model User {
 model UserBlock {
   id             String      @unique @default(uuid())
 
-  blockerId      String      
+  blockerId      String
   blocker        User        @relation(fields: [blockerId], references: [id], name: "userblock")
 
   blockedId      String
@@ -101,13 +101,13 @@ model UserBlock {
 
 model Match {
   id           String      @unique @default(uuid())
-  
+
   winner_id    String
   winner User @relation(fields: [winner_id], references: [id], name: "MatchWon")
 
   loser_id     String
   loser  User @relation(fields: [loser_id], references: [id], name: "MatchLost")
-  
+
   winner_score Int
   loser_score  Int
 

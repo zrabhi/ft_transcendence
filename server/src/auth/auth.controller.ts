@@ -83,9 +83,9 @@ export class AuthController {
     @User() user,
     @Res() response,
   ) {
-    try {      
-      // console.log("user auth", user); 
-      
+    try{
+      // console.log("user auth", user);
+
       const access_token = await this.authService.extractJwtToken(
       {
         id : user.id,
@@ -107,7 +107,7 @@ export class AuthController {
     @User() user,
     @Res() response,
   ) {
-    try {      
+    try {
       const access_token = await this.authService.extractJwtToken(
           {
             id : user.id,
@@ -121,6 +121,7 @@ export class AuthController {
     } catch (err) {
       response.redirect(LOGIN);
     }
+    
   }
 
   @Post('2fa/trun-on')
@@ -132,7 +133,7 @@ export class AuthController {
       request.user,
     );
     // console.log(isCodeValid);
-    
+
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }

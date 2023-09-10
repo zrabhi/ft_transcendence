@@ -9,6 +9,7 @@ import { AuthService } from '../auth/auth.service';
     namespace: 'chat',
   }
 })
+
 export class ChatGateway implements OnGatewayConnection{
   @WebSocketServer()
   server: Server;

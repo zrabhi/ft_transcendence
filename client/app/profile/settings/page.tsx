@@ -2,6 +2,7 @@
 import SideBar from "@/components/LoggedUser/SideBar/SideBar";
 import { useState, useRef, useContext } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { AuthContext } from "@/app/context/AuthContext";
 import "./style.scss";
 import { baseUrlUsers, postCheckRequest, postFileRequest } from "@/app/context/utils/service";
@@ -12,10 +13,10 @@ import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
 export default function Settings() {
   // use context to get user data
   const { getUserData, user, updateUserInfo } = useContext(AuthContext);
-  
+
   // to check if 2fa is enabled or not
   const [tfaDisabled, setTfaDisabled] = useState(true);
-  
+
   // informations can updated by the user
   const [username, setUsername] = useState(user?.data?.username || '');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -38,7 +39,9 @@ export default function Settings() {
   const typeErrorRef = useRef<HTMLParagraphElement>(null);
 
   // those also created by zRabhi for upload images
+  const [image, setImage] = useState<any>();
   const [avatar, setAvatar] = useState<any>();
+  const avatarRef  = useRef<HTMLImageElement>(user.avatar);
   const [cover, setCover] = useState<any>();
 
   // data that will be sent to the server
@@ -109,7 +112,17 @@ export default function Settings() {
 
   const changeAvatar = async (e: any) => {
     setAvatar(e.target.files[0]);
-    // console.log("avaatr ", avatar);
+    const reader = new FileReader();
+    reader.onload = async function(ev)
+    {
+      if (e.target.files && e.target.files[0])
+      {
+        avatarRef.current.src = e.target!.result as string;
+        setImage(ev.target!.result as string);
+        console.log("avatart ref ", avatarRef);
+      }
+    }
+    reader.readAsDataURL(e.target.files[0]);
   };
 
   const changeCover = (e: any) => {
@@ -143,7 +156,7 @@ export default function Settings() {
       } else if (username.length > 20) {
         usernameMsgRef.current!.innerHTML = "Username must be at most 20 characters";
         return false;
-      } 
+      }
     }
     return true;
   }
@@ -159,12 +172,12 @@ export default function Settings() {
 
   const isNothingToUpdate = () => {
     if (
-        username.length === 0 && 
-        newPassword.length === 0 && 
-        confirmNewPassword.length === 0 && 
-        discord.length === 0 && 
-        twitter.length === 0 && 
-        !avatar && 
+        username.length === 0 &&
+        newPassword.length === 0 &&
+        confirmNewPassword.length === 0 &&
+        discord.length === 0 &&
+        twitter.length === 0 &&
+        !avatar &&
         !cover
       ) {
       return true;
@@ -196,9 +209,9 @@ export default function Settings() {
       passwordMatchMsgRef.current!.innerHTML = "Passwords don't match";
       return ;
     }
-    if (avatar) 
+    if (avatar)
       await handleImageUpdate("avatar");
-    if (cover) 
+    if (cover)
       await handleImageUpdate("cover");
     updateMsgRef.current!.innerHTML = "Updated successfully";
     updateMsgRef.current!.classList.remove("error");
@@ -211,15 +224,15 @@ export default function Settings() {
         <div className="settings">
           <Link className='
             btn
-            text-white 
-            text-xl 
-            px-8 py-2 
-            mx-auto 
+            text-white
+            text-xl
+            px-8 py-2
+            mx-auto
             block
             capitalize
             rounded-lg
             my-8
-            ' 
+            '
             href='/profile'>go to profile</Link>
           <div className="setting-box">
             <h3 className="mx-auto">Update your Informations</h3>
@@ -228,10 +241,10 @@ export default function Settings() {
                 <form action="">
                   <div className="input">
                     <label htmlFor="username">username</label>
-                    <input 
-                      type="text" 
-                      name="username" 
-                      id="username" 
+                    <input
+                      type="text"
+                      name="username"
+                      id="username"
                       placeholder='enter your username'
                       autoComplete='off'
                       value={username}
@@ -241,9 +254,9 @@ export default function Settings() {
                   <div ref={usernameMsgRef} className="error"></div>
                   <div className="input">
                     <label htmlFor="current-password">current password</label>
-                    <input 
-                      type="password" name="current-password" 
-                      id="current-password" placeholder='entery your current password' 
+                    <input
+                      type="password" name="current-password"
+                      id="current-password" placeholder='entery your current password'
                       autoComplete='off'
                       onChange={(e) => setCurrentPassword(e.target.value)}
                     />
@@ -277,7 +290,13 @@ export default function Settings() {
                     <h4>update avatar</h4>
                     <div className="upload">
                       <div className="avatar bg-slate-600 text-2xl">
-                        {/* Here insert current image before Update and after update insert new image  */}
+                          <Image
+                             ref={avatarRef}
+                             src={!image? user.avatar : image}
+                             width={200}
+                             height={200}
+                             alt="avatar"
+                          />
                       </div>
                       <div className="input">
                         <input

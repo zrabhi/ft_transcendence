@@ -486,7 +486,16 @@ export class UserService {
       },
     })
   }
-
+  async disable2fa(userId: string)
+  {
+    return await this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        tfa: false,
+        twoFactorAuthenticationSecret: null,
+      },
+    });
+  }
 
   // async getFileUpload(fileTarget, category) {
   //   let userFile: any = undefined;

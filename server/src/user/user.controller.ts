@@ -328,4 +328,12 @@ export class UserController {
   async getUsersRank() {
     return await this.userService.getUsersRank();
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/user/disable2fa')
+  async handleDisable2fa(@Req() request, @Res() response)
+  {
+    await this.userService.disable2fa(request.user.id);
+    response.status(200).json("Two factor authentication disabled successfully");
+  }
 }

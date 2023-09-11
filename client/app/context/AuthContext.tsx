@@ -13,10 +13,18 @@ export const AuthProvider = ({ children }: {
 }) => {
 
     const [user, setUser] = useState<User>(userInit);
+    const [tfaDisabled, setTfaDisabled] = useState(true);
     const [loginError, setLoginError] = useState<LoginError>();
     const router = useRouter();
     const [cookie, setCookie] = useCookies(['access_token']);
     const [currentWindow, setCurrentWindow] = useState("");
+    const Urls = {
+        home: "",
+        gameHistory: "game-history",
+        instructions: "instructions",
+        aboutUs: "about-us",
+        login: "login",};
+
 
     // useEffect(() =>{
     //     if (cookie.access_token === '' || !cookie.access_token) 
@@ -30,25 +38,28 @@ export const AuthProvider = ({ children }: {
             router.replace("/login");
             return false;
         }
-        // console.log("response", response);
-
         setUser(response);
     };
 
     useEffect(() => {
+      const pathname = window.location.href.split("/");
+
+      if (pathname[3] === Urls.home || pathname[3] === Urls.gameHistory ||
+        pathname[3] === Urls.instructions ||
+        pathname[3] === Urls.aboutUs)
+        return ;
         (async () => {
             const response = await getRequest(`${baseUrlUsers}/user`)
             if (response.error) {
                 setLoginError(response);
                 return false;
             }
-            // console.log("response", response);
-
+            response.tfa === false ? setTfaDisabled(true): setTfaDisabled(false);
             setUser(response);
             return true;
         })();
     }, []);
-     
+
 
     const updatingInfos = useCallback(async  (username : string, password: string ) => {
 
@@ -66,13 +77,12 @@ export const AuthProvider = ({ children }: {
 
 
     const updateUserInfo = useCallback(async  (body: any) =>
-    {   
+    {
         const response = await putRequest(`${baseUrlUsers}/users/update`, JSON.stringify(body))
         if (response.error) {
             setLoginError(response);
             return false;
         }
-        // console.log("response", response);
         setUser(response);
         return true;
     }, [])
@@ -91,22 +101,26 @@ export const AuthProvider = ({ children }: {
         return true;
     }, []);
 
-    const HandleClickUpdate = useCallback(async (UpdateInfo: any) => 
+    const handleDisable2fa = async () =>
+  {
+    const response =  await putRequest(`${baseUrlUsers}/user/disable2fa`, "");
+    setTfaDisabled(true);
+    console.log(response);
+  }
+    const HandleClickUpdate = useCallback(async (UpdateInfo: any) =>
     {
         setLoginError(LoginErrorInit);
         const response = await putRequest(`${baseUrlUsers}/users/update`, UpdateInfo);
 
         if (response.error) {
-            setLoginError(response);
             return false;
         }
         console.log("Updated Succefully!!");
-        
         return true;
     },[])
 
     return (
-        <AuthContext.Provider value={{ user: user, loginError: loginError, LogIn, updatingInfos, updateUserInfo}}>
+        <AuthContext.Provider value={{ user: user, loginError: loginError, LogIn, updatingInfos, updateUserInfo, tfaDisabled, handleDisable2fa}}>
             {children}
         </AuthContext.Provider>
     );

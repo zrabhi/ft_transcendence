@@ -84,8 +84,6 @@ export class AuthController {
     @Res() response,
   ) {
     try{
-      // console.log("user auth", user);
-
       const access_token = await this.authService.extractJwtToken(
       {
         id : user.id,
@@ -126,12 +124,12 @@ export class AuthController {
   @Post('2fa/turn-on')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  async turnOnTwoFactorAuthentication(@Req() request, @Body() body) {
+  async turnOnTwoFactorAuthentication(@Req() request, @Body() body, @Res() res) {
     console.log(body);
 
-    const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+    const isCodeValid = await this.authService.isTwoFactorAuthenticationCodeValid(
       body.twoFactorAuthenticationCode,
-      request.user,
+      request.user.id,
     );
     // console.log(isCodeValid);
 
@@ -139,6 +137,7 @@ export class AuthController {
       throw new UnauthorizedException('Wrong authentication code');
     }
     await this.authService.turnOnTwoFactorAuthentication(request.user.id);
+    res.status(200).json("ok")
   }
 
   // @Post('2fa/authenticate')

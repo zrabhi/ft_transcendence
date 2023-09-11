@@ -24,7 +24,7 @@ export default function Complete() {
   const avatar  = useRef<HTMLImageElement>(user.avatar);
   const ErrorRef = useRef<HTMLDivElement>(null);
 
-  const [image, setImage] = useState<any>();
+  const [image, setImage] = useState(user.avatar);
   const [cover, setCover] = useState("http://127.0.0.1:8080/api/cover/pictures/default.png");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -60,7 +60,7 @@ export default function Complete() {
   };
 
   const passwordCheck = () =>
-  {
+  { 
     if (password.length < 8) {
       passwordRef.current!.innerHTML = "Password must be at least 8 characters";
       return false
@@ -70,7 +70,7 @@ export default function Complete() {
         "Password and confirm password do not match";
       return false
     }
-    return true;
+    return true; 
   }
 
   const updatingInfos = async  (username : string, password: string ) => {
@@ -89,11 +89,11 @@ export default function Complete() {
     }
       return true;
 };
-
+  
   const errorsChecks  = () =>
   {
     // if (loginError.message)
-      // console.log(true);
+      // console.log(true);    
   }
 
   const reset = () =>
@@ -163,16 +163,16 @@ export default function Complete() {
                 />
               </div>
               <div ref={passwordRef} className="error pass-error"></div>
-
+              
             </div>
             <div className="profile-box">
               <div className="current-pic">
                 <Image
-                  src={!image ?  user.avatar : image}
+                  src={user.avatar} 
                   ref={avatar}
                   width={200}
                   height={200}
-                  alt="avatar"
+                  alt="avatar" 
                 />
               </div>
               <div className="upload-pic">

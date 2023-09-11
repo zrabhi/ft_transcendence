@@ -23,19 +23,27 @@ export default function SideBar() {
       <Logo />
       <div className="sidebar-nav">
         <div className="to-home">
-          <CgHomeAlt size={24} className="icon" />
+          <Link href='home'>
+            <CgHomeAlt size={24} className="icon" />
+          </Link>
         </div>
         <div className="to-profile">
-          <CgProfile size={24} className="icon" />
+          <Link href='profile'>
+            <CgProfile size={24} className="icon" />
+          </Link>
         </div>
         <div className="to-chat">
-          <PiChatsFill size={24} className="icon" />
+          <Link href='chat'>
+            <PiChatsFill size={24} className="icon" />
+          </Link>
         </div>
         {/* <div className="to-live">
           <PiTelevisionFill size={24} className="icon" />
         </div> */}
         <div className="to-game">
-          <CgGames size={24} className="icon" />
+          <Link href='game'>
+            <CgGames size={24} className="icon" />
+          </Link>
         </div>
       </div>
       <div className="sidebar-footer">

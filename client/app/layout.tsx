@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AuthProvider } from "./context/AuthContext";
 
+
 const metadata: Metadata = {
   title: "Pong Game",
   description: "This is the awesome pong game you can play on it",

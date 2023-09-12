@@ -8,13 +8,19 @@ import { IoMdSettings, IoMdExit } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
 import Link from 'next/link'
+import { baseUrlUsers, putRequest } from "@/app/context/utils/service";
 
 export default function SideBar() {
   const router = useRouter();
   const [cookie, setCookie, remove] = useCookies(['access_token']);
 
   // Login out (updated by zac)
-  const handleSignOut = () => {
+  const statusUpdate = async () =>
+  {
+    const response = await putRequest(`${baseUrlUsers}/user/logout`, "");
+  }
+  const handleSignOut = async () => {
+    await statusUpdate();
     remove('access_token');
     router.replace("/login");
   };

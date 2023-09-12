@@ -56,7 +56,7 @@ export default function TfaPage() {
         setErrorMsg("Please enter Your Authetification code");
         return false;
       }
-      else if (!numberArgs.test(code) || code.length < 6)
+      else if (!numberArgs.test(code) || code.length < 6 || code.length > 6 )
       {
         setError(true);
         setErrorMsg("The Authetification code is 6 Digits ");

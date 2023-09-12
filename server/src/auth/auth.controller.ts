@@ -10,7 +10,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import {Response} from 'Express'
+import { Response, response } from 'Express';
 import { GoogleGuard } from './Guards/GoogleGuard';
 import passport, { Profile } from 'passport';
 import { AuthService } from './auth.service';
@@ -25,11 +25,12 @@ import { JwtAuthGuard } from './Guards/AuthGurad';
 import { SeassionGuard } from './Guards/SeassionGuard';
 import { UserService } from 'src/user/user.service';
 import { AuthGuard } from '@nestjs/passport';
-const HOSTNAME : string = process.env.HOSTNAME;
+import { turnOnGuard } from './Guards/turnOnGurad';
+const HOSTNAME: string = process.env.HOSTNAME;
 const LOGIN: string = process.env.HOSTNAME + process.env.LOGIN;
-const COMPLETE : string = process.env.HOSTNAME + process.env.COMPLETE;
-const PROFILE : string = process.env.HOSTNAME +  process.env.PROFILE;
-
+const COMPLETE: string = process.env.HOSTNAME + process.env.COMPLETE;
+const PROFILE: string = process.env.HOSTNAME + process.env.PROFILE;
+const TFALOGIN: string = process.env.HOSTNAME + process.env.TFALOGIN;
 
 @Controller('/api/auth')
 export class AuthController {
@@ -38,29 +39,23 @@ export class AuthController {
     private userService: UserService,
   ) {}
 
-
   @Post('signin')
   async handleSignin(@Body() body: AuthDto, @Res() response: Response) {
     try {
-
-      const data = await this.authService.signin(body);
-      const {matches, user} = data
-      if (matches)
-      {
-        const  access_token =  await this.authService.extractJwtToken({
+      const data = await this.authService.signin(body,);
+      const { matches, user } = data;
+      if (matches) {
+        const access_token = await this.authService.extractJwtToken({
           id: user.id,
           username: user.username,
           setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
         });
         response.cookie('acces_token', access_token);
         return response.status(200).json(user);
-    }
-    return response.status(400).json({ msg: 'Invalid Credencial' });
-      // response.end("ok");
-      } catch (e) {
-      return response
-        .status(400)
-        .json({ msg: 'Invalid Credencial Error '});
+      }
+      return response.status(400).json({ msg: 'Invalid Credencial' });
+    } catch (e) {
+      return response.status(400).json({ msg: 'Invalid Credencial Error ' });
     }
   }
 
@@ -76,46 +71,40 @@ export class AuthController {
     return;
   }
 
-
   @Get('/42/redirect')
   @UseGuards(FtGurad)
-  async handleRedirectFt(
-    @User() user,
-    @Res() response,
-  ) {
-    try{
-      const access_token = await this.authService.extractJwtToken(
-      {
-        id : user.id,
+  async handleRedirectFt(@User() user, @Res() response) {
+    try {
+      const access_token = await this.authService.extractJwtToken({
+        id: user.id,
         username: user.username,
         setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
-      })
-      response.cookie('access_token', access_token);
+      });
+      response.cookie("access_token", access_token);
       if (!user.password)
           return response.redirect(COMPLETE);
+      else if (user.tfa)
+        return response.redirect(TFALOGIN);
       response.redirect(PROFILE);
     } catch (err) {
-      response.redirect(LOGIN);
+      console.log("errrrr => ",err);
+
     }
   }
 
   @Get('google/redirect')
   @UseGuards(GoogleGuard)
-  async handleRedirectGoogle(
-    @User() user,
-    @Res() response,
-  ) {
+  async handleRedirectGoogle(@User() user, @Res() response : Response) {
     try {
-      const access_token = await this.authService.extractJwtToken(
-          {
-            id : user.id,
-            username: user.username,
-            setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
-          })
+      const access_token = await this.authService.extractJwtToken({
+        id: user.id,
+        username: user.username,
+        setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
+      });
       response.cookie('access_token', access_token);
-      if (!user.password)
-          return response.redirect(COMPLETE);
-      response.redirect(PROFILE);
+      if (!user.password) return response.redirect(COMPLETE);
+      if (user.tfa)
+            return response.redirect(TFALOGIN);
     } catch (err) {
       response.redirect(LOGIN);
     }
@@ -123,47 +112,46 @@ export class AuthController {
 
   @Post('2fa/turn-on')
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
-  async turnOnTwoFactorAuthentication(@Req() request, @Body() body, @Res() res) {
+  @UseGuards(turnOnGuard)
+  async turnOnTwoFactorAuthentication(
+    @Req() request,
+    @Body() body,
+    @Res() res,
+  ) {
     console.log(body);
 
-    const isCodeValid = await this.authService.isTwoFactorAuthenticationCodeValid(
-      body.twoFactorAuthenticationCode,
-      request.user.id,
-    );
-    // console.log(isCodeValid);
+    const isCodeValid =
+      await this.authService.isTwoFactorAuthenticationCodeValid(
+        body.twoFactorAuthenticationCode,
+        request.user.id,
+      );
 
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
     await this.authService.turnOnTwoFactorAuthentication(request.user.id);
-    res.status(200).json("ok")
+    res.status(200).json('ok');
   }
 
-  // @Post('2fa/authenticate')
-  // @HttpCode(200)
+  @Post('2fa/authenticate')
+  @HttpCode(200)
   // @UseGuards(JwtAuthGuard)
-  // async authenticate(@Request() request, @Body() body) {
+  async authenticate(@Req() request, @Res() response, @Body() body) {
+    try {
+      const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+        body.twoFactorAuthenticationCode,
+        request.user.id,
+      );
 
-  //   try {
-  //     const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
-  //       body.twoFactorAuthentication,
-  //       request.user,
-  //     );
-
-  //     if (!isCodeValid) {
-  //       throw new UnauthorizedException('Wrong authentication code');
-  //     }
-
-  //     return this.authService.loginWith2fa(request.user);
-  //   } catch (error) {
-  //   }
-  // }
+      if (!isCodeValid)
+        throw new UnauthorizedException('Wrong authentication code');
+      await this.authService.setTfaVeridied(request.user.id);
+    } catch (error) {}
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post('2fa/generate')
-  async register(@Res() response, @Request() request) {
-
+  async register(@Res() response, @Req() request) {
     const { otpauthUrl } =
       await this.authService.generateTwoFactorAuthenticationSecret(
         request.user,

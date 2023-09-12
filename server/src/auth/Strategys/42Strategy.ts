@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile, VerifyCallback } from 'passport-42';
@@ -13,7 +13,6 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
       clientID: configService.get('FORTYTWO_CLIENT_ID'),
       clientSecret: configService.get('FORTYTWO_CLIENT_SECRET'),
       callbackURL: configService.get('CALL_BACK_URL_42'),
-      passReqToCallback: true,
     });
   }
 
@@ -30,12 +29,11 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
     return userData;
   }
   async validate(
-    request: { session: { accessToken: string } },
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-    done: Function,
-  ) {
+    done: VerifyCallback,
+  ): Promise<any> {
     const user = this.extract42UserData(profile);
     let userCheck = await this.userService.findUserEmail(user.email);
     if (!userCheck)
@@ -43,6 +41,6 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
       const newUser = await this.authService.signup(user);
       userCheck  = await this.userService.findUserById(newUser.id);
     }
-    return done(null, userCheck);
+     done(null, userCheck);
   }
 }

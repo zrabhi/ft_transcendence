@@ -79,6 +79,8 @@ export default function SignIn() {
     e.preventDefault();
     const result = await LogIn(loginInfo);
     if (result) {
+      if (user.tfa){
+        return router.push("/login/tfalogin");}
       router.push("/profile");
     } else return (ErrorRef.current!.innerHTML = "Invalid Credentials");
 

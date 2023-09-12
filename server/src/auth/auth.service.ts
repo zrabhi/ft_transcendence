@@ -51,6 +51,7 @@ export class AuthService {
         access_token =  await this.extractJwtToken({
         id: user.id,
         username: user.username,
+        tfa: user.tfa,
         setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
       });
     }
@@ -91,12 +92,11 @@ export class AuthService {
   }
 
   async extractJwtToken(playload: any) : Promise<string> {
-    try{  
+    try{
       const access_token = await this.jwtService.signAsync(playload);
       return access_token;
     }catch(err){
-      // console.log("ac, access_toces");
-      // console.log(err.message);
+
     }
   }
 
@@ -118,7 +118,6 @@ export class AuthService {
           id: true,
         },
       });
-  
   }
 
   async generateTwoFactorAuthenticationSecret(user) {
@@ -130,7 +129,6 @@ export class AuthService {
     );
 
     await this.setTwoFactorAuthenticationSecret(secret, user.id);
-    
     return {
       secret,
       otpauthUrl,
@@ -156,6 +154,7 @@ export class AuthService {
       },
       data: {
         tfa: true,
+        isTfaVerified:true
       },
     });
   }
@@ -164,7 +163,7 @@ export class AuthService {
     return toDataURL(otpAuthUrl);
   }
 
- async isTwoFactorAuthenticationCodeValid( twoFactorAuthenticationCode: string, useriD: string)
+async isTwoFactorAuthenticationCodeValid( twoFactorAuthenticationCode: string, useriD: string)
     {
       // console.log(twoFactorAuthenticationCode);
       // console.log(user.setTwoFactorAuthenticationSecret);
@@ -181,17 +180,29 @@ export class AuthService {
     }
   }
 
-  // async loginWith2fa(userWithoutPsw)
-  //     {
-  //       const payload = {
-  //         email: userWithoutPsw.id,
-  //         isTwoFactorAuthenticationEnabled: !!userWithoutPsw.isTwoFactorAuthenticationEnabled,
-  //         tfa: true,
-  //       };
+  async setTfaVeridied(userId: string)
+  {
+    await this._prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        isTfaVerified: true,
+      },
+    });
+  }
 
-  //       return {
-  //         id: payload.email,
-  //         access_token: this.jwtService.signAsync(payload),
-  //       };
-  //     }
+  async loginWith2fa(userWithoutPsw)
+      {
+        const payload = {
+          email: userWithoutPsw.id,
+          isTwoFactorAuthenticationEnabled: !!userWithoutPsw.isTwoFactorAuthenticationEnabled,
+          tfa: true,
+        };
+
+        return {
+          id: payload.email,
+          access_token: this.jwtService.signAsync(payload),
+        };
+      }
 }

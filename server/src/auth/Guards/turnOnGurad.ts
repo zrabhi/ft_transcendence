@@ -11,9 +11,11 @@ import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
-export class JwtAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private config: ConfigService, private userService: UserService) {}
-
+export class turnOnGuard implements CanActivate {
+  constructor(
+    private jwtService: JwtService,
+    private config: ConfigService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -32,11 +34,8 @@ export class JwtAuthGuard implements CanActivate {
       // so that we can access it in our route handlers
       console.log(payload);
       request['user'] = payload;
-      const user = await this.userService.findUserById(request.user.id);
-      if (user.tfa && !user.isTfaVerified)
-            throw new UnauthorizedException();
-            
     } catch (err) {
+      response.cookie('access_token', '');
       throw new UnauthorizedException();
     }
     return true;

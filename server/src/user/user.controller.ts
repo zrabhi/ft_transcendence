@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   Param,
@@ -336,4 +337,16 @@ export class UserController {
     await this.userService.disable2fa(request.user.id);
     response.status(200).json("Two factor authentication disabled successfully");
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/user/logout')
+  async  handleLogout(@Req() request, @Res() response)
+  {
+    try{
+      await this.userService.logOut(request.user.id);
+      response.status(200).json("ok")
+    }catch(err)
+    {
+    }
+    }
 }

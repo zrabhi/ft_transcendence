@@ -492,11 +492,22 @@ export class UserService {
       where: { id: userId },
       data: {
         tfa: false,
+        isTfaVerified: false,
         twoFactorAuthenticationSecret: null,
       },
     });
   }
 
+    async  logOut(userId: string)
+    {
+      return await this.prismaService.user.update({
+        where: { id: userId },
+        data: {
+          isTfaVerified: false,
+          status: 'OFFLINE',
+        },
+      });
+    }
   // async getFileUpload(fileTarget, category) {
   //   let userFile: any = undefined;
   //   const assets = await readdir(`./images/${category}`);

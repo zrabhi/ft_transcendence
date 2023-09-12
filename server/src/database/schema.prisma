@@ -54,6 +54,7 @@ model User {
   discordHandler                  String?
   twitterHandler                  String?
   tfa                             Boolean?  @default(false)
+  isTfaVerified                   Boolean?  @default(false)
   twoFactorAuthenticationSecret   String?
 
   channelMessages                 ChannelMessage[] @relation(name: "MsgSender")

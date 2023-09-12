@@ -16,42 +16,55 @@ export const AuthProvider = ({ children }: {
     const [tfaDisabled, setTfaDisabled] = useState(true);
     const [loginError, setLoginError] = useState<LoginError>();
     const router = useRouter();
-    const [cookie, setCookie] = useCookies(['access_token']);
+    const [cookie, setCookie , remove] = useCookies(['access_token']);
     const [currentWindow, setCurrentWindow] = useState("");
+    const[pathname, setPathname] = useState<string>('');
+
+
     const Urls = {
         home: "",
         gameHistory: "game-history",
         instructions: "instructions",
         aboutUs: "about-us",
-        login: "login",};
+        login: "login",
+        tfaLogin :"tfalogin",
+    };
 
 
-    // useEffect(() =>{
-    //     if (cookie.access_token === '' || !cookie.access_token) 
-    //         router.replace("/login");
-    //     },[cookie.access_token, router])
+    useEffect(() =>{
+        if (cookie.access_token === '' || !cookie.access_token) 
+            router.replace("/login");
+        },[])
+const  checkPath = () =>{
+        setPathname('') ;
+        const currentPath = window.location.href.split("/");
+        if (currentPath[4] && currentPath[4] === Urls.tfaLogin)
+              return false;
+        if (currentPath[3] === Urls.home || currentPath[3] === Urls.gameHistory ||
+            currentPath[3] === Urls.instructions ||
+            currentPath[3] === Urls.aboutUs || (currentPath[3] === Urls.login && !currentPath[4]))
+                return false;
+    return true;
+}
 
     const fetchUserData = async () => {
         const response = await getRequest(`${baseUrlUsers}/user`)
         if (response.error) {
             setLoginError(response);
-            router.replace("/login");
             return false;
         }
         setUser(response);
     };
 
     useEffect(() => {
-      const pathname = window.location.href.split("/");
-
-      if (pathname[3] === Urls.home || pathname[3] === Urls.gameHistory ||
-        pathname[3] === Urls.instructions ||
-        pathname[3] === Urls.aboutUs)
-        return ;
-        (async () => {
+        if (!checkPath())
+            return ;
+    (async () => {
             const response = await getRequest(`${baseUrlUsers}/user`)
             if (response.error) {
                 setLoginError(response);
+                remove('access_token');
+                router.push("/login");
                 return false;
             }
             response.tfa === false ? setTfaDisabled(true): setTfaDisabled(false);

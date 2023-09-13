@@ -13,6 +13,7 @@ import Statistics from "@/components/LoggedUser/Profile/Statistics/Statistics";
 import Leaderboard from "@/components/LoggedUser/Profile/Leaderboard/Leaderboard";
 import { baseUrlUsers, getRequest } from "@/app/context/utils/service";
 import { GameHistory } from "@/interfaces/GameHistory";
+import RecentGames from "@/components/LoggedUser/Profile/RecentGames/RecentGames";
 
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
@@ -156,15 +157,7 @@ export default function Profile() {
               <h4>
                 recent activities
               </h4>
-              <div className="recent-games">
-                {
-                  recentGames.slice(0, 3).map((game, index) => (
-                    <div key={index} className=''>
-                      {game.result} the game against {game.against}
-                    </div>
-                  ))
-                }
-              </div>
+              <RecentGames />
             </div>
             <div className="box achievements">
               <h4>Achievements</h4>

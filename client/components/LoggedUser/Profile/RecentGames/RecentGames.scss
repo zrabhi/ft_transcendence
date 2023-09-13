@@ -1,0 +1,27 @@
+@import '@/app/globals.scss';
+
+.recent-games {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	.game {
+		width: fit-content;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 2rem;
+		.img {
+			width: 3rem;
+			height: 3rem;
+			img {
+				width: 100%;
+				height: 100%;
+			}
+		}
+		p {
+			text-transform: capitalize;
+			font-size: 1.1rem;
+			font-style: italic;
+		}
+	}
+}

@@ -10,7 +10,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe({ stopAtFirstError: true }));
   const corsOptions = {
-    origin: , // Replace with your allowed origin
+    origin: "http://127.0.0.1:3000", // Replace with your allowed origin
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   };

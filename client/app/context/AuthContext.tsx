@@ -42,7 +42,7 @@ const  checkPath = () =>{
               return false;
         if (currentPath[3] === Urls.home || currentPath[3] === Urls.gameHistory ||
             currentPath[3] === Urls.instructions ||
-            currentPath[3] === Urls.aboutUs || (currentPath[3] === Urls.login && !currentPath[4]))
+            currentPath[3] === Urls.aboutUs )
                 return false;
     return true;
 }

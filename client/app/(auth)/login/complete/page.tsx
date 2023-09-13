@@ -168,11 +168,11 @@ export default function Complete() {
             <div className="profile-box">
               <div className="current-pic">
                 <Image
-                  src={user.avatar} 
+                  src={user.avatar}
                   ref={avatar}
                   width={200}
                   height={200}
-                  alt="avatar" 
+                  alt="avatar"
                 />
               </div>
               <div className="upload-pic">

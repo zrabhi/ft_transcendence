@@ -117,7 +117,7 @@ export class UserController {
   @Get('/user/achievement')
   async getUserAchievement(@Req() req, @Res() res) {
     const achievements = await this.userService.achievementById(req.user.id); 
-    console.log(achievements);
+    // console.log(achievements);
 
     res.status(200).json(achievements);
   }
@@ -305,7 +305,7 @@ export class UserController {
       return res.status(200).json({ msg: 'Password Correct' });
       // passwrod check for you if if matches return true else in doesn not matche
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
   /// --------------------------------------------------Ranking--------------------------------------------------

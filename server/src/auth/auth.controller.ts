@@ -87,7 +87,7 @@ export class AuthController {
         return response.redirect(TFALOGIN);
       response.redirect(PROFILE);
     } catch (err) {
-      console.log("errrrr => ",err);
+      // console.log("errrrr => ",err);
 
     }
   }
@@ -118,7 +118,7 @@ export class AuthController {
     @Body() body,
     @Res() res,
   ) {
-    console.log(body);
+    // console.log(body);
 
     const isCodeValid =
       await this.authService.isTwoFactorAuthenticationCodeValid(

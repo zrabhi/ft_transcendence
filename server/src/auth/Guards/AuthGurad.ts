@@ -30,7 +30,7 @@ export class JwtAuthGuard implements CanActivate {
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      console.log(payload);
+      // console.log(payload);
       request['user'] = payload;
       const user = await this.userService.findUserById(request.user.id);
       if (user.tfa && !user.isTfaVerified)

@@ -10,9 +10,9 @@ import Avatar from '@/public/images/DefaultAvatar.jpg'
 export default function ProfileCard(user: any) {
 
   const handleImageClick = () => {
-    console.log('image clicked')
-    console.log(user.data && user.data.avatar);
-    console.log(`usernmea : ${user.data && user.data.username}}`);
+    // console.log('image clicked')
+    // console.log(user.data && user.data.avatar);
+    // console.log(`usernmea : ${user.data && user.data.username}}`);
   }
 
   return (

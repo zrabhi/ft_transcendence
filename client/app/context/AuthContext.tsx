@@ -118,7 +118,7 @@ const  checkPath = () =>{
   {
     const response =  await putRequest(`${baseUrlUsers}/user/disable2fa`, "");
     setTfaDisabled(true);
-    console.log(response);
+    // console.log(response);
   }
     const HandleClickUpdate = useCallback(async (UpdateInfo: any) =>
     {
@@ -128,7 +128,7 @@ const  checkPath = () =>{
         if (response.error) {
             return false;
         }
-        console.log("Updated Succefully!!");
+        // console.log("Updated Succefully!!");
         return true;
     },[])
 

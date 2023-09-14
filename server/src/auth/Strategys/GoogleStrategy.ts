@@ -41,6 +41,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     done: VerifyCallback,
   ): Promise<any> {
     {
+
       const user = this.extractGoogleUserData(profile);
       let userCheck = await this.userService.findUserEmail(user.email);
       if (!userCheck) {
@@ -48,6 +49,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         const newUser = await this.authService.signup(user);
         userCheck = await this.userService.findUserById(newUser.id);
       }
+      console.log("im heree");
+
       done(null, userCheck);
     }
   }

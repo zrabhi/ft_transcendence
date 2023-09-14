@@ -227,10 +227,10 @@ export class UserController {
   @Put('users/update')
   async HandleUpdate(@Body() user: PutUserDto, @Res() res, @Req() req) {
     const User = await this.userService.UpdateAllInfos(user, req.user.id);
-    return user;
-    // res.status(200).json({msg:"Ok"});
+    if (User)
+      return res.status(200).json(user);
+    res.status(400).json("Please Chose Another Username");
   }
-  // avatar imagesss
 
   @UseGuards(JwtAuthGuard)
   @Post('avatar')
@@ -250,7 +250,6 @@ export class UserController {
       return response.status(200).json(file);
     } catch (err) {
       response.status(400).json({ message: err.message });
-      // console.log('image rro', err.message);
       throw new err();
     }
   }
@@ -283,17 +282,22 @@ export class UserController {
   // @UseGuards(JwtAuthGuard)
   @Get('cover/pictures/:filename')
   async getCover(@Param('filename') filename: string, @Res() res) {
-    // if (await this.userService.getFileUpload(filename, 'covers'))
-    //   res.sendFile(filename, { root: './images/covers' });
-    res.sendFile(filename, { root: './images/covers' });
+    try{
+      res.sendFile(filename, { root: './images/covers' });
+    }catch(err)
+    {
+      res.status(400).json("avatar not found");
+    }
   }
 
   @Get('avatar/pictures/:filename')
   async getAvatar(@Param('filename') filename: string, @Res() res) {
-    // if (await this.userService.getFileUpload(filename, 'avatars'))
-    //   res.sendFile(filename, { root: './images/avatars' });
-
+    try{
     res.sendFile(filename, { root: './images/avatars' });
+    }catch(err)
+    {
+      res.status(400).json("avatar not found");
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -303,7 +307,6 @@ export class UserController {
       const checker = await this.userService.passWordCheck(body, req.user.id);
       if (!checker) return res.status(400).json({ msg: 'Incorrect Password' });
       return res.status(200).json({ msg: 'Password Correct' });
-      // passwrod check for you if if matches return true else in doesn not matche
     } catch (err) {
       // console.log(err);
     }

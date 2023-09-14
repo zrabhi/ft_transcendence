@@ -29,7 +29,6 @@ export default function Profile() {
     console.log(userAchievements);
     setAchievements(userAchievements);
     console.log(achievements);
-    
   } 
 
   const fetchGamesHistory = async () => {

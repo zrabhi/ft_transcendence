@@ -124,7 +124,7 @@ export class AuthService {
     const secret = authenticator.generateSecret();
     const otpauthUrl = authenticator.keyuri(
       user.id,
-      'ft_transcendence',
+      'ft_transcendence@' + user.username,
       secret,
     );
 

@@ -10,7 +10,7 @@ export class PutUserDto{
     cover: string
     
     @MaxLength(20, {message: " The Username is too High."})
-    @MinLength(6, {message: " The Username is too low."})
+    @MinLength(4, {message: " The Username is too low."})
     @IsNotEmpty()
     username:string
 

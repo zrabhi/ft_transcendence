@@ -16,7 +16,7 @@ import { AuthContext } from "@/app/context/AuthContext";
 import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
 
 export default function Complete() {
-  const { user } = useContext(AuthContext);
+  const { user, fetchUserData} = useContext(AuthContext);
   const [loginError, setLoginError] = useState<LoginError>(LoginErrorInit);
   const usernameRef = useRef<HTMLDivElement>(null);
   const passwordRef = useRef<HTMLDivElement>(null);
@@ -87,7 +87,8 @@ export default function Complete() {
             passwordRef.current!.innerHTML = "Password is not strong enough";
         return false;
     }
-      return true;
+    await fetchUserData();
+    return true;
 };
 
   const errorsChecks  = () =>

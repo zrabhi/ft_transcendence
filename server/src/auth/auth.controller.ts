@@ -19,13 +19,12 @@ import { AuthDto } from './dto/auth.dto';
 import { User } from './decorator/user-decorator';
 import { FtGurad } from './Guards/42Gurad';
 import { GithubGuard } from './Guards/GithubGuard';
-import { profile } from 'console';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtAuthGuard } from './Guards/AuthGurad';
 import { SeassionGuard } from './Guards/SeassionGuard';
 import { UserService } from 'src/user/user.service';
-import { AuthGuard } from '@nestjs/passport';
 import { turnOnGuard } from './Guards/turnOnGurad';
+
 const HOSTNAME: string = process.env.HOSTNAME;
 const LOGIN: string = process.env.HOSTNAME + process.env.LOGIN;
 const COMPLETE: string = process.env.HOSTNAME + process.env.COMPLETE;
@@ -42,7 +41,7 @@ export class AuthController {
   @Post('signin')
   async handleSignin(@Body() body: AuthDto, @Res() response: Response) {
     try {
-      const data = await this.authService.signin(body,);
+      const data = await this.authService.signin(body);
       const { matches, user } = data;
       if (matches) {
         const access_token = await this.authService.extractJwtToken({
@@ -80,21 +79,18 @@ export class AuthController {
         username: user.username,
         setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
       });
-      response.cookie("access_token", access_token);
-      if (!user.password)
-          return response.redirect(COMPLETE);
-      else if (user.tfa)
-        return response.redirect(TFALOGIN);
-      response.redirect(PROFILE);
+      response.cookie('access_token', access_token);
+      if (!user.password) return response.redirect(COMPLETE);
+      else if (user.tfa) return response.redirect(TFALOGIN);
+      return response.redirect(PROFILE);
     } catch (err) {
       // console.log("errrrr => ",err);
-
     }
   }
 
   @Get('google/redirect')
   @UseGuards(GoogleGuard)
-  async handleRedirectGoogle(@User() user, @Res() response : Response) {
+  async handleRedirectGoogle(@User() user, @Res() response: Response) {
     try {
       const access_token = await this.authService.extractJwtToken({
         id: user.id,
@@ -103,8 +99,8 @@ export class AuthController {
       });
       response.cookie('access_token', access_token);
       if (!user.password) return response.redirect(COMPLETE);
-      if (user.tfa)
-            return response.redirect(TFALOGIN);
+      if (user.tfa) return response.redirect(TFALOGIN);
+      return response.redirect(PROFILE);
     } catch (err) {
       response.redirect(LOGIN);
     }
@@ -118,24 +114,21 @@ export class AuthController {
     @Body() body,
     @Res() res,
   ) {
-    // console.log(body);
-
     const isCodeValid =
       await this.authService.isTwoFactorAuthenticationCodeValid(
         body.twoFactorAuthenticationCode,
         request.user.id,
       );
 
-    if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
-    }
+    if (!isCodeValid)
+      return res.status(400).json('Wrong authentication code');
     await this.authService.turnOnTwoFactorAuthentication(request.user.id);
     res.status(200).json('ok');
   }
 
   @Post('2fa/authenticate')
   @HttpCode(200)
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(turnOnGuard)
   async authenticate(@Req() request, @Res() response, @Body() body) {
     try {
       const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
@@ -144,7 +137,7 @@ export class AuthController {
       );
 
       if (!isCodeValid)
-        throw new UnauthorizedException('Wrong authentication code');
+        return response.status(400).json('Wrong authentication code');
       await this.authService.setTfaVeridied(request.user.id);
     } catch (error) {}
   }

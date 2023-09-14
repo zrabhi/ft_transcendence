@@ -79,7 +79,7 @@ export default function Complete() {
         `${baseUrlUsers}/user`,
         JSON.stringify({ username, password })
     );
-    if (response.error) 
+    if (response.error)
     {
         if (response.message === 'Username you chosed already exist')
             usernameRef.current!.innerHTML = response.message;
@@ -89,11 +89,11 @@ export default function Complete() {
     }
       return true;
 };
-  
+
   const errorsChecks  = () =>
   {
     // if (loginError.message)
-      // console.log(true);    
+      // console.log(true);
   }
 
   const reset = () =>

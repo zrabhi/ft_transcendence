@@ -4,6 +4,7 @@ import './style.scss';
 import Avatar1 from "@/public/images/avatar1.jpeg";
 import Image from 'next/image';
 import { baseUrlAuth, getQrCode, postRequest } from '@/app/context/utils/service';
+import { useRouter } from 'next/navigation';
 
 
 export default function TfaPage() {
@@ -14,6 +15,7 @@ export default function TfaPage() {
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [successMsg, setSuccessMsg] = useState<string>('');
   const [success, setSuccess] = useState<boolean>(false);
+  const router = useRouter();
 
   useEffect(() =>{
     (async () =>
@@ -77,6 +79,7 @@ export default function TfaPage() {
       {
         setSuccess(true);
         setSuccessMsg("successfully authenticated");
+        router.push("/profile");
       }
     }
 

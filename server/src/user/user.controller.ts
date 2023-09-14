@@ -329,6 +329,7 @@ export class UserController {
   async getUsersRank() {
     return await this.userService.getUsersRank();
   }
+    /// --------------------------------------------------Logout && disable2fa--------------------------------------------------
 
   @UseGuards(JwtAuthGuard)
   @Put('/user/disable2fa')

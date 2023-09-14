@@ -34,7 +34,7 @@ export default function Profile() {
 
   const fetchGamesHistory = async () => {
     const userGamesHistory = await getRequest(`${baseUrlUsers}/user/matches`);
-    console.log("history ", userGamesHistory);
+    // console.log("history ", userGamesHistory);
     setGamesHistory(userGamesHistory);  
   }
   useEffect( () =>

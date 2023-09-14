@@ -117,7 +117,7 @@ export default function Settings() {
       {
         avatarRef.current.src = e.target!.result as string;
         setImage(ev.target!.result as string);
-        console.log("avatart ref ", avatarRef);
+        // console.log("avatart ref ", avatarRef);
       }
     }
     reader.readAsDataURL(e.target.files[0]);
@@ -132,7 +132,7 @@ export default function Settings() {
         `${baseUrlUsers}/user/checkPassword`,
         JSON.stringify({ password })
       );
-      console.log(response);
+      // console.log(response);
 
       if (response.error) {
         setError(true);
@@ -193,9 +193,9 @@ export default function Settings() {
       updateMsgRef.current!.innerHTML = "Nothing to update";
       return ;
     }
-     const access = await checkCurrentPassword(currentPassword)
-     if (!access){
-      currPasswordRef.current!.innerHTML= "Invalid current password";
+    const access = await checkCurrentPassword(currentPassword)
+    if (!access && currPasswordRef.current){
+      currPasswordRef.current.innerHTML = "Invalid current password";
       return ;
     }
     if (!isValidUsername(username)) {

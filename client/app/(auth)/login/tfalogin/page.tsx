@@ -19,7 +19,7 @@ export default function TfaPage() {
     const handleOnChange = (e: any) =>
     {
       setCode(e.target.value);
-      console.log(code);
+      // console.log(code);
     }
     const inputVerify = () =>
     {
@@ -43,13 +43,13 @@ export default function TfaPage() {
     {
       setError(false);
       const response = await postRequest(`${baseUrlAuth}/2fa/turn-on`, JSON.stringify({twoFactorAuthenticationCode: code}));
-      console.log(response);
+      // console.log(response);
       if (response.error)
       {
         setError(true);
         setErrorMsg(response.message);
-        console.log(error);
-        console.log(errorMsg);
+        (error);
+        // console.log(errorMsg);
         return false;
       }
       return true;

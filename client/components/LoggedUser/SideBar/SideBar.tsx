@@ -22,7 +22,7 @@ export default function SideBar() {
   const handleSignOut = async () => {
     await statusUpdate();
     remove('access_token');
-    router.replace("/login");
+    router.push("/login");
   };
   return (
     <div className="sidebar">

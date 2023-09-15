@@ -14,6 +14,7 @@ import Leaderboard from "@/components/LoggedUser/Profile/Leaderboard/Leaderboard
 import { baseUrlUsers, getRequest } from "@/app/context/utils/service";
 import { GameHistory } from "@/interfaces/GameHistory";
 import RecentGames from "@/components/LoggedUser/Profile/RecentGames/RecentGames";
+import { Friends } from "@/interfaces/Friends";
 
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
@@ -21,6 +22,7 @@ export default function Profile() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [statistics, setStatistics] = useState<UserStatistics[]>([]);
   const [gameHistory, setGamesHistory] = useState<GameHistory[]>([])
+  const [FriendsList, setFriendsList] = useState<Friends[]>([]);
 
   // ZAC here you will fetch the data from the server and set it in state
   const fetchAchievements = async () =>
@@ -29,21 +31,31 @@ export default function Profile() {
     console.log(userAchievements);
     setAchievements(userAchievements);
     console.log(achievements);
-  } 
+  }
 
+  const fetchFriends = async () =>
+  {
+    const Friends = await getRequest(`${baseUrlUsers}/user/friends`);
+    console.log(Friends);
+    setFriendsList(Friends);
+    console.log(Friends[0]);
+
+
+  }
   const fetchGamesHistory = async () => {
     const userGamesHistory = await getRequest(`${baseUrlUsers}/user/matches`);
     // console.log("history ", userGamesHistory);
-    setGamesHistory(userGamesHistory);  
+    setGamesHistory(userGamesHistory);
   }
   useEffect( () =>
   {
     (async () => {
-      /// if there is no achievement the return is null 
+      /// if there is no achievement the return is null
           await fetchAchievements();
-      /// If there is no gameHistory the return is an empty array 
+      /// If there is no gameHistory the return is an empty array
           await fetchGamesHistory();
-
+          // if there is no friends the return is an empty arraye
+          await fetchFriends();
     })()
   },[])
 

@@ -116,7 +116,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('/user/achievement')
   async getUserAchievement(@Req() req, @Res() res) {
-    const achievements = await this.userService.achievementById(req.user.id); 
+    const achievements = await this.userService.achievementById(req.user.id);
     // console.log(achievements);
 
     res.status(200).json(achievements);
@@ -227,9 +227,8 @@ export class UserController {
   @Put('users/update')
   async HandleUpdate(@Body() user: PutUserDto, @Res() res, @Req() req) {
     const User = await this.userService.UpdateAllInfos(user, req.user.id);
-    if (User)
-      return res.status(200).json(user);
-    res.status(400).json("Please Chose Another Username");
+    if (User) return res.status(200).json(user);
+    res.status(400).json('Please Chose Another Username');
   }
 
   @UseGuards(JwtAuthGuard)
@@ -282,21 +281,19 @@ export class UserController {
   // @UseGuards(JwtAuthGuard)
   @Get('cover/pictures/:filename')
   async getCover(@Param('filename') filename: string, @Res() res) {
-    try{
+    try {
       res.sendFile(filename, { root: './images/covers' });
-    }catch(err)
-    {
-      res.status(400).json("avatar not found");
+    } catch (err) {
+      res.status(400).json('avatar not found');
     }
   }
 
   @Get('avatar/pictures/:filename')
   async getAvatar(@Param('filename') filename: string, @Res() res) {
-    try{
-    res.sendFile(filename, { root: './images/avatars' });
-    }catch(err)
-    {
-      res.status(400).json("avatar not found");
+    try {
+      res.sendFile(filename, { root: './images/avatars' });
+    } catch (err) {
+      res.status(400).json('avatar not found');
     }
   }
 
@@ -332,25 +329,51 @@ export class UserController {
   async getUsersRank() {
     return await this.userService.getUsersRank();
   }
-    /// --------------------------------------------------Logout && disable2fa--------------------------------------------------
+  /// --------------------------------------------------Logout && disable2fa--------------------------------------------------
 
   @UseGuards(JwtAuthGuard)
   @Put('/user/disable2fa')
-  async handleDisable2fa(@Req() request, @Res() response)
-  {
+  async handleDisable2fa(@Req() request, @Res() response) {
     await this.userService.disable2fa(request.user.id);
-    response.status(200).json("Two factor authentication disabled successfully");
+    response
+      .status(200)
+      .json('Two factor authentication disabled successfully');
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('/user/logout')
-  async  handleLogout(@Req() request, @Res() response)
+  async handleLogout(@Req() request, @Res() response) {
+    try {
+      await this.userService.logOut(request.user.id);
+      response.status(200).json('ok');
+    } catch (err) {}
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('user/friends')
+  async handleGetFriends(@Req() req, @Res() res) {
+    try {
+      const friends = await this.userService.getUserFriends(
+        req.user.id
+      );
+      console.log(friends);
+      const friendsList = [];
+      for (const friend of friends) {
+        const user = await this.userService.findUserById(friend.friend_id);
+        friendsList.push(user);
+      }
+      res.status(200).json(friendsList);
+    } catch (err) {
+      console.log('eerorr in get frirends  ', err);
+    }
+  }
+  @Get('user/friends/:username')
+  async getUserFriendsByName(@Param('user_id') user_id: string, @Res() res)
   {
     try{
-      await this.userService.logOut(request.user.id);
-      response.status(200).json("ok")
+        //TODO: GET USER FRIENDS WITH THEIR NAME
     }catch(err)
     {
+
     }
-    }
+  }
 }

@@ -7,7 +7,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Achievement, Match, Prisma, State, User } from '@prisma/client';
+import { Achievement, Friendship, Match, Prisma, State, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateMatchDto } from './dto/create-match.dto';
@@ -158,6 +158,13 @@ export class UserService {
       orderBy: {
         played_at: 'desc',
       },
+    });
+  }
+
+  async getUserFriends(user_id: string): Promise<Friendship[]>
+  {
+    return await this.prismaService.friendship.findMany({
+      where: { user_id: user_id},
     });
   }
 

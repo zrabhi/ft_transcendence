@@ -203,15 +203,12 @@ export default function Settings() {
       return;
     }
     const access = await checkCurrentPassword(currentPassword);
-    if (!access) {
+    if (!access)
       return;
-    }
-    if (!isValidUsername(username)) {
+    if (!isValidUsername(username))
       return;
-    }
-    if (newPassword.length && !isStrongPassword(newPassword)) {
+    if (newPassword.length && !isStrongPassword(newPassword))
       return;
-    }
     if (newPassword !== confirmNewPassword) {
       setError(true);
       setPasswordMatchMsg("Passwords don't match");

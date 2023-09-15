@@ -7,6 +7,7 @@ import { useCookies } from "react-cookie";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AuthProvider } from "./context/AuthContext";
+import { CookiesProvider } from 'react-cookie';
 
 
 const metadata: Metadata = {

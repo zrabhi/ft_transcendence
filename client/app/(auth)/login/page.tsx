@@ -31,12 +31,7 @@ export default function SignIn() {
     email: "",
     password: "",
   });
-  // const [user, setUser] = useState(null);
   const [isLoginLoading, setLoginLoading] = useState(false);
-  // const [loginError, setLoginError] = useState({
-  //   error: false,
-  //   message: "",
-  // });
   const router = useRouter();
   const ErrorRef = useRef<HTMLDivElement>(null);
 
@@ -79,6 +74,7 @@ export default function SignIn() {
     e.preventDefault();
     const result = await LogIn(loginInfo);
     if (result) {
+      console.log(user.tfa);
       if (user.tfa){
         return router.push("/login/tfalogin");}
       router.push("/profile");
@@ -153,10 +149,10 @@ export default function SignIn() {
                 </div>
 
                 <div className="checkbox">
-                  <input 
-                    type="checkbox" 
-                    name="terms" 
-                    id="news" 
+                  <input
+                    type="checkbox"
+                    name="terms"
+                    id="news"
                     value="news"
                     autoComplete="off"
                   />

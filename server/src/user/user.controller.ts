@@ -359,7 +359,11 @@ export class UserController {
       const friendsList = [];
       for (const friend of friends) {
         const user = await this.userService.findUserById(friend.friend_id);
-        friendsList.push(user);
+        friendsList.push({
+          usernama: user.username,
+          status: user.status,
+          avatar: user.avatar,
+        })
       }
       res.status(200).json(friendsList);
     } catch (err) {

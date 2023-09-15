@@ -28,17 +28,13 @@ export default function Profile() {
   const fetchAchievements = async () =>
   {
     const userAchievements = await getRequest(`${baseUrlUsers}/user/achievement`);
-    console.log(userAchievements);
     setAchievements(userAchievements);
-    console.log(achievements);
   }
 
   const fetchFriends = async () =>
   {
     const Friends = await getRequest(`${baseUrlUsers}/user/friends`);
-    console.log(Friends);
     setFriendsList(Friends);
-    console.log(Friends[0]);
 
 
   }

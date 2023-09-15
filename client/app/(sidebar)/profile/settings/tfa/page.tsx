@@ -1,13 +1,15 @@
 'use client';
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import './style.scss';
 import Avatar1 from "@/public/images/avatar1.jpeg";
 import Image from 'next/image';
 import { baseUrlAuth, getQrCode, postRequest } from '@/app/context/utils/service';
 import { useRouter } from 'next/navigation';
+import { AuthContext } from '@/app/context/AuthContext';
 
 
 export default function TfaPage() {
+  const {fetchUserData } = useContext(AuthContext);
   const [qrCodeImage, setQrCodeImage] = useState<any>()
   const [isEnabeld , setIsEnabeld] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
@@ -31,13 +33,10 @@ export default function TfaPage() {
     {
       setError(false);
       const response = await postRequest(`${baseUrlAuth}/2fa/turn-on`, JSON.stringify({twoFactorAuthenticationCode: code}));
-      // console.log(response);
       if (response.error)
       {
         setError(true);
         setErrorMsg(response.message);
-        // console.log(error);
-        // console.log(errorMsg);
         return false;
       }
       return true;
@@ -46,7 +45,6 @@ export default function TfaPage() {
     const handleOnChange = (e: any) =>
     {
       setCode(e.target.value);
-      // console.log(code);
     }
 
     const inputVerify = () =>
@@ -61,7 +59,7 @@ export default function TfaPage() {
       else if (!numberArgs.test(code) || code.length < 6 || code.length > 6 )
       {
         setError(true);
-        setErrorMsg("The Authetification code is 6 Digits ");
+        setErrorMsg("The Authetification code is 6 Digits");
         return false;
       }
       return true
@@ -79,7 +77,7 @@ export default function TfaPage() {
       {
         setSuccess(true);
         setSuccessMsg("successfully authenticated");
-        router.push("/profile");
+        router.replace("/profile/settings");
       }
     }
 

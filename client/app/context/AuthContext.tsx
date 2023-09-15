@@ -130,7 +130,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const handleDisable2fa = async () => {
     const response = await putRequest(`${baseUrlUsers}/user/disable2fa`, "");
     setTfaDisabled(true);
-    // console.log(response);
   };
   const HandleClickUpdate = useCallback(async (UpdateInfo: any) => {
     setLoginError(LoginErrorInit);
@@ -142,7 +141,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (response.error) {
       return false;
     }
-    // console.log("Updated Succefully!!");
     return true;
   }, []);
 

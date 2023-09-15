@@ -16,11 +16,16 @@ import { AuthContext } from "@/app/context/AuthContext";
 import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
 
 export default function Complete() {
+  // replacing
   const { user, fetchUserData} = useContext(AuthContext);
   const [loginError, setLoginError] = useState<LoginError>(LoginErrorInit);
   const usernameRef = useRef<HTMLDivElement>(null);
   const passwordRef = useRef<HTMLDivElement>(null);
 
+  // errors usestate
+  const [usernameMsg, setUsernameMsg] = useState<string>('');
+  const [passwordMsg, setPasswordMsg] = useState<string>('');
+  const [error, setError] = useState<boolean>(false);
   const avatar  = useRef<HTMLImageElement>(user.avatar);
   const ErrorRef = useRef<HTMLDivElement>(null);
 
@@ -60,17 +65,18 @@ export default function Complete() {
   };
 
   const passwordCheck = () =>
-  { 
+  {
     if (password.length < 8) {
-      passwordRef.current!.innerHTML = "Password must be at least 8 characters";
+      setError(true);
+      setPasswordMsg("Password must be at least 8 characters");
       return false
     }
     if (password !== confirmPassword) {
-      passwordRef.current!.innerHTML =
-        "Password and confirm password do not match";
+      setError(true)
+      setPasswordMsg("Password and confirm password do not match");
       return false
     }
-    return true; 
+    return true;
   }
 
   const updatingInfos = async  (username : string, password: string ) => {
@@ -81,34 +87,30 @@ export default function Complete() {
     );
     if (response.error)
     {
+      setError(true);
         if (response.message === 'Username you chosed already exist')
-            usernameRef.current!.innerHTML = response.message;
+          setUsernameMsg(response.message);
         else
-            passwordRef.current!.innerHTML = "Password is not strong enough";
+            setPasswordMsg("Password is not strong enough");
         return false;
     }
     await fetchUserData();
     return true;
 };
 
-  const errorsChecks  = () =>
-  {
-    // if (loginError.message)
-      // console.log(true);
-  }
-
   const reset = () =>
   {
-    usernameRef.current!.innerHTML = "";
-    passwordRef.current!.innerHTML = "";
+    setUsernameMsg("");
+    setPasswordMsg("");
+    setError(false);
   }
 
   const handleSubmitClick = async (e: any) => {
-    // console.log(avatar);
     e.preventDefault();
     reset();
     if (username.length < 6) {
-      usernameRef.current!.innerHTML = "Username must be at least 6 characters";
+      setError(true);
+      setUsernameMsg("Username must be at least 6 characters");
       return;
     }
     if (!passwordCheck())
@@ -140,7 +142,7 @@ export default function Complete() {
                   autoComplete="off"
                 />
               </div>
-              <div ref={usernameRef} className="error username-error"></div>
+              {error ? (<div className="error username-error">{usernameMsg}</div>) : ""}
               <div className="password">
                 <label htmlFor="password">password</label>
                 <input
@@ -163,8 +165,7 @@ export default function Complete() {
                   placeholder="Confirm Password"
                 />
               </div>
-              <div ref={passwordRef} className="error pass-error"></div>
-              
+              {error ? (<div  className="error pass-error">{passwordMsg}</div>) : ""}
             </div>
             <div className="profile-box">
               <div className="current-pic">

@@ -30,7 +30,6 @@ export default function Complete() {
   const ErrorRef = useRef<HTMLDivElement>(null);
 
   const [image, setImage] = useState(user.avatar);
-  const [cover, setCover] = useState("http://127.0.0.1:8080/api/cover/pictures/default.png");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -170,7 +169,7 @@ export default function Complete() {
             <div className="profile-box">
               <div className="current-pic">
                 <Image
-                  src={user.avatar}
+                  src={!image ? user.avatar: image}
                   ref={avatar}
                   width={200}
                   height={200}

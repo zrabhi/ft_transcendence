@@ -56,7 +56,6 @@ export default function SignIn() {
       email: e.target.value,
     }));
   };
-
   const handlePasswordChange = (e: any) => {
     setLoginInfo((prevData) => ({
       ...loginInfo,

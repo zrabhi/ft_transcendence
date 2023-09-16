@@ -7,7 +7,14 @@ import {
   Param,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Achievement, Friendship, Match, Prisma, State, User } from '@prisma/client';
+import {
+  Achievement,
+  Friendship,
+  Match,
+  Prisma,
+  State,
+  User,
+} from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateMatchDto } from './dto/create-match.dto';
@@ -110,15 +117,7 @@ export class UserService {
           username: username,
         },
       });
-    } catch (error) {
-      // throw new HttpException(
-      //   {
-      //     status: HttpStatus.NOT_FOUND,
-      //     error: `This username :${username} is not found.`,
-      //   },
-      //   HttpStatus.NOT_FOUND,
-      // );
-    }
+    } catch (error) {}
   }
 
   /// find user witth unique email
@@ -161,10 +160,16 @@ export class UserService {
     });
   }
 
-  async getUserFriends(user_id: string): Promise<Friendship[]>
-  {
+  async getUserFriends(user_id: string): Promise<Friendship[]> {
     return await this.prismaService.friendship.findMany({
-      where: { user_id: user_id},
+      where: { user_id: user_id },
+    });
+  }
+
+  async getUserFriendsByName(user_name: string): Promise<Friendship[]> {
+    const user = await this.findUserName(user_name);
+    return await this.prismaService.friendship.findMany({
+      where: { user_id: user.id },
     });
   }
 

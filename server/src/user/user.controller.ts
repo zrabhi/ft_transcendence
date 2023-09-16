@@ -52,9 +52,6 @@ export const strorageAvatar = {
       const filename: string =
         path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
       const extension: string = path.parse(file.originalname).ext;
-
-      // console.log(file);
-
       cb(null, `${filename}${extension}`);
     },
   }),
@@ -79,7 +76,6 @@ export class UserController {
   async handleNickNameCheck(@Req() req, @Res() res) {
     try {
     } catch (err) {
-      // console.log(err);
     }
   }
 
@@ -117,7 +113,6 @@ export class UserController {
   @Get('/user/achievement')
   async getUserAchievement(@Req() req, @Res() res) {
     const achievements = await this.userService.achievementById(req.user.id);
-    // console.log(achievements);
 
     res.status(200).json(achievements);
   }
@@ -219,7 +214,7 @@ export class UserController {
       await this.userService.updateUser(user, req);
       return response.status(200).json('Information updated successfully');
     } catch (err) {
-      return response.status(401).json('Username you chosed already exist');
+      return response.status(400).json('Username you chosed already exist');
     }
   }
 
@@ -352,32 +347,36 @@ export class UserController {
   @Get('user/friends')
   async handleGetFriends(@Req() req, @Res() res) {
     try {
-      const friends = await this.userService.getUserFriends(
-        req.user.id
-      );
-      console.log(friends);
+      const friends = await this.userService.getUserFriends(req.user.id);
       const friendsList = [];
       for (const friend of friends) {
         const user = await this.userService.findUserById(friend.friend_id);
         friendsList.push({
-          usernama: user.username,
+          username: user.username,
           status: user.status,
           avatar: user.avatar,
-        })
+        });
       }
       res.status(200).json(friendsList);
     } catch (err) {
-      console.log('eerorr in get frirends  ', err);
+      console.log('error in get friends  ', err);
     }
   }
-  @Get('user/friends/:username')
-  async getUserFriendsByName(@Param('user_id') user_id: string, @Res() res)
-  {
-    try{
-        //TODO: GET USER FRIENDS WITH THEIR NAME
-    }catch(err)
-    {
 
-    }
+  @Get('user/friends/:username')
+  async getUserFriendsByName(@Param('username') user_name: string, @Res() res) {
+    try {
+      const friends = await this.userService.getUserFriendsByName(user_name);
+      const friendsList = [];
+      for (const friend of friends) {
+        const user = await this.userService.findUserById(friend.friend_id);
+        friendsList.push({
+          username: user.username,
+          status: user.status,
+          avatar: user.avatar,
+        });
+      }
+      res.status(200).json(friendsList);
+    } catch (err) {}
   }
 }

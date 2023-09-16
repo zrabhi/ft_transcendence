@@ -31,6 +31,7 @@ export default function Settings() {
   const [twitter, setTwitter] = useState(user?.data?.twitter || "");
 
   const [usernameMsg, setUsernameMsg] = useState<string>("");
+  const [fileMsg, setFileMsg] = useState<string>("");
   const [passwordMatchMsg, setPasswordMatchMsg] = useState<string>("");
   const [currPasswordError, setCurrentPasswordErr] = useState("");
   const [passwordMsg, setPasswordMsg] = useState<string>("");
@@ -108,7 +109,9 @@ export default function Settings() {
     if (type === "cover") formData.append("file", cover);
     const response = await postFileRequest(`${baseUrlUsers}/${type}`, formData);
     if (response.error) {
+      console.log(response);
       setError(true);
+      setFileMsg("File Is not an image");
       return false;
     }
     return true;
@@ -175,6 +178,7 @@ export default function Settings() {
     setUsernameMsg("");
     setPasswordMsg("");
     setCurrentPasswordErr("");
+    setFileMsg("")
     updateMsgRef.current!.classList.remove("success");
     updateMsgRef.current!.classList.add("error");
   };
@@ -214,7 +218,12 @@ export default function Settings() {
       setPasswordMatchMsg("Passwords don't match");
       return;
     }
-    if (avatar) await handleImageUpdate("avatar");
+    if (avatar)
+    {
+      const res =  await handleImageUpdate("avatar");
+      if (!res)
+        return ;
+    }
     if (cover) await handleImageUpdate("cover");
     if (infos.username || infos.password) {
       const response = await updateUserInfo(infos);
@@ -332,6 +341,7 @@ export default function Settings() {
                       </div>
                     </div>
                   </div>
+                  {error ?  <p className="error">{fileMsg}</p> : ""}
                   {/* <div className="update-cover">
                     <h4>update cover</h4>
                     <div className="input">

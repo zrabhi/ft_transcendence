@@ -36,10 +36,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     tfaLogin: "tfalogin",
   };
 
-  useEffect(() => {
-    if (cookie.access_token === "" || !cookie.access_token)
-      router.replace("/login");
-  }, []);
+  // useEffect(() => {
+  //   if (cookie.access_token === "" || !cookie.access_token)
+  //     router.replace("/login");
+  // }, []);
   const checkPath = () => {
     setPathname("");
     const currentPath = window.location.href.split("/");
@@ -68,22 +68,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(response);
   };
 
-  useEffect(() => {
-    if (!checkPath()) return;
-    (async () => {
-      const response = await getRequest(`${baseUrlUsers}/user`);
-      if (response.error) {
-        setLoginError(response);
-        remove("access_token");
-        router.push("/login");
-        return false;
-      }
-      response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
-      console.log(response);
-      setUser(response);
-      return true;
-    })();
-  }, []);
+  // useEffect(() => {
+  //   if (!checkPath()) return;
+  //   (async () => {
+  //     const response = await getRequest(`${baseUrlUsers}/user`);
+  //     if (response.error) {
+  //       setLoginError(response);
+  //       remove("access_token");
+  //       router.push("/login");
+  //       return false;
+  //     }
+  //     response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
+  //     console.log(response);
+  //     setUser(response);
+  //     return true;
+  //   })();
+  // }, []);
 
   const updatingInfos = useCallback(
     async (username: string, password: string) => {

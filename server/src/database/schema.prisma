@@ -35,6 +35,7 @@ enum Type {
   PUBLIC
   PRIVATE
   PROTECTED
+  DM
 }
 
 model User {
@@ -178,6 +179,7 @@ model Channel {
   name              String
   type              Type
   password          String?
+  member_limit Int  @default(0)
 
   messages          ChannelMessage[] @relation("message")
 
@@ -185,7 +187,21 @@ model Channel {
 
   banedUsers        ChannelBan[]      @relation(name: "channelBan")
 
+  //TODO: OWNER
+  // TODO: ADMINS
+ //TODO muted Users
   created_at        DateTime @default(now())
+}
+model ChannelMembers{
+  id        String @unique @default(uuid())
+
+  userId    String
+  user      User @relation(fields: [userId], references:[id], name: "userToChannel", onDelete: Cascade)
+
+  channelId String
+  channel   Channel @relation(fields: [channelId], references:[id], name: "channelMembers", onDelete: Cascade)
+
+  role Role
 }
 
 model ChannelMessage {
@@ -202,18 +218,6 @@ model ChannelMessage {
   created_at DateTime @default(now())
 }
 
-model ChannelMembers{
-  id        String @unique @default(uuid())
-
-  userId    String
-  user      User @relation(fields: [userId], references:[id], name: "userToChannel", onDelete: Cascade)
-
-  channelId String
-  channel   Channel @relation(fields: [channelId], references:[id], name: "channelMembers", onDelete: Cascade)
-
-  role Role
-}
-
 model ChannelBan{
   id          String @unique @default(uuid())
 
@@ -223,7 +227,7 @@ model ChannelBan{
   channelId   String
   channel     Channel @relation(fields: [channelId], references:[id], name: "channelBan", onDelete: Cascade)
 
-  created_at  DateTime @default(now()) 
+  created_at  DateTime @default(now())
 }
 
 

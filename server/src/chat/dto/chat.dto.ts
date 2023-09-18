@@ -1,18 +1,54 @@
-import { IsNotEmpty, IsOptional, IsStrongPassword } from "class-validator";
-import { Type } from "@prisma/client";
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsStrongPassword,
+} from 'class-validator';
+import { Type } from '@prisma/client';
 
 export class createChannelDto {
-    @IsNotEmpty()
-    name: string
 
-    @IsNotEmpty()
-    type: Type
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-    @IsStrongPassword()
-    @IsNotEmpty()
-    @IsOptional()
-    password?: string
+  @IsNotEmpty()
+  type: Type;
 
-    @IsNotEmpty()
-    owner_id: string
+  @IsInt()
+  memberLimit: number;
+
+  @IsStrongPassword()
+  @IsNotEmpty()
+  @IsOptional()
+  password?: string;
+
+  @IsNotEmpty()
+  owner_id: string;
+}
+
+export class createDmDto {
+  @IsString()
+  username: string;
+
+  @IsInt()
+  memberLimit: number;
+}
+
+export class MessageInfo {
+  @IsString()
+  channelId: string;
+
+  @IsString()
+  sender: string;
+
+  @IsString()
+  senderAvatar: string;
+
+  @IsString()
+  time: string;
+
+  @IsString()
+  message: string;
 }

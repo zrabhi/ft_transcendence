@@ -6,7 +6,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { AiOutlineSetting } from "react-icons/ai";
 import { BsThreeDotsVertical, BsFillSendFill } from "react-icons/Bs";
 
+import {
+  List,
+  ListItem,
+  ListItemPrefix,
+  Avatar,
+  Card,
+  Typography,
+} from "@material-tailwind/react";
+
 import "./style.scss";
+import axios from "axios";
 
 export default function Chat() {
   const [selectedUserChat, setSelectedUserChat] = useState(null);
@@ -16,6 +26,7 @@ export default function Chat() {
     { id: 2, message: "test long long long long long 2" },
     { id: 3, message: "test3" },
   ];
+
   return (
     <div className="logged-user">
       <SideBar />
@@ -30,6 +41,7 @@ export default function Chat() {
               setSelectedUser={setSelectedUserChat}
             />
             {selectedUserChat && <BoxChat user={selectedUserChat} />}
+            <Friends />
           </div>
         </div>
       </div>
@@ -109,6 +121,7 @@ const UserCard = ({ user, onClick }: any): JSX.Element => {
 
 const BoxChat = ({ user }: any): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     ref.current?.scrollIntoView({
@@ -116,6 +129,25 @@ const BoxChat = ({ user }: any): JSX.Element => {
       block: "end",
     });
   }, []);
+
+  const sendMessage = async () => {
+    const body = {
+      message,
+      channelId: 1,
+    };
+    console.log("body", body);
+    try {
+      const response = await axios.post("http://127.0.0.1:8080/api/chat", body);
+      console.log("response", response);
+      setMessage("");
+    } catch (error) {
+      alert("error");
+    }
+  };
+  const handleChange = (e: any) => {
+    setMessage(e.target.value);
+  };
+
   return (
     <div className="box-chat">
       <div className="box-chat-container">
@@ -169,13 +201,15 @@ const BoxChat = ({ user }: any): JSX.Element => {
           <div className="p-4 flex items-center w-full">
             <div className="relative w-full">
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
-                <BsFillSendFill color={"white"} />
+                <BsFillSendFill color={"white"} onClick={sendMessage} />
               </div>
               <input
                 type="search"
                 id="default-search"
                 className="block w-full p-4 pl-10 text-sm text-white rounded-3xl bg-[#1F1F1F] focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 "
                 placeholder="Write a message"
+                onChange={handleChange}
+                value={message}
               />
             </div>
           </div>
@@ -201,5 +235,80 @@ const User = ({ user }: any): JSX.Element => {
         <div>in Match making</div>
       </div>
     </div>
+  );
+};
+
+const Friends = () => {
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  const [users, setUsers] = useState([{}, {}, {}]);
+
+  useEffect(() => {
+    // get friends here
+  }, []);
+
+  return (
+    <>
+      {showSidebar ? (
+        <button
+          className="flex text-4xl text-white items-center cursor-pointer fixed right-10 top-6 z-50"
+          onClick={() => setShowSidebar(!showSidebar)}
+        >
+          x
+        </button>
+      ) : (
+        <svg
+          onClick={() => setShowSidebar(!showSidebar)}
+          className="fixed  z-30 flex items-center cursor-pointer right-10 top-6"
+          fill="#2563EB"
+          viewBox="0 0 100 80"
+          width="40"
+          height="40"
+        >
+          <rect width="100" height="10"></rect>
+          <rect y="30" width="100" height="10"></rect>
+          <rect y="60" width="100" height="10"></rect>
+        </svg>
+      )}
+
+      <div
+        className={`top-0 right-0 w-[35vw] bg-blue-600  p-10 pl-20 text-white fixed h-full z-40 ease-in-out duration-300 ${
+          showSidebar ? "translate-x-0 " : "translate-x-full"
+        }`}
+      >
+        <h3 className="mt-15 text-2xl font-semibold text-white">Friends</h3>
+        <Card className="friends-list">
+          <List className="gap-3.5">
+            {users.length && 
+              users.map(user => (
+                (
+                  <ListItem className="border-b-2 p-4">
+                    <ListItemPrefix>
+                      <Avatar
+                        variant="circular"
+                        alt="candice"
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOWSMigj9Wnxa4KWAspMvvIf6Iho0n8cZCIGFjorPQRA&s"
+                      />
+                    </ListItemPrefix>
+                    <div>
+                      <Typography variant="h6" color="blue-gray">
+                        Tania Andrew
+                      </Typography>
+                      <Typography
+                        variant="small"
+                        color="gray"
+                        className="font-normal"
+                      >
+                        Software Engineer @ Material Tailwind
+                      </Typography>
+                    </div>
+                  </ListItem>
+                )
+              ))
+            }
+          </List>
+        </Card>
+      </div>
+    </>
   );
 };

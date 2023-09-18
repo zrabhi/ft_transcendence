@@ -34,7 +34,13 @@
   border-bottom: 1px solid #999999;
   &:hover {
     cursor: pointer;
+    opacity: 0.5;
   }
+  height: 130px;
+  max-height: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space:nowrap;
   .user-card-content {
     display: flex;
     flex-direction: row;
@@ -95,3 +101,8 @@
     background: linear-gradient(left, #8391A6, #536175);
   }
   
+
+  .friends-list {
+    margin-top: 30px;
+    width: 100%;
+  }

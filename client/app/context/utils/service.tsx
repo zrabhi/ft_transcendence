@@ -1,5 +1,6 @@
 export const baseUrlAuth = "http://127.0.0.1:8080/api/auth";
 export const baseUrlUsers = "http://127.0.0.1:8080/api";
+export const baseChatUrl = "http://127.0.0.1:8080/chat";
 import axios from "axios";
 
 export const postRequest = async (url: string, body: any) => {

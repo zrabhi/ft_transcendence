@@ -17,6 +17,7 @@ import {
 
 import "./style.scss";
 import axios from "axios";
+import { baseChatUrl, baseUrlUsers, getRequest, postRequest } from "@/app/context/utils/service";
 
 export default function Chat() {
   const [selectedUserChat, setSelectedUserChat] = useState(null);
@@ -82,9 +83,9 @@ const ListUsersMessages = ({ users, setSelectedUser }: any) => {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                 />
               </svg>
@@ -240,13 +241,32 @@ const User = ({ user }: any): JSX.Element => {
 
 const Friends = () => {
   const [showSidebar, setShowSidebar] = useState(false);
+  const [creatChatData, setCreationData] = useState(
+    {
+      username:"",
+      memberLimit: 2
+    }
+  );
+  const [users, setUsers] = useState([]);
 
-  const [users, setUsers] = useState([{}, {}, {}]);
+  const CreateChat = async (user: any) => {
+    const response = await postRequest(`${baseChatUrl}/create/dm`, JSON.stringify({username: user.username, memberLimit: 2}))
+    console.log("chat data " , response);
+  }
 
   useEffect(() => {
+    (async() =>
+    {const response = await getRequest(`${baseUrlUsers}/users`);
+    setUsers(response);
+
+  })()
     // get friends here
   }, []);
+  useEffect(() =>
+  {
+      console.log("users =>" ,users);
 
+  },[users])
   return (
     <>
       {showSidebar ? (
@@ -279,10 +299,10 @@ const Friends = () => {
         <h3 className="mt-15 text-2xl font-semibold text-white">Friends</h3>
         <Card className="friends-list">
           <List className="gap-3.5">
-            {users.length && 
+            {users.length &&
               users.map(user => (
                 (
-                  <ListItem className="border-b-2 p-4">
+                  <ListItem className="border-b-2 p-4" onClick={() => CreateChat(user)}>
                     <ListItemPrefix>
                       <Avatar
                         variant="circular"
@@ -292,7 +312,7 @@ const Friends = () => {
                     </ListItemPrefix>
                     <div>
                       <Typography variant="h6" color="blue-gray">
-                        Tania Andrew
+                        {user?.username}
                       </Typography>
                       <Typography
                         variant="small"

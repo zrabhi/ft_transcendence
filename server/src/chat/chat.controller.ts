@@ -13,7 +13,7 @@ export class ChatController {
 
     @Post('create/dm')
     @UseGuards(JwtAuthGuard)
-    async handleCreateChannelDm(@UserInfo() user :User, @Res() res: Response, @Body() createDm: createDmDto)
+    async handleCreateChannelDm(@UserInfo() user :User, @Res() res: Response, @Body() createDm)
     {
         // console.log(createDm);
         const result = await this.chatService.handleCreateDmChannel(user.id, createDm);

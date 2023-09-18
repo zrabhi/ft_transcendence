@@ -49,7 +49,7 @@ export class AuthController {
           username: user.username,
           setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
         });
-        response.cookie('acces_token', access_token);
+        response.cookie('access_token', access_token);
         return response.status(200).json(user);
       }
       return response.status(400).json({ msg: 'Invalid Credencial' });
@@ -153,4 +153,5 @@ export class AuthController {
       await this.authService.generateQrCodeDataURL(otpauthUrl),
     );
   }
+  
 }

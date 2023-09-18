@@ -129,7 +129,7 @@ const BoxChat = ({ user }: any): JSX.Element => {
       behavior: "smooth",
       block: "end",
     });
-  }, []);
+  },[]);
 
   const sendMessage = async () => {
     const body = {
@@ -138,7 +138,7 @@ const BoxChat = ({ user }: any): JSX.Element => {
     };
     console.log("body", body);
     try {
-      const response = await axios.post("http://127.0.0.1:8080/api/chat", body);
+      const response = await axios.post("https://1997-196-65-77-2.ngrok-free.app/api/chat", body);
       console.log("response", response);
       setMessage("");
     } catch (error) {

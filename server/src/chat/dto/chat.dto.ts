@@ -40,14 +40,14 @@ export class MessageInfo {
   @IsString()
   channelId: string;
 
-  @IsString()
-  sender: string;
+  // @IsString()
+  // sender: string;
 
-  @IsString()
-  senderAvatar: string;
+  // @IsString()
+  // senderAvatar: string;
 
-  @IsString()
-  time: string;
+  // @IsString()
+  // time: string;
 
   @IsString()
   message: string;

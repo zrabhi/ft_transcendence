@@ -5,6 +5,8 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { createChannelDto, createDmDto } from './dto/chat.dto';
+import { User } from 'src/auth/decorator/user-decorator';
+import { Channel } from '@prisma/client';
 
 @Injectable()
 export class ChatService {
@@ -14,30 +16,57 @@ export class ChatService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async checkChannelDmExistence(user: string, otherUser: string) {
-    return await this._prisma.channel.findFirst({
+  async checkChannelDmExistence(user: string, otherUser: string): Promise<Channel | any > {
+    const search = await this._prisma.channel.findMany({
       where: {
-        OR: [{ name: user }, { name: otherUser }],
+        AND: [
+          { users: { has: user } }, // Check if userId1 is in the 'users' array
+          { users: { has: otherUser } }, // Check if userId2 is in the 'users' array
+        ],
       },
+      select: {
+        id: true,
+        name: true, // You can select other fields you need from the channel
+        users: true,
+      },
+    })
+    console.log("search is " ,search);
+    return search
+  }
+  async getChannelMessages(channel_id: string, user) {
+
+    const messages = await this._prisma.channelMessage.findMany({
+      where: { channel_id: channel_id },
     });
+    const allMessage = [];
+    for (const message of messages) {
+      if (message.user_id === user.id)
+      allMessage.push({sender:user.username, avatar: user.avatar, content: message.content})
+      else
+      {
+        const otherUser =await this._user.findUserById(message.user_id);
+        allMessage.push({reciever:otherUser.username, avatar:otherUser.avatar, content: message.content});
+      }
+    }
+    return allMessage;
   }
 
- async handleCreateDmChannel(user_id: string, createDm: createDmDto) {
+  async handleCreateDmChannel(user_id: string, createDm: createDmDto)  {
     const { username, memberLimit } = createDm;
     const user = await this._user.findUserById(user_id);
     const otherUser = await this._user.findUserName(username);
 
-    const result = await this.checkChannelDmExistence(
-      user.username,
-      username,
-    );
-    console.log(result);
-    if (result) return false;
+    const result = await this.checkChannelDmExistence(user.username, username);
+    console.log("result here", result);
+    if (result.length > 0)
+        return await this.getChannelMessages(result.id, user);
+    //Todo: get messages
     const channel = await this._prisma.channel.create({
       data: {
         name: user.username,
         member_limit: memberLimit,
         type: 'DM',
+        users: [username, user.username]
       },
     });
     await this._prisma.channelMembers.create({
@@ -59,10 +88,16 @@ export class ChatService {
   }
   //Todo: saveMessageToChannel
 
-  async saveMessageToChannel()
-  {
+  async saveMessageToChannel(user, messageInfo) {
+
+    const message = await this._prisma.channelMessage.create({
+      data: {
+        channel_id: messageInfo.channelId,
+        user_id: user.id,
+        content: messageInfo.message
+      }
+    })
+    console.log("message created", message);
 
   }
-
 }
-

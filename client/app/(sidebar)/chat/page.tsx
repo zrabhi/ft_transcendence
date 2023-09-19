@@ -127,7 +127,7 @@ const BoxChat = ({ user }: any): JSX.Element => {
       behavior: "smooth",
       block: "end",
     });
-  }, []);
+  },[]);
 
   useEffect(() => {
     (async () => {

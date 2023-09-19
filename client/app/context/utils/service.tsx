@@ -12,7 +12,6 @@ export const postRequest = async (url: string, body: any) => {
     credentials: 'include',
     body,
   });
-  // console.log(response);
 
   const data = await response.json();
   if (!response.ok) {

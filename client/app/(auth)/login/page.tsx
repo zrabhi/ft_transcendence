@@ -169,7 +169,7 @@ export default function SignIn() {
                 <div className="auto-auth">
                   or you can sign in with
                   <div className="logos">
-                    <Link href="http://127.0.0.1:8080/api/auth/google/login">
+                    <Link href="http://192.168.1.128:8080/api/auth/google/login">
                       <div className="google">
                         <Image
                           src={googleLogo}
@@ -179,7 +179,7 @@ export default function SignIn() {
                         />
                       </div>{" "}
                     </Link>
-                    <Link href="http://127.0.0.1:8080/api/auth/42/login">
+                    <Link href="http://192.168.1.128:8080/api/auth/42/login">
                       <div className="school">
                         <Image
                           src={schoolLogo}

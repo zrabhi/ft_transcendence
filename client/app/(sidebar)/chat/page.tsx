@@ -17,16 +17,27 @@ import {
 
 import "./style.scss";
 import axios from "axios";
-import { baseChatUrl, baseUrlUsers, getRequest, postRequest } from "@/app/context/utils/service";
+import {
+  baseChatUrl,
+  baseUrlUsers,
+  getRequest,
+  postRequest,
+} from "@/app/context/utils/service";
 
-export default function Chat() {
-  const [selectedUserChat, setSelectedUserChat] = useState(null);
+const Chat: React.FC = () => {
+  const [selectedChannel, setSelectedChannel] = useState(null);
+  const [channels, setChannels] = useState([]);
 
-  const users = [
-    { id: 1, message: "test message 1" },
-    { id: 2, message: "test long long long long long 2" },
-    { id: 3, message: "test3" },
-  ];
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await getRequest(`${baseUrlUsers}/channels`);
+        console.log(response);
+        setChannels(response);
+      } catch (error) {}
+    })();
+    // get friends here
+  }, []);
 
   return (
     <div className="logged-user">
@@ -38,17 +49,17 @@ export default function Chat() {
           </h2>
           <div className="container">
             <ListUsersMessages
-              users={users}
-              setSelectedUser={setSelectedUserChat}
+              users={channels}
+              setSelectedUser={setSelectedChannel}
             />
-            {selectedUserChat && <BoxChat user={selectedUserChat} />}
-            <Friends />
+            {selectedChannel && <BoxChat user={selectedChannel} />}
+            <Friends setSelectedChannel />
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 const ListUsersMessages = ({ users, setSelectedUser }: any) => {
   const handleClickUserMessage = (user: any) => {
@@ -74,27 +85,13 @@ const ListUsersMessages = ({ users, setSelectedUser }: any) => {
               placeholder="Search..."
             />
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                />
-              </svg>
+              S
             </div>
           </div>
         </form>
       </div>
       <div>
-        {users.map((user, index): any => {
+        {users.map((user: any, index: Number) => {
           return (
             <UserCard
               user={user}
@@ -123,6 +120,7 @@ const UserCard = ({ user, onClick }: any): JSX.Element => {
 const BoxChat = ({ user }: any): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     ref.current?.scrollIntoView({
@@ -131,6 +129,16 @@ const BoxChat = ({ user }: any): JSX.Element => {
     });
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await getRequest(`${baseUrlUsers}/messages`);
+        setMessages(response);
+      } catch (error) {}
+    })();
+    // get friends here
+  }, [user]);
+
   const sendMessage = async () => {
     const body = {
       message,
@@ -138,7 +146,10 @@ const BoxChat = ({ user }: any): JSX.Element => {
     };
     console.log("body", body);
     try {
-      const response = await axios.post("http://127.0.0.1:8080/api/chat", body);
+      const response = await axios.post(
+        "http://192.168.1.128:8080/api/chat",
+        body
+      );
       console.log("response", response);
       setMessage("");
     } catch (error) {
@@ -239,34 +250,31 @@ const User = ({ user }: any): JSX.Element => {
   );
 };
 
-const Friends = () => {
+const Friends = ({ selectedChannel }: any) => {
   const [showSidebar, setShowSidebar] = useState(false);
-  const [creatChatData, setCreationData] = useState(
-    {
-      username:"",
-      memberLimit: 2
-    }
-  );
+  const [creatChatData, setCreationData] = useState({
+    username: "",
+    memberLimit: 2,
+  });
   const [users, setUsers] = useState([]);
 
   const CreateChat = async (user: any) => {
-    const response = await postRequest(`${baseChatUrl}/create/dm`, JSON.stringify({username: user.username, memberLimit: 2}))
-    console.log("chat data " , response);
-  }
+    const response = await postRequest(
+      `${baseChatUrl}/create/dm`,
+      JSON.stringify({ username: user.username, memberLimit: 2 })
+    );
+    console.log("chat data ", response);
+    selectedChannel(user);
+  };
 
   useEffect(() => {
-    (async() =>
-    {const response = await getRequest(`${baseUrlUsers}/users`);
-    setUsers(response);
-
-  })()
+    (async () => {
+      const response = await getRequest(`${baseUrlUsers}/users`);
+      setUsers(response);
+    })();
     // get friends here
   }, []);
-  useEffect(() =>
-  {
-      console.log("users =>" ,users);
 
-  },[users])
   return (
     <>
       {showSidebar ? (
@@ -297,12 +305,16 @@ const Friends = () => {
         }`}
       >
         <h3 className="mt-15 text-2xl font-semibold text-white">Friends</h3>
-        <Card className="friends-list">
-          <List className="gap-3.5">
-            {users.length &&
-              users.map(user => (
-                (
-                  <ListItem className="border-b-2 p-4" onClick={() => CreateChat(user)}>
+        {users.length > 0 ? (
+          <Card className="friends-list">
+            <List className="gap-3.5">
+              {users.length > 0 &&
+                users.map((user, index: Number) => (
+                  <ListItem
+                    key={index}
+                    className="border-b-2 p-4"
+                    onClick={() => CreateChat(user)}
+                  >
                     <ListItemPrefix>
                       <Avatar
                         variant="circular"
@@ -323,12 +335,15 @@ const Friends = () => {
                       </Typography>
                     </div>
                   </ListItem>
-                )
-              ))
-            }
-          </List>
-        </Card>
+                ))}
+            </List>
+          </Card>
+        ) : (
+          <div className="friends-list">No friends</div>
+        )}
       </div>
     </>
   );
 };
+
+export default Chat;

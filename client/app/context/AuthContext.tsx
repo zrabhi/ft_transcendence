@@ -15,6 +15,7 @@ import { LoginError, User, userInit, LoginErrorInit } from "./utils/types";
 import { baseUrlAuth } from "./utils/service";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
+// import socketIO from 'socket.io-client';
 
 export const AuthContext = createContext<any>({});
 
@@ -145,6 +146,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return true;
   }, []);
 
+
+
+  // const socket = socketIO.connect('https://1997-196-65-77-2.ngrok-free.app');
+
   return (
     <AuthContext.Provider
       value={{
@@ -156,6 +161,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         tfaDisabled,
         handleDisable2fa,
         fetchUserData,
+        // socket
       }}
     >
       {children}

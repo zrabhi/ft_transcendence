@@ -37,10 +37,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     tfaLogin: "tfalogin",
   };
 
-  // useEffect(() => {
-  //   if (cookie.access_token === "" || !cookie.access_token)
-  //     router.replace("/login");
-  // }, []);
+  useEffect(() => {
+    if (cookie.access_token === "" || !cookie.access_token)
+      router.replace("/login");
+  }, []);
   const checkPath = () => {
     setPathname("");
     const currentPath = window.location.href.split("/");

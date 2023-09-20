@@ -28,6 +28,7 @@ import { v4 as uuidv4 } from 'uuid';
 import path = require('path');
 import { UserService } from './user.service';
 import { log } from 'console';
+import { UserInfo } from 'src/auth/decorator/user-decorator';
 
 export const strorageCover = {
   storage: diskStorage({
@@ -67,8 +68,8 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/users')
-  async getAllUsers(): Promise<User[]> {
-    return await this.userService.findAllUsers();
+  async getAllUsers(@UserInfo() user): Promise<User[]> {
+    return await this.userService.findAllUsers(user);
   }
 
   @UseGuards(JwtAuthGuard)

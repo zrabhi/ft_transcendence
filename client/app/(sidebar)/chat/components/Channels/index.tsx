@@ -2,12 +2,18 @@ import { AiOutlineSetting } from "react-icons/ai";
 
 import UserCard from "../UserCard"
 import { BsSearch } from "react-icons/Bs";
+import { baseChatUrl, postRequest } from "@/app/context/utils/service";
 
-const Channels = ({ channels, setSelectedUser }: any) => {
-    const handleClickUserMessage = (user: any) => {
+const Channels = ({ channels, setSelectedUser,setSelectedChannel}: any) => {
+    const handleClickUserMessage = async (user: any) => {
+      const response = await postRequest(
+        `${baseChatUrl}/create/dm`,
+        JSON.stringify({ username: user.username, memberLimit: 2 })
+      );
+      setSelectedChannel(response);
       setSelectedUser(user);
+      console.log("userrr ",user);
     };
-  
     return (
       <div className="users-container">
         <div className="inbox-header">
@@ -27,7 +33,7 @@ const Channels = ({ channels, setSelectedUser }: any) => {
                 placeholder="Search..."
               />
               <div className="absolute text-white inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-               <BsSearch />
+              <BsSearch />
               </div>
             </div>
           </form>

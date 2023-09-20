@@ -190,6 +190,7 @@ model Channel {
 
   //TODO: OWNER
   // TODO: ADMINS
+  //TODO: time message sended
  //TODO muted Users
   created_at        DateTime @default(now())
 }

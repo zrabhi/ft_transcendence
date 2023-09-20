@@ -30,11 +30,11 @@ export class ChatService {
         users: true,
       },
     })
-    console.log("search is " ,search);
     return search
   }
-  async getChannelMessages(channel_id: string, user) {
+  async getChannelMessages(channel_id: string, username: string ) {
 
+    const user = await this._user.findUserName(username);
     const messages = await this._prisma.channelMessage.findMany({
       where: { channel_id: channel_id },
     });
@@ -57,10 +57,8 @@ export class ChatService {
     const otherUser = await this._user.findUserName(username);
 
     const result = await this.checkChannelDmExistence(user.username, username);
-    console.log("result here", result);
     if (result.length > 0)
-        return await this.getChannelMessages(result.id, user);
-    //Todo: get messages
+          return result[0];
     const channel = await this._prisma.channel.create({
       data: {
         name: user.username,
@@ -68,6 +66,7 @@ export class ChatService {
         type: 'DM',
         users: [username, user.username]
       },
+
     });
     await this._prisma.channelMembers.create({
       data: {
@@ -97,7 +96,18 @@ export class ChatService {
         content: messageInfo.message
       }
     })
-    console.log("message created", message);
 
+  }
+
+  async getAllUserChannels(username: string) : Promise<Channel[]>
+  {
+        return await this._prisma.channel.findMany({
+          where:{
+            AND: [{ users: { has: username } }]
+          },
+          include: {
+            messages: true,
+          }
+        })
   }
 }

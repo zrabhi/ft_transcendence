@@ -52,3 +52,12 @@ export class MessageInfo {
   @IsString()
   message: string;
 }
+
+
+export class getChannelDmDto
+{
+  @IsString()
+  channelId: string;
+
+  user: any;
+}

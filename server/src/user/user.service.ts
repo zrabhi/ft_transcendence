@@ -24,8 +24,10 @@ import { FileUserDto, PutUserDto } from './dto/put-user-dto';
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAllUsers(): Promise<User[]> {
-    return await this.prismaService.user.findMany({});
+  async findAllUsers(user): Promise<User[]> {
+    const Allusers = await this.prismaService.user.findMany({});
+    const users = Allusers.filter(currUser =>  currUser.id != user.id)
+    return users;
   }
 
   async findUserById(user_id: string): Promise<User> {
@@ -35,11 +37,6 @@ export class UserService {
       },
     });
   }
-
-  // async checkUserNames(user: PutUserDto, userId: string)
-  // {
-
-  // }
 
   async addUser(createUserDto: CreateUserDto) {
     const exist = !!(await this.prismaService.user.findFirst({

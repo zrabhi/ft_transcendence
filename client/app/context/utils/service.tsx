@@ -87,8 +87,28 @@ export const getRequest = async (url: string) => {
     },
     credentials: "include",
   });
-  
-  
+
+  const data = await response.json();
+  if (!response.ok) {
+    let message;
+    if (data?.message) message = data.message;
+    else message = data;
+    return { error: true, message };
+  }
+  return data;
+};
+
+export const getRequestBody = async (url: string, body: any) => {
+  console.log("url", url);
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body,
+    credentials: "include",
+  });
+
   const data = await response.json();
   if (!response.ok) {
     let message;

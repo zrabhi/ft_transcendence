@@ -23,7 +23,6 @@ const Friends = ({ setSelectedChannel, setSelectedUser, users }: any) => {
       JSON.stringify({ username: user.username, memberLimit: 2 })
     );
 
-    // this sets coming from Chat component
     setSelectedChannel(response); // to set selected channel after clicking a friend
     setSelectedUser(user); // to set the selected friend
   };
@@ -39,7 +38,6 @@ const Friends = ({ setSelectedChannel, setSelectedUser, users }: any) => {
           x
         </button>
       ) : (
-        
           <FaUserFriends onClick={() => setShowSidebar(!showSidebar)} className="fixed  z-30 flex items-center cursor-pointer right-10 top-6 text-white icon"/>
       )}
 

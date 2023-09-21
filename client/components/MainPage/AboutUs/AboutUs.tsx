@@ -2,8 +2,9 @@
 import React from 'react'
 import ybadaouiImage from '@/public/authors/ybadaoui.jpeg'
 import zrabhiImage from '@/public/authors/zrabhi.jpeg'
-import mmoumniImage from '@/public/authors/mmoumni.jpeg'
 import mkarimImage from '@/public/authors/mkarim.jpeg'
+import obakhtiImage from '@/public/authors/obakhti.jpeg'
+import hmzahImage from '@/public/authors/hmzah.jpeg'
 import AuthorCard from './AuthorCard/AuthorCard'
 import './AboutUs.scss'
 import { motion } from 'framer-motion'
@@ -28,6 +29,18 @@ export default function AboutUs() {
       imageSrc: mkarimImage,
       linkedinUrl: 'https://www.linkedin.com/in/skeet1/',
       githubUrl: 'https://github.com/skeet1/',
+    },
+    {
+      name: 'Oussama Bakhti',
+      imageSrc: obakhtiImage,
+      linkedinUrl: 'https://www.linkedin.com/in/oussama-bakhti',
+      githubUrl: 'https://github.com/OussamaBakhti/',
+    },
+    {
+      name: 'Hatim MZAH',
+      imageSrc: hmzahImage,
+      linkedinUrl: 'https://www.linkedin.com/in/hatimmzah/',
+      githubUrl: 'https://github.com/mza7a/',
     },
   ];
   

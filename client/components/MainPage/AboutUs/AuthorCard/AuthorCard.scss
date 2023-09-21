@@ -1,0 +1,58 @@
+@import '@/app/globals.scss';
+
+.author {
+  padding: .1rem;
+  border-radius: .5rem;
+  position: relative;
+  overflow: hidden;
+  width: 22rem;
+  .content {
+    background-color: $main-bg-color;
+    color: $main-text-color;
+    padding: 2rem;
+    border-radius: .5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    h2 {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    img {
+      width: 8rem;
+      height: 8rem;
+      border-radius: 50%;
+    }
+    .links {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-right: auto;
+      margin-left: auto;
+      a {
+        font-size: 1.5rem;
+      }
+    }
+  }
+  background: linear-gradient(
+    60deg,
+    hsl(44, 85%, 66%),
+    hsl(224, 85%, 66%),
+    hsl(269, 85%, 66%),
+    hsl(314, 85%, 66%),
+    hsl(359, 85%, 66%),
+    );
+    background-size: 300% 300%;
+    background-position: 0 50%;
+    animation: moveGradient 4s alternate infinite;
+}
+
+
+@keyframes moveGradient {
+  50% {
+    background-position: 100% 50%;
+  }
+}

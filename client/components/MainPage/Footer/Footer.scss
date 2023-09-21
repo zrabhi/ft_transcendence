@@ -12,6 +12,9 @@
   p {
     font-size: .9rem;
     color: $main-text-color;
+    span {
+      margin-right: .2rem;
+    }
     a {
       font-weight: 600;
       transition: .2s ease-in-out;

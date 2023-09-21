@@ -1,6 +1,11 @@
-node_modules
-dist
+node_modules/*
+/dist
 # Keep environment variables out of version control
 .env
+algo.tldr
 *.sql
 dist
+images/avatars/*.jpg
+images/avatars/*.png
+images/avatars/*.jpeg
+!images/avatars/default.jpeg

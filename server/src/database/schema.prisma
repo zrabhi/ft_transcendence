@@ -11,136 +11,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id                   String   @unique @default(uuid())
-  email                String   @unique
-  username             String   @unique
-  password             String
-  avatar               String   @default("../resources/avatar.png")
-  cover                String   @default("../resources/cover.png")
-  status               Status   @default(ONLINE)
-  country              String?
-  win                  Int      @default(0)
-  loss                 Int      @default(0)
-  ladder_level         Int      @default(0)
-  xp                   Int      @default(50)
-  totalGames           Int      @default(0)
-  discordHandler       String?
-  twitterHandler       String?
-  created_date         DateTime @default(now())
-
-  channelMessages Channel_message[] @relation(name: "channelMessage")
-
-  messagesSended   Message[] @relation(name: "messageSended")
-  messagesRecieved Message[] @relation(name: "messageRecieved")
-
-  matchWon Match[] @relation(name: "MatchWon")
-  matchLost  Match[] @relation(name: "MatchLost")
-
-  friendRequest Friend[] @relation(name: "friendRequest")
-  friendRecieve Friend[] @relation(name: "friendRecieve")
-
-  achievement Achievement?
-
-  roles UserRole[] @relation(name:"userRole")
-  channelState ChannelBlock[] @relation(name:"userChannelState")
-}
-
-model Match {
-  id           String      @unique @default(uuid())
-  winner_id    String
-  loser_id     String
-  winner_score Int
-  loser_score  Int
-  played_at    DateTime @default(now())
-
-  winner User @relation(fields: [winner_id], references: [id], name: "MatchWon")
-  loser  User @relation(fields: [loser_id], references: [id], name: "MatchLost")
-}
-
-model Achievement{
-  id                   String @unique @default(uuid())
-  userId               String @unique
-  accountCreationAchie Boolean
-  firstFriendAchie     Boolean  @default(false)
-  firstGameAchie       Boolean  @default(false)
-  threeGameInRowAchie  Boolean  @default(false)
-  firstWinAchie        Boolean  @default(false)
-  cleanSheetGameAchie  Boolean  @default(false)
-  tenGameInRowAchie    Boolean  @default(false)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Friend {
-  id          String      @unique @default(uuid())
-  sender_id   String
-  reciever_id String
-  state    State  
-  created_at  DateTime @default(now())
-
-  sender   User @relation(fields: [sender_id], references: [id], name: "friendRequest")
-  reciever User @relation(fields: [reciever_id], references: [id], name: "friendRecieve")
-}
-
-model Message {
-  id          String      @unique @default(uuid())
-  sender_id   String
-  reciever_id String
-  content     String
-  created_at  DateTime @default(now())
-
-  sender      User     @relation(fields: [sender_id], references: [id], name: "messageSended")
-  reciever    User     @relation(fields: [reciever_id], references: [id], name: "messageRecieved")
-}
-
-model Channel {
-  id       String    @unique @default(uuid())
-  name     String
-  type     Type
-  password String?
-
-  messages Channel_message[] @relation("message")
-  roles    UserRole[] @relation(name: "channelUser")
-  restrictedUsers ChannelBlock[] @relation(name: "restrictedUser")
-}
-
-model Channel_message {
-  id         String      @unique @default(uuid())
-  channel_id String
-  user_id    String
-  content    String
-  created_at DateTime @default(now())
-
-  user    User    @relation(fields: [user_id], references: [id], name: "channelMessage", onDelete: Cascade)
-  channel Channel @relation(fields: [channel_id], references: [id], name: "message", onDelete: Cascade)
-}
-
-model UserRole{
-  id        String @unique @default(uuid())
-  userId    String
-  channelId String
-  role Role
-
-  user User @relation(fields: [userId], references:[id], name: "userRole", onDelete: Cascade)
-  channel Channel @relation(fields: [channelId], references:[id], name: "channelUser", onDelete: Cascade)
-}
-
-model ChannelBlock{
-  id        String @unique @default(uuid())
-  userId    String
-  channelId String
-  isBanned  Boolean @default(false)
-  isMute    Boolean @default(false)
-
-  user User @relation(fields: [userId], references:[id], name: "userChannelState", onDelete: Cascade)
-  channel Channel @relation(fields: [channelId], references:[id], name: "restrictedUser", onDelete: Cascade)
-}
 
 enum State {
-  FRIENDS
-  REQUESTER_BLOCK_RECIEVER
-  RECIEVER_BLOCK_REQUESTER
+  PENDING
+  ACCEPTED
+  REJECTED
+
 }
 
 enum Status {
@@ -159,4 +35,222 @@ enum Type {
   PUBLIC
   PRIVATE
   PROTECTED
+  DM
+}
+
+model User {
+  id                              String   @unique @default(uuid())
+  email                           String   @unique
+  username                        String   @unique
+  password                        String?
+  avatar                          String   @default("http://127.0.0.1:8080/api/avatar/pictures/default.jpeg")
+  cover                           String   @default("http://127.0.0.1:8080/api/cover/pictures/default.png")
+  status                          Status   @default(ONLINE)
+  country                         String?
+  win                             Int      @default(0)
+  loss                            Int      @default(0)
+  ladder_level                    Int      @default(0)
+  xp                              Int      @default(50)
+  totalGames                      Int      @default(0)
+  discordHandler                  String?
+  twitterHandler                  String?
+  tfa                             Boolean?  @default(false)
+  isTfaVerified                   Boolean?  @default(false)
+  twoFactorAuthenticationSecret   String?
+
+  channelMessages                 ChannelMessage[] @relation(name: "MsgSender")
+
+  userBlock                         UserBlock[]        @relation(name: "userblock")
+  blockedUser                       UserBlock[]        @relation(name: "blockeduser")
+
+  messagesSended                  Message[] @relation(name: "messageSended")
+  messagesRecieved                Message[] @relation(name: "messageRecieved")
+
+  GameInviteRequest               GameInvite[] @relation(name: "gameInviteRequest")
+  GameInviteRecieved              GameInvite[] @relation(name: "gameInviteRecieved")
+
+  ChannelInviteRequest            ChannelInvite[] @relation(name: "channelInviteRequest")
+  ChannelInviteRecieved           ChannelInvite[] @relation(name: "channelInviteRecieved")
+
+  IncomingRequest                 FriendRequest[] @relation(name: "IncomingReq")
+  OutgoingRequest                 FriendRequest[] @relation(name: "OutgoingReq")
+
+  matchWon                        Match[] @relation(name: "MatchWon")
+  matchLost                       Match[] @relation(name: "MatchLost")
+
+  friend                          Friendship[] @relation(name: "friends")
+  friendOf                        Friendship[] @relation(name: "friendOf")
+
+  achievement                     Achievement?
+  memberof                        ChannelMembers[] @relation(name:"userToChannel")
+
+  ChannelBan                      ChannelBan[]    @relation(name:"userBaned")
+
+  created_date                    DateTime        @default(now())
+}
+
+model UserBlock {
+  id             String      @unique @default(uuid())
+
+  blockerId      String
+  blocker        User        @relation(fields: [blockerId], references: [id], name: "userblock")
+
+  blockedId      String
+  blocked        User       @relation(fields: [blockedId], references: [id], name: "blockeduser")
+
+  created_date   DateTime  @default(now())
+}
+
+model Match {
+  id           String      @unique @default(uuid())
+
+  winner_id    String
+  winner User @relation(fields: [winner_id], references: [id], name: "MatchWon")
+
+  loser_id     String
+  loser  User @relation(fields: [loser_id], references: [id], name: "MatchLost")
+
+  winner_score Int
+  loser_score  Int
+
+  played_at    DateTime @default(now())
+}
+
+model Achievement{
+  id                    String @unique @default(uuid())
+
+  userId                String @unique
+  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  accountCreationAchie Boolean
+  firstFriendAchie     Boolean  @default(false)
+  firstGameAchie       Boolean  @default(false)
+  threeGameInRowAchie  Boolean  @default(false)
+  firstWinAchie        Boolean  @default(false)
+  cleanSheetGameAchie  Boolean  @default(false)
+  tenGameInRowAchie    Boolean  @default(false)
+
+  created_at           DateTime @default(now())
+}
+
+model FriendRequest {
+  id             String      @unique @default(uuid())
+
+  requester_id   String
+  requester      User        @relation(fields: [requester_id], references: [id], name: "OutgoingReq", onDelete: Cascade)
+
+  requested_id   String
+  requested      User        @relation(fields: [requested_id], references: [id], name: "IncomingReq", onDelete: Cascade)
+
+  state          State
+  created_at     DateTime     @default(now())
+
+  updated_at     DateTime
+}
+
+model Friendship {
+  id           String      @unique   @default(uuid())
+
+  user_id      String
+  user         User   @relation(fields: [user_id], references: [id], name: "friends", onDelete: Cascade)
+
+  friend_id    String
+  friend       User   @relation(fields: [friend_id], references: [id], name: "friendOf", onDelete: Cascade)
+
+  created_at  DateTime  @default(now())
+}
+
+model Message {
+  id          String      @unique @default(uuid())
+
+  sender_id   String
+  sender      User     @relation(fields: [sender_id], references: [id], name: "messageSended", onDelete: Cascade)
+
+  reciever_id String
+  reciever    User     @relation(fields: [reciever_id], references: [id], name: "messageRecieved", onDelete: Cascade)
+
+  content     String
+
+  created_at  DateTime @default(now())
+}
+
+model Channel {
+  id                String    @unique @default(uuid())
+  name              String
+  type              Type
+  password          String?
+  member_limit Int  @default(0)
+
+  messages          ChannelMessage[] @relation("message")
+
+  members           ChannelMembers[]  @relation(name: "channelMembers")
+
+  banedUsers        ChannelBan[]      @relation(name: "channelBan")
+
+  //TODO: OWNER
+  // TODO: ADMINS
+ //TODO muted Users
+  created_at        DateTime @default(now())
+}
+model ChannelMembers{
+  id        String @unique @default(uuid())
+
+  userId    String
+  user      User @relation(fields: [userId], references:[id], name: "userToChannel", onDelete: Cascade)
+
+  channelId String
+  channel   Channel @relation(fields: [channelId], references:[id], name: "channelMembers", onDelete: Cascade)
+
+  role Role
+}
+
+model ChannelMessage {
+  id         String      @unique @default(uuid())
+
+  channel_id String
+  channel Channel @relation(fields: [channel_id], references: [id], name: "message", onDelete: Cascade)
+
+  user_id    String
+  user    User    @relation(fields: [user_id], references: [id], name: "MsgSender", onDelete: Cascade)
+
+  content    String
+
+  created_at DateTime @default(now())
+}
+
+model ChannelBan{
+  id          String @unique @default(uuid())
+
+  userId      String
+  user        User @relation(fields: [userId], references:[id], name: "userBaned", onDelete: Cascade)
+
+  channelId   String
+  channel     Channel @relation(fields: [channelId], references:[id], name: "channelBan", onDelete: Cascade)
+
+  created_at  DateTime @default(now())
+}
+
+
+model ChannelInvite{
+  senderId     String
+  sender       User   @relation(fields: [senderId], references:[id], name: "channelInviteRequest", onDelete: Cascade)
+
+  recieverId   String
+  reciever      User   @relation(fields: [recieverId], references:[id], name: "channelInviteRecieved", onDelete: Cascade)
+
+  created_at   DateTime      @default(now())
+
+  @@id([senderId, recieverId])
+}
+
+model GameInvite {
+  senderId     String
+  sender       User   @relation(fields: [senderId], references:[id], name: "gameInviteRequest", onDelete: Cascade)
+
+  recieverId   String
+  reciever      User   @relation(fields: [recieverId], references:[id], name: "gameInviteRecieved", onDelete: Cascade)
+
+  created_at   DateTime      @default(now())
+
+  @@id([senderId, recieverId])
 }

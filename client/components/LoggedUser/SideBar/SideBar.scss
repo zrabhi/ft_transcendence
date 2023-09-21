@@ -5,7 +5,7 @@
   height: 100%;
   width: 6rem;
   background: linear-gradient(to right, $grd-first-color, $grd-second-color);
-  border-radius: 0 1rem 1rem 0;
+  // border-radius: 0 1rem 1rem 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -18,15 +18,13 @@
     gap: 3rem;
     div {
       background: linear-gradient(to bottom, #725caf, #2a1a47);
-      padding: 1rem;
+      padding: .5rem;
       color: $main-text-color;
       border-radius: 50%;
       cursor: pointer;
       transition: .2s ease-in-out;
       &:hover {
-        // background: $main-bg-color;
-        transform: scale(1.2);
-        border-radius: 50%;
+        color: $soft-gold-color
       }
     }
   }

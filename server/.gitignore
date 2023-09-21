@@ -5,3 +5,7 @@ node_modules/*
 algo.tldr
 *.sql
 dist
+images/avatars/*.jpg
+images/avatars/*.png
+images/avatars/*.jpeg
+!images/avatars/default.jpeg

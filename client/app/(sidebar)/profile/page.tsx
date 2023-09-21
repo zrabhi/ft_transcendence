@@ -154,7 +154,7 @@ export default function Profile() {
     },
   ];
 
-  const [activeItem, setActiveItem] = useState<number | null>(0); // Initialize with the first item as active (index 0)
+  const [activeItem, setActiveItem] = useState<number | null>(); // Initialize with the first item as active (index 0)
 
   const handleItemClick = (index: number) => {
     setActiveItem(index);
@@ -186,6 +186,8 @@ export default function Profile() {
                     </a>
                   </li>
                 ))}
+                <div className="indicator absolute">
+                </div>
               </ul>
             </div>
 

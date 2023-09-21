@@ -34,6 +34,7 @@
                   width: 1.2rem;
                   height: 4rem;
                   color: $main-text-color;
+                  transition: .5s;
                   svg {
                     display: block;
                     width: 100%;
@@ -45,7 +46,7 @@
                   font-size: .7rem;
                   font-weight: 500;
                   letter-spacing: .02rem;
-                  bottom: .4rem;
+                  bottom: 0rem;
                   opacity: 0;
                 }
               }
@@ -54,39 +55,35 @@
               a {
                 .icon {
                   position: relative;
-                  background-color: $soft-gold-color;
-                  width: 5rem;
-                  height: 5rem;
                   border-radius: 50%;
                   display: flex;
                   justify-content: center;
                   align-items: center;
-                  border: .5rem solid $main-bg-color;
                   transform: translateY(-50%);
                   svg {
                     width: 1.6rem;
                     height: 1.6rem;
                   }
-                  &::before {
-                    content: '';
-                    position: absolute;
-                    width: 1.2rem;
-                    height: 1.2rem;
-                    top: 50%;
-                    right: -1.5rem;
-                    border-top-left-radius: 1rem;
-                    box-shadow: -2px -5px 0 0 $main-bg-color;
-                  }
-                  &::after {
-                    content: '';
-                    position: absolute;
-                    width: 1.2rem;
-                    height: 1.2rem;
-                    top: 50%;
-                    left: -1.5rem;
-                    border-top-right-radius: 1rem;
-                    box-shadow: 2px -5px 0 0 $main-bg-color;
-                  }
+                  // &::before {
+                  //   content: '';
+                  //   position: absolute;
+                  //   width: 1.2rem;
+                  //   height: 1.2rem;
+                  //   top: 50%;
+                  //   right: -1.5rem;
+                  //   border-top-left-radius: 1rem;
+                  //   box-shadow: -2px -5px 0 0 $main-bg-color;
+                  // }
+                  // &::after {
+                  //   content: '';
+                  //   position: absolute;
+                  //   width: 1.2rem;
+                  //   height: 1.2rem;
+                  //   top: 50%;
+                  //   left: -1.5rem;
+                  //   border-top-right-radius: 1rem;
+                  //   box-shadow: 2px -5px 0 0 $main-bg-color;
+                  // }
                 }
                 .text {
                   opacity: 1;

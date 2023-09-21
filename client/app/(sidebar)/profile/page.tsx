@@ -14,6 +14,9 @@ import Leaderboard from "@/components/LoggedUser/Profile/Leaderboard/Leaderboard
 import { baseUrlUsers, getRequest } from "@/app/context/utils/service";
 import { GameHistory } from "@/interfaces/GameHistory";
 import { Friends } from "@/interfaces/Friends";
+import { FaUserFriends, FaHistory, FaListOl } from "react-icons/fa";
+import { ImStatsBars } from "react-icons/im";
+import { GiAchievement } from "react-icons/gi";
 
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
@@ -151,6 +154,20 @@ export default function Profile() {
     },
   ];
 
+  const [activeItem, setActiveItem] = useState<number | null>(0); // Initialize with the first item as active (index 0)
+
+  const handleItemClick = (index: number) => {
+    setActiveItem(index);
+  };
+
+  const menuItems = [
+    { icon: <FaUserFriends />, text: 'Friends' },
+    { icon: <FaHistory />, text: 'History' },
+    { icon: <FaListOl />, text: 'Leaderboard' },
+    { icon: <ImStatsBars />, text: 'Statistics' },
+    { icon: <GiAchievement />, text: 'Achievements' },
+  ];
+
   return (
     <div className="profile-page text-white">
       <SideBar />
@@ -159,49 +176,19 @@ export default function Profile() {
           <HeaderBar />
           <ProfileCard data={user} />
           <div className="profile-boxes">
-            <div className="box achievements">
-              <h4>Achievements</h4>
+            <div className="navbar-boxes">
               <ul>
-                {userStatistics.achievements.map((achievement, index) => (
-                  <li key={index}>
-                    <AchievementItem achievement={achievement} />
+                {menuItems.map((item, index) => (
+                  <li className={`list ${activeItem === index ? 'active' : ''}`} key={index} onClick={() => handleItemClick(index)}>
+                    <a href="#">
+                      <span className="icon">{item.icon}</span>
+                      <span className="text">{item.text}</span>
+                    </a>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="box statistics">
-              <h4>
-                statistics
-              </h4>
-              <Statistics />
-              {/* NUMBER OF WINS AND LOSES A GAMES HAVE BEEN PLAYED BY THE USER  */}
-            </div>
-            <div className="box games-history">
-              <h4>
-                games history
-              </h4>
-              {/* INCLUDE 1V1 GAMES THAT HAVE BEEN PLAYED BY THE USER */}
-              <div className="games">
-                {
-                  gamesHistory.map((game, index) => (
-                    <GameData key={index} game={game} />
-                  )
-                )}
-              </div>
-            </div>
-            <div className="box friends">
-              <h4>
-                friends
-              </h4>
-              {/* LIST OF FRIENDS */}
-            </div>
-            <div className="box leaderboard">
-              <h4>
-                leaderboard
-              </h4>
-              {/* LIST OF USERS WITH THE HIGHEST WIN GAMES */}
-              <Leaderboard />
-            </div>
+
           </div>
         </div>
       </div>

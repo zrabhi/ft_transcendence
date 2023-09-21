@@ -1,0 +1,41 @@
+@import '@/app/globals.scss';
+
+.game-data {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 2rem;
+  .winner,
+  .loser {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    .avatar {
+      cursor: pointer;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+    .state,
+    .name {
+      font-size: .9rem;
+      font-weight: 600;
+      text-transform: capitalize;
+      font-family: 'Playfair Display SC', serif;
+      text-align: center;
+      letter-spacing: .1rem;
+    }
+  }
+  .result {
+    font-size: 2rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    text-align: center;
+    letter-spacing: .1rem;
+    margin: 0 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: .5rem;
+  }
+}

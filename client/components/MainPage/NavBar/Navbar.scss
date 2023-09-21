@@ -35,7 +35,7 @@ header {
       border-radius: .5rem;
       transition: .2s ease-in-out;
       &:hover {
-        background-color: darker($blue-bg-color, 100%);
+        opacity: .8;
       }
     }
     .close-list {

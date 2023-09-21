@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Logo from '@/components/MainPage/Logo/Logo'
 import './Navbar.scss'
 import { useRef, useState } from 'react'
-import {BsList} from 'react-icons/Bs'
+import { BsList } from 'react-icons/Bs'
 import { FaTimes } from 'react-icons/fa'
 
 const Navbar = () => {
@@ -33,7 +33,7 @@ const Navbar = () => {
             <li>
               <Link className='link' href='about-us' >About us</Link>
             </li>
-              <Link href='/signin' >
+              <Link href='/login' >
                 <button className='
                   signin-btn
                   px-4 py-2

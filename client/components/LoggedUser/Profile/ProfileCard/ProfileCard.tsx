@@ -1,70 +1,95 @@
-import React from 'react'
+"use client"
+import React, { useEffect, useState } from 'react'
 import './ProfileCard.scss'
 import Image from 'next/image'
+import Link from 'next/link'
 import CoverImage from '@/public/images/FetchCoverImage.png'
 import { BsTwitter, BsDiscord } from 'react-icons/Bs'
-import ReactCountryFlag from 'react-country-flag'
 import Avatar from '@/public/images/DefaultAvatar.jpg'
 
-export default function ProfileCard() {
+export default function ProfileCard(user: any) {
+
+  const handleImageClick = () => {
+    // console.log('image clicked')
+    // console.log(user.data && user.data.avatar);
+    // console.log(`usernmea : ${user.data && user.data.username}}`);
+  }
+
   return (
     <div className="profile-card">
       <div className="cover-img">
-        <Image 
-          src={CoverImage}
+        <Image
+          src={user.data && user.data.cover? user.data.cover : CoverImage}
+          width={100}
+          height={100}
           alt='cover image'
         />
       </div>
       <div className="info">
-        <div className="left">
+        <div className="first">
           <div className="total-games">
             <h4>total games</h4>
-            Fetch: 15
+            {
+              user.data && user.data.totalGames
+            }
           </div>
           <div className="state">
             <h4>stats</h4>
-            Fetch: State Logo
+            {
+              // user.data && user.data.avatar 
+            }
           </div>
         </div>
-        <div className="right">
-          <div className="country">
-            <h4>country</h4>
-            <div className="flag">
-              <ReactCountryFlag svg 
-                countryCode='MA' 
-                style={{
-                  fontSize: '2rem', 
-                  lineHeight:'2rem'
-                }} 
-              />
-            </div>
-          </div>
+        <div className="second">
           <div className="social-media">
             <h4>social medias</h4>
             <div className="icons">
-              <div className="discord icon">
-                <BsDiscord />
-              </div>
-              <div className="twitter icon">
-                <BsTwitter />
-              </div>
+              {/* Discord  */}
+              { (user.data && user.data.discordHandler && user.data.discordHandler.length >= 0 ) ?
+                <div className="discord icon">
+                  <Link href={user.data && user.data.discordHandler} target='_blank'>
+                    <BsDiscord />
+                  </Link>
+                </div>
+                : 
+                <div className="discord icon grayscale pointer-none">
+                  <BsDiscord />
+                </div>
+              }
+
+              {/* Twitter */}
+              { (user.data && user.data.twitterHandler && user.data.twitterHandler.length >= 0 ) ?
+                <div className="discord icon">
+                  <Link href={user.data && user.data.twitterHandler} target='_blank'>
+                    <BsTwitter />
+                  </Link>
+                </div>
+                : 
+                <div className="discord icon grayscale pointer-none">
+                  <BsTwitter />
+                </div>
+              }
             </div>
           </div>
         </div>
       </div>
       <div className="user">
         <div className="img relative w-4/5 mx-auto">
-          <Image 
-            src={Avatar}
+          <Image
+            src={user.data && user.data.avatar && !user.data.avatar.includes('googleusercontent') ? user.data.avatar : Avatar}
+            width={500}
+            height={500}
             alt='Image of the user'
             className='rounded-full '
+            onClick={handleImageClick}
           />
           <div className="level w-8 h-8 rounded-full flex justify-center items-center absolute bottom-2 right-2">
-            4
+          4
           </div>
         </div>
         <div className="username text-center m-2">
-          username
+          {user.data &&
+          user.data.username}
         </div>
       </div>
     </div>

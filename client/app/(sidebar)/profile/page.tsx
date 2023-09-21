@@ -13,7 +13,6 @@ import Statistics from "@/components/LoggedUser/Profile/Statistics/Statistics";
 import Leaderboard from "@/components/LoggedUser/Profile/Leaderboard/Leaderboard";
 import { baseUrlUsers, getRequest } from "@/app/context/utils/service";
 import { GameHistory } from "@/interfaces/GameHistory";
-import RecentGames from "@/components/LoggedUser/Profile/RecentGames/RecentGames";
 import { Friends } from "@/interfaces/Friends";
 
 export default function Profile() {
@@ -160,12 +159,6 @@ export default function Profile() {
           <HeaderBar />
           <ProfileCard data={user} />
           <div className="profile-boxes">
-            <div className="box recent-activities">
-              <h4>
-                recent activities
-              </h4>
-              <RecentGames />
-            </div>
             <div className="box achievements">
               <h4>Achievements</h4>
               <ul>

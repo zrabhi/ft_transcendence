@@ -191,6 +191,9 @@ body {
             border-radius: 1px;
             opacity: .5;
           }
+          &:active {
+            transform: scale(1.02) translateY(2px);
+          }
         }
         .auto-auth {
           text-align: center;

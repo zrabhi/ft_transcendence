@@ -165,7 +165,7 @@ export default function SignIn() {
                   </label>
                 </div>
                 <div ref={ErrorRef} className="errorRef email-error"></div>
-                <button onClick={handleClickButton}> sign in</button>
+                <button onClick={handleClickButton} className=""> sign in</button>
                 <div className="auto-auth">
                   or you can sign in with
                   <div className="logos">

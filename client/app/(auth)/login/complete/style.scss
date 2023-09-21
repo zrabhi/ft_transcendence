@@ -111,7 +111,8 @@
           }
         }
         .submit {
-          padding: 1rem 1rem 0rem;
+          border-radius: .5rem;
+          overflow: hidden;
           input {
             padding: .5rem;
             background-color: $blue-bg-color;
@@ -121,6 +122,9 @@
               background-color: rgb(77 74 201 / .8);
               transform: scale(1.05);
             }
+          }
+          &:active {
+            transform: scale(1.02) translateY(2px);
           }
         }
       }

@@ -16,7 +16,8 @@
     a {
       background-color: $blue-bg-color;
       transition: .1s ease-in-out;
-      font-weight: 600;
+      font-weight: 500;
+      border-radius: .3rem;
       &:hover {
         opacity: .8;
       }

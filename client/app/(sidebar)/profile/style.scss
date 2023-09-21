@@ -13,15 +13,21 @@
           margin-top: 3rem;
           background-color: $blue-bg-color;
           border-radius: .5rem;
+          .nav-menu {
+            padding: 0 1rem;
+            position: relative;
+          }
           ul {
+            position: relative;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
             height: 4rem;
             .list {
               position: relative;
               height: 4rem;
               list-style: none;
+              width: 20%;
               a {
                 position: relative;
                 display: flex;
@@ -35,6 +41,7 @@
                   height: 4rem;
                   color: $main-text-color;
                   transition: .5s;
+                  z-index: 1;
                   svg {
                     display: block;
                     width: 100%;
@@ -51,6 +58,37 @@
                 }
               }
             }
+            .indicator {
+              position: absolute;
+              width: 4rem;
+              height: 4rem;
+              border-radius: 50%;
+              top: -50%;
+              background-color: $soft-gold-color;
+              border: .5rem solid $main-bg-color;
+              transition: .5s;
+              transform: translateX(-50%);
+              &::before {
+                content: '';
+                position: absolute;
+                width: 1.2rem;
+                height: 1.2rem;
+                top: 50%;
+                right: -1.5rem;
+                border-top-left-radius: 1rem;
+                box-shadow: -2px -5px 0 0 $main-bg-color;
+              }
+              &::after {
+                content: '';
+                position: absolute;
+                width: 1.2rem;
+                height: 1.2rem;
+                top: 50%;
+                left: -1.5rem;
+                border-top-right-radius: 1rem;
+                box-shadow: 2px -5px 0 0 $main-bg-color;
+              }
+            }
             .active {
               a {
                 .icon {
@@ -63,27 +101,8 @@
                   svg {
                     width: 1.6rem;
                     height: 1.6rem;
+                    transform: scale(1.2);
                   }
-                  // &::before {
-                  //   content: '';
-                  //   position: absolute;
-                  //   width: 1.2rem;
-                  //   height: 1.2rem;
-                  //   top: 50%;
-                  //   right: -1.5rem;
-                  //   border-top-left-radius: 1rem;
-                  //   box-shadow: -2px -5px 0 0 $main-bg-color;
-                  // }
-                  // &::after {
-                  //   content: '';
-                  //   position: absolute;
-                  //   width: 1.2rem;
-                  //   height: 1.2rem;
-                  //   top: 50%;
-                  //   left: -1.5rem;
-                  //   border-top-right-radius: 1rem;
-                  //   box-shadow: 2px -5px 0 0 $main-bg-color;
-                  // }
                 }
                 .text {
                   opacity: 1;

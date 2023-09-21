@@ -45,6 +45,7 @@ export default function Profile() {
     // console.log("history ", userGamesHistory);
     setGamesHistory(userGamesHistory);
   }
+
   useEffect( () =>
   {
     (async () => {
@@ -154,7 +155,20 @@ export default function Profile() {
     },
   ];
 
-  const [activeItem, setActiveItem] = useState<number | null>(); // Initialize with the first item as active (index 0)
+  const [activeItem, setActiveItem] = useState<number>(0);
+
+  useEffect(() => {
+    const listItemWidth = 100 / menuItems.length;
+
+    // Calculate the left property dynamically based on the clicked index
+    const left = `calc(${listItemWidth * activeItem}% + ${listItemWidth / 2}%)`;
+  
+    // Update the CSS style of the .indicator element
+    const indicator = document.querySelector('.indicator') as HTMLElement;
+    if (indicator) {
+      indicator.style.left = left;
+    }
+  }, [activeItem]);
 
   const handleItemClick = (index: number) => {
     setActiveItem(index);
@@ -177,18 +191,20 @@ export default function Profile() {
           <ProfileCard data={user} />
           <div className="profile-boxes">
             <div className="navbar-boxes">
-              <ul>
-                {menuItems.map((item, index) => (
-                  <li className={`list ${activeItem === index ? 'active' : ''}`} key={index} onClick={() => handleItemClick(index)}>
-                    <a href="#">
-                      <span className="icon">{item.icon}</span>
-                      <span className="text">{item.text}</span>
-                    </a>
-                  </li>
-                ))}
-                <div className="indicator absolute">
-                </div>
-              </ul>
+              <div className="nav-menu">
+                <ul>
+                  {menuItems.map((item, index) => (
+                    <li className={`list ${activeItem === index ? 'active' : ''}`} key={index} onClick={() => handleItemClick(index)}>
+                      <a href="#">
+                        <span className="icon">{item.icon}</span>
+                        <span className="text">{item.text}</span>
+                      </a>
+                    </li>
+                  ))}
+                  <div className="indicator absolute">
+                  </div>
+                </ul>
+              </div>
             </div>
 
           </div>

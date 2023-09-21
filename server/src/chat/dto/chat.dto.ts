@@ -35,17 +35,25 @@ export class createDmDto {
   @IsInt()
   memberLimit: number;
 }
+export class createRoomDto{
+  @IsNotEmpty()
+  @IsString()
+  name: string;
 
+
+  password?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  type:Type
+
+  @IsNotEmpty()
+  @IsInt()
+  memberLimit: number;
+}
 export class MessageInfo {
   @IsString()
   channelId: string;
-
-  // @IsString()
-  // sender: string;
-
-  // @IsString()
-  // senderAvatar: string;
-
   // @IsString()
   // time: string;
 
@@ -53,7 +61,11 @@ export class MessageInfo {
   message: string;
 }
 
+// export class getRoomDto{
+//   @IsString()
+//   name: string;
 
+// }
 export class getChannelDmDto
 {
   @IsString()

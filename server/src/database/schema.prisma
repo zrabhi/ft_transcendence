@@ -176,8 +176,9 @@ model Message {
 
 model Channel {
   id                String    @unique @default(uuid())
-  name              String
+  name              String    @unique
   users String[]
+  owner String?
   type              Type
   password          String?
   member_limit Int  @default(0)

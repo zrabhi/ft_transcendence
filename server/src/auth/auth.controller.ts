@@ -120,8 +120,7 @@ export class AuthController {
         request.user.id,
       );
 
-    if (!isCodeValid)
-      return res.status(400).json('Wrong authentication code');
+    if (!isCodeValid) return res.status(400).json('Wrong authentication code');
     await this.authService.turnOnTwoFactorAuthentication(request.user.id);
     res.status(200).json('ok');
   }
@@ -153,5 +152,4 @@ export class AuthController {
       await this.authService.generateQrCodeDataURL(otpauthUrl),
     );
   }
-  
 }

@@ -6,7 +6,7 @@ import { baseChatUrl, postRequest } from "@/app/context/utils/service";
 
 const Channels = ({ channels, setSelectedUser,setSelectedChannel}: any) => {
     const handleClickUserMessage = async (user: any) => {
-      const response = await postRequest(
+      const response = await postRequest( //TODO: ERROR IN
         `${baseChatUrl}/create/dm`,
         JSON.stringify({ username: user.username, memberLimit: 2 })
       );

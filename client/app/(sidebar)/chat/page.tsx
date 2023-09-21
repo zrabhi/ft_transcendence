@@ -22,7 +22,7 @@ const Chat: React.FC = () => {
 
   const [selectedChannel, setSelectedChannel] = useState(null); // to set the channel selected
   const [selectedUser, setSelectedUser] = useState({}); // to set the user selected
-  const [channels, setChannels] = useState([]); // to set channels already exists
+  const [channels, setChannels] = useState<any>([]); // to set channels already exists
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
   // GET all users
   useEffect(() => {
@@ -36,9 +36,11 @@ const Chat: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const response = await getRequest(`${baseChatUrl}/channels`);
-        console.log(response);
-        setChannels(response);
+        const responseDm = await getRequest(`${baseChatUrl}/channelsDm`); // fetching USER Dms
+        setChannels(responseDm);
+
+        // const responseRooms = await  getRequest(`${baseChatUrl}/channelsRooms`); // fetching user rooms
+        // setChannels((prevRes) => [...prevRes, ...responseRooms])
       } catch (error) { }
     })();
   }, []);

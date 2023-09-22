@@ -21,6 +21,7 @@ import {
   MessageInfo,
 } from './dto/chat.dto';
 import { channel } from 'diagnostics_channel';
+import { userInfo } from 'os';
 
 //TODO: CREATE GET BOTH DM AND ROOMS MESSAGES IN ON REQUEST
 @Controller('chat')
@@ -43,14 +44,14 @@ export class ChatController {
     );
     res.status(200).json(result);
   }
-  @Get('getChannel/:channelName')
-  @UseGuards(JwtAuthGuard)
-  async handleGetChannel(@UserInfo() user: User, @Res() res: Response,
-  @Param('channelName') channelName: string)
-  {
-    const result = await this.chatService.getCHannelRoom(channelName);
-    res.status(200).json(result);
-  }
+  // @Get('getChannel/:channelName')
+  // @UseGuards(JwtAuthGuard)
+  // async handleGetChannel(@UserInfo() user: User, @Res() res: Response,
+  // @Param('channelName') channelName: string)
+  // {
+  //   const result = await this.chatService.getCHannelRoom(channelName);
+  //   res.status(200).json(result);
+  // }
 
   @Post('create/room')
   @UseGuards(JwtAuthGuard)
@@ -63,7 +64,7 @@ export class ChatController {
       user.id,
       createRoom,
     );
-    console.log(result);
+    // console.log(result);
 
     if (result.channel === undefined) return res.status(400).json(result.error);
     return res.status(200).json(result.channel);
@@ -85,6 +86,18 @@ export class ChatController {
     if (result.channel === undefined) return res.status(400).json(result.error);
     return res.status(200).json(`${user.username} has joined channel`);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('getChannel/:channleId')
+  async handlegetChannelById(@Param('channleId') channleId:string, @Res() res: Response)
+  {
+    console.log("im here");
+    
+      const result =  await this.chatService.getChannelById(channleId);
+      console.log("channleby id  found", result);
+      res.status(200).json(result);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post('saveMessage')
   async handleSaveMessageDm(
@@ -97,15 +110,15 @@ export class ChatController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('getMessages/:channelId/:username')
+  @Get('getMessages/:channelId')
   async handleGetMessagesDm(
     @Param('channelId') channelId: string,
-    @Param('username') username: string,
+    @UserInfo() user: User,
     @Res() res: Response,
   ) {
     const result = await this.chatService.getChannelDmMessages(
       channelId,
-      username,
+      user
     );
     res.status(200).json(result);
   }
@@ -128,7 +141,7 @@ export class ChatController {
     const result = (await this.chatService.getAllUserChannelsDm(
       user.username,
     )) as any;
-    console.log('result here', result);
+    // console.log('result here', result);
 
     const channels = [];
     for (const channel of result) {
@@ -142,13 +155,14 @@ export class ChatController {
       );
 
       channels.push({
+        id: channel.id,
         username: searchedUser.username,
         avatar: searchedUser.avatar,
         message: lastMessage.content,
         status: searchedUser.status,
       });
     }
-    console.log(channels);
+    // console.log(channels);
     res.status(200).json(channels);
   }
 
@@ -161,12 +175,13 @@ export class ChatController {
     for (const channel of result) {
       const lastMessage = channel.messages[channel.messages.length - 1];
       if (!lastMessage) continue;
-      console.log('last', lastMessage);
+      // console.log('last', lastMessage);
 
       const searchedUser = await this.userService.findUserById(
         lastMessage.user_id,
       );
       channels.push({
+        id: channel.id,
         username: channel.name,
         avatar: searchedUser.avatar,
         message: lastMessage.content,
@@ -174,7 +189,7 @@ export class ChatController {
       });
     }
 
-    console.log(channels);
+    // console.log(channels);
     res.status(200).json(channels);
     //TODO get all rooms user in
   }

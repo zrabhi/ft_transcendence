@@ -2,17 +2,19 @@ import { AiOutlineSetting } from "react-icons/ai";
 
 import UserCard from "../UserCard"
 import { BsSearch } from "react-icons/Bs";
-import { baseChatUrl, postRequest } from "@/app/context/utils/service";
+import { baseChatUrl, getRequest, postRequest } from "@/app/context/utils/service";
 
-const Channels = ({ channels, setSelectedUser,setSelectedChannel}: any) => {
-    const handleClickUserMessage = async (user: any) => {
-      const response = await postRequest( //TODO: ERROR IN
-        `${baseChatUrl}/create/dm`,
-        JSON.stringify({ username: user.username, memberLimit: 2 })
-      );
+const Channels = ({ channels, setSelectedChat,setSelectedChannel}: any) => {
+    const handleClickUserMessage = async (channel: any) => {
+
+      // const response = await postRequest( //TODO: ERROR IN
+      //   `${baseChatUrl}/create/dm`,
+      //   JSON.stringify({ username: user.username, memberLimit: 2 })
+      // );
+      // replacing create/dm with get channel
+      const response = await getRequest(`${baseChatUrl}/getChannel/${channel.id}`);
+      setSelectedChat(channel);
       setSelectedChannel(response);
-      setSelectedUser(user);
-      console.log("userrr ",user);
     };
     return (
       <div className="users-container">

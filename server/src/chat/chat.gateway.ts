@@ -26,6 +26,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
     private chatService: ChatService,
     private userService: UserService) { }
 
+
   private connectedUsers = new Map<Socket,User>();
 
  async handleConnection(client: Socket) {
@@ -47,7 +48,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
 @SubscribeMessage('joinChat')
 handleJoinChat(@ConnectedSocket() client: Socket,@MessageBody() data: any,)
 {
-  console.log("client joined chat with ", data.id, this.connectedUsers.get(client));
+  // console.log("client joined chat with ", data.id, this.connectedUsers.get(client));
 
   client.join(data.id);
 }
@@ -58,7 +59,7 @@ handleJoinChat(@ConnectedSocket() client: Socket,@MessageBody() data: any,)
     })
     if (!payload)
         return client.disconnect(true);
-    console.log("uuuuu ",this.connectedUsers.get(client).avatar);
+    // console.log("uuuuu ",this.connectedUsers.get(client).avatar);
 
     const messageInfo = {
       reciever: payload.username,

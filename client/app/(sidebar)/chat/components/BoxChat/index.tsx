@@ -4,37 +4,40 @@ import {
   getRequestBody,
   postRequest,
 } from "@/app/context/utils/service";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { BsFillSendFill, BsThreeDotsVertical } from "react-icons/Bs";
 import { User } from "../UserCard";
 import io, { Socket } from "socket.io-client";
 import { useCookies } from "react-cookie";
-import { Message } from "@/interfaces/Message";
+import { Message } from "@/interfaces/ChatTypes";
+import { AuthContext } from "@/app/context/AuthContext";
 
 let socket: Socket;
 const BoxChat = ({
   selectedChannel,
-  selectedUser,
+  selectedChat,
   setChannels,
   users,
 }: any): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [user, setUser] = useState({});
+  const [chat, setChat] = useState({});
   const [cookie, setCookie, remove] = useCookies(["access_token"]);
-
+  const {user} = useContext(AuthContext)
   // trying to create socket to connect with other user here
   useEffect(() => {
     (async () => {
       const response = await getRequest(
-        `${baseChatUrl}/getMessages/${selectedChannel.id}/${selectedUser.username}`
+        `${baseChatUrl}/getMessages/${selectedChannel.id}`
       );
       setMessages(() => []);
       setMessages((prevMessages) => [...prevMessages, ...response]); //reminderr
+      console.log("chat ", selectedChat);
+      
     })();
 
-    setUser(selectedUser);
+    setChat(selectedChat);
     socket = io("http://127.0.0.1:8080/chat", {
       auth: {
         token: cookie.access_token,
@@ -48,7 +51,7 @@ const BoxChat = ({
         let sendedMessage: Message = {
           content: messageInfo.content,
         };
-        if (selectedUser.username === messageInfo.reciever) {
+        if (user.username != messageInfo.reciever) {
           sendedMessage.sender = messageInfo.reciever;
           sendedMessage.avatar = messageInfo.avatar;
         } else sendedMessage = messageInfo;
@@ -86,7 +89,7 @@ const BoxChat = ({
   return (
     <div className="box-chat">
       <div className="box-chat-container">
-        <User user={user} />
+        <User user={chat} />
         <BsThreeDotsVertical className="icon cursor-pointer" />
       </div>
       <div className="box-chat-messages">

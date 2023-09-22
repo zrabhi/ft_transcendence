@@ -15,13 +15,16 @@ import {
 import Channels from "./components/Channels";
 import BoxChat from "./components/BoxChat";
 import Friends from "./components/Friends";
+import { channels } from "@/interfaces/channels";
+import { chat } from "@/interfaces/ChatTypes";
 
 
 
 const Chat: React.FC = () => {
 
-  const [selectedChannel, setSelectedChannel] = useState(null); // to set the channel selected
-  const [selectedUser, setSelectedUser] = useState({}); // to set the user selected
+  const [selectedChannel, setSelectedChannel] = useState<channels>(); // to set the channel selected
+  const [selectedChat, setSelectedChat] = useState<chat>(); // to set the user selected
+  //TODO:create type for channles already exists
   const [channels, setChannels] = useState<any>([]); // to set channels already exists
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
   // GET all users
@@ -38,9 +41,8 @@ const Chat: React.FC = () => {
       try {
         const responseDm = await getRequest(`${baseChatUrl}/channelsDm`); // fetching USER Dms
         setChannels(responseDm);
-
-        // const responseRooms = await  getRequest(`${baseChatUrl}/channelsRooms`); // fetching user rooms
-        // setChannels((prevRes) => [...prevRes, ...responseRooms])
+        const responseRooms = await getRequest(`${baseChatUrl}/channelsRooms`); // fetching user rooms
+        setChannels((prevchannels: any) => [...prevchannels, ...responseRooms])
       } catch (error) { }
     })();
   }, []);
@@ -59,11 +61,11 @@ const Chat: React.FC = () => {
             <Channels
               channels={channels}
               setSelectedChannel={setSelectedChannel}
-              setSelectedUser={setSelectedUser}
+              setSelectedChat={setSelectedChat}
               users={users}
             />
-            {selectedChannel && <BoxChat selectedChannel={selectedChannel} selectedUser={selectedUser} setChannels={setChannels} users={users} />}
-            <Friends setSelectedChannel={setSelectedChannel} setSelectedUser={setSelectedUser} users={users} />
+            {selectedChannel && <BoxChat selectedChannel={selectedChannel} selectedChat={selectedChat} setChannels={setChannels} users={users} />}
+            <Friends setSelectedChannel={setSelectedChannel} setSelectedChat={setSelectedChat} users={users} />
           </div>
         </div>
       </div>

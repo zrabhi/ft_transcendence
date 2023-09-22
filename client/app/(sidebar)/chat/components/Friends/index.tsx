@@ -14,7 +14,7 @@ import { AiOutlineMessage } from "react-icons/ai";
 import {GiPingPongBat} from "react-icons/gi"
 import { FaUserFriends } from "react-icons/fa";
 
-const Friends = ({ setSelectedChannel, setSelectedUser, users }: any) => {
+const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
   const [showSidebar, setShowSidebar] = useState(false);
 
   const CreateChat = async (user: any) => {
@@ -24,7 +24,7 @@ const Friends = ({ setSelectedChannel, setSelectedUser, users }: any) => {
     );
 
     setSelectedChannel(response); // to set selected channel after clicking a friend
-    setSelectedUser(user); // to set the selected friend
+    setSelectedChat(user); // to set the selected friend
   };
 
 

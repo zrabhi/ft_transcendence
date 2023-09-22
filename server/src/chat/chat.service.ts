@@ -8,6 +8,7 @@ import { createChannelDto, createDmDto, createRoomDto } from './dto/chat.dto';
 import { User } from 'src/auth/decorator/user-decorator';
 import { Channel } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class ChatService {
   constructor(
@@ -21,7 +22,16 @@ export class ChatService {
   {
     return this._prisma.channel.findMany({
       where:{
-       OR: [{name: channelName}],
+      OR: [{name: channelName}],
+      }
+    })
+  }
+  async getChannelById(channelId: string)
+  {
+    return await this._prisma.channel.findUnique({
+      where:
+      {
+        id: channelId
       }
     })
   }
@@ -75,10 +85,10 @@ export class ChatService {
         },
       });
     }
-    if (type === 'PRIVATE') {
+    if (type === 'PROTECTED') {
       if (!password)
         return {
-          error: 'Password must be set with private channels',
+          error: 'Password must be set with PROTECTED channels',
           channel: undefined,
         };
       const channelPassword = await bcrypt.hash(password, 10);
@@ -86,7 +96,7 @@ export class ChatService {
         data: {
           name: name,
           owner: user.username,
-          type: 'PRIVATE',
+          type: 'PROTECTED',
           member_limit: memberLimit,
           password: channelPassword,
         },
@@ -103,8 +113,7 @@ export class ChatService {
     return { error: undefined, channel: channel };
   }
 
-  async getChannelDmMessages(channel_id: string, username: string) {
-    const user = await this._user.findUserName(username);
+  async getChannelDmMessages(channel_id: string, user: any) {
     const messages = await this._prisma.channelMessage.findMany({
       where: { channel_id: channel_id },
     });
@@ -112,14 +121,14 @@ export class ChatService {
     for (const message of messages) {
       if (message.user_id === user.id)
         allMessage.push({
-          sender: user.username,
+          reciever: user.username,
           avatar: user.avatar,
           content: message.content,
         });
       else {
         const otherUser = await this._user.findUserById(message.user_id);
         allMessage.push({
-          reciever: otherUser.username,
+          sender: otherUser.username,
           avatar: otherUser.avatar,
           content: message.content,
         });
@@ -177,10 +186,10 @@ export class ChatService {
         error: `${user.username} your already in channel`,
         channel: undefined,
       };
-    if (channel.type === 'PRIVATE') {
+    if (channel.type === 'PROTECTED') {
       if (!password)
         return {
-          error: 'you must provide channel password to join a PRIVATE channel',
+          error: 'you must provide channel password to join a PROTECTED channel',
           channel: undefined,
         };
       const match = await bcrypt.compare(password, channel.password);
@@ -206,7 +215,7 @@ export class ChatService {
     if (result.length > 0) return result[0];
     const channel = await this._prisma.channel.create({
       data: {
-        name: 'PrivateDM',
+        name:  uuidv4(),
         member_limit: memberLimit,
         type: 'DM',
         users: [username, user.username],

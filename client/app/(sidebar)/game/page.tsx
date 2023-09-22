@@ -1,11 +1,15 @@
+'use client';
 import SideBar from '@/components/LoggedUser/SideBar/SideBar'
 import React from 'react'
 
 export default function Game() {
+
+	const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
+
   return (
 	<div className="logged-user">
-		<SideBar />
-		<div className="home">
+		<SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+		<div className={`game ${isExpanded ? 'ml-16': ''}`}>
 			<h2 className='text-2xl bg-slate-400 text-white mx-auto my-4 text-center uppercase'>
 				This is the game page
 			</h2>

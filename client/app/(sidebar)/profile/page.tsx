@@ -23,6 +23,7 @@ export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
 
   const [activeItem, setActiveItem] = useState<number>(2);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   useEffect(() => {
     const listItemWidth = 100 / menuItems.length;
@@ -47,8 +48,8 @@ export default function Profile() {
 
   return (
     <div className="profile-page text-white">
-      <SideBar />
-      <div className="profile">
+      <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+      <div className={`profile ${isExpanded ? 'ml-16': ''}`}>
         <div className="profile-content">
           <HeaderBar />
           <ProfileCard data={user} />

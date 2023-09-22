@@ -3,17 +3,17 @@
 .sidebar {
   position: fixed;
   height: 100%;
-  width: 6rem;
+  width: 4rem;
   background: linear-gradient(to right, $grd-first-color, $grd-second-color);
-  // border-radius: 0 1rem 1rem 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 0;
   z-index: 5;
+  transition: .3s ease-in-out;
   .sidebar-nav {
     display: flex;
+    justify-content: center;
     flex-direction: column;
     gap: 3rem;
     div {
@@ -29,17 +29,41 @@
     }
   }
   .sidebar-footer {
-    flex-basis: 15rem;
     display: flex;
+    justify-content: center;
     flex-direction: column;
     gap: 2rem;
     div {
       transition: .2s ease-in-out;
+      color: $main-text-color;
       cursor: pointer;
       &:hover {
         opacity: .8;
         transform: scale(1.1);
       }
+    }
+  }
+  .expander {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 1.6rem;
+    height: 1.6rem;
+    background-color: $soft-gold-color;
+    transform: translate(100%, -50%);
+    border-radius: 0% 50% 50% 0;
+    .icon {
+      width: 100%;
+      height: 100%;
+      padding-right: 10%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: .3s ease-in-out;
+    }
+    .collapsed {
+      transform: rotate(180deg) translateX(10%);
     }
   }
 }

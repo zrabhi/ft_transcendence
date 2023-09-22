@@ -7,7 +7,7 @@ export default function HeaderBar() {
   return (
     <div className="header-bar">
       <div className="header-bar__title">
-        <h1>Welocme Back</h1>
+        <h1 className='text-white'>Welocme Back</h1>
       </div>
       <div className="header-icons">
         <SearchBar />

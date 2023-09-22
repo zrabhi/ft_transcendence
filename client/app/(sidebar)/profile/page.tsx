@@ -49,8 +49,8 @@ export default function Profile() {
   return (
     <div className="profile-page text-white">
       <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
-      <div className={`profile ${isExpanded ? 'ml-16': ''}`}>
-        <div className="profile-content">
+      <div className={`profile ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
+        <div className="profile-content min-h-screen p-8">
           <HeaderBar />
           <ProfileCard data={user} />
           <div className="profile-boxes">

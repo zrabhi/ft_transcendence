@@ -26,7 +26,9 @@ export default function SideBar() {
   };
   return (
     <div className="sidebar">
-      <Logo />
+      <div className="logo">
+        {/* <Logo /> */}
+      </div>
       <div className="sidebar-nav">
         <div className="to-home">
           <Link href='home'>
@@ -43,9 +45,6 @@ export default function SideBar() {
             <PiChatsFill size={24} className="icon" />
           </Link>
         </div>
-        {/* <div className="to-live">
-          <PiTelevisionFill size={24} className="icon" />
-        </div> */}
         <div className="to-game">
           <Link href='game'>
             <CgGames size={24} className="icon" />

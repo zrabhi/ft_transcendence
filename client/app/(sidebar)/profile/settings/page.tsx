@@ -12,7 +12,6 @@ import {
   putRequest,
 } from "@/app/context/utils/service";
 import { StaticImageData } from "next/image";
-import { Avatar } from "@radix-ui/themes";
 import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
 
 export default function Settings() {

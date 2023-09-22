@@ -7,6 +7,7 @@
   gap: 1rem;
   overflow: hidden;
   border-radius: 1rem;
+
   .icon {
     background-color: $main-text-color;
     border-radius: 1rem;
@@ -22,6 +23,7 @@
   }
   .search-box {
     transform: translateX(100rem);
+    position: relative;
     input {
       outline: none;
       border: none;

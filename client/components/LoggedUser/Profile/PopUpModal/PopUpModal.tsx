@@ -2,7 +2,7 @@ import React from 'react'
 import { useState } from 'react'
 import { GrClose } from 'react-icons/gr'
 
-export default function PopUpModal({ isVisible, close }: any) {
+export default function PopUpModal({ isVisible, close, children }: any) {
 
   if (!isVisible) return (<></>)
 
@@ -20,8 +20,8 @@ export default function PopUpModal({ isVisible, close }: any) {
       <div className="content w-[40rem] xs:w-[18rem] sm:w-[24rem] md:w-[30rem]
         bg-slate-500 rounded-xl bg-opacity-50 relative p-4 pt-12 pb-8
       ">
-
-        <div className="input">
+        {children}
+        {/* <div className="input">
           <input type='text' placeholder='Enter the username'
           className='w-4/5 px-6 py-2 mx-auto rounded-[.5rem] bg-slate-300
             focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50
@@ -34,7 +34,7 @@ export default function PopUpModal({ isVisible, close }: any) {
             hover:bg-opacity-70 transition duration-300 ease-in-out
             '
           />
-        </div>
+        </div> */}
         <div className="close-icon absolute top-2 right-2 bg-slate-300
           flex justify-center items-center rounded-full w-8 h-8 hover:bg-red-200
           cursor-pointer 

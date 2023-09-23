@@ -47,11 +47,12 @@ export default function SearchContent() {
         mt-4 bg-gray-800 bg-opacity-50 rounded-[.5rem] p-2
       `}
       >
-        <ul className='flex flex-col gap-2'>
+        <ul className='flex flex-col'>
           {users.map((user: any) => (
             <div key={user.id} className="user">
               <li key={user.id}
-              className='flex items-center space-x-2 cursor-pointer hover:bg-slate-400 hover:bg-opacity-50'
+              className='flex items-center space-x-2 cursor-pointer hover:bg-slate-400 
+              hover:bg-opacity-50 rounded-[.5rem] p-2'
               >
                 <div className="w-8 h-8 relative overflow-hidden rounded-full">
                   <Image

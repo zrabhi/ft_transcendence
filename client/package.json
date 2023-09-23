@@ -24,6 +24,7 @@
     "class-variance-authority": "^0.7.0",
     "eslint": "8.45.0",
     "eslint-config-next": "13.4.12",
+    "formik": "^2.4.5",
     "framer-motion": "^10.16.2",
     "i": "^0.3.7",
     "js-cookie": "^3.0.5",
@@ -37,6 +38,7 @@
     "react-country-flag": "^3.1.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.10.1",
+    "react-modal": "^3.16.1",
     "sass": "^1.64.1",
     "socket.io-client": "^4.7.2",
     "tailwind-merge": "^1.14.0",
@@ -44,9 +46,11 @@
     "tailwindcss-animate": "^1.0.7",
     "tw-elements-react": "^1.0.0-alpha1",
     "typescript": "5.1.6",
-    "utf-8-validate": "^5.0.10"
+    "utf-8-validate": "^5.0.10",
+    "yup": "^1.2.0"
   },
   "devDependencies": {
-    "@types/js-cookie": "^3.0.4"
+    "@types/js-cookie": "^3.0.4",
+    "@types/react-modal": "^3.16.0"
   }
 }

@@ -56,6 +56,7 @@
     background-color: #14003d;
     color: #999999;
     width: 497px;
+    max-width: 497px;
     height: 100px;
     display: flex;
     justify-content: space-between;
@@ -120,4 +121,5 @@
   .friends-bar {
     width: 100%;
     width: 450px;
+    background-color: #654795;
   }

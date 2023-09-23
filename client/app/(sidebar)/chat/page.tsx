@@ -62,7 +62,6 @@ const Chat: React.FC = () => {
               channels={channels}
               setSelectedChannel={setSelectedChannel}
               setSelectedChat={setSelectedChat}
-              users={users}
             />
             {selectedChannel && <BoxChat selectedChannel={selectedChannel} selectedChat={selectedChat} setChannels={setChannels} users={users} />}
             <Friends setSelectedChannel={setSelectedChannel} setSelectedChat={setSelectedChat} users={users} />

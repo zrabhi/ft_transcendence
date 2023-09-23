@@ -11,20 +11,16 @@ import io, { Socket } from "socket.io-client";
 import { useCookies } from "react-cookie";
 import { Message } from "@/interfaces/ChatTypes";
 import { AuthContext } from "@/app/context/AuthContext";
+import Image from "next/image";
 
 let socket: Socket;
-const BoxChat = ({
-  selectedChannel,
-  selectedChat,
-  setChannels,
-  users,
-}: any): JSX.Element => {
+const BoxChat = ({ selectedChannel, selectedChat }: any): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [chat, setChat] = useState({});
   const [cookie, setCookie, remove] = useCookies(["access_token"]);
-  const {user} = useContext(AuthContext)
+  const { user } = useContext(AuthContext);
   // trying to create socket to connect with other user here
   useEffect(() => {
     (async () => {
@@ -34,7 +30,6 @@ const BoxChat = ({
       setMessages(() => []);
       setMessages((prevMessages) => [...prevMessages, ...response]); //reminderr
       console.log("chat ", selectedChat);
-      
     })();
 
     setChat(selectedChat);
@@ -107,7 +102,7 @@ const BoxChat = ({
                     key={index}
                   >
                     <span className="material-icons mr-2">
-                      {message.reciever}
+                      <Image alt={message.reciever} src={message.avatar} width={50} height={50} />
                     </span>
                     <p>{message.content}</p>
                   </div>
@@ -117,7 +112,7 @@ const BoxChat = ({
                     key={index}
                   >
                     <span className="material-icons mr-2">
-                      {message.sender}
+                      <Image alt={message.sender} src={message.avatar} width={50} height={50} />
                     </span>
                     <p>{message.content}</p>
                   </div>

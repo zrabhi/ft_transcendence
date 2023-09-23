@@ -79,7 +79,7 @@ const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
             </List>
           </Card>
         ) : (
-          <div className="friends-list">No friends</div>
+          <div className="friends-list">You need to Add new friends first</div>
         )}
       </div>
     </>

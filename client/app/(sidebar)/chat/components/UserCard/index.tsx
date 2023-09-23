@@ -1,11 +1,11 @@
-const UserCard = ({ user, onClick }: any): JSX.Element => {
+const UserCard = ({ channel, onClick }: any): JSX.Element => {
     return (
       <div
         onClick={onClick}
         className="user-card-container block p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700"
       >
-        <User user={user} />
-        <div>{user.message}</div>
+        <User user={channel} />
+        <div>{channel.message}</div>
       </div>
     );
   };

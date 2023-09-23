@@ -73,7 +73,7 @@ export default function SignIn() {
     e.preventDefault();
     const result = await LogIn(loginInfo);
     if (result) {
-      console.log(user.tfa);
+      // console.log(user.tfa);
       if (user.tfa){
         return router.push("/login/tfalogin");}
       router.push("/profile");

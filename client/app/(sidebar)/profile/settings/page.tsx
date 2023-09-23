@@ -108,7 +108,7 @@ export default function Settings() {
     if (type === "cover") formData.append("file", cover);
     const response = await postFileRequest(`${baseUrlUsers}/${type}`, formData);
     if (response.error) {
-      console.log(response);
+      // console.log(response);
       setError(true);
       setFileMsg("File Is not an image");
       return false;

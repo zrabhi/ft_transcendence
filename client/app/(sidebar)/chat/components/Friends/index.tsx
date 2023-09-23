@@ -25,6 +25,7 @@ const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
 
     setSelectedChannel(response); // to set selected channel after clicking a friend
     setSelectedChat(user); // to set the selected friend
+    console.log("selected user is ", user);
   };
 
 

@@ -15,17 +15,18 @@ import {
 import Channels from "./components/Channels";
 import BoxChat from "./components/BoxChat";
 import Friends from "./components/Friends";
-import { channels } from "@/interfaces/channels";
-import { chat } from "@/interfaces/ChatTypes";
+import { channel, channels } from "@/interfaces/channels";
+import { Message, chat } from "@/interfaces/ChatTypes";
 
 
 
 const Chat: React.FC = () => {
 
-  const [selectedChannel, setSelectedChannel] = useState<channels>(); // to set the channel selected
+  const [selectedChannel, setSelectedChannel] = useState<channel>(); // to set the channel selected
   const [selectedChat, setSelectedChat] = useState<chat>(); // to set the user selected
   //TODO:create type for channles already exists
-  const [channels, setChannels] = useState<any>([]); // to set channels already exists
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
   // GET all users
   useEffect(() => {
@@ -45,7 +46,7 @@ const Chat: React.FC = () => {
         setChannels((prevchannels: any) => [...prevchannels, ...responseRooms])
       } catch (error) { }
     })();
-  }, []);
+  }, [messages]);
 
   // TODO :?  --- GET CONNECTED USER FRIENDS
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
@@ -63,7 +64,7 @@ const Chat: React.FC = () => {
               setSelectedChannel={setSelectedChannel}
               setSelectedChat={setSelectedChat}
             />
-            {selectedChannel && <BoxChat selectedChannel={selectedChannel} selectedChat={selectedChat} setChannels={setChannels} users={users} />}
+            {selectedChannel && <BoxChat setMessages={setMessages} messages={messages} selectedChannel={selectedChannel} selectedChat={selectedChat} setChannels={setChannels} users={users} />}
             <Friends setSelectedChannel={setSelectedChannel} setSelectedChat={setSelectedChat} users={users} />
           </div>
         </div>

@@ -14,12 +14,12 @@ import { AuthContext } from "@/app/context/AuthContext";
 import Image from "next/image";
 
 let socket: Socket;
-const BoxChat = ({ selectedChannel, selectedChat }: any): JSX.Element => {
+const BoxChat = ({ selectedChannel, selectedChat,setMessages, messages }: any): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState<string>("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [chat, setChat] = useState({});
-  const [cookie, setCookie, remove] = useCookies(["access_token"]);
+  // const [messages, setMessages] = useState<Message[]>([]);
+  const [chat, setChat] = useState({}); // id && tyoe && avatar && username && message
+  const [cookie] = useCookies(["access_token"]);
   const { user } = useContext(AuthContext);
   // trying to create socket to connect with other user here
   useEffect(() => {
@@ -27,8 +27,9 @@ const BoxChat = ({ selectedChannel, selectedChat }: any): JSX.Element => {
       const response = await getRequest(
         `${baseChatUrl}/getMessages/${selectedChannel.id}`
       );
+      // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.users
       setMessages(() => []);
-      setMessages((prevMessages) => [...prevMessages, ...response]); //reminderr
+      setMessages((prevMessages: any) => [...prevMessages, ...response.allMessages]); //reminderr
       console.log("chat ", selectedChat);
     })();
 
@@ -50,7 +51,7 @@ const BoxChat = ({ selectedChannel, selectedChat }: any): JSX.Element => {
           sendedMessage.sender = messageInfo.reciever;
           sendedMessage.avatar = messageInfo.avatar;
         } else sendedMessage = messageInfo;
-        setMessages((prevMessages) => [...prevMessages, sendedMessage]);
+        setMessages((prevMessages : any) => [...prevMessages, sendedMessage]);
       });
     });
     return () => {
@@ -90,10 +91,6 @@ const BoxChat = ({ selectedChannel, selectedChat }: any): JSX.Element => {
       <div className="box-chat-messages">
         <div className="messages-box flex flex-col flex-grow overflow-y-auto justify-end">
           <div className="flex flex-col space-y-2 p-4">
-            {
-              /* TODO: List messages here */
-              //DONE
-            }
             {messages &&
               messages?.map((message, index) =>
                 message.reciever ? (

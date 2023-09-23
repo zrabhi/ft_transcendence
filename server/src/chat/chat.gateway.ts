@@ -59,6 +59,7 @@ handleJoinChat(@ConnectedSocket() client: Socket,@MessageBody() data: any,)
     })
     if (!payload)
         return client.disconnect(true);
+    // const user = this.userService.findUserById(payload.id);
     // console.log("uuuuu ",this.connectedUsers.get(client).avatar);
 
     const messageInfo = {

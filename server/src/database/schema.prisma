@@ -188,10 +188,10 @@ model Channel {
   members           ChannelMembers[]  @relation(name: "channelMembers")
 
   banedUsers        ChannelBan[]      @relation(name: "channelBan")
-
+  avatar String? @default("http://127.0.0.1:8080/api/avatar/pictures/default.jpeg")
+  time String?
   //TODO: OWNER
   // TODO: ADMINS
-  //TODO: time message sended
  //TODO muted Users
   created_at        DateTime @default(now())
 }

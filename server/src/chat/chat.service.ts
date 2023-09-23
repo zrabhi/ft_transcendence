@@ -61,8 +61,6 @@ export class ChatService {
         name: name,
       },
     });
-    console.log(search);
-
     return search;
   }
   async handleCreateRoomChannel(
@@ -75,6 +73,8 @@ export class ChatService {
     const result = await this.checkChannelRoomExistence(name);
     if (result) return { error: 'Channel already exists', channel: undefined };
     let channel: any;
+    console.log("type", type);
+
     if (type === 'PUBLIC') {
       channel = await this._prisma.channel.create({
         data: {
@@ -84,6 +84,7 @@ export class ChatService {
           member_limit: memberLimit,
         },
       });
+      console.log(channel);
     }
     if (type === 'PROTECTED') {
       if (!password)
@@ -110,31 +111,49 @@ export class ChatService {
         role: 'OWNER',
       },
     });
-    return { error: undefined, channel: channel };
+    return { error: undefined, channel: channel, user:user};
   }
 
-  async getChannelDmMessages(channel_id: string, user: any) {
-    const messages = await this._prisma.channelMessage.findMany({
-      where: { channel_id: channel_id },
+  async getChannelDmMessages(channel_id: string, user_id: string) {
+    const channel = await this._prisma.channel.findUnique({
+      where: { id: channel_id },
+      include:{
+        messages : true,
+        members: true
+      }
     });
-    const allMessage = [];
-    for (const message of messages) {
+    const user = await this._user.findUserById(user_id);
+    const allMessages = [];
+    for (const message of channel.messages) {
       if (message.user_id === user.id)
-        allMessage.push({
+        allMessages.push({
           reciever: user.username,
           avatar: user.avatar,
           content: message.content,
         });
       else {
         const otherUser = await this._user.findUserById(message.user_id);
-        allMessage.push({
+        allMessages.push({
           sender: otherUser.username,
           avatar: otherUser.avatar,
           content: message.content,
         });
       }
     }
-    return allMessage;
+    const users = []
+    for (const member of channel.members) {
+        const searchedUser = await this._user.findUserById(member.userId);
+        let checker = false;
+        if (searchedUser.username === channel.owner)
+          checker = true;
+        users.push({
+          username: searchedUser.username,
+          avatar: searchedUser.avatar,
+          status: searchedUser.status,
+          owner: checker
+        })
+    }
+    return {allMessages, users}; // returning all messages and users in channel
   }
 
   async handleGetRoomMessages(channel_id: string, user_id: string)
@@ -166,6 +185,7 @@ export class ChatService {
     }
     return allMessages;
   }
+
   //TODO: check if the user is blocked from the channel
   async handleJoinChannelRoom(name: string, user: any, password: string) {
     console.log(user.username, user.id);

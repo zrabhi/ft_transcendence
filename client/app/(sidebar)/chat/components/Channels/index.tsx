@@ -7,7 +7,7 @@ import {
 
 import UserCard from "../UserCard";
 import { BsSearch } from "react-icons/Bs";
-import { baseChatUrl, getRequest } from "@/app/context/utils/service";
+import { baseChatUrl, getRequest, postRequest } from "@/app/context/utils/service";
 import { Key, useEffect, useState } from "react";
 
 import Modal from "react-modal";
@@ -38,6 +38,7 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel }: any) => {
     const response = await getRequest(
       `${baseChatUrl}/getChannel/${channel.id}`
     );
+    // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.users
     setSelectedChat(channel);
     setSelectedChannel(response);
   };
@@ -78,7 +79,7 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel }: any) => {
       <ChannelsSwitcher isChecked={isChecked} setIsChecked={setIsChecked} />
 
       <div>
-        <AddNewChannel isChecked={isChecked} />
+        <AddNewChannel isChecked={isChecked} setSelectedChannel={setSelectedChannel} setSelectedChat={setSelectedChat} />
         {selectedChannels.length > 0 &&
           selectedChannels?.map((channel: any, index: Number) => {
             return (
@@ -125,7 +126,7 @@ const ChannelsSwitcher = ({ isChecked, setIsChecked }: any) => {
   );
 };
 
-const AddNewChannel = ({ isChecked }: any) => {
+const AddNewChannel = ({ isChecked, setSelectedChannel, setSelectedChat }: any) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => {
@@ -143,6 +144,8 @@ const AddNewChannel = ({ isChecked }: any) => {
       <ModalContainer
         isOpen={isOpen}
         handleOpen={handleOpen}
+        setSelectedChannel={setSelectedChannel}
+        setSelectedChat={setSelectedChat}
         typeModal={isChecked ? "room" : "dm"}
       />
     </>
@@ -162,11 +165,11 @@ const validationSchema = Yup.object().shape({
   password: Yup.string()
     .test(
       "password-required",
-      "Password is required when type is protected",
+      "Password is required when type is PROTECTED",
       function (value) {
         // 'this' refers to the current Yup validation context
         const type = this.parent.type;
-        if (type === "protected") {
+        if (type === "PROTECTED") {
           return !!value;
         }
         return true; // Password is not required for other types
@@ -195,7 +198,7 @@ const initialValues: FormValues = {
   avatar: "",
 };
 
-const ModalContainer = ({ isOpen, handleOpen, typeModal }: any) => {
+const ModalContainer = ({ isOpen, handleOpen, typeModal, setSelectedChannel, setSelectedChat }: any) => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null); // State to store the avatar image URL
 
 
@@ -213,9 +216,21 @@ const ModalContainer = ({ isOpen, handleOpen, typeModal }: any) => {
   };
   Modal.setAppElement("div");
 
-  const handleSubmit = (values: FormValues, { resetForm }: any) => {
+  const handleSubmit = async (values: FormValues, { resetForm }: any) => {
     // Handle form submission here
-    console.log(values);
+    console.log("value of format ", values);
+    const roomForm = {
+      name: values.name,
+      type: values.type,
+      avatar: values.avatar,
+      password: values.password,
+      memberLimit: 30,
+    }
+    const response = await postRequest(`${baseChatUrl}/create/room`, JSON.stringify(roomForm))
+    // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.users
+    console.log(response); // response value is ,  channel created and (the username , avatar, status , owner ) obkect of the creator
+    setSelectedChannel(response.channel);
+    setSelectedChat(response);
     resetForm();
   };
 
@@ -268,9 +283,9 @@ const ModalContainer = ({ isOpen, handleOpen, typeModal }: any) => {
                       className="border border-gray-300 rounded w-full px-3 py-2 my-2"
                     >
                       <option value="">Select type of this room</option>
-                      <option value="public">Public</option>
-                      <option value="private">Private</option>
-                      <option value="protected">Protected</option>
+                      <option value="PUBLIC">PUBLIC</option>
+                      <option value="PRIVATE">PRIVATE</option>
+                      <option value="PROTECTED">PROTECTED</option>
                     </Field>
                     <ErrorMessage
                       name="type"
@@ -279,7 +294,7 @@ const ModalContainer = ({ isOpen, handleOpen, typeModal }: any) => {
                     />
                   </div>
 
-                  {values.type === "protected" && (
+                  {values.type === "PROTECTED" && (
                     <div>
                       <label htmlFor="password" className="block text-gray-700 font-medium">
                         Password
@@ -357,7 +372,6 @@ const ModalContainer = ({ isOpen, handleOpen, typeModal }: any) => {
         ) : (
           <>
           {/* TODO: get all friends here ?? Todo or not*/}
-          
           </>
         )}
       </div>

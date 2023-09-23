@@ -20,7 +20,6 @@ import {
   getChannelDmDto,
   MessageInfo,
 } from './dto/chat.dto';
-import { channel } from 'diagnostics_channel';
 import { userInfo } from 'os';
 
 //TODO: CREATE GET BOTH DM AND ROOMS MESSAGES IN ON REQUEST
@@ -64,10 +63,19 @@ export class ChatController {
       user.id,
       createRoom,
     );
-    // console.log(result);
+    console.log("create rooom result ", result);
 
     if (result.channel === undefined) return res.status(400).json(result.error);
-    return res.status(200).json(result.channel);
+    const data = {
+      channel: result.channel,
+      members:  {
+        username: result.user.username,
+        avatar: result.user.avatar,
+        status: result.user.status,
+        owner: true,
+      }
+    }
+    return res.status(200).json(data);
   }
 
   @Put('joinroom/:name/:password')
@@ -118,8 +126,11 @@ export class ChatController {
   ) {
     const result = await this.chatService.getChannelDmMessages(
       channelId,
-      user
+      user.id
     );
+    console.log("all messages here =>",result.allMessages);
+    console.log("members are here =>",result.users);
+
     res.status(200).json(result);
   }
   @UseGuards(JwtAuthGuard)
@@ -141,7 +152,6 @@ export class ChatController {
     const result = (await this.chatService.getAllUserChannelsDm(
       user.username,
     )) as any;
-    // console.log('result here', result);
 
     const channels = [];
     for (const channel of result) {
@@ -156,13 +166,13 @@ export class ChatController {
 
       channels.push({
         id: channel.id,
+        type: "dm",
         username: searchedUser.username,
         avatar: searchedUser.avatar,
         message: lastMessage.content,
         status: searchedUser.status,
       });
     }
-    // console.log(channels);
     res.status(200).json(channels);
   }
 
@@ -175,21 +185,18 @@ export class ChatController {
     for (const channel of result) {
       const lastMessage = channel.messages[channel.messages.length - 1];
       if (!lastMessage) continue;
-      // console.log('last', lastMessage);
-
       const searchedUser = await this.userService.findUserById(
         lastMessage.user_id,
       );
       channels.push({
         id: channel.id,
-        username: channel.name,
+        type:"room",
+        username: "#" + channel.name,
         avatar: searchedUser.avatar,
         message: lastMessage.content,
         status: searchedUser.status,
       });
     }
-
-    // console.log(channels);
     res.status(200).json(channels);
     //TODO get all rooms user in
   }

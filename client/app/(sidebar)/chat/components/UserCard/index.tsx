@@ -19,11 +19,11 @@ const UserCard = ({ channel, onClick }: any): JSX.Element => {
           width={50}
           height={50}
           src={user.avatar}
-          alt={user.username}
+          alt={user.username ? user.username : "#" + user.name}
         />
         <div className="flex flex-col justify-between">
-          <div>{user.username}</div>
-          <div className='text-xs'>{user.status}</div>
+          <div>{user.username ? user.username : "#" + user.name}</div>
+          <div className='text-xs'>{user.status ? user.status : ""}</div>
         </div>
       </div>
     );

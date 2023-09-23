@@ -21,20 +21,6 @@ export default function PopUpModal({ isVisible, close, children }: any) {
         bg-slate-500 rounded-xl bg-opacity-50 relative p-4 pt-12 pb-8
       ">
         {children}
-        {/* <div className="input">
-          <input type='text' placeholder='Enter the username'
-          className='w-4/5 px-6 py-2 mx-auto rounded-[.5rem] bg-slate-300
-            focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50
-            block placeholder-capitalize text-black font-semibold
-          '
-          />
-          <input type="submit" value="SEARCH" 
-            className='w-4/5 p-2 mx-auto block mt-8 rounded-[.5rem] bg-purple-600
-            bg-opacity-50 text-white font-semibold cursor-pointer
-            hover:bg-opacity-70 transition duration-300 ease-in-out
-            '
-          />
-        </div> */}
         <div className="close-icon absolute top-2 right-2 bg-slate-300
           flex justify-center items-center rounded-full w-8 h-8 hover:bg-red-200
           cursor-pointer 

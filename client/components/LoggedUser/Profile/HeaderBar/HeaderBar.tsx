@@ -3,6 +3,8 @@ import { IoMdSearch } from 'react-icons/io'
 import { BsBellFill } from 'react-icons/Bs'
 import './HeaderBar.scss'
 import PopUpModal from '@/components/LoggedUser/Profile/PopUpModal/PopUpModal'
+import SearchContent from './SearchContent'
+import NotifContent from './NotifContent'
 
 export default function HeaderBar() {
 
@@ -18,10 +20,10 @@ export default function HeaderBar() {
         <IoMdSearch className="icon" onClick={() => setShowSearchModal(true)} />
         <BsBellFill className="icon" onClick={() => setShowNotifModal(true)} />
         <PopUpModal isVisible={showSearchModal} close={() => setShowSearchModal(false)}>
+          <SearchContent />
         </PopUpModal>
-          {/* <SearchContent /> */}
         <PopUpModal isVisible={showNotifModal} close={() => setShowNotifModal(false)}>
-          {/* <NotifContent /> */}
+          <NotifContent />
         </PopUpModal>
       </div>
     </div>

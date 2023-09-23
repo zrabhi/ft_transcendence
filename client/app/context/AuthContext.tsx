@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return false;
       }
       response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
-      console.log(response);
+      // console.log(response);
       setUser(response);
       return true;
     })();

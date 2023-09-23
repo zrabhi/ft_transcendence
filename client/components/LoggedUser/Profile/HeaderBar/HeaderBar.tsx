@@ -1,17 +1,30 @@
 import React from 'react'
-import SearchBar from '@/components/LoggedUser/Profile/HeaderBar/SearchBar/SearchBar'
-import Notification from '@/components/LoggedUser/Profile/HeaderBar/Notification/Notification'
+import { IoMdSearch } from 'react-icons/io'
+import { BsBellFill } from 'react-icons/Bs'
 import './HeaderBar.scss'
+import PopUpModal from '@/components/LoggedUser/Profile/PopUpModal/PopUpModal'
+import SearchContent from './SearchContent'
+import NotifContent from './NotifContent'
 
 export default function HeaderBar() {
+
+  const [showSearchModal, setShowSearchModal] = React.useState(false)
+  const [showNotifModal, setShowNotifModal] = React.useState(false)
+
   return (
     <div className="header-bar">
-      <div className="header-bar__title">
-        <h1>Welocme Back</h1>
+      <div className="title">
+        <h1 className='text-white'>Welocme Back</h1>
       </div>
-      <div className="header-icons">
-        <SearchBar />
-        <Notification />
+      <div className="icons">
+        <IoMdSearch className="icon" onClick={() => setShowSearchModal(true)} />
+        <BsBellFill className="icon" onClick={() => setShowNotifModal(true)} />
+        <PopUpModal isVisible={showSearchModal} close={() => setShowSearchModal(false)}>
+          <SearchContent />
+        </PopUpModal>
+        <PopUpModal isVisible={showNotifModal} close={() => setShowNotifModal(false)}>
+          <NotifContent />
+        </PopUpModal>
       </div>
     </div>
   )

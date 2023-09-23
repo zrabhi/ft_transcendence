@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { Button } from '@radix-ui/themes'
+// import { Button } from '@radix-ui/themes'
 
 export default function Leaderboard() {
   return (

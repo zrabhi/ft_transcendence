@@ -73,7 +73,7 @@ export default function SignIn() {
     e.preventDefault();
     const result = await LogIn(loginInfo);
     if (result) {
-      console.log(user.tfa);
+      // console.log(user.tfa);
       if (user.tfa){
         return router.push("/login/tfalogin");}
       router.push("/profile");
@@ -129,41 +129,9 @@ export default function SignIn() {
                     <div ref={passMessage} className="text"></div>
                   </div>
                 </div>
-                <div className="checkbox">
-                  <input
-                    type="checkbox"
-                    name="terms"
-                    id="terms"
-                    autoComplete='off'
-                    value="terms"
-                  />
-                  <div className="check-icon" onClick={handleCheckOne}>
-                    <div ref={checkOne} className="icon hidden">
-                      <FaCheckSquare size="16" />
-                    </div>
-                  </div>
-                  <label htmlFor="terms" onClick={handleCheckOne}>
-                    I agree to <Link href="#">terms & conditions</Link>{" "}
-                  </label>
-                </div>
 
-                <div className="checkbox">
-                  <input
-                    type="checkbox"
-                    name="terms"
-                    id="news"
-                    value="news"
-                    autoComplete="off"
-                  />
-                  <div className="check-icon" onClick={handleCheckTwo}>
-                    <div ref={checkTwo} className="icon hidden">
-                      <FaCheckSquare size="16" />
-                    </div>
-                  </div>
-                  <label htmlFor="news" onClick={handleCheckTwo}>
-                    I&apos;d like to being informed about latest news and tips
-                  </label>
-                </div>
+
+
                 <div ref={ErrorRef} className="errorRef email-error"></div>
                 <button onClick={handleClickButton} className=""> sign in</button>
                 <div className="auto-auth">

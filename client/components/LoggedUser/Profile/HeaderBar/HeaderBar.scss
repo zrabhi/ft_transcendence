@@ -6,12 +6,21 @@
   align-items: center;
   gap: .8rem;
   background-color: $blue-bg-color;
-  padding: .5rem;
-  margin-bottom: 2rem;
+  padding: .5rem 1rem;
+  margin-bottom: 1rem;
   border-radius: 1rem;
-  .header-icons {
+  .title {
+    width: fit-content;
+  }
+  .icons {
     display: flex;
     align-items: center;
-    gap: .5rem;
+    gap: 1rem;
+    .icon {
+      @apply 
+        cursor-pointer 
+        w-5 lg:w-7
+        h-5 lg:h-7
+    }
   }
 }

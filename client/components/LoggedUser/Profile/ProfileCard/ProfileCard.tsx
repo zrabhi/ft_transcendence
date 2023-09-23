@@ -4,7 +4,7 @@ import './ProfileCard.scss'
 import Image from 'next/image'
 import Link from 'next/link'
 import CoverImage from '@/public/images/FetchCoverImage.png'
-import { BsTwitter, BsDiscord } from 'react-icons/Bs'
+import { BsTwitter, BsDiscord } from 'react-icons/bs'
 import Avatar from '@/public/images/DefaultAvatar.jpg'
 
 export default function ProfileCard(user: any) {

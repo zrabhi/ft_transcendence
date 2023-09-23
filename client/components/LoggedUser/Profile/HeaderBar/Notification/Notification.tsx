@@ -1,5 +1,5 @@
 import React from 'react'
-import { BsBellFill } from 'react-icons/Bs'
+import { BsBellFill } from 'react-icons/bs'
 import './Notification.scss'
 
 export default function Notification() {

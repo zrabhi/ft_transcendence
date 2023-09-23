@@ -1,97 +1,75 @@
-"use client"
-import React, { useEffect, useState } from 'react'
+import React from 'react';
+import Image from 'next/image';
+import AvatarImage from '@/public/images/DefaultAvatar.jpg'; // Import your avatar image
+import DefaultCover from '@/public/images/DefaultCover.jpeg'; // Import your cover image
 import './ProfileCard.scss'
-import Image from 'next/image'
-import Link from 'next/link'
-import CoverImage from '@/public/images/FetchCoverImage.png'
-import { BsTwitter, BsDiscord } from 'react-icons/Bs'
-import Avatar from '@/public/images/DefaultAvatar.jpg'
 
-export default function ProfileCard(user: any) {
-
-  const handleImageClick = () => {
-    // console.log('image clicked')
-    // console.log(user.data && user.data.avatar);
-    // console.log(`usernmea : ${user.data && user.data.username}}`);
-  }
-
+export default function ProfileCard({ user }: any) {
   return (
-    <div className="profile-card">
-      <div className="cover-img">
+    <div className="profile-card text-main-text-color shadow-lg p-6">
+      <div className="relative h-32 w-full mb-4 overflow-hidden">
         <Image
-          src={user.data && user.data.cover? user.data.cover : CoverImage}
-          width={100}
-          height={100}
-          alt='cover image'
+          src={DefaultCover}
+          layout="fill"
+          objectFit="cover"
+          alt="Statistics Cover"
+          className='bg-fixed bg-no-repeat'
         />
       </div>
-      <div className="info">
-        <div className="first">
-          <div className="total-games">
-            <h4>total games</h4>
-            {
-              user.data && user.data.totalGames
-            }
-          </div>
-          <div className="state">
-            <h4>stats</h4>
-            {
-              // user.data && user.data.avatar 
-            }
-          </div>
-        </div>
-        <div className="second">
-          <div className="social-media">
-            <h4>social medias</h4>
-            <div className="icons">
-              {/* Discord  */}
-              { (user.data && user.data.discordHandler && user.data.discordHandler.length >= 0 ) ?
-                <div className="discord icon">
-                  <Link href={user.data && user.data.discordHandler} target='_blank'>
-                    <BsDiscord />
-                  </Link>
-                </div>
-                : 
-                <div className="discord icon grayscale pointer-none">
-                  <BsDiscord />
-                </div>
-              }
 
-              {/* Twitter */}
-              { (user.data && user.data.twitterHandler && user.data.twitterHandler.length >= 0 ) ?
-                <div className="discord icon">
-                  <Link href={user.data && user.data.twitterHandler} target='_blank'>
-                    <BsTwitter />
-                  </Link>
-                </div>
-                : 
-                <div className="discord icon grayscale pointer-none">
-                  <BsTwitter />
-                </div>
-              }
-            </div>
-          </div>
-        </div>
+      <div className="relative w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden">
+        <Image
+          src={user && user.data && user.data.avatar ? user.data.avatar : AvatarImage}
+          layout="fill"
+          objectFit="cover"
+          alt="User Avatar"
+        />
       </div>
-      <div className="user">
-        <div className="img relative w-4/5 mx-auto">
-          <Image
-            src={user.data && user.data.avatar && !user.data.avatar.includes('googleusercontent') ? user.data.avatar : Avatar}
-            width={500}
-            height={500}
-            alt='Image of the user'
-            className='rounded-full '
-            onClick={handleImageClick}
-          />
-          <div className="level w-8 h-8 rounded-full flex justify-center items-center absolute bottom-2 right-2">
-          4
+
+      {/* User Info */}
+      <div className="text-center">
+        {/* Display the user's username */}
+        <h2 className="text-xl font-semibold">{user && user.data && user.data.username}</h2>
+
+        {/* User Statistics */}
+        <div className="mt-2">
+          {/* Customize and display user statistics */}
+          <div className="mb-2">
+            <span className="text-gray-400">Total Games:</span>{' '}
+            {user && user.data && user.data.totalGames}
+          </div>
+          <div className="mb-2">
+            <span className="text-gray-400">Win Rate:</span>{' '}
+            {user && user.data && user.data.winRate}
+          </div>
+          <div>
+            <span className="text-gray-400">Ladder Rank:</span>{' '}
+            {user && user.data && user.data.ladderRank}
           </div>
         </div>
-        <div className="username text-center m-2">
-          {user.data &&
-          user.data.username}
+        <div className="mt-4">
+          {user && user.data && user.data.discordHandler && (
+            <a
+              href={user.data.discordHandler}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-soft-gold-color hover:text-light-gold-color mr-4"
+            >
+              Discord
+            </a>
+          )}
+          {user && user.data && user.data.twitterHandler && (
+            <a
+              href={user.data.twitterHandler}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-soft-gold-color hover:text-light-gold-color"
+            >
+              Twitter
+            </a>
+          )}
         </div>
       </div>
     </div>
-  )
+  );
 }

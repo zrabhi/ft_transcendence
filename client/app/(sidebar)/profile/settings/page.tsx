@@ -12,7 +12,6 @@ import {
   putRequest,
 } from "@/app/context/utils/service";
 import { StaticImageData } from "next/image";
-import { Avatar } from "@radix-ui/themes";
 import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
 
 export default function Settings() {
@@ -247,17 +246,14 @@ export default function Settings() {
             className="
             btn
             text-white
-            text-xl
             px-8 py-2
             mx-auto
             block
-            capitalize
-            rounded-lg
             my-8
             "
             href="/profile"
           >
-            go to profile
+            Go to profile
           </Link>
           <div className="setting-box">
             <h3 className="mx-auto">Update your Informations</h3>

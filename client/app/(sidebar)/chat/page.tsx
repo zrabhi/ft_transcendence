@@ -48,10 +48,10 @@ const Chat: React.FC = () => {
   }, []);
 
   // TODO :?  --- GET CONNECTED USER FRIENDS
-
+  const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
   return (
     <div className="logged-user">
-      <SideBar />
+      <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded}/>
       <div className="home">
         <div className="chat-page">
           <h2 className="text-2xl text-white mx-auto my-4">

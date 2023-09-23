@@ -9,7 +9,7 @@
 }
 
 body {
-  background-color: #090227;
+  background-color: #1f0d3c;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -31,7 +31,7 @@ body {
 }
 
 .not-found .container .content .link {
-  background-color: #4D4AC9;
+  background-color: #654795;
   width: -moz-fit-content;
   width: fit-content;
 }

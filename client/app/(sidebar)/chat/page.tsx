@@ -42,6 +42,8 @@ const Chat: React.FC = () => {
       try {
         const responseDm = await getRequest(`${baseChatUrl}/channelsDm`); // fetching USER Dms
         setChannels(responseDm);
+        console.log("reposne form ge channles", responseDm);
+        
         const responseRooms = await getRequest(`${baseChatUrl}/channelsRooms`); // fetching user rooms
         setChannels((prevchannels: any) => [...prevchannels, ...responseRooms])
       } catch (error) { }

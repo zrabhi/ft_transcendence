@@ -30,6 +30,8 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel }: any) => {
     //   JSON.stringify({ username: user.username, memberLimit: 2 })
     // );
     // replacing create/dm with get channel
+    console.log("in channels component",channel.id);
+    
     const response = await getRequest(
       `${baseChatUrl}/getChannel/${channel.id}`
     );
@@ -44,7 +46,7 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel }: any) => {
         !isChecked ? ch?.type === "dm" : ch?.type === "room"
       )
     );
-  }, [isChecked]);
+  }, [isChecked, channels]);
   
   return (
     <div className="users-container">
@@ -85,9 +87,9 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel }: any) => {
           selectedChannels?.map((channel: any, index: Number) => {
             return (
               <UserCard
-                channel={channel}
+                channel={channel.channel}
                 key={index}
-                onClick={() => handleClickUserMessage(channel)}
+                onClick={() => handleClickUserMessage(channel.channel)} // replacing channel with channel.channel
               />
             );
           })}
@@ -235,9 +237,9 @@ const ModalContainer = ({
       JSON.stringify(roomForm)
     );
     // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.users
-    console.log(response); // response value is ,  channel created and (the username , avatar, status , owner ) obkect of the creator
-    setSelectedChannel(response.channel);
-    setSelectedChat(response);
+    console.log("channel craeted", response); // response value is ,  channel created and (the username , avatar, status , owner ) obkect of the creator
+    setSelectedChannel(response);
+    setSelectedChat(response.channel); /// edited with response.channel
     resetForm();
     handleOpen();
   };

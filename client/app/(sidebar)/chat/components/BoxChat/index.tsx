@@ -47,7 +47,7 @@ interface CheckboxesState {
 }
 
 let socket: Socket;
-const BoxChat = ({ selectedChat, setMessages, messages }: any): JSX.Element => {
+const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel }: any): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // state for dropdown
@@ -59,81 +59,81 @@ const BoxChat = ({ selectedChat, setMessages, messages }: any): JSX.Element => {
   });
 
   // if you wanna test this with backend please remove this state and pass a prop called selectedChannel
-  const [selectedChannel, setSelectedChannel] = useState({
-    type: "room",
-    members: [
-      {
-        id: 1,
-        name: "User 1",
-        role: "Owner",
-        avatar: "https://via.placeholder.com/150",
-        status: "Online",
-      },
-      {
-        id: 2,
-        name: "User 2",
-        role: "Admin",
-        avatar: "https://via.placeholder.com/150",
-        status: "Online",
-      },
-      {
-        id: 3,
-        name: "User 3",
-        role: "Member",
-        avatar: "https://via.placeholder.com/150",
-        status: "Offline",
-      },
-      {
-        id: 4,
-        name: "User 4",
-        role: "Admin",
-        avatar: "https://via.placeholder.com/150",
-        status: "Online",
-      },
-      {
-        id: 5,
-        name: "User 5",
-        role: "Admin",
-        avatar: "https://via.placeholder.com/150",
-        status: "Offline",
-      },
-      {
-        id: 6,
-        name: "User 6",
-        role: "Member",
-        avatar: "https://via.placeholder.com/150",
-        status: "Online",
-      },
-      {
-        id: 7,
-        name: "User 7",
-        role: "Member",
-        avatar: "https://via.placeholder.com/150",
-        status: "Offline",
-      },
-      {
-        id: 8,
-        name: "User 8",
-        role: "Admin",
-        avatar: "https://via.placeholder.com/150",
-        status: "Online",
-      },
-      {
-        id: 9,
-        name: "User 9",
-        role: "Member",
-        avatar: "https://via.placeholder.com/150",
-        status: "Offline",
-      },
-    ],
-  });
+  // const [selectedChannel, setSelectedChannel] = useState({
+  //   type: "room",
+  //   members: [
+  //     {
+  //       id: 1,
+  //       name: "User 1",
+  //       role: "Owner",
+  //       avatar: "https://via.placeholder.com/150",
+  //       status: "Online",
+  //     },
+  //     {
+  //       id: 2,
+  //       name: "User 2",
+  //       role: "Admin",
+  //       avatar: "https://via.placeholder.com/150",
+  //       status: "Online",
+  //     },
+  //     {
+  //       id: 3,
+  //       name: "User 3",
+  //       role: "Member",
+  //       avatar: "https://via.placeholder.com/150",
+  //       status: "Offline",
+  //     },
+  //     {
+  //       id: 4,
+  //       name: "User 4",
+  //       role: "Admin",
+  //       avatar: "https://via.placeholder.com/150",
+  //       status: "Online",
+  //     },
+  //     {
+  //       id: 5,
+  //       name: "User 5",
+  //       role: "Admin",
+  //       avatar: "https://via.placeholder.com/150",
+  //       status: "Offline",
+  //     },
+  //     {
+  //       id: 6,
+  //       name: "User 6",
+  //       role: "Member",
+  //       avatar: "https://via.placeholder.com/150",
+  //       status: "Online",
+  //     },
+  //     {
+  //       id: 7,
+  //       name: "User 7",
+  //       role: "Member",
+  //       avatar: "https://via.placeholder.com/150",
+  //       status: "Offline",
+  //     },
+  //     {
+  //       id: 8,
+  //       name: "User 8",
+  //       role: "Admin",
+  //       avatar: "https://via.placeholder.com/150",
+  //       status: "Online",
+  //     },
+  //     {
+  //       id: 9,
+  //       name: "User 9",
+  //       role: "Member",
+  //       avatar: "https://via.placeholder.com/150",
+  //       status: "Offline",
+  //     },
+  //   ],
+  // });
   // const [messages, setMessages] = useState<Message[]>([]);
   const [chat, setChat] = useState({}); // id && tyoe && avatar && username && message
   const [cookie] = useCookies(["access_token"]);
   const { user } = useContext(AuthContext);
 
   const getRoleOptions = (type: string) => {
-    if (type === "room") {
+    if (type === "PUBLIC" || type ==="PRIVATE" || type === "PROTECTED") {
       return {
         Owner: [
           { text: "Delete Room", action: handleDeleteRoom },
@@ -160,7 +160,7 @@ const BoxChat = ({ selectedChat, setMessages, messages }: any): JSX.Element => {
     }
   };
 
-  const roleOptions = getRoleOptions(selectedChannel.type);
+  const roleOptions = getRoleOptions(selectedChannel.channel.type);
 
   function handleBlock() {
     alert("Block action");
@@ -183,17 +183,18 @@ const BoxChat = ({ selectedChat, setMessages, messages }: any): JSX.Element => {
   };
 
   const optionsToShow =
-    selectedChannel?.type === "room" ? roleOptions["Owner"] : roleOptions || [];
+    ((selectedChannel?.channel.type === "PUBLIC") || (selectedChannel?.channel.type === "PROTECTED")
+    || (selectedChannel?.channel.type === "PRIVATE")) ? roleOptions["Owner"] : roleOptions || [];
 
   const separateOptions = optionsToShow.filter(
-    (option) =>
+    (option: any) =>
       option.text === "Delete Room" ||
       option.text === "Leave Room" ||
       option.text === "Block"
   );
 
   const nonSeparateOptions = optionsToShow.filter(
-    (option) =>
+    (option: any) =>
       option.text !== "Delete Room" &&
       option.text !== "Leave Room" &&
       option.text !== "Block"
@@ -224,9 +225,11 @@ const BoxChat = ({ selectedChat, setMessages, messages }: any): JSX.Element => {
 
   // trying to create socket to connect with other user here
   useEffect(() => {
+      console.log("selected channe sis =>", selectedChannel);
+      
     (async () => {
       const response = await getRequest(
-        `${baseChatUrl}/getMessages/${selectedChannel.id}`
+        `${baseChatUrl}/getMessages/${selectedChannel?.channel?.id}`
       );
       // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.users
       setMessages(() => []);
@@ -245,7 +248,7 @@ const BoxChat = ({ selectedChat, setMessages, messages }: any): JSX.Element => {
     });
     socket.on("connected", () => {
       console.table("connected");
-      socket.emit("joinChat", { id: selectedChannel.id });
+      socket.emit("joinChat", { id: selectedChannel.channel.id });
 
       socket.on("message", (messageInfo: Message) => {
         let sendedMessage: Message = {
@@ -275,7 +278,7 @@ const BoxChat = ({ selectedChat, setMessages, messages }: any): JSX.Element => {
   const sendMessage = async () => {
     const body = {
       message: message,
-      channelId: selectedChannel.id,
+      channelId: selectedChannel.channel.id,
       token: cookie.access_token,
     };
 

@@ -22,7 +22,9 @@ const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
       `${baseChatUrl}/create/dm`,
       JSON.stringify({ username: user.username, memberLimit: 2 })
     );
-
+    
+    console.log("res is => ",response);
+    
     setSelectedChannel(response); // to set selected channel after clicking a friend
     setSelectedChat(user); // to set the selected friend
     console.log("selected user is ", user);

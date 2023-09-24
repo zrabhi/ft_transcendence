@@ -59,12 +59,12 @@ handleJoinChat(@ConnectedSocket() client: Socket,@MessageBody() data: any,)
     })
     if (!payload)
         return client.disconnect(true);
-    // const user = this.userService.findUserById(payload.id);
+    const user =await  this.userService.findUserById(payload.id);
     // console.log("uuuuu ",this.connectedUsers.get(client).avatar);
 
     const messageInfo = {
-      reciever: payload.username,
-      avatar: this.connectedUsers.get(client).avatar,
+      reciever: user.username,
+      avatar: user.avatar,
       content: data.message,
     };
     this.chatService.saveMessageToChannel(payload, data);

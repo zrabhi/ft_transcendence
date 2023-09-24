@@ -41,7 +41,15 @@ export class ChatController {
       user.id,
       createDm,
     );
-    res.status(200).json(result);
+    const members = [];
+    members.push({ username: result.user.username,
+      avatar: result.user.avatar,
+      status: result.user.status,})
+    const data = {
+      channel: result.channel,
+      members:  members
+    }
+    res.status(200).json(data);
   }
   // @Get('getChannel/:channelName')
   // @UseGuards(JwtAuthGuard)
@@ -66,14 +74,16 @@ export class ChatController {
     console.log("create rooom result ", result);
 
     if (result.channel === undefined) return res.status(400).json(result.error);
-    const data = {
-      channel: result.channel,
-      members:  {
-        username: result.user.username,
+    const members = [];
+    members.push({
+        name: result.user.username,
         avatar: result.user.avatar,
         status: result.user.status,
-        owner: true,
-      }
+        role: "Owner"
+    })
+    const data = {
+      channel: result.channel,
+      members:  members
     }
     return res.status(200).json(data);
   }
@@ -101,9 +111,27 @@ export class ChatController {
   {
     console.log("im here");
     
-      const result =  await this.chatService.getChannelById(channleId);
-      console.log("channleby id  found", result);
-      res.status(200).json(result);
+      const channel =  await this.chatService.getChannelById(channleId);
+      const members = [];
+      for (const member of channel.members)
+      {
+          const user = await this.userService.findUserById(member.userId);
+          let checker = "Member"
+          if (channel.owner ===user.username)
+              checker = "Owner"
+          members.push({
+            name:user.username,
+            avatar: user.avatar,
+            status: user.status,
+            role:checker
+          })
+      }
+      const data = {
+        channel: channel,
+        members: members
+      }
+      console.log("channleby id  found", channel);
+      res.status(200).json(data);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -149,21 +177,40 @@ export class ChatController {
   @UseGuards(JwtAuthGuard)
   @Get('channelsDm')
   async handleGetChannelsDm(@Res() res: Response, @UserInfo() user: User) {
-    const result = (await this.chatService.getAllUserChannelsDm(
-      user.username,
+    
+    const currUser = await this.userService.findUserById(user.id);
+    let result = (await this.chatService.getAllUserChannelsDm(
+      currUser,
     )) as any;
-
+    
+    console.log("result here is ", result);
+    
+    const data = [];
     const channels = [];
     for (const channel of result) {
       const searchedUserName = channel.users.filter((username) => {
-        if (username != user.username) return username;
+        if (username != currUser.username) return username;
       });
       const lastMessage = channel.messages[channel.messages.length - 1];
       if (!lastMessage) continue;
       const searchedUser = await this.userService.findUserName(
         searchedUserName[0],
       );
-
+      data.push({
+        type: "dm",
+        channel: {
+          id: channel.id,
+          username: searchedUser.username, /// it ay be deleteedd
+          avatar: searchedUser.avatar,
+          message: lastMessage.content,
+          status: searchedUser.status,
+        },
+        memebers:{
+          name:searchedUser.username,
+          avatar:searchedUser.avatar,
+          status: searchedUser.status
+        }
+      })
       channels.push({
         id: channel.id,
         type: "dm",
@@ -173,7 +220,9 @@ export class ChatController {
         status: searchedUser.status,
       });
     }
-    res.status(200).json(channels);
+    console.log("data is >>" , data);
+    
+    res.status(200).json(data);
   }
 
   @Get('channelsRooms')
@@ -189,18 +238,42 @@ export class ChatController {
         lastMessage.user_id,
       );
       channels.push({
-        id: channel.id,
-        type:"room",
-        username: "#" + channel.name,
-        avatar: searchedUser.avatar,
-        message: lastMessage.content,
-        status: searchedUser.status,
-      });
+        type: "room",
+        channel: {
+          id: channel.id,
+          name: channel.name, /// it ay be deleteedd
+          avatar: channel.avatar,
+          message: lastMessage.content,
+          status: "",
+        },
+        memebers:{
+          name:searchedUser.username,
+          avatar:searchedUser.avatar,
+          status: searchedUser.status,
+          role:"Member"
+        }
+      })
+      // channels.push({
+      //   id: channel.id,
+      //   type:"room",
+      //   username: "#" + channel.name,
+      //   avatar: searchedUser.avatar,
+      //   message: lastMessage.content,
+      //   status: searchedUser.status,
+      // });
     }
     res.status(200).json(channels);
     //TODO get all rooms user in
   }
+
+  @Get('LastMessages')
+  @UseGuards(JwtAuthGuard)
+  async handleGetUserLastMessages(@UserInfo() suer: User, @Res() res : Response)
+  {
+    // todo get all last messages 
+  }
 }
+//TODO: GET ALL MESSAGES IN ON REQUEST 
 
 // TODO : CREATE ALL GET RQUESTS TO GET CHATS
 //TODO: add time to messages senn

@@ -28,12 +28,17 @@ export class ChatService {
   }
   async getChannelById(channelId: string)
   {
-    return await this._prisma.channel.findUnique({
+    const channel = await this._prisma.channel.findUnique({
       where:
       {
         id: channelId
+      },
+      include:
+      {
+        members: true,
       }
     })
+    return channel
   }
   async checkChannelDmExistence(
     user: string,
@@ -50,6 +55,8 @@ export class ChatService {
         id: true,
         name: true, // You can select other fields you need from the channel
         users: true,
+        type:true,
+
       },
     });
     return search;
@@ -124,6 +131,9 @@ export class ChatService {
     });
     const user = await this._user.findUserById(user_id);
     const allMessages = [];
+    console.log("channel", channel_id);
+
+    if (channel.messages.length > 0){
     for (const message of channel.messages) {
       if (message.user_id === user.id)
         allMessages.push({
@@ -140,12 +150,13 @@ export class ChatService {
         });
       }
     }
+  }
     const users = []
     for (const member of channel.members) {
         const searchedUser = await this._user.findUserById(member.userId);
-        let checker = false;
-        if (searchedUser.username === channel.owner)
-          checker = true;
+        let checker = "Member";
+        if (searchedUser.username === channel.owner) //TODO: get admin channels too
+          checker = "Owner";
         users.push({
           username: searchedUser.username,
           avatar: searchedUser.avatar,
@@ -232,7 +243,13 @@ export class ChatService {
     const otherUser = await this._user.findUserName(username);
 
     const result = await this.checkChannelDmExistence(user.username, username);
-    if (result.length > 0) return result[0];
+    if (result.length > 0){
+      const data = {
+       channel: result[0],
+       user:user,
+     }
+       return data;
+      }
     const channel = await this._prisma.channel.create({
       data: {
         name:  uuidv4(),
@@ -256,7 +273,7 @@ export class ChatService {
         role: 'MEMBER',
       },
     });
-    return channel;
+    return {channel:channel, user:otherUser};
   }
   //Todo: saveMessageToChannel:
 
@@ -270,13 +287,14 @@ export class ChatService {
     });
   }
 
-  async getAllUserChannelsDm(username: string): Promise<Channel[]> {
+  async getAllUserChannelsDm(currUser: any): Promise<Channel[]> {
     const channelsDm = await this._prisma.channel.findMany({
       where: {
-        AND: [{ users: { has: username } }],
+        AND: [{ users: { has: currUser.username } }],
       },
       include: {
         messages: true,
+        
       },
     });
     return channelsDm;
@@ -303,7 +321,6 @@ export class ChatService {
         if (isInRoom.length > 0)
             Rooms.push(channel)
     }
-    console.log("Rooms", Rooms);
     return Rooms
   }
 }

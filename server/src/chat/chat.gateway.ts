@@ -46,20 +46,63 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
     console.log(`Client disconnected   id ${client.id}`);
 }
 @SubscribeMessage('joinChat')
-handleJoinChat(@ConnectedSocket() client: Socket,@MessageBody() data: any,)
+handleJoinChat(@ConnectedSocket() client: Socket,@MessageBody() data: any)
 {
   // console.log("client joined chat with ", data.id, this.connectedUsers.get(client));
 
   client.join(data.id);
 }
-  @SubscribeMessage('message')
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+@SubscribeMessage('leaveChannel')
+async handleLeveChannel(@ConnectedSocket() client: Socket, @MessageBody() data: any)
+{
+  // checking the access token of user is still valid if not the socket is the disconnected and the action not made 
+  const payload = await this.jwtService.verifyAsync(data.token,{
+    secret: process.env.JWT_SECRET,
+  })
+  if (!payload)
+      return client.disconnect(true);
+  //TODO: handleLeave Channel here
+}
+@SubscribeMessage('mute')
+async handleMutedUser(@ConnectedSocket() client: Socket, @MessageBody() data: any)
+{
+  // checking the access token of user is still valid if not the socket is the disconnected and the action not made
+  const payload = await this.jwtService.verifyAsync(data.token,{
+    secret: process.env.JWT_SECRET,
+  })
+  if (!payload)
+      return client.disconnect(true);
+}
+@SubscribeMessage('ban')
+async handleBannedUser(@ConnectedSocket() client: Socket, @MessageBody() data: any)
+{
+  // checking the access token of user is still valid if not the socket is the disconnected and the action not made
+  const payload = await this.jwtService.verifyAsync(data.token,{
+    secret: process.env.JWT_SECRET,
+  })
+  if (!payload)
+      return client.disconnect(true);
+}
+@SubscribeMessage('block')
+async handleblockeedUser(@ConnectedSocket() client: Socket, @MessageBody() data: any)
+{
+  // checking the access token of user is still valid if not the socket is the disconnected and the action not made
+  const payload = await this.jwtService.verifyAsync(data.token,{
+    secret: process.env.JWT_SECRET,
+  })
+  if (!payload)
+      return client.disconnect(true);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+@SubscribeMessage('message')
   async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() data: any){
     const payload = await this.jwtService.verifyAsync(data.token,{
       secret: process.env.JWT_SECRET,
     })
     if (!payload)
         return client.disconnect(true);
-    const user =await  this.userService.findUserById(payload.id);
+    const user =  await  this.userService.findUserById(payload.id);
     // console.log("uuuuu ",this.connectedUsers.get(client).avatar);
 
     const messageInfo = {

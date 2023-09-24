@@ -26,7 +26,7 @@ export class UserService {
 
   async findAllUsers(user): Promise<User[]> {
     const Allusers = await this.prismaService.user.findMany({});
-    const users = Allusers.filter(currUser =>  currUser.id != user.id)
+    const users = Allusers.filter(currUser => currUser.id != user.id) // error returning cuurent user
     return users;
   }
 

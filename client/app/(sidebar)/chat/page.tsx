@@ -48,7 +48,7 @@ const Chat: React.FC = () => {
         setChannels((prevchannels: any) => [...prevchannels, ...responseRooms])
       } catch (error) { }
     })();
-  }, [messages]);
+  }, []);
 
   // TODO :?  --- GET CONNECTED USER FRIENDS
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
@@ -62,11 +62,12 @@ const Chat: React.FC = () => {
           </h2>
           <div className="container">
             <Channels
+              setMessages={setMessages}
               channels={channels}
               setSelectedChannel={setSelectedChannel}
               setSelectedChat={setSelectedChat}
             />
-            {selectedChannel && <BoxChat setMessages={setMessages} messages={messages} selectedChannel={selectedChannel} selectedChat={selectedChat} setChannels={setChannels} users={users} />}
+            {selectedChannel && <BoxChat setMessages={setMessages} messages={messages}  channels={channels} selectedChannel={selectedChannel} selectedChat={selectedChat} setChannels={setChannels} users={users} />}
             <Friends setSelectedChannel={setSelectedChannel} setSelectedChat={setSelectedChat} users={users} />
           </div>
         </div>

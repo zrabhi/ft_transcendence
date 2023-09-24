@@ -47,7 +47,7 @@ interface CheckboxesState {
 }
 
 let socket: Socket;
-const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel }: any): JSX.Element => {
+const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChannels, channels }: any): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // state for dropdown
@@ -259,8 +259,23 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel }: any):
           sendedMessage.avatar = messageInfo.avatar;
         } else sendedMessage = messageInfo;
         setMessages((prevMessages: any) => [...prevMessages, sendedMessage]);
+        let updatedChannel = channels.map(channel =>{
+            if (channel.channel.id === selectedChannel.channel.id)
+              channel.channel.message = sendedMessage.content
+            return channel;
+          })
+        // const updatedItems = items.map(item => {
+        //   if (item.id === id) {
+        //     return { ...item, message: newMessage };
+        //   }
+        //   return item;
+        // });
+    
+        // setItems(updatedItems);
+        // searchedChannel.channel.message = sendedMessage.content;
+        setChannels(updatedChannel);
+        })
       });
-    });
     return () => {
       socket.disconnect();
     };
@@ -281,8 +296,9 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel }: any):
       channelId: selectedChannel.channel.id,
       token: cookie.access_token,
     };
-
+    console.log("socket ", socket);
     socket.emit("message", body);
+    setMessage("");
   };
 
   const handleChange = (e: any) => {
@@ -559,7 +575,7 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel }: any):
                         </div>
                       </div>
                       <div>
-                        {renderActions("Admin", user)}
+                        {renderActions("Owner", user)}
                         {/* the "Admin" is the user connected role in this room channel */}
                         {/* it can be "Admin" "Owner" "Member" */}
                       </div>

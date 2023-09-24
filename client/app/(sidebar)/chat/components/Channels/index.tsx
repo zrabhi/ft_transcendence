@@ -20,7 +20,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
 
-const Channels = ({ channels, setSelectedChat, setSelectedChannel }: any) => {
+const Channels = ({ channels, setSelectedChat, setSelectedChannel, setMessages }: any) => {
   const [isChecked, setIsChecked] = useState(false);
   const [selectedChannels, setSelectedChannels] = useState([]);
 
@@ -80,6 +80,7 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel }: any) => {
           <AddNewChannel
             setSelectedChannel={setSelectedChannel}
             setSelectedChat={setSelectedChat}
+            setMessages={setMessages}
           />
         )}
 
@@ -129,7 +130,7 @@ const ChannelsSwitcher = ({ isChecked, setIsChecked }: any) => {
   );
 };
 
-const AddNewChannel = ({ setSelectedChannel, setSelectedChat }: any) => {
+const AddNewChannel = ({ setSelectedChannel, setSelectedChat,  setMessages}: any) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => {
@@ -146,6 +147,7 @@ const AddNewChannel = ({ setSelectedChannel, setSelectedChat }: any) => {
       </button>
       <ModalContainer
         isOpen={isOpen}
+        setMessages={setMessages}
         handleOpen={handleOpen}
         setSelectedChannel={setSelectedChannel}
         setSelectedChat={setSelectedChat}
@@ -205,6 +207,8 @@ const ModalContainer = ({
   handleOpen,
   setSelectedChannel,
   setSelectedChat,
+  setMessages
+  
 }: any) => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null); // State to store the avatar image URL
 
@@ -235,7 +239,8 @@ const ModalContainer = ({
     const response = await postRequest(
       `${baseChatUrl}/create/room`,
       JSON.stringify(roomForm)
-    );
+      );
+    setMessages([]);
     // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.users
     console.log("channel craeted", response); // response value is ,  channel created and (the username , avatar, status , owner ) obkect of the creator
     setSelectedChannel(response);

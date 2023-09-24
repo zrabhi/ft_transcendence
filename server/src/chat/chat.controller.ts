@@ -205,7 +205,7 @@ export class ChatController {
           message: lastMessage.content,
           status: searchedUser.status,
         },
-        memebers:{
+        members:{
           name:searchedUser.username,
           avatar:searchedUser.avatar,
           status: searchedUser.status
@@ -246,7 +246,7 @@ export class ChatController {
           message: lastMessage.content,
           status: "",
         },
-        memebers:{
+        members:{
           name:searchedUser.username,
           avatar:searchedUser.avatar,
           status: searchedUser.status,

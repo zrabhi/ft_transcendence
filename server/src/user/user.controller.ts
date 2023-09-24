@@ -69,7 +69,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('/users')
   async getAllUsers(@UserInfo() user): Promise<User[]> {
-    return await this.userService.findAllUsers(user);
+    const currUser = this.userService.findUserById(user.id);
+    return await this.userService.findAllUsers(currUser);
   }
 
   @UseGuards(JwtAuthGuard)

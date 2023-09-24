@@ -17,8 +17,8 @@ export default function HeaderBar() {
         <h1 className='text-white'>Welocme Back</h1>
       </div>
       <div className="icons">
-        <IoMdSearch className="icon" onClick={() => setShowSearchModal(true)} />
-        <BsBellFill className="icon" onClick={() => setShowNotifModal(true)} />
+        <IoMdSearch className="icon text-white" onClick={() => setShowSearchModal(true)} />
+        <BsBellFill className="icon text-white" onClick={() => setShowNotifModal(true)} />
         <PopUpModal isVisible={showSearchModal} close={() => setShowSearchModal(false)}>
           <SearchContent />
         </PopUpModal>

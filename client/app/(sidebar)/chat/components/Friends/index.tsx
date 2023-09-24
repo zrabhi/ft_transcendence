@@ -70,10 +70,8 @@ const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
                       </Typography>
                     </div>
                     <div className="flex flex-row gap-3.5 items-center">
-                      {/* <Typography variant="h3" color="blue-gray"> */}
                       <AiOutlineMessage className='icon cursor-pointer' onClick={() => CreateChat(user)} />
-                      <GiPingPongBat className='icon cursor-pointer' />
-                      {/* </Typography> */}
+                      <GiPingPongBat className='icon cursor-pointer' /> {/* TODO: Add onClick to invite to a game */}
                     </div>
                   </ListItem>
                 ))}

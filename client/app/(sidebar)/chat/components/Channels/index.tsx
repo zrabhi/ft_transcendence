@@ -7,23 +7,18 @@ import {
 
 import UserCard from "../UserCard";
 import { BsSearch } from "react-icons/Bs";
-import { baseChatUrl, getRequest, postRequest } from "@/app/context/utils/service";
+import {
+  baseChatUrl,
+  getRequest,
+  postRequest,
+} from "@/app/context/utils/service";
 import { Key, useEffect, useState } from "react";
 
 import Modal from "react-modal";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
 import * as Yup from "yup";
-import Image from "next/image";
 
-import {
-  List,
-  ListItem,
-  ListItemPrefix,
-  Avatar,
-  Card,
-  Typography,
-} from "@material-tailwind/react";
 
 const Channels = ({ channels, setSelectedChat, setSelectedChannel }: any) => {
   const [isChecked, setIsChecked] = useState(false);
@@ -50,7 +45,7 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel }: any) => {
       )
     );
   }, [isChecked]);
-
+  
   return (
     <div className="users-container">
       <div className="inbox-header">
@@ -79,7 +74,13 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel }: any) => {
       <ChannelsSwitcher isChecked={isChecked} setIsChecked={setIsChecked} />
 
       <div>
-        <AddNewChannel isChecked={isChecked} setSelectedChannel={setSelectedChannel} setSelectedChat={setSelectedChat} />
+        {isChecked && (
+          <AddNewChannel
+            setSelectedChannel={setSelectedChannel}
+            setSelectedChat={setSelectedChat}
+          />
+        )}
+
         {selectedChannels.length > 0 &&
           selectedChannels?.map((channel: any, index: Number) => {
             return (
@@ -126,29 +127,28 @@ const ChannelsSwitcher = ({ isChecked, setIsChecked }: any) => {
   );
 };
 
-const AddNewChannel = ({ isChecked, setSelectedChannel, setSelectedChat }: any) => {
+const AddNewChannel = ({ setSelectedChannel, setSelectedChat }: any) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => {
     setIsOpen(!isOpen);
   };
   return (
-    <>
+    <div className="flex justify-center items-center mb-2">
       <button
         className="mt-3 flex justify-center items-center gap-3 block text-white bg-[#654795] focus:outline-none font-medium rounded-3xl text-sm px-5 py-2.5 text-center"
         type="button"
         onClick={handleOpen}
       >
-        <AiFillPlusCircle /> {!isChecked ? "Create New DM" : "Create New Room"}
+        <AiFillPlusCircle /> New Room
       </button>
       <ModalContainer
         isOpen={isOpen}
         handleOpen={handleOpen}
         setSelectedChannel={setSelectedChannel}
         setSelectedChat={setSelectedChat}
-        typeModal={isChecked ? "room" : "dm"}
       />
-    </>
+    </div>
   );
 };
 
@@ -160,8 +160,8 @@ interface FormValues {
 }
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("Name is required"),
-  type: Yup.string().required("Type is required"),
+  name: Yup.string().required("Room name is required"),
+  type: Yup.string().required("Room type is required"),
   password: Yup.string()
     .test(
       "password-required",
@@ -198,9 +198,13 @@ const initialValues: FormValues = {
   avatar: "",
 };
 
-const ModalContainer = ({ isOpen, handleOpen, typeModal, setSelectedChannel, setSelectedChat }: any) => {
+const ModalContainer = ({
+  isOpen,
+  handleOpen,
+  setSelectedChannel,
+  setSelectedChat,
+}: any) => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null); // State to store the avatar image URL
-
 
   const customStyles = {
     content: {
@@ -225,155 +229,163 @@ const ModalContainer = ({ isOpen, handleOpen, typeModal, setSelectedChannel, set
       avatar: values.avatar,
       password: values.password,
       memberLimit: 30,
-    }
-    const response = await postRequest(`${baseChatUrl}/create/room`, JSON.stringify(roomForm))
+    };
+    const response = await postRequest(
+      `${baseChatUrl}/create/room`,
+      JSON.stringify(roomForm)
+    );
     // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.users
     console.log(response); // response value is ,  channel created and (the username , avatar, status , owner ) obkect of the creator
     setSelectedChannel(response.channel);
     setSelectedChat(response);
     resetForm();
+    handleOpen();
   };
 
   return (
     <Modal isOpen={isOpen} style={customStyles} contentLabel="Modal">
       <div className="flex justify-between items-center mb-3">
-        <h2 className="font-bold">{typeModal === 'room' ? "Create a room chat" : "Create a Dm with a friend"}</h2>
-        <AiOutlineClose className={"cursor-pointer"} onClick={() => {
-          setAvatarPreview(null);
-          handleOpen();
-        }} />
+        <h2 className="font-bold">Create a room chat</h2>
+        <AiOutlineClose
+          className={"cursor-pointer"}
+          onClick={() => {
+            setAvatarPreview(null);
+            handleOpen();
+          }}
+        />
       </div>
-      <hr className="h-1 mx-auto bg-[#654795] border-0 rounded my-8 dark:bg-gray-700"/>
+      <hr className="h-1 mx-auto bg-[#654795] border-0 rounded my-8 dark:bg-gray-700" />
       <div>
-        {typeModal === "room" ? (
-          <>
-            <Formik
-              initialValues={initialValues}
-              validationSchema={validationSchema}
-              onSubmit={handleSubmit}
-            >
-              {({ handleSubmit, isSubmitting, setFieldValue, values }) => (
-                <Form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label htmlFor="name" className="block text-gray-700 font-medium">
-                      Name
-                    </label>
-                    <Field
-                      type="text"
-                      name="name"
-                      id="name"
-                      placeholder="Enter your name"
-                      className="border border-gray-300 rounded w-full px-3 py-2 my-2"
-                    />
-                    <ErrorMessage
-                      name="name"
-                      component="div"
-                      className="text-red-500"
-                    />
-                  </div>
+        <>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ handleSubmit, isSubmitting, setFieldValue, values }) => (
+              <Form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-gray-700 font-medium"
+                  >
+                    Room Name
+                  </label>
+                  <Field
+                    type="text"
+                    name="name"
+                    id="name"
+                    placeholder="Enter room name"
+                    className="border border-gray-300 rounded w-full px-3 py-2 my-2"
+                  />
+                  <ErrorMessage
+                    name="name"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
 
+                <div>
+                  <label
+                    htmlFor="type"
+                    className="block text-gray-700 font-medium"
+                  >
+                    Room Type
+                  </label>
+                  <Field
+                    as="select" // Use "as" to render a select dropdown
+                    name="type"
+                    id="type"
+                    className="border border-gray-300 rounded w-full px-3 py-2 my-2"
+                  >
+                    <option value="">Select type of this room</option>
+                    <option value="PUBLIC">PUBLIC</option>
+                    <option value="PRIVATE">PRIVATE</option>
+                    <option value="PROTECTED">PROTECTED</option>
+                  </Field>
+                  <ErrorMessage
+                    name="type"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+
+                {values.type === "PROTECTED" && (
                   <div>
-                    <label htmlFor="type" className="block text-gray-700 font-medium">
-                      Type
-                    </label>
-                    <Field
-                      as="select" // Use "as" to render a select dropdown
-                      name="type"
-                      id="type"
-                      className="border border-gray-300 rounded w-full px-3 py-2 my-2"
+                    <label
+                      htmlFor="password"
+                      className="block text-gray-700 font-medium"
                     >
-                      <option value="">Select type of this room</option>
-                      <option value="PUBLIC">PUBLIC</option>
-                      <option value="PRIVATE">PRIVATE</option>
-                      <option value="PROTECTED">PROTECTED</option>
-                    </Field>
+                      Password
+                    </label>
+                    <Field
+                      type="password"
+                      name="password"
+                      id="password"
+                      placeholder="Enter your password"
+                      className="border border-gray-300 rounded w-full px-3 py-2 my-2"
+                    />
                     <ErrorMessage
-                      name="type"
+                      name="password"
                       component="div"
                       className="text-red-500"
                     />
                   </div>
+                )}
 
-                  {values.type === "PROTECTED" && (
-                    <div>
-                      <label htmlFor="password" className="block text-gray-700 font-medium">
-                        Password
-                      </label>
-                      <Field
-                        type="password"
-                        name="password"
-                        id="password"
-                        placeholder="Enter your password"
-                        className="border border-gray-300 rounded w-full px-3 py-2 my-2"
+                <div>
+                  <div className="mt-2 flex justify-start items-center">
+                    {avatarPreview && (
+                      <img
+                        src={avatarPreview}
+                        alt="Avatar"
+                        className="mr-3 avatar"
                       />
-                      <ErrorMessage
-                        name="password"
-                        component="div"
-                        className="text-red-500"
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <div className="mt-2 flex justify-start items-center">
-                      {avatarPreview &&
-                        <Image
-                          src={avatarPreview}
-                          alt="Avatar"
-                          width={50}
-                          height={50}
-                          className="mr-3 rounded-3xl"
-                        />
-                      }
-                      <input
-                        type="file"
-                        id="avatar"
-                        name="avatar"
-                        accept="image/jpeg, image/png, image/gif"
-                        className="hidden" // Hide the default file input
-                        onChange={(
-                          event: React.ChangeEvent<HTMLInputElement>
-                        ) => {
-                          const file =
-                            event.target.files && event.target.files[0];
-                          if (file) {
-                            setFieldValue("avatar", file); // Set the file value when a file is selected
-                            setAvatarPreview(URL.createObjectURL(file));
-                          }
-                        }}
-                      />
-                      <label
-                        htmlFor="avatar"
-                        className="cursor-pointer bg-[#654795] text-white rounded px-4 py-2 hover:bg-[#654795]"
-                      >
-                        Select Avatar
-                      </label>
-                    </div>
-                    <ErrorMessage
+                    )}
+                    <input
+                      type="file"
+                      id="avatar"
                       name="avatar"
-                      component="div"
-                      className="text-red-500"
+                      accept="image/jpeg, image/png, image/gif"
+                      className="hidden" // Hide the default file input
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>
+                      ) => {
+                        const file =
+                          event.target.files && event.target.files[0];
+                        if (file) {
+                          setFieldValue("avatar", file); // Set the file value when a file is selected
+                          setAvatarPreview(URL.createObjectURL(file));
+                        }
+                      }}
                     />
-                  </div>
-
-                  <div className="w-full flex justify-end">
-                    <button
-                      type="submit"
-                      className="bg-[#654795] text-white rounded px-4 py-2"
-                      disabled={isSubmitting}
+                    <label
+                      htmlFor="avatar"
+                      className="cursor-pointer bg-[#654795] text-white rounded px-4 py-2 hover:bg-[#654795]"
                     >
-                      Submit
-                    </button>
+                      Select Channel Avatar
+                    </label>
                   </div>
-                </Form>
-              )}
-            </Formik>
-          </>
-        ) : (
-          <>
-          {/* TODO: get all friends here ?? Todo or not*/}
-          </>
-        )}
+                  <ErrorMessage
+                    name="avatar"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+
+                <div className="w-full flex justify-end">
+                  <button
+                    type="submit"
+                    className="bg-[#654795] text-white rounded px-4 py-2"
+                    disabled={isSubmitting}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </>
       </div>
     </Modal>
   );

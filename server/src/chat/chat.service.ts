@@ -17,28 +17,23 @@ export class ChatService {
     private readonly jwtService: JwtService,
   ) {}
 
-
-  async getCHannelRoom(channelName: string)
-  {
+  async getCHannelRoom(channelName: string) {
     return this._prisma.channel.findMany({
-      where:{
-      OR: [{name: channelName}],
-      }
-    })
-  }
-  async getChannelById(channelId: string)
-  {
-    const channel = await this._prisma.channel.findUnique({
-      where:
-      {
-        id: channelId
+      where: {
+        OR: [{ name: channelName }],
       },
-      include:
-      {
+    });
+  }
+  async getChannelById(channelId: string) {
+    const channel = await this._prisma.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+      include: {
         members: true,
-      }
-    })
-    return channel
+      },
+    });
+    return channel;
   }
   async checkChannelDmExistence(
     user: string,
@@ -55,8 +50,7 @@ export class ChatService {
         id: true,
         name: true, // You can select other fields you need from the channel
         users: true,
-        type:true,
-
+        type: true,
       },
     });
     return search;
@@ -80,7 +74,7 @@ export class ChatService {
     const result = await this.checkChannelRoomExistence(name);
     if (result) return { error: 'Channel already exists', channel: undefined };
     let channel: any;
-    console.log("type", type);
+    console.log('type', type);
 
     if (type === 'PUBLIC') {
       channel = await this._prisma.channel.create({
@@ -118,74 +112,72 @@ export class ChatService {
         role: 'OWNER',
       },
     });
-    return { error: undefined, channel: channel, user:user};
+    return { error: undefined, channel: channel, user: user };
   }
 
   async getChannelDmMessages(channel_id: string, user_id: string) {
     const channel = await this._prisma.channel.findUnique({
       where: { id: channel_id },
-      include:{
-        messages : true,
-        members: true
-      }
+      include: {
+        messages: true,
+        members: true,
+      },
     });
     const user = await this._user.findUserById(user_id);
     const allMessages = [];
-    console.log("channel", channel_id);
+    console.log('channel', channel_id);
 
-    if (channel.messages.length > 0){
-    for (const message of channel.messages) {
-      if (message.user_id === user.id)
+    if (channel.messages.length > 0) {
+      for (const message of channel.messages) {
+        if (message.user_id === user.id)
+          allMessages.push({
+            reciever: user.username,
+            avatar: user.avatar,
+            content: message.content,
+          });
+        else {
+          const otherUser = await this._user.findUserById(message.user_id);
+          allMessages.push({
+            sender: otherUser.username,
+            avatar: otherUser.avatar,
+            content: message.content,
+          });
+        }
+      }
+    }
+    const users = [];
+    for (const member of channel.members) {
+      const searchedUser = await this._user.findUserById(member.userId);
+      let checker = 'Member';
+      if (searchedUser.username === channel.owner)
+        //TODO: get admin channels too
+        checker = 'Owner';
+      users.push({
+        username: searchedUser.username,
+        avatar: searchedUser.avatar,
+        status: searchedUser.status,
+        owner: checker,
+      });
+    }
+    return { allMessages, users }; // returning all messages and users in channel
+  }
+
+  async handleGetRoomMessages(channel_id: string, user_id: string) {
+    const user = await this._user.findUserById(user_id);
+    const messages = await this._prisma.channelMessage.findMany({
+      where: {
+        channel_id: channel_id,
+      },
+    });
+    const allMessages = [];
+    for (const message of messages) {
+      if (message.user_id === user_id)
         allMessages.push({
           reciever: user.username,
           avatar: user.avatar,
           content: message.content,
         });
       else {
-        const otherUser = await this._user.findUserById(message.user_id);
-        allMessages.push({
-          sender: otherUser.username,
-          avatar: otherUser.avatar,
-          content: message.content,
-        });
-      }
-    }
-  }
-    const users = []
-    for (const member of channel.members) {
-        const searchedUser = await this._user.findUserById(member.userId);
-        let checker = "Member";
-        if (searchedUser.username === channel.owner) //TODO: get admin channels too
-          checker = "Owner";
-        users.push({
-          username: searchedUser.username,
-          avatar: searchedUser.avatar,
-          status: searchedUser.status,
-          owner: checker
-        })
-    }
-    return {allMessages, users}; // returning all messages and users in channel
-  }
-
-  async handleGetRoomMessages(channel_id: string, user_id: string)
-  {
-    const user = await this._user.findUserById(user_id);
-    const messages = await this._prisma.channelMessage.findMany({
-      where:{
-        channel_id: channel_id,
-      }
-    })
-    const allMessages = []
-    for (const message of messages)
-    {
-      if (message.user_id === user_id)
-      allMessages.push({
-        reciever: user.username,
-        avatar: user.avatar,
-        content: message.content,
-      });
-      else
-      {
         const otherUser = await this._user.findUserById(message.user_id);
         allMessages.push({
           sender: otherUser.username,
@@ -220,7 +212,8 @@ export class ChatService {
     if (channel.type === 'PROTECTED') {
       if (!password)
         return {
-          error: 'you must provide channel password to join a PROTECTED channel',
+          error:
+            'you must provide channel password to join a PROTECTED channel',
           channel: undefined,
         };
       const match = await bcrypt.compare(password, channel.password);
@@ -243,16 +236,16 @@ export class ChatService {
     const otherUser = await this._user.findUserName(username);
 
     const result = await this.checkChannelDmExistence(user.username, username);
-    if (result.length > 0){
+    if (result.length > 0) {
       const data = {
-       channel: result[0],
-       user:user,
-     }
-       return data;
-      }
+        channel: result[0],
+        user: user,
+      };
+      return data;
+    }
     const channel = await this._prisma.channel.create({
       data: {
-        name:  uuidv4(),
+        name: uuidv4(),
         member_limit: memberLimit,
         type: 'DM',
         users: [username, user.username],
@@ -273,7 +266,7 @@ export class ChatService {
         role: 'MEMBER',
       },
     });
-    return {channel:channel, user:otherUser};
+    return { channel: channel, user: otherUser };
   }
   //Todo: saveMessageToChannel:
 
@@ -294,33 +287,110 @@ export class ChatService {
       },
       include: {
         messages: true,
-        
       },
     });
     return channelsDm;
   }
 
   async getAllChannelsRooms(user: any) {
-
     const Allchannels = await this._prisma.channel.findMany({
-      include:{
+      include: {
         members: true,
-        messages:true
-      }
-    })
+        messages: true,
+      },
+    });
     const Rooms = [];
     for (const channel of Allchannels) {
-        let isInRoom  = [];
-        if (channel.users.length === 0)
-        {
-          isInRoom = channel.members.filter(member => {
+      let isInRoom = [];
+      if (channel.users.length === 0) {
+        isInRoom = channel.members.filter((member) => {
           if (member.userId === user.id) {
-              return true
-          }})
-        }
-        if (isInRoom.length > 0)
-            Rooms.push(channel)
+            return true;
+          }
+        });
+      }
+      if (isInRoom.length > 0) Rooms.push(channel);
     }
-    return Rooms
+    return Rooms;
+  }
+
+  //////////////////// Ban method && Mute Method && Set As Admin /////////////////////////////////////
+  async handleSetAsAdmin(user: any, channel_id: string, userToBeSet: string) {
+    const currUser = await this._user.findUserById(user.id);
+    const newAdmin = await this._user.findUserName(userToBeSet);
+    const channel = await this._prisma.channel.findUnique({
+      where: {
+        id: channel_id,
+      },
+      include: {
+        members: true,
+      },
+    });
+    if (newAdmin.username === channel.owner)
+      return {
+        error: `${newAdmin.username} The User is The channel owner ()`,
+        channel: undefined,
+      };
+    if (currUser.username != channel.owner)
+      return {
+        error: `${currUser.username} Only the Owner can set New admins`,
+        channel: undefined,
+      };
+
+    // let isAdmin = false;
+    // let searchedUser: any;
+    // for (const member of channel.members) {
+    //   if (member.userId === newAdmin.id) searchedUser = member;
+    //   // if (member.userId === newAdmin && )
+    // }
+  }
+  async handleUserMute(user: any, channel_id: string, userToBeMuted: string) {
+    const currUser = await this._user.findUserById(user.id);
+    const mutedUser = await this._user.findUserName(userToBeMuted);
+    const channel = await this._prisma.channel.findUnique({
+      where: {
+        id: channel_id,
+      },
+      include: {
+        admins: true,
+        members: true,
+      },
+    });
+    if (mutedUser.username === channel.owner)
+      return {
+        error: `channel owner ${mutedUser.username} cant be muted by the  Members or Admins`,
+        success: false,
+      };
+    let searchedUser: any = channel.members.filter(member => {return member.userId === mutedUser.id});
+    console.log(searchedUser);
+    
+    for (const member of channel.members) {
+      if (searchedUser[0].id === member.id )
+        continue;
+      console.log('searched user ', member.userId);
+      // if (member.userId === mutedUser.id && member.role === 'ADMIN')
+      if (
+        member.userId === currUser.id &&
+        (member.role === 'ADMIN' || member.role === 'OWNER')
+      ) {
+        if (searchedUser.role === 'ADMIN' && member.role === 'ADMIN')
+          return {
+            error: 'channels admins Cant ban each other',
+            success: false,
+          };
+        else {
+          await this._prisma.channelMembers.update({
+            where: {
+              id: searchedUser[0].id,
+            },
+            data: {
+              isMuted: true,
+            },
+          });
+          return { success: true, message: 'the user muted succesfully' };
+          //mute the user (the user will be muted drom the admin ) // the ( isMuted)attribute in channelMembers will change to true
+        }
+      }
+    }
   }
 }

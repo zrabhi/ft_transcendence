@@ -2,10 +2,6 @@
 
 import SideBar from "@/components/LoggedUser/SideBar/SideBar";
 import React, { useEffect, useState } from "react";
-
-
-
-
 import "./style.scss";
 import {
   baseChatUrl,
@@ -17,6 +13,8 @@ import BoxChat from "./components/BoxChat";
 import Friends from "./components/Friends";
 import { channel, channels } from "@/interfaces/channels";
 import { Message, chat } from "@/interfaces/ChatTypes";
+import  io, { Socket } from "socket.io-client";
+import { useCookies } from "react-cookie";
 
 
 
@@ -28,16 +26,29 @@ const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
+  const [cookie] = useCookies(["access_token"]);
   // GET all users
+  let socket : Socket
   useEffect(() => {
     (async () => {
       const response = await getRequest(`${baseUrlUsers}/users`);
       setUsers(response);
     })();
   }, []);
-
+  // testing socket in root chat page 
+  // socket = io("http://127.0.0.1:8080/chat", {
+  //   auth: {
+  //     token: cookie.access_token,
+  //   },
+  // });
+  // socket.on("connected", (messageInfo: Message) =>
+  // {
+    
+  // })
   // GET all channels already created
   useEffect(() => {
+    
+
     (async () => {
       try {
         const responseDm = await getRequest(`${baseChatUrl}/channelsDm`); // fetching USER Dms

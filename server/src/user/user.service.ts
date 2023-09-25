@@ -24,9 +24,11 @@ import { FileUserDto, PutUserDto } from './dto/put-user-dto';
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAllUsers(user): Promise<User[]> {
+  async findAllUsers(user: any) : Promise<User[]> {
     const Allusers = await this.prismaService.user.findMany({});
-    const users = Allusers.filter(currUser => currUser.id != user.id) // error returning cuurent user
+    const users = Allusers.filter(currUser => {
+      return currUser.id != user.id
+    }) 
     return users;
   }
 

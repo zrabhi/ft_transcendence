@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
 import { User } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -22,12 +23,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
   server: Server;
 
   constructor(private authService: AuthService,
+    private prismaService: PrismaService,
     private  jwtService: JwtService,
     private chatService: ChatService,
     private userService: UserService) { }
 
 
-  private connectedUsers = new Map<Socket,User>();
+  private connectedUsers = new Map<String,Socket>();
 
  async handleConnection(client: Socket) {
   const payload = await this.jwtService.verifyAsync(client.handshake.auth.token,{
@@ -35,14 +37,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
   })
   if (!payload)
     return client.disconnect(true);
-  client.join(payload.username)
-  const newUser = await this.userService.findUserName(payload.username);
-  this.connectedUsers.set(client, newUser,);
+  client.join(payload.id)
+  // const newUser = await this.userService.findUserById(payload.id);
+  this.connectedUsers.set(payload.id, client);
   this.server.to(client.id).emit('connected', 'Hello world!');
   }
 
-  handleDisconnect(client: Socket) {
-    this.connectedUsers.delete(client)
+ async  handleDisconnect(client: Socket) {
+    const payload = await this.jwtService.verifyAsync(client.handshake.auth.token,{
+      secret: process.env.JWT_SECRET,
+    })
+    if (!payload)
+      return client.disconnect(true);
+    this.connectedUsers.delete(payload.id)
     console.log(`Client disconnected   id ${client.id}`);
 }
 @SubscribeMessage('joinChat')
@@ -73,6 +80,13 @@ async handleMutedUser(@ConnectedSocket() client: Socket, @MessageBody() data: an
   })
   if (!payload)
       return client.disconnect(true);
+  /// mute the user here
+  try{
+    await this.chatService.handleUserMute(payload, data.channel_id, data.username)
+  }catch(err)
+  {
+
+  }
 }
 @SubscribeMessage('ban')
 async handleBannedUser(@ConnectedSocket() client: Socket, @MessageBody() data: any)
@@ -83,6 +97,7 @@ async handleBannedUser(@ConnectedSocket() client: Socket, @MessageBody() data: a
   })
   if (!payload)
       return client.disconnect(true);
+
 }
 @SubscribeMessage('block')
 async handleblockeedUser(@ConnectedSocket() client: Socket, @MessageBody() data: any)
@@ -103,15 +118,40 @@ async handleblockeedUser(@ConnectedSocket() client: Socket, @MessageBody() data:
     if (!payload)
         return client.disconnect(true);
     const user =  await  this.userService.findUserById(payload.id);
-    // console.log("uuuuu ",this.connectedUsers.get(client).avatar);
-
+    const channel = await this.prismaService.channel.findUnique({
+      where:{
+        id:data.channelId
+      },
+      include:
+      {
+        members:true
+      }
+    })
+    for (const member of channel.members)
+    {
+      if ((member.isBanned || member.isMuted) && member.userId === user.id){
+        console.log("im banned");
+        return this.server.to(data.channelId).emit("muted or muted")
+      }
+    }
     const messageInfo = {
       reciever: user.username,
       avatar: user.avatar,
       content: data.message,
     };
+    // for (const member of channel.members)
+    // {
+    //     if (member.userId != user.id)
+    //     {
+          
+    //       this.server.to(member.userId).emit('lastMessage', messageInfo)}
+    // }
+      // console.log("uuuuu ",this.connectedUsers.get(client).avatar);
+
     this.chatService.saveMessageToChannel(payload, data);
-    console.log("im hereee message:", data.message);
+    // console.log("im hereee message:", data.message);
     this.server.to(data.channelId).emit('message', messageInfo);
+    // console.log("found here", data);
+    
   }
 }

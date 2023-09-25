@@ -15,6 +15,7 @@ import { UserInfo } from 'src/auth/decorator/user-decorator';
 import { UserService } from 'src/user/user.service';
 import { ChatService } from './chat.service';
 import {
+  banDto,
   createDmDto,
   createRoomDto,
   getChannelDmDto,
@@ -271,6 +272,15 @@ export class ChatController {
   async handleGetUserLastMessages(@UserInfo() suer: User, @Res() res : Response)
   {
     // todo get all last messages 
+  }
+
+  @Put('mute')
+  @UseGuards(JwtAuthGuard)
+  async handleBanUser(@UserInfo() user: User, @Res() res : Response, @Body() banInfo: banDto)
+  {
+    const {channel_id, username} = banInfo;
+    const result = await this.chatService.handleUserMute(user, channel_id, username);
+    res.status(200).json(result);
   }
 }
 //TODO: GET ALL MESSAGES IN ON REQUEST 

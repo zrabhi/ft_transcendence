@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsString,
   IsStrongPassword,
+  isString,
 } from 'class-validator';
 import { Type } from '@prisma/client';
 
@@ -72,4 +73,12 @@ export class getChannelDmDto
   channelId: string;
 
   user: any;
+}
+export class banDto {
+  @IsString()
+  username: string
+
+  @IsString()
+  @IsNotEmpty()
+  channel_id: string
 }

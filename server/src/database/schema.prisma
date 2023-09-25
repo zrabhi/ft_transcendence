@@ -85,7 +85,8 @@ model User {
   memberof                        ChannelMembers[] @relation(name:"userToChannel")
 
   ChannelBan                      ChannelBan[]    @relation(name:"userBaned")
-
+  ChannelAdmin                    ChannelAdmin[]   @relation(name:"userAdmin")
+  ChannelMuted                    ChannelMuted[]   @relation(name:"userMuted")
   created_date                    DateTime        @default(now())
 }
 
@@ -188,11 +189,11 @@ model Channel {
   members           ChannelMembers[]  @relation(name: "channelMembers")
 
   banedUsers        ChannelBan[]      @relation(name: "channelBan")
+  admins            ChannelAdmin[]    @relation(name: "channelAdmin")
+  Muted             ChannelMuted[]    @relation(name: "channelMute")
+
   avatar String? @default("http://127.0.0.1:8080/api/avatar/pictures/default.jpeg")
   time String?
-  //TODO: OWNER
-  // TODO: ADMINS
- //TODO muted Users
   created_at        DateTime @default(now())
 }
 model ChannelMembers{
@@ -205,6 +206,8 @@ model ChannelMembers{
   channel   Channel @relation(fields: [channelId], references:[id], name: "channelMembers", onDelete: Cascade)
 
   role Role
+  isBanned Boolean @default(false)
+  isMuted Boolean @default(false)
 }
 
 model ChannelMessage {
@@ -231,6 +234,28 @@ model ChannelBan{
   channel     Channel @relation(fields: [channelId], references:[id], name: "channelBan", onDelete: Cascade)
 
   created_at  DateTime @default(now())
+}
+model ChannelMuted{
+  id     String @unique @default(uuid())
+  
+  userId String
+  user User @relation(fields: [userId], references: [id], name: "userMuted", onDelete: Cascade)
+
+  channelId  String
+  channel     Channel @relation(fields: [channelId], references:[id], name: "channelMute", onDelete: Cascade)
+
+  created_at  DateTime @default(now())
+}
+model ChannelAdmin{
+  id     String @unique @default(uuid())
+
+  userId String
+  user User @relation(fields: [userId], references: [id], name: "userAdmin", onDelete: Cascade)
+
+  channelId String
+  channel     Channel @relation(fields: [channelId], references:[id], name: "channelAdmin", onDelete: Cascade)
+
+  created_at DateTime @default(now())
 }
 
 

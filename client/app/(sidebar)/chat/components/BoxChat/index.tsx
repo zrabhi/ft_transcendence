@@ -250,6 +250,8 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
       console.table("connected");
       socket.emit("joinChat", { id: selectedChannel.channel.id });
 
+      
+
       socket.on("message", (messageInfo: Message) => {
         let sendedMessage: Message = {
           content: messageInfo.content,
@@ -259,20 +261,11 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
           sendedMessage.avatar = messageInfo.avatar;
         } else sendedMessage = messageInfo;
         setMessages((prevMessages: any) => [...prevMessages, sendedMessage]);
-        let updatedChannel = channels.map(channel =>{
+        let updatedChannel = channels.map((channel : any) =>{
             if (channel.channel.id === selectedChannel.channel.id)
               channel.channel.message = sendedMessage.content
             return channel;
           })
-        // const updatedItems = items.map(item => {
-        //   if (item.id === id) {
-        //     return { ...item, message: newMessage };
-        //   }
-        //   return item;
-        // });
-    
-        // setItems(updatedItems);
-        // searchedChannel.channel.message = sendedMessage.content;
         setChannels(updatedChannel);
         })
       });

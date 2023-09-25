@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
 import Link from 'next/link'
 import { baseUrlUsers, putRequest } from "@/app/context/utils/service";
-import { BsCaretRightFill, BsCaretLeftFill } from "react-icons/Bs";
+import { BsCaretRightFill, BsCaretLeftFill } from "react-icons/bs";
 
 interface SideBarProps {
   isExpanded: boolean;

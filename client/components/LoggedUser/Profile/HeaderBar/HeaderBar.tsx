@@ -1,6 +1,6 @@
 import React from 'react'
 import { IoMdSearch } from 'react-icons/io'
-import { BsBellFill } from 'react-icons/Bs'
+import { BsBellFill } from 'react-icons/bs'
 import './HeaderBar.scss'
 import PopUpModal from '@/components/LoggedUser/Profile/PopUpModal/PopUpModal'
 import SearchContent from './SearchContent'

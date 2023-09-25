@@ -1,9 +1,60 @@
-.game{
-    display: flex;
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+
+
+.core{
+    background-color: #654795;
+    border-radius: 15px;
     align-items: center;
-    flex-direction: column;
-    background-color: black;
-    color: aliceblue;
-    width:100;
-    height: 100%;
+    
+}
+.maps{
+    background-color: #1f0d3c;
+    border-radius: 13px;
+    margin:40px 40px;
+    padding: 20px 40px;
+    max-width: fit-content;
+
+}
+.arena{
+    /* background-color: black; */
+    border: 5px white solid;
+    color: white;
+    margin:40px 100px;
+    align-items: center;
+    
+}
+
+.button{
+    /* background-color: #654795; */
+
+    border: 5px white dashed;
+    margin-bottom: 80px;
+    font-family: 'Press Start 2P';
+    font-size: larger;
+    border-radius: 5px;
+    padding:15px 40px;
+    max-width: fit-content;
+}
+
+.map{
+    background-color: whitesmoke;
+    padding: 10px 10px;
+    border-radius: 5px;
+    color: white;
+    border: 2px white solid;
+    font-family: 'Press Start 2P';
+}
+.subcore{
+    background-color: #1f0d3c;
+    padding:10px 10px;
+    margin: 0px 40px;
+    margin-bottom: 40px;
+    border-radius: 10px;
+    min-width: 80%;
+}
+.presstext{
+    margin-top: 90px;
+    font-family: 'Press Start 2P';
+    /* min-width: 100%; */
 }

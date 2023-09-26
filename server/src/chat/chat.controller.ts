@@ -92,17 +92,17 @@ export class ChatController {
     return res.status(200).json(data);
   }
 
-  @Put('leaveChnnel/:username')
+  @Put('leaveChannel/:channelId')
   @UseGuards(JwtAuthGuard)
   async handleLeaveChannel(
-    @Param('username') username: string,
-  @Res() res: Response,
-  @UserInfo() user: User,)
-  { 
-    /// handle leave channel hereee
-     
+    @Param('channelId') channel_id: string,
+    @Res() res: Response,
+    @UserInfo() user: User,
+  ) {
+    const result = await this.chatService.handleLeaveChannel(user, channel_id);
+    if (!result.success) return res.status(400).json(result);
+    return res.status(200).json(result);
   }
-
 
   @Put('deleteChannel/:chennelID')
   @UseGuards(JwtAuthGuard)
@@ -152,8 +152,7 @@ export class ChatController {
       const user = await this.userService.findUserById(member.userId);
       let checker = 'Member';
       if (channel.owner === user.username) checker = 'Owner';
-      else if (member.role === "ADMIN")
-          checker = "Admin"
+      else if (member.role === 'ADMIN') checker = 'Admin';
       members.push({
         name: user.username,
         avatar: user.avatar,

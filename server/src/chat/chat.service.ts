@@ -149,8 +149,7 @@ export class ChatService {
     for (const member of channel.members) {
       const searchedUser = await this._user.findUserById(member.userId);
       let checker = 'Member';
-      if (searchedUser.username === channel.owner)
-        checker = 'Owner';
+      if (searchedUser.username === channel.owner) checker = 'Owner';
       users.push({
         username: searchedUser.username,
         avatar: searchedUser.avatar,
@@ -334,6 +333,44 @@ export class ChatService {
       return { success: false, error: 'Channel not foudn or already deleted!' };
     }
   }
+  async handleLeaveChannel(user: any, channel_id: string) {
+    const currUser = await this._user.findUserById(user.id);
+    const channel = await this._prisma.channel.findUnique({
+      where: {
+        id: channel_id,
+      },
+      include: {
+        members: true,
+      },
+    });
+    if (channel.owner === currUser.username)
+      return {
+        success: false,
+        error: `${currUser.username} your the channel owner (you can delete channel from existence)!`,
+      };
+    const searchedUser = channel.members.filter((member: any) => {
+      return currUser.id === member.userId;
+    });
+    if (!searchedUser[0])
+      return {
+        success: false,
+        message: `${currUser.username} Your no longer channel member`,
+      };
+    for (const member of channel.members) {
+      if (member.id === searchedUser[0].id) {
+        await this._prisma.channelMembers.delete({
+          where: {
+            id: searchedUser[0].id,
+          },
+        });
+        return {
+          success: true,
+          message: `${currUser.username} You left the channel!`,
+        };
+      }
+    }
+  }
+
   //////////////////// Ban method && Mute Method && Set As Admin /////////////////////////////////////
   async handleSetAsAdmin(user: any, channel_id: string, userToBeSet: string) {
     const currUser = await this._user.findUserById(user.id);
@@ -377,7 +414,10 @@ export class ChatService {
               role: 'ADMIN',
             },
           });
-          return { success: true, message: 'the user  now setted as an admin of the channel'};
+          return {
+            success: true,
+            message: 'the user  now setted as an admin of the channel',
+          };
         }
       }
     }

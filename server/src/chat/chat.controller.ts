@@ -196,8 +196,9 @@ export class ChatController {
   }
   @UseGuards(JwtAuthGuard)
   @Get('getChannels')
-  async handleGetChannels()
-  { 
+  async handleGetChannels(@UserInfo() user: User, @Res() res: Response) {
+    const result = await this.chatService.getAllChannels(user);
+    res.status(200).json(result);
     /// handle get channels expect private one's
   }
   // @UseGuards(JwtAuthGuard)
@@ -245,15 +246,15 @@ export class ChatController {
           status: searchedUser.status,
         },
       });
-      console.log("created at ", lastMessage.created_at);
-      
+      console.log('created at ', lastMessage.created_at);
+
       channels.push({
         id: channel.id,
         type: 'dm',
         username: searchedUser.username,
         avatar: searchedUser.avatar,
         message: lastMessage.content,
-        time:lastMessage.created_at,
+        time: lastMessage.created_at,
         status: searchedUser.status,
       });
     }

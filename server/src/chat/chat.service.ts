@@ -17,6 +17,27 @@ export class ChatService {
     private readonly jwtService: JwtService,
   ) {}
 
+  async getAllChannels(user: any) {
+    const currUser = await this._user.findUserById(user.id);
+    const channels = await this._prisma.channel.findMany({
+      include: {
+        members: true,
+      },
+    });
+    const rooms = [];
+    for (const channel of channels) {
+      if (channel.type === 'DM' || channel.type === 'PRIVATE') continue;
+      const searchedUser = channel.members.filter((member: any) => {
+        return member.userId === currUser.id;
+      });
+      if (searchedUser[0]) continue;
+      else {
+        rooms.push(channel);
+      }
+    }
+    console.log("channels listed are ", rooms);
+    return rooms;
+  }
   async getCHannelRoom(channelName: string) {
     return this._prisma.channel.findMany({
       where: {
@@ -103,7 +124,7 @@ export class ChatService {
           password: channelPassword,
         },
       });
-      // Todo: create Protected channel
+      // Todo: create PRIVATE channel
     }
     await this._prisma.channelMembers.create({
       data: {

@@ -66,9 +66,9 @@
     {
       "id": "pointer:pointer",
       "typeName": "pointer",
-      "x": -194.71770183915567,
-      "y": -530.8108298296027,
-      "lastActivityTimestamp": 1695752565979,
+      "x": 218.066117902026,
+      "y": 288.9601978419439,
+      "lastActivityTimestamp": 1695753674045,
       "meta": {}
     },
     {
@@ -79,9 +79,9 @@
       "typeName": "page"
     },
     {
-      "x": 450.4732629905708,
-      "y": 2388.4629306664897,
-      "z": 0.17903786033090502,
+      "x": 687.5328200862552,
+      "y": 563.7741161228998,
+      "z": 0.5,
       "meta": {},
       "id": "camera:page:HACXhvVar9IGAdZ9poIQG",
       "typeName": "camera"
@@ -89,8 +89,10 @@
     {
       "editingId": null,
       "croppingId": null,
-      "selectedIds": [],
-      "hoveredId": null,
+      "selectedIds": [
+        "shape:K3v66kgcQO128y1fNqas2"
+      ],
+      "hoveredId": "shape:GxQH91bRuXzLeXOTn1VN2",
       "erasingIds": [],
       "hintingIds": [],
       "focusLayerId": null,
@@ -104,7 +106,7 @@
       "opacityForNextShape": 1,
       "stylesForNextShape": {
         "tldraw:geo": "rectangle",
-        "tldraw:color": "black",
+        "tldraw:color": "light-blue",
         "tldraw:dash": "draw",
         "tldraw:fill": "none",
         "tldraw:size": "m"
@@ -123,8 +125,8 @@
       "screenBounds": {
         "x": 0,
         "y": 0,
-        "w": 1238.1944580078125,
-        "h": 613.8888549804688
+        "w": 770.8333129882812,
+        "h": 640.2777709960938
       },
       "zoomBrush": null,
       "isGridMode": false,
@@ -475,7 +477,7 @@
       "parentId": "page:HACXhvVar9IGAdZ9poIQG",
       "index": "aD",
       "props": {
-        "color": "grey",
+        "color": "light-blue",
         "size": "m",
         "text": "List all\nchannles except\nprivate",
         "font": "draw",

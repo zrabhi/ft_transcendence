@@ -313,7 +313,14 @@ export class ChatService {
     }
     return Rooms;
   }
-
+  async handleDeleteRoom(channel_id: string)
+  {
+    await this._prisma.channel.delete({
+      where:{
+        id: channel_id
+      }
+    })
+  }
   //////////////////// Ban method && Mute Method && Set As Admin /////////////////////////////////////
   async handleSetAsAdmin(user: any, channel_id: string, userToBeSet: string) {
     const currUser = await this._user.findUserById(user.id);
@@ -363,7 +370,7 @@ export class ChatService {
       };
     let searchedUser: any = channel.members.filter(member => {return member.userId === mutedUser.id});
     console.log(searchedUser);
-    
+
     for (const member of channel.members) {
       if (searchedUser[0].id === member.id )
         continue;

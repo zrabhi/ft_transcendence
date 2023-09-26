@@ -202,10 +202,13 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
 
   // Action functions
   function handleDeleteRoom() {
+    // handle delete room action
+    
     alert("Delete Room action");
   }
 
   function handleAddMember() {
+    // handle add member action
     alert("Add member action");
   }
 
@@ -214,6 +217,7 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
   }
 
   function handleLeaveRoom() {
+    //handle leave room action
     alert("Leave Room action");
   }
 
@@ -226,7 +230,7 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
   // trying to create socket to connect with other user here
   useEffect(() => {
       console.log("selected channe sis =>", selectedChannel);
-      
+
     (async () => {
       const response = await getRequest(
         `${baseChatUrl}/getMessages/${selectedChannel?.channel?.id}`
@@ -249,8 +253,6 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
     socket.on("connected", () => {
       console.table("connected");
       socket.emit("joinChat", { id: selectedChannel.channel.id });
-
-      
 
       socket.on("message", (messageInfo: Message) => {
         let sendedMessage: Message = {
@@ -331,6 +333,7 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
   };
 
   const renderActions = (role: string, user: any) => {
+    console.log("role user", user);
     if (role in actionOptions) {
       return (
         <div className="mt-2">

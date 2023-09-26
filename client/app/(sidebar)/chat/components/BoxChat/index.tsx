@@ -47,7 +47,14 @@ interface CheckboxesState {
 }
 
 let socket: Socket;
-const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChannels, channels }: any): JSX.Element => {
+const BoxChat = ({
+  selectedChat,
+  setMessages,
+  messages,
+  selectedChannel,
+  setChannels,
+  channels,
+}: any): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // state for dropdown
@@ -133,7 +140,7 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
   const { user } = useContext(AuthContext);
 
   const getRoleOptions = (type: string) => {
-    if (type === "PUBLIC" || type ==="PRIVATE" || type === "PROTECTED") {
+    if (type === "PUBLIC" || type === "PRIVATE" || type === "PROTECTED") {
       return {
         Owner: [
           { text: "Delete Room", action: handleDeleteRoom },
@@ -183,8 +190,11 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
   };
 
   const optionsToShow =
-    ((selectedChannel?.channel.type === "PUBLIC") || (selectedChannel?.channel.type === "PROTECTED")
-    || (selectedChannel?.channel.type === "PRIVATE")) ? roleOptions["Owner"] : roleOptions || [];
+    selectedChannel?.channel.type === "PUBLIC" ||
+    selectedChannel?.channel.type === "PROTECTED" ||
+    selectedChannel?.channel.type === "PRIVATE"
+      ? roleOptions["Owner"]
+      : roleOptions || [];
 
   const separateOptions = optionsToShow.filter(
     (option: any) =>
@@ -203,7 +213,7 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
   // Action functions
   function handleDeleteRoom() {
     // handle delete room action
-    
+
     alert("Delete Room action");
   }
 
@@ -229,7 +239,7 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
 
   // trying to create socket to connect with other user here
   useEffect(() => {
-      console.log("selected channe sis =>", selectedChannel);
+    console.log("selected channe sis =>", selectedChannel);
 
     (async () => {
       const response = await getRequest(
@@ -257,20 +267,21 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
       socket.on("message", (messageInfo: Message) => {
         let sendedMessage: Message = {
           content: messageInfo.content,
+          time: messageInfo.time,
         };
         if (user.username != messageInfo.reciever) {
           sendedMessage.sender = messageInfo.reciever;
           sendedMessage.avatar = messageInfo.avatar;
         } else sendedMessage = messageInfo;
         setMessages((prevMessages: any) => [...prevMessages, sendedMessage]);
-        let updatedChannel = channels.map((channel : any) =>{
-            if (channel.channel.id === selectedChannel.channel.id)
-              channel.channel.message = sendedMessage.content
-            return channel;
-          })
+        let updatedChannel = channels.map((channel: any) => {
+          if (channel.channel.id === selectedChannel.channel.id)
+            channel.channel.message = sendedMessage.content;
+          return channel;
+        });
         setChannels(updatedChannel);
-        })
       });
+    });
     return () => {
       socket.disconnect();
     };
@@ -286,10 +297,12 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
   //   // get friends here
 
   const sendMessage = async () => {
+    var time = new Date();
     const body = {
       message: message,
       channelId: selectedChannel.channel.id,
       token: cookie.access_token,
+      time: time.getHours() + ":" + time.getMinutes(),
     };
     console.log("socket ", socket);
     socket.emit("message", body);
@@ -427,9 +440,7 @@ const BoxChat = ({ selectedChat, setMessages, messages, selectedChannel, setChan
                     <span className="mr-2">
                       <img
                         alt={message.sender}
-                        src={
-                          message.avatar
-                        }
+                        src={message.avatar}
                         className="avatar-chat"
                         style={{ width: "40px", height: "40px" }}
                       />

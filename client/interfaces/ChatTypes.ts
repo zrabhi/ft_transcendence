@@ -3,6 +3,7 @@ export interface Message {
     reciever?:string
     avatar?:string
     content: string
+    time: string
 }
 
 export interface chat

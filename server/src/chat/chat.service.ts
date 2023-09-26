@@ -133,6 +133,7 @@ export class ChatService {
           allMessages.push({
             reciever: user.username,
             avatar: user.avatar,
+            time: message.time,
             content: message.content,
           });
         else {
@@ -140,6 +141,7 @@ export class ChatService {
           allMessages.push({
             sender: otherUser.username,
             avatar: otherUser.avatar,
+            time: message.time,
             content: message.content,
           });
         }
@@ -173,6 +175,7 @@ export class ChatService {
         allMessages.push({
           reciever: user.username,
           avatar: user.avatar,
+          time: message.time,
           content: message.content,
         });
       else {
@@ -180,6 +183,7 @@ export class ChatService {
         allMessages.push({
           sender: otherUser.username,
           avatar: otherUser.avatar,
+          time: message.time,
           content: message.content,
         });
       }
@@ -274,6 +278,7 @@ export class ChatService {
         channel_id: messageInfo.channelId,
         user_id: user.id,
         content: messageInfo.message,
+        time: messageInfo.time,
       },
     });
   }

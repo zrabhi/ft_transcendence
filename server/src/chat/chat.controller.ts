@@ -96,13 +96,17 @@ export class ChatController {
   async handleDeleteChannel(
     @Param('chennelID') channel_id: string,
     @Res() res: Response,
+    @UserInfo() user: User,
   ) {
-      try{
-        await this.chatService.handleDeleteRoom(channel_id);
-        res.status(200).json("ok");
-      }catch(err){
-      }
-    //HANDLE DELETE CHANNEL
+    try {
+      const currUser = await this.userService.findUserById(user.id);
+      const result = await this.chatService.handleDeleteRoom(
+        channel_id,
+        currUser,
+      );
+      if (!result.success) return res.status(400).json(result);
+      return res.status(200).json(result);
+    } catch (err) {}
   }
   @Put('joinroom/:name/:password')
   @UseGuards(JwtAuthGuard)

@@ -313,13 +313,27 @@ export class ChatService {
     }
     return Rooms;
   }
-  async handleDeleteRoom(channel_id: string)
+  async handleDeleteRoom(channel_id: string, user : any)
   {
+    try{
+    const channel = await this._prisma.channel.findUnique({
+      where:
+      {
+        id: channel_id
+      }
+    })
+    if (channel.owner != user.username)
+        return {success: false, error: "Your not the channel owner to do this action"}
     await this._prisma.channel.delete({
       where:{
         id: channel_id
       }
     })
+    return {success: true}
+  }catch(err)
+  {
+      return {success: false, error: "Channel not foudn or already deleted!"}
+  }
   }
   //////////////////// Ban method && Mute Method && Set As Admin /////////////////////////////////////
   async handleSetAsAdmin(user: any, channel_id: string, userToBeSet: string) {

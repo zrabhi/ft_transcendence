@@ -150,7 +150,6 @@ export class ChatService {
       const searchedUser = await this._user.findUserById(member.userId);
       let checker = 'Member';
       if (searchedUser.username === channel.owner)
-        //TODO: get admin channels too
         checker = 'Owner';
       users.push({
         username: searchedUser.username,
@@ -313,27 +312,27 @@ export class ChatService {
     }
     return Rooms;
   }
-  async handleDeleteRoom(channel_id: string, user : any)
-  {
-    try{
-    const channel = await this._prisma.channel.findUnique({
-      where:
-      {
-        id: channel_id
-      }
-    })
-    if (channel.owner != user.username)
-        return {success: false, error: "Your not the channel owner to do this action"}
-    await this._prisma.channel.delete({
-      where:{
-        id: channel_id
-      }
-    })
-    return {success: true}
-  }catch(err)
-  {
-      return {success: false, error: "Channel not foudn or already deleted!"}
-  }
+  async handleDeleteRoom(channel_id: string, user: any) {
+    try {
+      const channel = await this._prisma.channel.findUnique({
+        where: {
+          id: channel_id,
+        },
+      });
+      if (channel.owner != user.username)
+        return {
+          success: false,
+          error: 'Your not the channel owner to do this action',
+        };
+      await this._prisma.channel.delete({
+        where: {
+          id: channel_id,
+        },
+      });
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: 'Channel not foudn or already deleted!' };
+    }
   }
   //////////////////// Ban method && Mute Method && Set As Admin /////////////////////////////////////
   async handleSetAsAdmin(user: any, channel_id: string, userToBeSet: string) {
@@ -357,14 +356,34 @@ export class ChatService {
         error: `${currUser.username} Only the Owner can set New admins`,
         channel: undefined,
       };
-
-    // let isAdmin = false;
-    // let searchedUser: any;
-    // for (const member of channel.members) {
-    //   if (member.userId === newAdmin.id) searchedUser = member;
-    //   // if (member.userId === newAdmin && )
-    // }
+    const searchedUser = channel.members.filter((member: any) => {
+      return newAdmin.id === member.userId;
+    });
+    console.log('user is found ', searchedUser);
+    for (const member of channel.members) {
+      if (searchedUser[0].id === member.id) continue;
+      if (member.userId === currUser.id) {
+        if (searchedUser[0].role === 'ADMIN')
+          return {
+            error: `${newAdmin.username} is already an admin`,
+            channel: undefined,
+          };
+        else {
+          await this._prisma.channelMembers.update({
+            where: {
+              id: searchedUser[0].id,
+            },
+            data: {
+              role: 'ADMIN',
+            },
+          });
+          return { success: true, message: 'the user  now setted as an admin of the channel'};
+        }
+      }
+    }
+    return searchedUser[0];
   }
+
   async handleUserMute(user: any, channel_id: string, userToBeMuted: string) {
     const currUser = await this._user.findUserById(user.id);
     const mutedUser = await this._user.findUserName(userToBeMuted);
@@ -382,12 +401,13 @@ export class ChatService {
         error: `channel owner ${mutedUser.username} cant be muted by the  Members or Admins`,
         success: false,
       };
-    let searchedUser: any = channel.members.filter(member => {return member.userId === mutedUser.id});
+    let searchedUser: any = channel.members.filter((member) => {
+      return member.userId === mutedUser.id;
+    });
     console.log(searchedUser);
 
     for (const member of channel.members) {
-      if (searchedUser[0].id === member.id )
-        continue;
+      if (searchedUser[0].id === member.id) continue;
       console.log('searched user ', member.userId);
       // if (member.userId === mutedUser.id && member.role === 'ADMIN')
       if (

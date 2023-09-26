@@ -22,6 +22,7 @@ import {
   MessageInfo,
 } from './dto/chat.dto';
 import { userInfo } from 'os';
+import { channel } from 'diagnostics_channel';
 
 //TODO: CREATE GET BOTH DM AND ROOMS MESSAGES IN ON REQUEST
 @Controller('chat')
@@ -91,6 +92,18 @@ export class ChatController {
     return res.status(200).json(data);
   }
 
+  @Put('leaveChnnel/:username')
+  @UseGuards(JwtAuthGuard)
+  async handleLeaveChannel(
+    @Param('username') username: string,
+  @Res() res: Response,
+  @UserInfo() user: User,)
+  { 
+    /// handle leave channel hereee
+     
+  }
+
+
   @Put('deleteChannel/:chennelID')
   @UseGuards(JwtAuthGuard)
   async handleDeleteChannel(
@@ -139,6 +152,8 @@ export class ChatController {
       const user = await this.userService.findUserById(member.userId);
       let checker = 'Member';
       if (channel.owner === user.username) checker = 'Owner';
+      else if (member.role === "ADMIN")
+          checker = "Admin"
       members.push({
         name: user.username,
         avatar: user.avatar,
@@ -150,7 +165,6 @@ export class ChatController {
       channel: channel,
       members: members,
     };
-    console.log('channleby id  found', channel);
     res.status(200).json(data);
   }
 
@@ -200,8 +214,6 @@ export class ChatController {
     const currUser = await this.userService.findUserById(user.id);
     let result = (await this.chatService.getAllUserChannelsDm(currUser)) as any;
 
-    console.log('result here is ', result);
-
     const data = [];
     const channels = [];
     for (const channel of result) {
@@ -237,8 +249,6 @@ export class ChatController {
         status: searchedUser.status,
       });
     }
-    console.log('data is >>', data);
-
     res.status(200).json(data);
   }
 
@@ -306,6 +316,22 @@ export class ChatController {
       username,
     );
     res.status(200).json(result);
+  }
+  @Put('setadmin/:channelId/:username')
+  @UseGuards(JwtAuthGuard)
+  async handleSetAdmin(
+    @Param('username') username: string,
+    @Param('channelId') channelId: string,
+    @Res() res: Response,
+    @UserInfo() user: User,
+  ) {
+    const result = await this.chatService.handleSetAsAdmin(
+      user,
+      channelId,
+      username,
+    );
+    res.status(200).json(result);
+    // handle set As Admin
   }
 }
 //TODO: GET ALL MESSAGES IN ON REQUEST

@@ -163,8 +163,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //       this.server.to(member.userId).emit('lastMessage', messageInfo)}
     // }
     // console.log("uuuuu ",this.connectedUsers.get(client).avatar);
-    console.log("time sended ", typeof data.time);
-    
     this.chatService.saveMessageToChannel(payload, data);
     this.server.to(data.channelId).emit('message', messageInfo);
   }

@@ -179,13 +179,13 @@ const BoxChat = ({
 
   const actionOptions = {
     Owner: [
-      { text: "Ban", action: handleDeleteRoom },
-      { text: "Mute", action: handleAddMember },
-      { text: "Set as admin", action: handleShowMembers },
+      { text: "Ban", action: handleDeleteRoom }, // change to handle Ban
+      { text: "Mute", action: handleAddMember }, // change to handle Mute
+      { text: "Set as admin", action: handleShowMembers }, // change to handle set As ADMIN
     ],
     Admin: [
-      { text: "Ban", action: handleLeaveRoom },
-      { text: "Mute", action: handleAddMember },
+      { text: "Ban", action: handleLeaveRoom },  // change to handle Ban
+      { text: "Mute", action: handleAddMember }, // change to handle Mute
     ],
   };
 
@@ -231,6 +231,19 @@ const BoxChat = ({
     alert("Leave Room action");
   }
 
+  function handleBanMember()
+  {
+    alert("Ban member from room");
+  }
+
+  function handleMuteMember()
+  {
+    alert("Mute member!!")
+  }
+  function handleSetAsAdmin()
+  {
+    alert("Set the member As Admin ")
+  }
   // Function to handle option click
   function handleOptionClick(action: () => void) {
     action(); // Call the corresponding action function
@@ -354,7 +367,7 @@ const BoxChat = ({
             <button
               key={index}
               className={`text-${
-                option.text === "Ban"
+                option.text === "Ban" 
                   ? "red"
                   : option.text === "Mute"
                   ? "green"

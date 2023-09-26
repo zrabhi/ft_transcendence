@@ -137,7 +137,7 @@ export class ChatController {
     if (result.channel === undefined) return res.status(400).json(result.error);
     return res.status(200).json(`${user.username} has joined channel`);
   }
-
+  /// channel roles
   @UseGuards(JwtAuthGuard)
   @Get('getChannel/:channleId')
   async handlegetChannelById(
@@ -151,8 +151,9 @@ export class ChatController {
     for (const member of channel.members) {
       const user = await this.userService.findUserById(member.userId);
       let checker = 'Member';
-      if (channel.owner === user.username) checker = 'Owner';
-      else if (member.role === 'ADMIN') checker = 'Admin';
+      if (member.role === "ADMIN")
+        checker = 'Admin';
+      if (member.role === "OWNER") checker = 'Owner';
       members.push({
         name: user.username,
         avatar: user.avatar,

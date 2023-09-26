@@ -172,7 +172,9 @@ export class ChatService {
     for (const member of channel.members) {
       const searchedUser = await this._user.findUserById(member.userId);
       let checker = 'Member';
-      if (searchedUser.username === channel.owner) checker = 'Owner';
+      if (member.role === "ADMIN")
+        checker = 'Admin';
+      if (channel.owner === searchedUser.username ) checker = 'Owner';
       users.push({
         username: searchedUser.username,
         avatar: searchedUser.avatar,

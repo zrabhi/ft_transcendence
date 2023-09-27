@@ -17,12 +17,13 @@ import io, { Socket } from "socket.io-client";
 import { useCookies } from "react-cookie";
 
 const Chat: React.FC = () => {
+  // ADDED BY ZAC 
   /// create useState Where you can get blocked users && update it when the users is blocked from chat
   /// the resposne from back end is the username of the blocked user
+  // we will change change to context api and we must always setBlockedUsers if new user have been block by the current user
   const [blockedUsers, setBlockedUsers] = useState<blockedUsers[]>([]);
   const [selectedChannel, setSelectedChannel] = useState<channel>(); // to set the channel selected
   const [selectedChat, setSelectedChat] = useState<chat>(); // to set the user selected
-  //TODO:create type for channles already exists
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)

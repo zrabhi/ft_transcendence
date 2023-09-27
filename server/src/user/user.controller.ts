@@ -376,7 +376,7 @@ export class UserController {
         .json({ success: true, message: 'user succefully blocked' });
     } catch (err) {
       res.status(400).json({
-        success: true,
+        success: false,
         error: 'can t blocke this user Or already been blocked ',
       });
     }

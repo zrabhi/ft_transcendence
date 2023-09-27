@@ -413,13 +413,13 @@ export class ChatService {
     });
     if (newAdmin.username === channel.owner)
       return {
+        success:false,
         error: `${newAdmin.username} The User is The channel owner ()`,
-        channel: undefined,
       };
     if (currUser.username != channel.owner)
       return {
+        success:false,
         error: `${currUser.username} Only the Owner can set New admins`,
-        channel: undefined,
       };
     const searchedUser = channel.members.filter((member: any) => {
       return newAdmin.id === member.userId;
@@ -430,8 +430,8 @@ export class ChatService {
       if (member.userId === currUser.id) {
         if (searchedUser[0].role === 'ADMIN')
           return {
+            success: false,
             error: `${newAdmin.username} is already an admin`,
-            channel: undefined,
           };
         else {
           await this._prisma.channelMembers.update({

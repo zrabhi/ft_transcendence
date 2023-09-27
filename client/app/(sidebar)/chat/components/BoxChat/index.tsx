@@ -1,8 +1,10 @@
 import {
   baseChatUrl,
+  baseUrlUsers,
   getRequest,
   getRequestBody,
   postRequest,
+  putRequest,
 } from "@/app/context/utils/service";
 import { Key, useContext, useEffect, useRef, useState } from "react";
 
@@ -171,14 +173,40 @@ const BoxChat = ({
 
   const roleOptions = getRoleOptions(selectedChannel.channel.type);
 
-  function handleBlock() {
+ async  function handleBlock(username: string) {
+  // username is the selected user to be blocked
+  const response = await putRequest(`${baseUrlUsers}/block/${username}`,"")
+  if (!response.success)
+    {
+       // error has been  occured here 
+      // in response.error you will find the error occured
+    }
+    // else 
+    // if response.success === true , the will be success message in response.message
+    // show unblock button 
     alert("Block action");
   }
 
+  // added by zac
+  async function handleUnBlock(username: string)
+  {
+    // username of the the person to be unblocked
+    const response = await putRequest(`${baseUrlUsers}/unblock/${username}`, "")
+    if (!response.success)
+    {
+      // error has been  occured here 
+      // in response.error you will find the error occured
+    }
+     // else 
+    // if response.success === true , the will be success message in response.message
+    // show block button 
+  }
+  
   function handleShowProfile() {
     alert("Show profile action");
   }
 
+  // change it to async 
   const actionOptions = {
     Owner: [
       { text: "Ban", action: handleDeleteRoom }, // change to handle Ban
@@ -213,9 +241,16 @@ const BoxChat = ({
   );
 
   // Action functions
-  function handleDeleteRoom() {
+  async function handleDeleteRoom() {
     // handle delete room action
-
+    const response = await putRequest(`${baseChatUrl}/deleteChannel/${selectedChannel.channel.id}`, "") 
+    if(!response.success)
+    {
+      // error has been  occured here 
+      // in response.error you will find the error occured
+    }
+    /// else
+      /// setSelectedchannel to an empty array
     alert("Delete Room action");
   }
 
@@ -228,7 +263,15 @@ const BoxChat = ({
     setIsPopupOpen(true);
   }
 
-  function handleLeaveRoom() {
+  async function handleLeaveRoom() {
+      const response = await putRequest(`${baseChatUrl}/leaveChannel/${selectedChannel.channel.id}`,"");
+      if (!response.success)
+      {
+        // error has been  occured here 
+        // in response.error you will find the error occured
+      }
+    /// else
+    /// setSelectedchannel to an empty array
     //handle leave room action
     alert("Leave Room action");
   }
@@ -242,8 +285,16 @@ const BoxChat = ({
   {
     alert("Mute member!!")
   }
-  function handleSetAsAdmin()
+ async function handleSetAsAdmin(username :string)
   {
+    const response = await putRequest(`${baseChatUrl}/setadmin/${selectedChannel.channel.id}/${username}`, "")
+    if (!response.success)
+    {
+      // error has been  occured here 
+      // in response.error you will find the error occured
+    }
+    //else
+      // change user role as a admin 
     alert("Set the member As Admin ")
   }
   // Function to handle option click

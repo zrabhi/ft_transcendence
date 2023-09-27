@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import {
+  BadRequestException,
   Body,
   HttpException,
   HttpStatus,
@@ -24,11 +25,11 @@ import { FileUserDto, PutUserDto } from './dto/put-user-dto';
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAllUsers(user: any) : Promise<User[]> {
+  async findAllUsers(user: any): Promise<User[]> {
     const Allusers = await this.prismaService.user.findMany({});
-    const users = Allusers.filter(currUser => {
-      return currUser.id != user.id
-    }) 
+    const users = Allusers.filter((currUser) => {
+      return currUser.id != user.id;
+    });
     return users;
   }
 
@@ -516,6 +517,81 @@ export class UserService {
         status: 'OFFLINE',
       },
     });
+  }
+  async findUserByIdWithBlocked(user_id: string) {}
+  async handleBlockUser(user: any, username: string) {
+    const currUser = await this.prismaService.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        userBlock: true,
+      },
+    });
+  
+    const blockedUser = await this.findUserName(username);
+    const checker = currUser.userBlock.filter((blocked : any)=>{
+      return blocked.blockedId === blockedUser.id
+    })  
+    if (checker[0])
+      throw BadRequestException;
+    return await this.prismaService.userBlock.create({
+      data: {
+        blockerId: currUser.id,
+        blockedId: blockedUser.id,
+      },
+    });
+  }
+
+  async handleUnBlockUser(user: any, username: string)
+  {
+      const currUser = await this.prismaService.user.findUnique({
+        where:
+        {
+          id:user.id
+        },
+        include:{
+          userBlock:true,
+        }
+      })
+      const otherUser = await this.findUserName(username);
+      const checker = currUser.userBlock.filter((blocked : any)=>{
+        return blocked.blockedId === otherUser.id
+      })  
+      if (!checker[0])
+        throw BadRequestException;
+    await this.prismaService.userBlock.delete({
+      where:{
+        id:checker[0].id
+      }
+    })
+     
+  }
+
+
+  async handleGetBlockedUsers(user:any) {
+    const currUser = await this.prismaService.user.findUnique({
+      where:{
+        id: user.id
+      },
+      include:{
+        userBlock: true
+      }
+    })
+    const users = [];
+    for (const block of currUser.userBlock)
+    {
+       const searchedUser = await this.prismaService.user.findUnique({
+        where:{
+          id: block.blockedId,
+        }
+       })
+       users.push({
+          username: searchedUser.username
+       })
+    }
+    console.log("blocked userss ===>> ", users);
+    return users
   }
   // async getFileUpload(fileTarget, category) {
   //   let userFile: any = undefined;

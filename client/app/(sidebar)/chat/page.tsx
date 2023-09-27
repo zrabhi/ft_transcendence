@@ -20,6 +20,8 @@ import { useCookies } from "react-cookie";
 
 const Chat: React.FC = () => {
 
+  /// create useState Where you can get blocked users && update it when the users is blocked from chat
+  /// the resposne from back end is the username of the blocked user
   const [selectedChannel, setSelectedChannel] = useState<channel>(); // to set the channel selected
   const [selectedChat, setSelectedChat] = useState<chat>(); // to set the user selected
   //TODO:create type for channles already exists

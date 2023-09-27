@@ -76,8 +76,7 @@ export class UserController {
   @Get('userNameCheck')
   async handleNickNameCheck(@Req() req, @Res() res) {
     try {
-    } catch (err) {
-    }
+    } catch (err) {}
   }
 
   @UseGuards(JwtAuthGuard)
@@ -364,6 +363,59 @@ export class UserController {
     }
   }
 
+  @Put('block/:username')
+  @UseGuards(JwtAuthGuard)
+  async handleBlockUser(
+    @Param('username') username: string,
+    @UserInfo() user: User,
+    @Res() res: Response,
+  ) {
+    try {
+      await this.userService.handleBlockUser(user, username);
+      res
+        .status(200)
+        .json({ success: true, message: 'user succefully blocked' });
+    } catch (err) {
+      res.status(400).json({
+        success: true,
+        error: 'can t blocke this user Or already been blocked ',
+      });
+    }
+  }
+  @Put('unblock/:username')
+  @UseGuards(JwtAuthGuard)
+  async handleUnBlockUser(
+    @Param('username') username: string,
+    @UserInfo() user: User,
+    @Res() res: Response,
+  ) {
+    try {
+      await this.userService.handleUnBlockUser(user, username);
+      res
+        .status(200)
+        .json({ success: true, message: 'user unblocked succefully' });
+    } catch (err) {
+      res
+        .status(400)
+        .json({
+          success: false,
+          error:
+            'Error occured while unblocking this user or already have been unblocked',
+        });
+    }
+    // handle unblock user here
+  }
+  @Get('blockedUsers')
+  @UseGuards(JwtAuthGuard)
+  async handleGetBlockedUsers(@UserInfo() user: User, @Res() res: Response) {
+    console.log('im here');
+
+    try {
+      const result = await this.userService.handleGetBlockedUsers(user);
+      res.status(200).json(result);
+    } catch (err) {}
+    // handle get blocked usersss
+  }
   @Get('user/friends/:username')
   async getUserFriendsByName(@Param('username') user_name: string, @Res() res) {
     try {

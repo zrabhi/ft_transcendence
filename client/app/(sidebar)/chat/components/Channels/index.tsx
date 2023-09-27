@@ -38,6 +38,8 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel, setMessages }
     // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.users
     setSelectedChat(channel);
     setSelectedChannel(response);
+    console.log("memebers is channel are ", response.members);
+    
   };
 
   useEffect(() => {

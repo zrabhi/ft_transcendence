@@ -258,7 +258,7 @@ const BoxChat = ({
       const response = await getRequest(
         `${baseChatUrl}/getMessages/${selectedChannel?.channel?.id}`
       );
-      // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.users
+      // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.members // (going to remove it cause were not working with this object)
       setMessages(() => []);
       setMessages((prevMessages: any) => [
         ...prevMessages,
@@ -595,7 +595,7 @@ const BoxChat = ({
                         </div>
                       </div>
                       <div>
-                        {renderActions("Owner", user)}
+                        {renderActions(user.role, user)}
                         {/* the "Admin" is the user connected role in this room channel */}
                         {/* it can be "Admin" "Owner" "Member" */}
                       </div>

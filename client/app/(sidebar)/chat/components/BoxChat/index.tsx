@@ -38,6 +38,7 @@ interface MessageProps {
   sender?: string;
   avatar: string;
   content: string;
+  blocked?:boolean
 }
 
 interface CheckboxesState {
@@ -49,6 +50,7 @@ interface CheckboxesState {
 let socket: Socket;
 const BoxChat = ({
   selectedChat,
+  blockedUsers,
   setMessages,
   messages,
   selectedChannel,
@@ -281,18 +283,28 @@ const BoxChat = ({
         let sendedMessage: Message = {
           content: messageInfo.content,
           time: messageInfo.time,
+          blocked: false
         };
+        const isBlocked = blockedUsers.filter((user: any)=>
+        {
+          if (user.username === messageInfo.reciever)
+              sendedMessage.blocked = true;
+        }
+        )
         if (user.username != messageInfo.reciever) {
           sendedMessage.sender = messageInfo.reciever;
           sendedMessage.avatar = messageInfo.avatar;
+          // sendedMessage.blocked = isBlocked;
         } else sendedMessage = messageInfo;
+          console.log("sended messages ", sendedMessage);
+        if (sendedMessage.blocked === false){
         setMessages((prevMessages: any) => [...prevMessages, sendedMessage]);
         let updatedChannel = channels.map((channel: any) => {
           if (channel.channel.id === selectedChannel.channel.id)
             channel.channel.message = sendedMessage.content;
           return channel;
         });
-        setChannels(updatedChannel);
+        setChannels(updatedChannel);}
       });
     });
     return () => {
@@ -477,9 +489,10 @@ const BoxChat = ({
                         style={{ width: "40px", height: "40px" }}
                       />
                     </span>
+                    
                     <div style={{ flex: 1 }}>
                       <p className="ml-2" style={{ wordWrap: "break-word" }}>
-                        {message.content}
+                        {!message.blocked ? message.content: "You can't see message from blocked user!"}
                       </p>
                     </div>
                   </div>

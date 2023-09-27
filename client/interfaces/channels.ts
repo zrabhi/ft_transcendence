@@ -15,3 +15,8 @@ export  interface channels{
     message: string;
     status: string;
 }
+
+export interface blockedUsers
+{
+    usernam:string
+}

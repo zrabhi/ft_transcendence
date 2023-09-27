@@ -11,17 +11,15 @@ import {
 import Channels from "./components/Channels";
 import BoxChat from "./components/BoxChat";
 import Friends from "./components/Friends";
-import { channel, channels } from "@/interfaces/channels";
+import { blockedUsers, channel, channels } from "@/interfaces/channels";
 import { Message, chat } from "@/interfaces/ChatTypes";
-import  io, { Socket } from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 import { useCookies } from "react-cookie";
 
-
-
 const Chat: React.FC = () => {
-
   /// create useState Where you can get blocked users && update it when the users is blocked from chat
   /// the resposne from back end is the username of the blocked user
+  const [blockedUsers, setBlockedUsers] = useState<blockedUsers[]>([]);
   const [selectedChannel, setSelectedChannel] = useState<channel>(); // to set the channel selected
   const [selectedChat, setSelectedChat] = useState<chat>(); // to set the user selected
   //TODO:create type for channles already exists
@@ -30,14 +28,18 @@ const Chat: React.FC = () => {
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
   const [cookie] = useCookies(["access_token"]);
   // GET all users
-  let socket : Socket
+  let socket: Socket;
   useEffect(() => {
     (async () => {
       const response = await getRequest(`${baseUrlUsers}/users`);
       setUsers(response);
     })();
+    (async () => {
+      const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
+      setBlockedUsers(response)
+    })();
   }, []);
-  // testing socket in root chat page 
+  // testing socket in root chat page
   // socket = io("http://127.0.0.1:8080/chat", {
   //   auth: {
   //     token: cookie.access_token,
@@ -56,8 +58,8 @@ const Chat: React.FC = () => {
         console.log("reposne form ge channles", responseDm);
 
         const responseRooms = await getRequest(`${baseChatUrl}/channelsRooms`); // fetching user rooms
-        setChannels((prevchannels: any) => [...prevchannels, ...responseRooms])
-      } catch (error) { }
+        setChannels((prevchannels: any) => [...prevchannels, ...responseRooms]);
+      } catch (error) {}
     })();
   }, []);
 
@@ -65,7 +67,7 @@ const Chat: React.FC = () => {
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
   return (
     <div className="logged-user">
-      <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded}/>
+      <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
       <div className="home">
         <div className="chat-page">
           <h2 className="text-2xl text-white mx-auto my-4">
@@ -78,8 +80,24 @@ const Chat: React.FC = () => {
               setSelectedChannel={setSelectedChannel}
               setSelectedChat={setSelectedChat}
             />
-            {selectedChannel && <BoxChat setMessages={setMessages} messages={messages}  channels={channels} selectedChannel={selectedChannel} selectedChat={selectedChat} setChannels={setChannels} users={users} />}
-            <Friends setSelectedChannel={setSelectedChannel} setSelectedChat={setSelectedChat} users={users} />
+            {selectedChannel && (
+              <BoxChat
+                blockedUsers={blockedUsers}
+                setBlockedUsers={setBlockedUsers}
+                setMessages={setMessages}
+                messages={messages}
+                channels={channels}
+                selectedChannel={selectedChannel}
+                selectedChat={selectedChat}
+                setChannels={setChannels}
+                users={users}
+              />
+            )}
+            <Friends
+              setSelectedChannel={setSelectedChannel}
+              setSelectedChat={setSelectedChat}
+              users={users}
+            />
           </div>
         </div>
       </div>

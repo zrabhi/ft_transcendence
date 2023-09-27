@@ -4,6 +4,7 @@ export interface Message {
     avatar?:string
     content: string
     time: string
+    blocked?:boolean
 }
 
 export interface chat

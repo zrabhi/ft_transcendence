@@ -66,9 +66,9 @@
     {
       "id": "pointer:pointer",
       "typeName": "pointer",
-      "x": -223.18114737324981,
-      "y": -13.840815330484816,
-      "lastActivityTimestamp": 1695827287499,
+      "x": 1019.4374609318311,
+      "y": -256.7698582856174,
+      "lastActivityTimestamp": 1695833346039,
       "meta": {}
     },
     {
@@ -79,9 +79,9 @@
       "typeName": "page"
     },
     {
-      "x": 796.5033911231819,
-      "y": 779.8335189974689,
-      "z": 0.3528846509595605,
+      "x": 537.0552762893376,
+      "y": 404.27566267161546,
+      "z": 0.38067884968351096,
       "meta": {},
       "id": "camera:page:HACXhvVar9IGAdZ9poIQG",
       "typeName": "camera"
@@ -90,9 +90,9 @@
       "editingId": null,
       "croppingId": null,
       "selectedIds": [
-        "shape:ta9UdmjqB2J7h55Kipghb"
+        "shape:1s7chMVgcu3jZF2gNBNTO"
       ],
-      "hoveredId": "shape:xkkhKzbGNMmBtNr9T9Le9",
+      "hoveredId": null,
       "erasingIds": [],
       "hintingIds": [],
       "focusLayerId": null,
@@ -125,8 +125,8 @@
       "screenBounds": {
         "x": 0,
         "y": 0,
-        "w": 1549.3055419921875,
-        "h": 563.1943969726562
+        "w": 742.361083984375,
+        "h": 413.8888854980469
       },
       "zoomBrush": null,
       "isGridMode": false,
@@ -329,8 +329,8 @@
       "typeName": "shape"
     },
     {
-      "x": 81.96384884211051,
-      "y": -356.4064164485133,
+      "x": 70.18478806589832,
+      "y": -356.89098106545987,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,
@@ -398,8 +398,8 @@
       "typeName": "shape"
     },
     {
-      "x": 82.80060928314157,
-      "y": -119.28176236514514,
+      "x": 67.57969272663564,
+      "y": -121.11311920058836,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,
@@ -421,8 +421,8 @@
       "typeName": "shape"
     },
     {
-      "x": 327.3539311992448,
-      "y": -124.93643285073779,
+      "x": 295.6081146203958,
+      "y": -116.89846825086653,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,
@@ -444,8 +444,8 @@
       "typeName": "shape"
     },
     {
-      "x": 318.19119552151005,
-      "y": -362.2727588264059,
+      "x": 295.6234472469016,
+      "y": -355.9307303027459,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,
@@ -691,8 +691,8 @@
       "typeName": "shape"
     },
     {
-      "x": -433.7786320498029,
-      "y": 333.8215136486323,
+      "x": -422.39856848909574,
+      "y": 349.5199001130769,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,
@@ -820,8 +820,8 @@
       "typeName": "shape"
     },
     {
-      "x": 84.49240168846893,
-      "y": 117.83413292192171,
+      "x": 67.87482953490064,
+      "y": 117.96953363960273,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,
@@ -1026,8 +1026,8 @@
       "typeName": "shape"
     },
     {
-      "x": 325.94385185791657,
-      "y": 116.6845448560689,
+      "x": 295.281160854312,
+      "y": 119.25699815960093,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,

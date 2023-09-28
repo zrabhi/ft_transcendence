@@ -181,8 +181,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         members: true,
       },
     });
+    let type : string = "dm"
+    if (channel.type != "DM")
+      type = "room"
     const lastMessage = {
-      type:"dm",
+      type:type,
       channel:{
         id: data.channelId,
         username: user.username,
@@ -192,7 +195,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
     const messageInfo = {
-      type:"dm",
+      type:type,
       channelId: data.channelId,
       reciever: user.username,
       avatar: user.avatar,

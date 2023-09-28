@@ -31,7 +31,6 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel, setMessages }
     // );
     // replacing create/dm with get channel
     console.log("in channels component",channel.id);
-    
     const response = await getRequest(
       `${baseChatUrl}/getChannel/${channel.id}`
     );
@@ -39,7 +38,6 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel, setMessages }
     setSelectedChat(channel);
     setSelectedChannel(response);
     console.log("memebers is channel are ", response.members);
-    
   };
 
   useEffect(() => {
@@ -49,7 +47,7 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel, setMessages }
       )
     );
   }, [isChecked, channels]);
-  
+
   return (
     <div className="users-container">
       <div className="inbox-header">

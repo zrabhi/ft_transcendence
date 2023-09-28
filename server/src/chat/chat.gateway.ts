@@ -72,7 +72,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   @SubscribeMessage('leaveRoom')
-  async handledLeaveRoom(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+  async handledLeaveRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
@@ -86,11 +89,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         members: true,
       },
     });
-    const result = await this.chatService.handleLeaveChannel(user, data.channelID);
-     // Todo: resturn error message id something  wrong happend
+    const result = await this.chatService.handleLeaveChannel(
+      user,
+      data.channelID,
+    );
+    // Todo: resturn error message id something  wrong happend
     for (const member of channel.members) {
       if (member.userId != user.id)
-          this.server.to(member.userId).emit('leftRoom', data.channelId);
+        this.server.to(member.userId).emit('leftRoom', data.channelId);
     }
   }
 
@@ -114,15 +120,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         members: true,
       },
     });
-    const result = await (this.chatService.handleDeleteRoom(data.channelId, user)) as any;
+    const result = (await this.chatService.handleDeleteRoom(
+      data.channelId,
+      user,
+    )) as any;
     const response = {
       channelId: data.channelId,
-      success : result.success,
-      error: result.error
-    }
+      success: result.success,
+      error: result.error,
+    };
     // Todo: return error message id something  wrong happend
     for (const member of channel.members) {
-        this.server.to(member.userId).emit('channelDeleted', response);
+      this.server.to(member.userId).emit('channelDeleted', response);
     }
   }
   @SubscribeMessage('mute')
@@ -154,6 +163,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       secret: process.env.JWT_SECRET,
     });
     if (!payload) return client.disconnect(true);
+    //TODO : HANDLE BAN ACTION HERE
   }
   @SubscribeMessage('block')
   async handleblockeedUser(
@@ -165,7 +175,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       secret: process.env.JWT_SECRET,
     });
     if (!payload) return client.disconnect(true);
-    //TODO: HANDLE BLOCKED USER
+    //TODO: HANDLE BLCOK ACTION HERE
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   @SubscribeMessage('message')
@@ -186,23 +196,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         members: true,
       },
     });
-    let type : string = "dm"
-    let name : string = user.username
-    let status : string = user.status;
-    if (channel.type != "DM")
-      type = "room", name = "#" + channel.name, status = "";
+    let type: string = 'dm';
+    let name: string = user.username;
+    let status: string = user.status;
+    let avatar: string = user.avatar;
+    if (channel.type != 'DM')
+      (type = 'room'),
+        (name = '#' + channel.name),
+        (status = ''),
+        (avatar = channel.avatar);
     const lastMessage = {
-      type:type,
-      channel:{
+      type: type,
+      channel: {
         id: data.channelId,
         username: name,
-        avatar: user.avatar,
+        avatar: avatar,
         message: data.message,
-        status: status
-      }
-    }
+        status: status,
+      },
+    };
     const messageInfo = {
-      type:type,
+      type: type,
       channelId: data.channelId,
       reciever: user.username,
       avatar: user.avatar,

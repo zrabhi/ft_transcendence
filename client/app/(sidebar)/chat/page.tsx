@@ -53,34 +53,44 @@ const Chat: React.FC = () => {
       console.log("socket connected");
       socket.on("lastMessage", (messageInfo: any) => {
         let checker = false;
-        let updatedChannel = channels.map((channel: any) => {
-          if (channel.channel && channel.channel.id === messageInfo.channel.id){
+        let updatedChannel : any = channels.filter((channel: any) => {
+          if (
+            channel.channel &&
+            channel.channel.id === messageInfo.channel.id
+          ) {
             checker = true;
             channel.channel.message = messageInfo.channel.message;
+            return channel;
           }
-          return channel;
         });
-        console.log("updated channel", updatedChannel);
-        !checker ? setChannels((prevChannels : any) => [...prevChannels, messageInfo]):
-            setChannels(updatedChannel);
+        let previousChannels =
+          channels.filter((channel: any) => {
+            return (
+              channel.channel && channel.channel.id != messageInfo.channel.id
+            );
+          })
+        console.log("updated channel", updatedChannel , previousChannels);
+        !checker
+          ? setChannels((prevChannels: any) => [messageInfo, ...prevChannels])
+          : setChannels(() => [...updatedChannel, ...previousChannels]);
       });
+
       socket.on("channelDeleted", (data: socketResponse) => {
         if (!data.success) {
-          alert(data.error)
-            // error in data.error
+          alert(data.error);
+          // error in data.error
         }
         let updatedChannel = channels.map((channel: any) => {
-          if (channel.channel.id === data.channelId)
-              return []
-        return channel;
+          if (channel.channel.id === data.channelId) return [];
+          return channel;
+        });
+        // if (selectedChannel  && selectedChannel.channel && selectedChannel?.channel.id === channelId) // NOT WORKING AS EXCPCTEDDD
+        // setSelectedChannel(); // the  the channel here for other usersss
+        setChannels(updatedChannel);
       });
-      // if (selectedChannel  && selectedChannel.channel && selectedChannel?.channel.id === channelId) // NOT WORKING AS EXCPCTEDDD
-      // setSelectedChannel(); // the  the channel here for other usersss
-      setChannels(updatedChannel)
-    })
-    socket.on("leftRoom", () =>{
-      // handle the response from socket server
-    })
+      socket.on("leftRoom", () => {
+        // handle the response from socket server
+      });
     });
     return () => {
       socket.disconnect();

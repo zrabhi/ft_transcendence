@@ -8,7 +8,7 @@
 
 
 // // useEffect(() => {
-// / 
+// /
 // //         }, [cookie]);
 
 
@@ -20,8 +20,8 @@
 //       include: {
 //         members: true,
 //       },
-//     }); 
+//     });
 //     const result = this.chatService.handleDeleteRoom(data.channelId, user);
-//     for (const member of channel.members) {  
+//     for (const member of channel.members) {
 //         this.server.to(member.userId).emit('channelDeleted', data.channelId);
 //     }

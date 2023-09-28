@@ -208,8 +208,8 @@ const BoxChat = ({
   // change it to async
   const actionOptions = {
     Owner: [
-      { text: "Ban", action: handleDeleteRoom }, // change to handle Ban
-      { text: "Mute", action: handleAddMember }, // change to handle Mute
+      { text: "Ban", action: handleBanMember }, // change to handle Ban and username of the banned one must be provided
+      { text: "Mute", action: handleMuteMember }, // change to handle Mute
       { text: "Set as admin", action: handleShowMembers }, // change to handle set As ADMIN
     ],
     Admin: [
@@ -247,7 +247,7 @@ const BoxChat = ({
       token:cookie.access_token
     }
     socket.emit('deleteChannel', body)
-  
+    setSelectedChannel(); // delete the channel for the current user
     alert("Delete Room action");
   }
 
@@ -261,6 +261,7 @@ const BoxChat = ({
   }
 
   async function handleLeaveRoom() {
+    // socket.emit("leaveRoom", );
     const response = await putRequest(
       `${baseChatUrl}/leaveChannel/${selectedChannel.channel.id}`,
       ""

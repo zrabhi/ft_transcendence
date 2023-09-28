@@ -15,11 +15,10 @@ import { blockedUsers, channel, channels } from "@/interfaces/channels";
 import { Message, chat } from "@/interfaces/ChatTypes";
 import io, { Socket } from "socket.io-client";
 import { useCookies } from "react-cookie";
-import { channel } from "diagnostics_channel";
 
 let socket: Socket;
 const Chat: React.FC = () => {
-  const [selectedChannel, setSelectedChannel] = useState<channel>(); // to set the channel selected
+  const [selectedChannel, setSelectedChannel] = useState<any>(); // to set the channel selected
   const [selectedChat, setSelectedChat] = useState<chat>(); // to set the user selected
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
@@ -52,13 +51,17 @@ const Chat: React.FC = () => {
     socket.on("connected", () => {
       console.log("socket connected");
       socket.on("lastMessage", (messageInfo: any) => {
-        
+        let checker = false;
         let updatedChannel = channels.map((channel: any) => {
-          if (channel.channel.id === messageInfo.channelId)
-            channel.channel.message = messageInfo.content;
+          if (channel.channel && channel.channel.id === messageInfo.channel.id){
+            checker = true;
+            channel.channel.message = messageInfo.channel.message;
+          }
           return channel;
         });
-        setChannels(updatedChannel);
+        console.log("updated channel", updatedChannel);
+        !checker ? setChannels((prevChannels : any) => [...prevChannels, messageInfo]):
+            setChannels(updatedChannel);
       });
       socket.on("channelDeleted", (channelId: string) => {
         let updatedChannel = channels.map((channel: any) => {
@@ -66,9 +69,13 @@ const Chat: React.FC = () => {
               return []
         return channel;
       });
-      // if (selectedChannel  &&  selectedChannel?.channel.id === channelId)
+      // if (selectedChannel  && selectedChannel.channel && selectedChannel?.channel.id === channelId) // NOT WORKING AS EXCPCTEDDD
+      // setSelectedChannel(); // the  the channel here for other usersss
       setChannels(updatedChannel)
-      })
+    })
+    socket.on("leftRoom", () =>{
+      // handle the response from socket server
+    })
     });
     return () => {
       socket.disconnect();

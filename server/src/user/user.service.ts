@@ -583,7 +583,6 @@ export class UserService {
         username: searchedUser.username,
       });
     }
-    console.log('blocked userss ===>> ', users);
     return users;
   }
   // async getFileUpload(fileTarget, category) {

@@ -359,8 +359,7 @@ export class ChatService {
       return { success: false, error: 'Channel not foudn or already deleted!' };
     }
   }
-  async handleLeaveChannel(user: any, channel_id: string) {
-    const currUser = await this._user.findUserById(user.id);
+  async handleLeaveChannel(currUser: any, channel_id: string) {
     const channel = await this._prisma.channel.findUnique({
       where: {
         id: channel_id,

@@ -528,13 +528,12 @@ export class UserService {
         userBlock: true,
       },
     });
-  
+
     const blockedUser = await this.findUserName(username);
-    const checker = currUser.userBlock.filter((blocked : any)=>{
-      return blocked.blockedId === blockedUser.id
-    })  
-    if (checker[0])
-      throw BadRequestException;
+    const checker = currUser.userBlock.filter((blocked: any) => {
+      return blocked.blockedId === blockedUser.id;
+    });
+    if (checker[0]) throw BadRequestException;
     return await this.prismaService.userBlock.create({
       data: {
         blockerId: currUser.id,
@@ -543,55 +542,49 @@ export class UserService {
     });
   }
 
-  async handleUnBlockUser(user: any, username: string)
-  {
-      const currUser = await this.prismaService.user.findUnique({
-        where:
-        {
-          id:user.id
-        },
-        include:{
-          userBlock:true,
-        }
-      })
-      const otherUser = await this.findUserName(username);
-      const checker = currUser.userBlock.filter((blocked : any)=>{
-        return blocked.blockedId === otherUser.id
-      })  
-      if (!checker[0])
-        throw BadRequestException;
+  async handleUnBlockUser(user: any, username: string) {
+    const currUser = await this.prismaService.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        userBlock: true,
+      },
+    });
+    const otherUser = await this.findUserName(username);
+    const checker = currUser.userBlock.filter((blocked: any) => {
+      return blocked.blockedId === otherUser.id;
+    });
+    if (!checker[0]) throw BadRequestException;
     await this.prismaService.userBlock.delete({
-      where:{
-        id:checker[0].id
-      }
-    })
-     
+      where: {
+        id: checker[0].id,
+      },
+    });
   }
 
-
-  async handleGetBlockedUsers(user:any) {
+  async handleGetBlockedUsers(user: any) {
     const currUser = await this.prismaService.user.findUnique({
-      where:{
-        id: user.id
+      where: {
+        id: user.id,
       },
-      include:{
-        userBlock: true
-      }
-    })
+      include: {
+        userBlock: true,
+      },
+    });
     const users = [];
-    for (const block of currUser.userBlock)
-    {
-       const searchedUser = await this.prismaService.user.findUnique({
-        where:{
+    for (const block of currUser.userBlock) {
+      const searchedUser = await this.prismaService.user.findUnique({
+        where: {
           id: block.blockedId,
-        }
-       })
-       users.push({
-          username: searchedUser.username
-       })
+        },
+      });
+      users.push({
+        username: searchedUser.username,
+      });
     }
-    console.log("blocked userss ===>> ", users);
-    return users
+    console.log('blocked userss ===>> ', users);
+    return users;
   }
   // async getFileUpload(fileTarget, category) {
   //   let userFile: any = undefined;

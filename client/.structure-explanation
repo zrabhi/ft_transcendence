@@ -10,3 +10,18 @@
 // // useEffect(() => {
 // / 
 // //         }, [cookie]);
+
+
+// const user = await this.userService.findUserById(payload.id);
+//     const channel = await this.prismaService.channel.findUnique({
+//       where: {
+//         id: data.channelId,
+//       },
+//       include: {
+//         members: true,
+//       },
+//     }); 
+//     const result = this.chatService.handleDeleteRoom(data.channelId, user);
+//     for (const member of channel.members) {  
+//         this.server.to(member.userId).emit('channelDeleted', data.channelId);
+//     }

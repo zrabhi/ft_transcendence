@@ -152,9 +152,8 @@ export class ChatController {
     for (const member of channel.members) {
       const user = await this.userService.findUserById(member.userId);
       let checker = 'Member';
-      if (member.role === "ADMIN")
-        checker = 'Admin';
-      if (member.role === "OWNER") checker = 'Owner';
+      if (member.role === 'ADMIN') checker = 'Admin';
+      if (member.role === 'OWNER') checker = 'Owner';
       members.push({
         id: Key++,
         name: user.username,

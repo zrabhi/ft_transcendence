@@ -40,7 +40,7 @@ interface MessageProps {
   sender?: string;
   avatar: string;
   content: string;
-  blocked?:boolean
+  blocked?: boolean;
 }
 
 interface CheckboxesState {
@@ -52,10 +52,10 @@ interface CheckboxesState {
 let socket: Socket;
 const BoxChat = ({
   selectedChat,
-  blockedUsers,
   setMessages,
   messages,
   selectedChannel,
+  setSelectedChannel,
   setChannels,
   channels,
 }: any): JSX.Element => {
@@ -138,10 +138,9 @@ const BoxChat = ({
   //     },
   //   ],
   // });
-  // const [messages, setMessages] = useState<Message[]>([]);
   const [chat, setChat] = useState({}); // id && tyoe && avatar && username && message
   const [cookie] = useCookies(["access_token"]);
-  const { user } = useContext(AuthContext);
+  const { user, blockedUsers, setBlockedUsers} = useContext(AuthContext);
 
   const getRoleOptions = (type: string) => {
     if (type === "PUBLIC" || type === "PRIVATE" || type === "PROTECTED") {
@@ -173,40 +172,40 @@ const BoxChat = ({
 
   const roleOptions = getRoleOptions(selectedChannel.channel.type);
 
- async  function handleBlock(username: string) {
-  // username is the selected user to be blocked
-  const response = await putRequest(`${baseUrlUsers}/block/${username}`,"")
-  if (!response.success)
-    {
-       // error has been  occured here 
+  async function handleBlock(username: string) {
+    // username is the selected user to be blocked
+    const response = await putRequest(`${baseUrlUsers}/block/${username}`, "");
+    if (!response.success) {
+      // error has been  occured here
       // in response.error you will find the error occured
     }
-    // else 
+    // else
     // if response.success === true , the will be success message in response.message
-    // show unblock button 
+    // show unblock button
     alert("Block action");
   }
 
   // added by zac
-  async function handleUnBlock(username: string)
-  {
+  async function handleUnBlock(username: string) {
     // username of the the person to be unblocked
-    const response = await putRequest(`${baseUrlUsers}/unblock/${username}`, "")
-    if (!response.success)
-    {
-      // error has been  occured here 
+    const response = await putRequest(
+      `${baseUrlUsers}/unblock/${username}`,
+      ""
+    );
+    if (!response.success) {
+      // error has been  occured here
       // in response.error you will find the error occured
     }
-     // else 
+    // else
     // if response.success === true , the will be success message in response.message
-    // show block button 
+    // show block button
   }
-  
+
   function handleShowProfile() {
     alert("Show profile action");
   }
 
-  // change it to async 
+  // change it to async
   const actionOptions = {
     Owner: [
       { text: "Ban", action: handleDeleteRoom }, // change to handle Ban
@@ -214,7 +213,7 @@ const BoxChat = ({
       { text: "Set as admin", action: handleShowMembers }, // change to handle set As ADMIN
     ],
     Admin: [
-      { text: "Ban", action: handleLeaveRoom },  // change to handle Ban
+      { text: "Ban", action: handleLeaveRoom }, // change to handle Ban
       { text: "Mute", action: handleAddMember }, // change to handle Mute
     ],
   };
@@ -243,14 +242,12 @@ const BoxChat = ({
   // Action functions
   async function handleDeleteRoom() {
     // handle delete room action
-    const response = await putRequest(`${baseChatUrl}/deleteChannel/${selectedChannel.channel.id}`, "") 
-    if(!response.success)
-    {
-      // error has been  occured here 
-      // in response.error you will find the error occured
+    const body = {
+      channelId:selectedChannel.channel.id,
+      token:cookie.access_token
     }
-    /// else
-      /// setSelectedchannel to an empty array
+    socket.emit('deleteChannel', body)
+  
     alert("Delete Room action");
   }
 
@@ -264,38 +261,38 @@ const BoxChat = ({
   }
 
   async function handleLeaveRoom() {
-      const response = await putRequest(`${baseChatUrl}/leaveChannel/${selectedChannel.channel.id}`,"");
-      if (!response.success)
-      {
-        // error has been  occured here 
-        // in response.error you will find the error occured
-      }
+    const response = await putRequest(
+      `${baseChatUrl}/leaveChannel/${selectedChannel.channel.id}`,
+      ""
+    );
+    if (!response.success) {
+      // error has been  occured here
+      // in response.error you will find the error occured
+    }
     /// else
     /// setSelectedchannel to an empty array
     //handle leave room action
     alert("Leave Room action");
   }
 
-  function handleBanMember()
-  {
+  function handleBanMember() {
     alert("Ban member from room");
   }
 
-  function handleMuteMember()
-  {
-    alert("Mute member!!")
+  function handleMuteMember() {
+    alert("Mute member!!");
   }
- async function handleSetAsAdmin(username :string)
-  {
-    const response = await putRequest(`${baseChatUrl}/setadmin/${selectedChannel.channel.id}/${username}`, "")
-    if (!response.success)
-    {
-      // error has been  occured here 
+  async function handleSetAsAdmin(username: string) {
+    const response = await putRequest(
+      `${baseChatUrl}/setadmin/${selectedChannel.channel.id}/${username}`,
+      ""
+    );
+    if (!response.success) {
+      // error has been  occured here
       // in response.error you will find the error occured
     }
-    //else
-      // change user role as a admin 
-    alert("Set the member As Admin ")
+
+    alert("Set the member As Admin ");
   }
   // Function to handle option click
   function handleOptionClick(action: () => void) {
@@ -334,28 +331,17 @@ const BoxChat = ({
         let sendedMessage: Message = {
           content: messageInfo.content,
           time: messageInfo.time,
-          blocked: false
+          blocked: false,
         };
-        const isBlocked = blockedUsers.filter((user: any)=>
-        {
-          if (user.username === messageInfo.reciever)
-              sendedMessage.blocked = true;
-        }
-        )
+        // blockedUsers.filter((user: any) => {
+        //   if (user.username === messageInfo.reciever)
+        //     sendedMessage.blocked = true; // added by zac to checked if the user id blocked bu the currUser
+        // });
         if (user.username != messageInfo.reciever) {
           sendedMessage.sender = messageInfo.reciever;
           sendedMessage.avatar = messageInfo.avatar;
-          // sendedMessage.blocked = isBlocked;
         } else sendedMessage = messageInfo;
-          console.log("sended messages ", sendedMessage);
-        if (sendedMessage.blocked === false){
         setMessages((prevMessages: any) => [...prevMessages, sendedMessage]);
-        let updatedChannel = channels.map((channel: any) => {
-          if (channel.channel.id === selectedChannel.channel.id)
-            channel.channel.message = sendedMessage.content;
-          return channel;
-        });
-        setChannels(updatedChannel);}
       });
     });
     return () => {
@@ -430,7 +416,7 @@ const BoxChat = ({
             <button
               key={index}
               className={`text-${
-                option.text === "Ban" 
+                option.text === "Ban"
                   ? "red"
                   : option.text === "Mute"
                   ? "green"
@@ -540,10 +526,12 @@ const BoxChat = ({
                         style={{ width: "40px", height: "40px" }}
                       />
                     </span>
-                    
+
                     <div style={{ flex: 1 }}>
                       <p className="ml-2" style={{ wordWrap: "break-word" }}>
-                        {!message.blocked ? message.content: "You can't see message from blocked user!"}
+                        {!message.blocked
+                          ? message.content
+                          : "You can't see message from blocked user!"}
                       </p>
                     </div>
                   </div>
@@ -659,7 +647,8 @@ const BoxChat = ({
                         </div>
                       </div>
                       <div>
-                        {renderActions(user.role, user)}
+                        {renderActions("Owner", user)}
+                        {/* "Owner" changed to user.role  */}
                         {/* the "Admin" is the user connected role in this room channel */}
                         {/* it can be "Admin" "Owner" "Member" */}
                       </div>

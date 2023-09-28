@@ -15,54 +15,65 @@ import { blockedUsers, channel, channels } from "@/interfaces/channels";
 import { Message, chat } from "@/interfaces/ChatTypes";
 import io, { Socket } from "socket.io-client";
 import { useCookies } from "react-cookie";
+import { channel } from "diagnostics_channel";
 
+let socket: Socket;
 const Chat: React.FC = () => {
-  // ADDED BY ZAC 
-  /// create useState Where you can get blocked users && update it when the users is blocked from chat
-  /// the resposne from back end is the username of the blocked user
-  // we will change change to context api and we must always setBlockedUsers if new user have been block by the current user
-  const [blockedUsers, setBlockedUsers] = useState<blockedUsers[]>([]);
   const [selectedChannel, setSelectedChannel] = useState<channel>(); // to set the channel selected
   const [selectedChat, setSelectedChat] = useState<chat>(); // to set the user selected
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
   const [cookie] = useCookies(["access_token"]);
-  // GET all users
-  let socket: Socket;
   useEffect(() => {
     (async () => {
       const response = await getRequest(`${baseUrlUsers}/users`);
       setUsers(response);
     })();
-    (async () => {
-      const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
-      setBlockedUsers(response)
-    })();
   }, []);
   // testing socket in root chat page
-  // socket = io("http://127.0.0.1:8080/chat", {
-  //   auth: {
-  //     token: cookie.access_token,
-  //   },
-  // });
-  // socket.on("connected", (messageInfo: Message) =>
-  // {
-
-  // })
   // GET all channels already created
   useEffect(() => {
     (async () => {
       try {
         const responseDm = await getRequest(`${baseChatUrl}/channelsDm`); // fetching USER Dms
         setChannels(responseDm);
-        console.log("reposne form ge channles", responseDm);
-
         const responseRooms = await getRequest(`${baseChatUrl}/channelsRooms`); // fetching user rooms
         setChannels((prevchannels: any) => [...prevchannels, ...responseRooms]);
       } catch (error) {}
     })();
   }, []);
+  useEffect(() => {
+    socket = io("http://127.0.0.1:8080/chat", {
+      auth: {
+        token: cookie.access_token,
+      },
+    });
+    socket.on("connected", () => {
+      console.log("socket connected");
+      socket.on("lastMessage", (messageInfo: any) => {
+        
+        let updatedChannel = channels.map((channel: any) => {
+          if (channel.channel.id === messageInfo.channelId)
+            channel.channel.message = messageInfo.content;
+          return channel;
+        });
+        setChannels(updatedChannel);
+      });
+      socket.on("channelDeleted", (channelId: string) => {
+        let updatedChannel = channels.map((channel: any) => {
+          if (channel.channel.id === channelId)
+              return []
+        return channel;
+      });
+      // if (selectedChannel  &&  selectedChannel?.channel.id === channelId)
+      setChannels(updatedChannel)
+      })
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [channels]);
 
   // TODO :?  --- GET CONNECTED USER FRIENDS
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
@@ -83,8 +94,7 @@ const Chat: React.FC = () => {
             />
             {selectedChannel && (
               <BoxChat
-                blockedUsers={blockedUsers}
-                setBlockedUsers={setBlockedUsers}
+                setSelectedChannel={setSelectedChannel}
                 setMessages={setMessages}
                 messages={messages}
                 channels={channels}

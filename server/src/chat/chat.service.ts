@@ -1,5 +1,4 @@
 //TODO: CREATE ALL CHAT SERVICE HERE
-
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -35,7 +34,7 @@ export class ChatService {
         rooms.push(channel);
       }
     }
-    console.log("channels listed are ", rooms);
+    console.log('channels listed are ', rooms);
     return rooms;
   }
   async getCHannelRoom(channelName: string) {
@@ -172,9 +171,8 @@ export class ChatService {
     for (const member of channel.members) {
       const searchedUser = await this._user.findUserById(member.userId);
       let checker = 'Member';
-      if (member.role === "ADMIN")
-        checker = 'Admin';
-      if (channel.owner === searchedUser.username ) checker = 'Owner';
+      if (member.role === 'ADMIN') checker = 'Admin';
+      if (channel.owner === searchedUser.username) checker = 'Owner';
       users.push({
         username: searchedUser.username,
         avatar: searchedUser.avatar,
@@ -413,12 +411,12 @@ export class ChatService {
     });
     if (newAdmin.username === channel.owner)
       return {
-        success:false,
+        success: false,
         error: `${newAdmin.username} The User is The channel owner ()`,
       };
     if (currUser.username != channel.owner)
       return {
-        success:false,
+        success: false,
         error: `${currUser.username} Only the Owner can set New admins`,
       };
     const searchedUser = channel.members.filter((member: any) => {

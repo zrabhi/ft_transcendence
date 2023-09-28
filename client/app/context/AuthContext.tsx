@@ -15,10 +15,14 @@ import { LoginError, User, userInit, LoginErrorInit } from "./utils/types";
 import { baseUrlAuth } from "./utils/service";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
+import {blockedUsers} from "@/interfaces/channels";
 // import socketIO from 'socket.io-client';
+// ADDED BY ZAC
+  /// create useState Where you can get blocked users && update it when the users is blocked from chat
+  /// the resposne from back end is the username of the blocked user
+  // we will change change to context api and we must always setBlockedUsers if new user have been block by the current user
 
 export const AuthContext = createContext<any>({});
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User>(userInit);
   const [tfaDisabled, setTfaDisabled] = useState(true);
@@ -27,7 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [cookie, setCookie, remove] = useCookies(["access_token"]);
   const [currentWindow, setCurrentWindow] = useState("");
   const [pathname, setPathname] = useState<string>("");
-
+  const [blockedUsers, setBlockedUsers] = useState<blockedUsers[]>([]);
   const Urls = {
     home: "",
     gameHistory: "game-history",
@@ -83,6 +87,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log(response);
       setUser(response);
       return true;
+    })();
+    (async () => {
+      const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
+      setBlockedUsers(response);
     })();
   }, []);
 
@@ -161,6 +169,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         tfaDisabled,
         handleDisable2fa,
         fetchUserData,
+        blockedUsers,
+        setBlockedUsers
         // socket
       }}
     >

@@ -71,7 +71,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.join(data.id);
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  @SubscribeMessage('leaveChannel')
+  @SubscribeMessage('deleteChannel')
   async handleLeveChannel(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
@@ -82,6 +82,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
     if (!payload) return client.disconnect(true);
     //TODO: handleLeave Channel here
+    const user = await this.userService.findUserById(payload.id);
+    const channel = await this.prismaService.channel.findUnique({
+      where: {
+        id: data.channelId,
+      },
+      include: {
+        members: true,
+      },
+    }); 
+    const result = this.chatService.handleDeleteRoom(data.channelId, user);
+    for (const member of channel.members) {  
+        this.server.to(member.userId).emit('channelDeleted', data.channelId);
+    }
   }
   @SubscribeMessage('mute')
   async handleMutedUser(
@@ -143,26 +156,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         members: true,
       },
     });
-    for (const member of channel.members) {
-      if ((member.isBanned || member.isMuted) && member.userId === user.id) {
-        console.log('im banned');
-        return this.server.to(data.channelId).emit('muted or muted');
-      }
-    }
     const messageInfo = {
+      channelId: data.channelId,
       reciever: user.username,
       avatar: user.avatar,
       content: data.message,
     };
-
-    // for (const member of channel.members)
-    // {
-    //     if (member.userId != user.id)
-    //     {
-
-    //       this.server.to(member.userId).emit('lastMessage', messageInfo)}
-    // }
-    // console.log("uuuuu ",this.connectedUsers.get(client).avatar);
+    for (const member of channel.members) {
+      if ((member.isBanned || member.isMuted) && member.userId === user.id) {
+           this.server.to(data.channelId).emit('muted or muted');
+      }
+      this.server.to(member.userId).emit('lastMessage', messageInfo);
+    }
     this.chatService.saveMessageToChannel(payload, data);
     this.server.to(data.channelId).emit('message', messageInfo);
   }

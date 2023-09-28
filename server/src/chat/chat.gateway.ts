@@ -114,10 +114,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         members: true,
       },
     });
-    const result = this.chatService.handleDeleteRoom(data.channelId, user);
-    // Todo: resturn error message id something  wrong happend
+    const result = await (this.chatService.handleDeleteRoom(data.channelId, user)) as any;
+    const response = {
+      channelId: data.channelId,
+      success : result.success,
+      error: result.error
+    }
+    // Todo: return error message id something  wrong happend
     for (const member of channel.members) {
-        this.server.to(member.userId).emit('channelDeleted', data.channelId);
+        this.server.to(member.userId).emit('channelDeleted', response);
     }
   }
   @SubscribeMessage('mute')
@@ -182,16 +187,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       },
     });
     let type : string = "dm"
+    let name : string = user.username
+    let status : string = user.status;
     if (channel.type != "DM")
-      type = "room"
+      type = "room", name = "#" + channel.name, status = "";
     const lastMessage = {
       type:type,
       channel:{
         id: data.channelId,
-        username: user.username,
+        username: name,
         avatar: user.avatar,
         message: data.message,
-        status: user.status
+        status: status
       }
     }
     const messageInfo = {

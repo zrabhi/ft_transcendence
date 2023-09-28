@@ -247,7 +247,7 @@ const BoxChat = ({
       token:cookie.access_token
     }
     socket.emit('deleteChannel', body)
-    setSelectedChannel(); // delete the channel for the current user
+    setSelectedChannel(); // delete the channel for the current user (this action must be done on root page )
     alert("Delete Room action");
   }
 

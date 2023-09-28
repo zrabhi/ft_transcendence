@@ -63,9 +63,13 @@ const Chat: React.FC = () => {
         !checker ? setChannels((prevChannels : any) => [...prevChannels, messageInfo]):
             setChannels(updatedChannel);
       });
-      socket.on("channelDeleted", (channelId: string) => {
+      socket.on("channelDeleted", (data: any) => {
+        if (!data.success) {
+          alert("error occurred")
+            // error in data.error
+        }
         let updatedChannel = channels.map((channel: any) => {
-          if (channel.channel.id === channelId)
+          if (channel.channel.id === data.channelId)
               return []
         return channel;
       });

@@ -11,12 +11,13 @@ import {
 import Channels from "./components/Channels";
 import BoxChat from "./components/BoxChat";
 import Friends from "./components/Friends";
-import { blockedUsers, channel, channels } from "@/interfaces/channels";
+import { channels } from "@/interfaces/channels";
 import { Message, chat } from "@/interfaces/ChatTypes";
 import io, { Socket } from "socket.io-client";
 import { useCookies } from "react-cookie";
 import { socketResponse } from "@/interfaces/socketResponse";
 
+// when adding notification we must add the  message sended by  the user in last messages
 let socket: Socket;
 const Chat: React.FC = () => {
   const [selectedChannel, setSelectedChannel] = useState<any>(); // to set the channel selected
@@ -53,7 +54,7 @@ const Chat: React.FC = () => {
       console.log("socket connected");
       socket.on("lastMessage", (messageInfo: any) => {
         let checker = false;
-        let updatedChannel : any = channels.filter((channel: any) => {
+        let updatedChannel: any = channels.filter((channel: any) => {
           if (
             channel.channel &&
             channel.channel.id === messageInfo.channel.id
@@ -63,13 +64,12 @@ const Chat: React.FC = () => {
             return channel;
           }
         });
-        let previousChannels =
-          channels.filter((channel: any) => {
-            return (
-              channel.channel && channel.channel.id != messageInfo.channel.id
-            );
-          })
-        console.log("updated channel", updatedChannel , previousChannels);
+        let previousChannels = channels.filter((channel: any) => {
+          return (
+            channel.channel && channel.channel.id != messageInfo.channel.id
+          );
+        });
+        console.log("updated channel", updatedChannel, previousChannels);
         !checker
           ? setChannels((prevChannels: any) => [messageInfo, ...prevChannels])
           : setChannels(() => [...updatedChannel, ...previousChannels]);
@@ -81,7 +81,7 @@ const Chat: React.FC = () => {
           // error in data.error
         }
         let updatedChannel = channels.map((channel: any) => {
-          if (channel.channel.id === data.channelId) return [];
+          if (channel.channel && channel.channel.id === data.channelId) return [];
           return channel;
         });
         // if (selectedChannel  && selectedChannel.channel && selectedChannel?.channel.id === channelId) // NOT WORKING AS EXCPCTEDDD

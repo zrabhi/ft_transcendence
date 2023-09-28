@@ -240,8 +240,13 @@ const ModalContainer = ({
       `${baseChatUrl}/create/room`,
       JSON.stringify(roomForm)
       );
+    if (response.error) {
+      //  render error message in (ERRORMESSAGE component)
+        // this means there is already a channel with the name given (room.From.name)
+      alert(`${roomForm.name} already exists`)
+      return ;
+    }
     setMessages([]);
-    // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.users
     console.log("channel craeted", response); // response value is ,  channel created and (the username , avatar, status , owner ) obkect of the creator
     setSelectedChannel(response);
     setSelectedChat(response.channel); /// edited with response.channel

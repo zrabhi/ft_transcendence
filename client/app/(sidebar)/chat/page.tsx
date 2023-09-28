@@ -15,6 +15,7 @@ import { blockedUsers, channel, channels } from "@/interfaces/channels";
 import { Message, chat } from "@/interfaces/ChatTypes";
 import io, { Socket } from "socket.io-client";
 import { useCookies } from "react-cookie";
+import { socketResponse } from "@/interfaces/socketResponse";
 
 let socket: Socket;
 const Chat: React.FC = () => {
@@ -63,9 +64,9 @@ const Chat: React.FC = () => {
         !checker ? setChannels((prevChannels : any) => [...prevChannels, messageInfo]):
             setChannels(updatedChannel);
       });
-      socket.on("channelDeleted", (data: any) => {
+      socket.on("channelDeleted", (data: socketResponse) => {
         if (!data.success) {
-          alert("error occurred")
+          alert(data.error)
             // error in data.error
         }
         let updatedChannel = channels.map((channel: any) => {

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
 import Image from 'next/image';
-export default function SearchContent() {
+
+export default function SearchContent({data}: any) {
   const [searchValue, setSearchValue] = useState('');
   const [users, setUsers] = useState([]);
 
@@ -10,8 +11,9 @@ export default function SearchContent() {
     const fetchUsers = async () => {
       try {
         const allUsers = await getRequest(`${baseUrlUsers}/users`);
-        const filteredUsers = allUsers.filter((user: any) =>
-          user.username.includes(searchValue)
+        const filteredUsers = allUsers.filter((user: any) => {
+          return user.username.includes(searchValue) && user.username !== data.username;
+          }
         );
         setUsers(filteredUsers);
       } catch (error) {

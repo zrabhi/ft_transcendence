@@ -252,6 +252,7 @@ const BoxChat = ({
   }
 
   function handleAddMember() {
+    // i need the user name of the added person 
     // handle add member action
     alert("Add member action");
   }
@@ -281,9 +282,12 @@ const BoxChat = ({
   }
 
   function handleMuteMember() {
+    // / i need the user name of the MUTED person 
     alert("Mute member!!");
   }
   async function handleSetAsAdmin(username: string) {
+
+    // i will change this implenetation to sockets
     const response = await putRequest(
       `${baseChatUrl}/setadmin/${selectedChannel.channel.id}/${username}`,
       ""

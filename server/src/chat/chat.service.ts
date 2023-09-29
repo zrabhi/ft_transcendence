@@ -353,6 +353,10 @@ export class ChatService {
         where: {
           id: channel_id,
         },
+        include:{
+          members:true,
+          messages:true,
+        }
       });
       return { success: true };
     } catch (err) {

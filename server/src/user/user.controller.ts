@@ -409,6 +409,19 @@ export class UserController {
       res.status(200).json(result);
     } catch (err) {}
   }
+  @UseGuards(JwtAuthGuard)
+  @Put('updateStatus')
+  async handleUpdateStatus(@Res() res: Response, @Body() body, @UserInfo() user)
+  {
+      try{
+        await this.userService.handleUpdateStatus(body.status, user.id);
+        res.status(200).json({success:true});
+      }catch(err)
+      {
+        res.status(400).json({success:false});
+      }
+      /// update user sttaus hereee
+  }
   @Get('user/friends/:username')
   async getUserFriendsByName(@Param('username') user_name: string, @Res() res) {
     try {

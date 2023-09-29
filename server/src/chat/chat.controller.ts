@@ -241,24 +241,10 @@ export class ChatController {
           avatar: searchedUser.avatar,
           message: lastMessage.content,
           status: searchedUser.status,
-        },
-        members: {
-          name: searchedUser.username,
-          avatar: searchedUser.avatar,
-          status: searchedUser.status,
+          time: lastMessage.created_at,
         },
       });
-      console.log('created at ', lastMessage.created_at);
-
-      channels.push({
-        id: channel.id,
-        type: 'dm',
-        username: searchedUser.username,
-        avatar: searchedUser.avatar,
-        message: lastMessage.content,
-        time: lastMessage.created_at,
-        status: searchedUser.status,
-      });
+      // console.log('created at ', lastMessage.created_at);
     }
     res.status(200).json(data);
   }
@@ -282,23 +268,10 @@ export class ChatController {
           name: channel.name, /// it ay be deleteedd
           avatar: channel.avatar,
           message: lastMessage.content,
+          time: lastMessage.created_at,
           status: '',
         },
-        members: {
-          name: searchedUser.username,
-          avatar: searchedUser.avatar,
-          status: searchedUser.status,
-          role: 'Member',
-        },
       });
-      // channels.push({
-      //   id: channel.id,
-      //   type:"room",
-      //   username: "#" + channel.name,
-      //   avatar: searchedUser.avatar,
-      //   message: lastMessage.content,
-      //   status: searchedUser.status,
-      // });
     }
     res.status(200).json(channels);
     //TODO get all rooms user in

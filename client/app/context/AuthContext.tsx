@@ -16,12 +16,13 @@ import { baseUrlAuth } from "./utils/service";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
 import {blockedUsers} from "@/interfaces/channels";
+import io, { Socket } from "socket.io-client";
 // import socketIO from 'socket.io-client';
 // ADDED BY ZAC
   /// create useState Where you can get blocked users && update it when the users is blocked from chat
   /// the resposne from back end is the username of the blocked user
   // we will change change to context api and we must always setBlockedUsers if new user have been block by the current user
-
+let notifSocket: Socket
 export const AuthContext = createContext<any>({});
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User>(userInit);
@@ -32,6 +33,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentWindow, setCurrentWindow] = useState("");
   const [pathname, setPathname] = useState<string>("");
   const [blockedUsers, setBlockedUsers] = useState<blockedUsers[]>([]);
+ 
+  // here we will aded states to save data cames from sockets
+  
   const Urls = {
     home: "",
     gameHistory: "game-history",
@@ -92,6 +96,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
       setBlockedUsers(response);
     })();
+
+
+
+  
+    // (async () => {
+    //   notifSocket = io("http://127.0.0.1:8080/notifications", {
+    //     auth:{
+    //       token:cookie.access_token,
+    //     }
+    //   });
+    //   notifSocket.on("connected",()=>{
+    //     console.log("notification notifSocket connected");
+    //   });
+    // })();
+    // return () => {
+    //   notifSocket.disconnect();
+    // };
   }, []);
 
   const updatingInfos = useCallback(
@@ -170,8 +191,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         handleDisable2fa,
         fetchUserData,
         blockedUsers,
-        setBlockedUsers
-        // socket
+        setBlockedUsers,
+        notifSocket
       }}
     >
       {children}

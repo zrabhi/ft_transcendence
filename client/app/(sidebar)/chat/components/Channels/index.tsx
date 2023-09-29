@@ -208,7 +208,6 @@ const ModalContainer = ({
   setSelectedChannel,
   setSelectedChat,
   setMessages
-  
 }: any) => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null); // State to store the avatar image URL
 

@@ -14,6 +14,7 @@ import {
   Match,
   Prisma,
   State,
+  Status,
   User,
 } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -509,6 +510,16 @@ export class UserService {
     });
   }
 
+  async handleUpdateStatus(currentStatus: Status, user_id: string) {
+    return await this.prismaService.user.update({
+      where: {
+        id: user_id,
+      },
+      data: {
+        status: currentStatus,
+      },
+    });
+  }
   async logOut(userId: string) {
     return await this.prismaService.user.update({
       where: { id: userId },

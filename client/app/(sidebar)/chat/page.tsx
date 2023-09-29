@@ -78,14 +78,14 @@ const Chat: React.FC = () => {
       socket.on("channelDeleted", (data: socketResponse) => {
         if (!data.success) {
           alert(data.error);
-          // error in data.error
+          return ;
         }
         let updatedChannel = channels.map((channel: any) => {
           if (channel.channel && channel.channel.id === data.channelId) return [];
           return channel;
         });
-        // if (selectedChannel  && selectedChannel.channel && selectedChannel?.channel.id === channelId) // NOT WORKING AS EXCPCTEDDD
-        // setSelectedChannel(); // the  the channel here for other usersss
+        // if (selectedChannel  && selectedChannel.channel && selectedChannel?.channel.id === data.channelId) // NOT WORKING AS EXCPCTEDDD
+        //   setSelectedChannel(undefined); // the  the channel here for other usersss
         setChannels(updatedChannel);
       });
       socket.on("leftRoom", () => {

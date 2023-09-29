@@ -31,7 +31,7 @@ export default function NotifContent() {
       username: 'user3',
     },
     {
-      type: 4,
+      type: 1,
       avatar: 'https://i.pravatar.cc/300',
       username: 'user4',
     }
@@ -39,10 +39,10 @@ export default function NotifContent() {
 
   return (
     <div className="notif-content">
-      <h3 className='text-lg tracking-wider font-semibold absolute top-6'>
+      <h3 className='text-lg tracking-wider font-semibold absolute top-4'>
         Notifications
       </h3>
-      <div className="notif-list mt-2">
+      <div className="notif-list mt-4">
         {
           notif.map((item, index) => (
             <NotifItem key={index} data={item} />

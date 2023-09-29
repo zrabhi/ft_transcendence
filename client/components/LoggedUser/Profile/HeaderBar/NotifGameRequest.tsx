@@ -1,7 +1,10 @@
 import React from 'react'
 
-export default function NotifGameRequest() {
+export default function NotifGameRequest({data}: any) {
   return (
-    <div>NotifGameRequest</div>
+    <div className="flex flex-col gap-2">
+      <span className="text-sm font-semibold">{data.username}</span>
+      <span className="text-sm font-semibold">You have a game request from</span>
+    </div>
   )
 }

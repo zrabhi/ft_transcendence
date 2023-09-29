@@ -1,5 +1,8 @@
 import React from 'react'
 import Image from 'next/image'
+import NotifFriendRequest from './NotifFriendRequest'
+import NotifMessage from './NotifMessage'
+import NotifGameRequest from './NotifGameRequest'
 
 export default function NotifItem({ data }: any) {
   return (
@@ -14,8 +17,17 @@ export default function NotifItem({ data }: any) {
           height={100}
         />
       </div>
-      <div className="content bg-slate-600 grow">
-        <p>hello this is content</p>
+      <div className="content grow text-slate-900">
+        {
+          // instead of pass the data to the component we can pass only username and content
+          data.type === 1 ? (
+            <NotifFriendRequest data={data} />
+          ) : data.type === 2 ? (
+            <NotifMessage data={data} />
+          ) : (
+            <NotifGameRequest data={data} />
+          )
+        }
       </div>
     </div>
   )

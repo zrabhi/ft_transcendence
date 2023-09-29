@@ -1,0 +1,60 @@
+@import '@/app/globals.scss';
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+.core{
+    background-color: $blue-bg-color;
+    border-radius: 15px;
+    align-items: center;
+    flex-direction: column;
+    
+}
+
+.score{
+    background-color: $main-bg-color;
+    border-radius: 15px;
+    color: white;
+    justify-content: center;
+    margin-top: 2%;
+    width: 50%;
+    font-family: 'Press Start 2P';
+}
+
+.table{
+    margin: 3%;
+    max-height: 200px;
+    max-width: 1000px;
+    width: 100%;
+    height: 100%;
+    border: 3px white solid;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.player{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 50%;
+    padding: 0px 2%;
+
+}
+.player1{
+    border-right: 2px white solid;
+}
+
+.avatar{
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 2% 0px;
+    border : 2px white solid;
+    img{
+        width: 100%;
+        height: 100%; 
+    }
+}
+canvas{
+    height: 100%;
+    width: 100%;
+}

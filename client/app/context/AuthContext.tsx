@@ -97,9 +97,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setBlockedUsers(response);
     })();
 
-
-
-  
     // (async () => {
     //   notifSocket = io("http://127.0.0.1:8080/notifications", {
     //     auth:{

@@ -16,11 +16,12 @@ import { Message, chat } from "@/interfaces/ChatTypes";
 import io, { Socket } from "socket.io-client";
 import { useCookies } from "react-cookie";
 import { socketResponse } from "@/interfaces/socketResponse";
+import HeaderBar from "@/components/LoggedUser/Profile/HeaderBar/HeaderBar";
 
 // when adding notification we must add the  message sended by  the user in last messages
 let socket: Socket;
 const Chat: React.FC = () => {
-  const [selectedChannel, setSelectedChannel] = useState<any>(); // to set the channel selected
+  const [selectedChannel, setSelectedChannel] = useState<any>(null); // to set the channel selected
   const [selectedChat, setSelectedChat] = useState<chat>(); // to set the user selected
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
@@ -84,8 +85,8 @@ const Chat: React.FC = () => {
           if (channel.channel && channel.channel.id === data.channelId) return [];
           return channel;
         });
-        // if (selectedChannel  && selectedChannel.channel && selectedChannel?.channel.id === data.channelId) // NOT WORKING AS EXCPCTEDDD
-        //   setSelectedChannel(undefined); // the  the channel here for other usersss
+        //  if (selectedChannel  && selectedChannel.channel && selectedChannel?.channel.id === data.channelId) // NOT WORKING AS EXCPCTEDDD
+        setSelectedChannel(null); // the  the channel here for other usersss
         setChannels(updatedChannel);
       });
       socket.on("leftRoom", () => {
@@ -99,10 +100,12 @@ const Chat: React.FC = () => {
 
   // TODO :?  --- GET CONNECTED USER FRIENDS
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
+  // add header bar to work in notification
   return (
     <div className="logged-user">
       <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
       <div className="home">
+          {/* <HeaderBar /> */}
         <div className="chat-page">
           <h2 className="text-2xl text-white mx-auto my-4">
             <strong>Chat</strong>

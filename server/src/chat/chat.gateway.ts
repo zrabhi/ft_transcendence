@@ -65,7 +65,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client disconnected   id ${client.id}`);
   }
   @SubscribeMessage('joinChat')
-  handleJoinChat(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+  handleJoinChat(
+  @ConnectedSocket() client: Socket,
+  @MessageBody() data: any) {
     // console.log("client joined chat with ", data.id, this.connectedUsers.get(client));
 
     client.join(data.id);

@@ -68,6 +68,9 @@ const BoxChat = ({
     admins: true,
     members: true,
   });
+  const [currentUserRole, setCurrentUserRole] = useState<
+    "Owner" | "Admin" | "Member"
+  >("Member");
 
   // if you wanna test this with backend please remove this state and pass a prop called selectedChannel
   // const [selectedChannel, setSelectedChannel] = useState({
@@ -140,7 +143,7 @@ const BoxChat = ({
   // });
   const [chat, setChat] = useState({}); // id && tyoe && avatar && username && message
   const [cookie] = useCookies(["access_token"]);
-  const { user, blockedUsers, setBlockedUsers} = useContext(AuthContext);
+  const { user, blockedUsers, setBlockedUsers } = useContext(AuthContext);
 
   const getRoleOptions = (type: string) => {
     if (type === "PUBLIC" || type === "PRIVATE" || type === "PROTECTED") {
@@ -170,7 +173,9 @@ const BoxChat = ({
     }
   };
 
-  const roleOptions = getRoleOptions(selectedChannel.channel.type);
+  const roleOptions = selectedChannel
+    ? getRoleOptions(selectedChannel?.channel?.type)
+    : {};
 
   async function handleBlock(username: string) {
     // username is the selected user to be blocked
@@ -213,26 +218,26 @@ const BoxChat = ({
       { text: "Set as admin", action: handleShowMembers }, // change to handle set As ADMIN
     ],
     Admin: [
-      { text: "Ban", action: handleLeaveRoom }, // change to handle Ban
-      { text: "Mute", action: handleAddMember }, // change to handle Mute
+      { text: "Ban", action: handleBanMember }, // change to handle Ban
+      { text: "Mute", action: handleMuteMember }, // change to handle Mute
     ],
   };
 
   const optionsToShow =
-    selectedChannel?.channel.type === "PUBLIC" ||
-    selectedChannel?.channel.type === "PROTECTED" ||
-    selectedChannel?.channel.type === "PRIVATE"
-      ? roleOptions["Owner"]
+    selectedChannel?.channel?.type === "PUBLIC" ||
+    selectedChannel?.channel?.type === "PROTECTED" ||
+    selectedChannel?.channel?.type === "PRIVATE"
+      ? roleOptions[currentUserRole]
       : roleOptions || [];
 
-  const separateOptions = optionsToShow.filter(
+  const separateOptions = optionsToShow?.filter(
     (option: any) =>
       option.text === "Delete Room" ||
       option.text === "Leave Room" ||
       option.text === "Block"
   );
 
-  const nonSeparateOptions = optionsToShow.filter(
+  const nonSeparateOptions = optionsToShow?.filter(
     (option: any) =>
       option.text !== "Delete Room" &&
       option.text !== "Leave Room" &&
@@ -243,16 +248,16 @@ const BoxChat = ({
   async function handleDeleteRoom() {
     // handle delete room action
     const body = {
-      channelId:selectedChannel.channel.id,
-      token:cookie.access_token
-    }
-    socket.emit('deleteChannel', body)
-    setSelectedChannel(); // delete the channel for the current user (this action must be done on root page )
+      channelId: selectedChannel.channel.id,
+      token: cookie.access_token,
+    };
+    socket.emit("deleteChannel", body);
+    // delete the channel for the current user (this action must be done on root page )
     alert("Delete Room action");
   }
 
   function handleAddMember() {
-    // i need the user name of the added person 
+    // i need the user name of the added person
     // handle add member action
     alert("Add member action");
   }
@@ -277,16 +282,16 @@ const BoxChat = ({
     alert("Leave Room action");
   }
 
-  function handleBanMember() {
-    alert("Ban member from room");
+  function handleBanMember(user: any) {
+    console.log("user clocked ", user);
+    alert(` Ban member from room`);
   }
 
   function handleMuteMember() {
-    // / i need the user name of the MUTED person 
+    // / i need the user name of the MUTED person
     alert("Mute member!!");
   }
   async function handleSetAsAdmin(username: string) {
-
     // i will change this implenetation to sockets
     const response = await putRequest(
       `${baseChatUrl}/setadmin/${selectedChannel.channel.id}/${username}`,
@@ -305,10 +310,17 @@ const BoxChat = ({
     setIsDropdownOpen(false); // Close the dropdown after clicking an option
   }
 
+  const getCurrentUserRole = () => {
+    const currentUser = selectedChannel?.members?.find((member: any) => {
+      return member.name === user.username;
+    });
+    console.log("currentUser", currentUser);
+    setCurrentUserRole(currentUser.role);
+  };
   // trying to create socket to connect with other user here
   useEffect(() => {
     console.log("selected channe sis =>", selectedChannel);
-
+    getCurrentUserRole();
     (async () => {
       const response = await getRequest(
         `${baseChatUrl}/getMessages/${selectedChannel?.channel?.id}`
@@ -363,7 +375,8 @@ const BoxChat = ({
 
   //   // get friends here
 
-  const sendMessage = async () => {
+  const sendMessage = async (e: any) => {
+    e.preventDefault(); // prevent from refreshing the chat box component
     var time = new Date();
     const body = {
       message: message,
@@ -377,6 +390,7 @@ const BoxChat = ({
   };
 
   const handleChange = (e: any) => {
+    e.preventDefault();
     setMessage(e.target.value);
   };
 
@@ -412,7 +426,7 @@ const BoxChat = ({
     Member: <FaUserFriends className="text-[#654795]" />,
   };
 
-  const renderActions = (role: string, user: any) => {
+  const renderActions = (role: "Owner" | "Admin" | "Member", user: any) => {
     console.log("role user", user);
     if (role in actionOptions) {
       return (
@@ -433,12 +447,16 @@ const BoxChat = ({
                   ? "green"
                   : "yellow"
               }-800 mr-2`}
-              onClick={option.action}
+              onClick={() => option.action(user)}
             >
-              {user.role === "Owner" ||
-              (user.role === "Admin" && option.text === "Set as admin")
-                ? ""
-                : option.text}
+              {
+              (role === "Owner" &&  user.role === "Admin" && (option.text === "Ban"|| option.text ==="Mute")) ||
+              (user.role === "Member" &&
+                (option.text === "Ban" ||
+                  option.text === "Mute" ||
+                  option.text === "Set as admin"))
+                ? option.text
+                : ""}
             </button>
           ))}
         </div>
@@ -652,7 +670,7 @@ const BoxChat = ({
                         </div>
                       </div>
                       <div>
-                        {renderActions("Owner", user)}
+                        {renderActions(currentUserRole, user)}
                         {/* "Owner" changed to user.role  */}
                         {/* the "Admin" is the user connected role in this room channel */}
                         {/* it can be "Admin" "Owner" "Member" */}

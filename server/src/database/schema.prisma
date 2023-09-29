@@ -25,7 +25,7 @@ enum Status {
   INGAME
 }
 
-enum Role{
+enum Role {
   OWNER
   ADMIN
   MEMBER
@@ -192,7 +192,7 @@ model Channel {
   admins            ChannelAdmin[]    @relation(name: "channelAdmin")
   Muted             ChannelMuted[]    @relation(name: "channelMute")
 
-  avatar String? @default("http://127.0.0.1:8080/api/avatar/pictures/default.jpeg")
+  avatar String?   @default("http://127.0.0.1:8080/api/avatar/pictures/default.jpeg")
   created_at        DateTime @default(now())
 }
 model ChannelMembers{
@@ -236,7 +236,7 @@ model ChannelBan{
 }
 model ChannelMuted{
   id     String @unique @default(uuid())
-  
+
   userId String
   user User @relation(fields: [userId], references: [id], name: "userMuted", onDelete: Cascade)
 

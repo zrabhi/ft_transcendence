@@ -43,7 +43,7 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
         await this.userService.handleUpdateStatus('ONLINE', payload.id)
     }catch(err)
     {
-        // we will emit the error the event called (Notif error)   
+        // we will emit the error the event called (Notif error)
     }
     client.join(payload.id);
     this.connectedUsers.set(payload.id, client);
@@ -52,7 +52,16 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(client: any) {
-
+    const payload = await this.jwtService.verifyAsync(
+      client.handshake.auth.token,
+      {
+        secret: process.env.JWT_SECRET,
+      },
+    );
+    if (!payload) return client.disconnect(true);
+    this.connectedUsers.delete(payload.id);
+    console.log(`Client disconnected   id ${client.id}`); 
+    // SMALL ERROR HERE NEEDS TO BE HANDLED (when connection lost)
   }
 
   @SubscribeMessage('FriendRequest')

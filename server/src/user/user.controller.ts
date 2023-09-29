@@ -344,12 +344,20 @@ export class UserController {
   }
   @UseGuards(JwtAuthGuard)
   @Get('user/friends')
-  async handleGetFriends(@Req() req, @Res() res) {
+  async handleGetFriends(@Req() req, @Res() res, @UserInfo() currUser) {
     try {
-      const friends = await this.userService.getUserFriends(req.user.id);
+      console.log(currUser.id);
+
+      const friends = await this.userService.getFriendsByUserId(currUser.id);
+      console.log(friends);
+
       const friendsList = [];
       for (const friend of friends) {
-        const user = await this.userService.findUserById(friend.friend_id);
+        let user;
+        if (friend.friend_id != currUser.id)
+           user = await this.userService.findUserById(friend.friend_id);
+        if (friend.user_id != currUser.id)
+          user = await this.userService.findUserById(friend.user_id);
         friendsList.push({
           username: user.username,
           status: user.status,
@@ -437,5 +445,49 @@ export class UserController {
       }
       res.status(200).json(friendsList);
     } catch (err) {}
+  }
+  @Get('getFriendRequests')
+  @UseGuards(JwtAuthGuard)
+  async handleGetFriendRequests(
+  @UserInfo() user: any,
+  @Res() res: Response)
+  {
+    try{
+      const result = await this.userService.getFriendRequests(user)
+      res.status(200).json(result)
+    }catch(err)
+    {
+      res.status(400).json("Error occuuredd")
+    }
+}
+  @Put('acceptFriendRequest/:username')
+  @UseGuards(JwtAuthGuard)
+  async handleAcceptFriendRequest(
+  @Param('username') username: string,
+  @UserInfo() user: any,
+  @Res() res: Response)
+  {
+    try{
+
+      await this.userService.updateFriendRequestState(user.id, username, 'ACCEPTED');
+      await this.userService.createFriendship(user.id, username);
+      res.status(200).json({success: true, message:"ACCEPTED"});
+      }catch(err)
+    {
+      res.status(400).json("error occured")
+    }
+  }
+
+  @Post('friendRequest/:username')
+  @UseGuards(JwtAuthGuard)
+  async handleFriendRequest(
+    @Param('username') username: string,
+    @UserInfo() user: any,
+    @Res() res: Response)
+  {
+    const result = await  this.userService.handleFriendRequest(user, username);
+    if (!result.success)
+      return res.status(400).json(result)
+    return res.status(200).json(result);
   }
 }

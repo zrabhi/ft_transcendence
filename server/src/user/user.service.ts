@@ -21,6 +21,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { FileUserDto, PutUserDto } from './dto/put-user-dto';
+import { generate } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -386,9 +387,9 @@ export class UserService {
     });
   }
 
-  async createFriendship(user_one_id: string, user_two_id: string) {
+  async createFriendship(user_one_id: string, user_two_name: string) {
     const userOne = await this.findUserById(user_one_id);
-    const userTwo = await this.findUserById(user_two_id);
+    const userTwo = await this.findUserName(user_two_name);
 
     const isFriend = await this.prismaService.friendship.findFirst({
       where: {
@@ -426,27 +427,29 @@ export class UserService {
     });
   }
 
+  //NOTICE: this fucntion not stablleeee
   async getFriendsByUserId(user_id: string) {
     return await this.prismaService.friendship.findMany({
       where: {
-        user_id: user_id,
+        OR: [{ user_id: user_id }, { friend_id: user_id }],
       },
     });
   }
 
+  //TODO : THIS IS FOR UPDATING FRIEND REQUEST WHETHER THE REQUEST ACCEPTED OR REJECTED
   async updateFriendRequestState(
     user_one_id: string,
-    user_two_id: string,
+    user_two_name: string,
     state: State,
   ) {
     const userOne = await this.findUserById(user_one_id);
-    const userTwo = await this.findUserById(user_two_id);
+    const userTwo = await this.findUserName(user_two_name);
 
     const FriendRequestId =
       await this.prismaService.friendRequest.findFirstOrThrow({
         where: {
-          requester_id: userOne.id,
-          requested_id: userTwo.id,
+          requester_id: userTwo.id,
+          requested_id: userOne.id,
         },
       });
 
@@ -596,6 +599,73 @@ export class UserService {
     }
     return users;
   }
+
+  async handleFriendRequest(user: any, username: string) {
+    const requestedFriend = await this.findUserName(username);
+    const currentUser = await this.prismaService.user.findUnique({
+      where: { id: user.id },
+      include: {
+        OutgoingRequest: true,
+      },
+    });
+    for (const request of currentUser.OutgoingRequest) {
+      if (
+        request.requester_id === currentUser.id &&
+        request.requested_id === requestedFriend.id
+      ) {
+        console.log(request);
+        // thats mean  already request has been send by the current user
+        return {
+          success: false,
+          error: `${currentUser.username} you have already sent request to this user`,
+        };
+      }
+    }
+    try {
+      await this.prismaService.friendRequest.create({
+        data: {
+          requester_id: currentUser.id,
+          requested_id: requestedFriend.id,
+          state: 'PENDING',
+          updated_at: new Date(),
+        },
+      });
+    } catch (err) {
+      return {
+        success: false,
+        error: `error while adding your friend request ${err}`,
+      };
+    }
+    return {
+      success: true,
+      message: `friend request successfully sent to ${username}`,
+    };
+  }
+
+  async getFriendRequests(user: any) {
+    const currentUser = await this.prismaService.user.findUnique({
+      where: { id: user.id },
+      include: {
+        IncomingRequest: true,
+      },
+    });
+
+    const requests = [];
+    for (const request of currentUser.IncomingRequest) {
+      if (
+        request.requested_id === currentUser.id &&
+        request.state === 'PENDING'
+      ) {
+        const otherUser = await this.findUserById(request.requester_id);
+        requests.push({
+          username: otherUser.username,
+          avatar: otherUser.avatar,
+        });
+      }
+    }
+    return requests;
+  }
+
   // async getFileUpload(fileTarget, category) {
   //   let userFile: any = undefined;
   //   const assets = await readdir(`./images/${category}`);

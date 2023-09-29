@@ -8,7 +8,7 @@ export default function HeaderBar() {
 
   const [showSearchModal, setShowSearchModal] = React.useState(false)
   const [showNotifModal, setShowNotifModal] = React.useState(false)
-
+  
   return (
     <div className="header-bar">
       <div className="title">

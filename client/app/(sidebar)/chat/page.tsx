@@ -92,6 +92,7 @@ const Chat: React.FC = () => {
       socket.on("leftRoom", () => {
         // handle the response from socket server
       });
+     
     });
     return () => {
       socket.disconnect();

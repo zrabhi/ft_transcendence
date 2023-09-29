@@ -75,6 +75,13 @@ const BoxChat = ({
   // if you wanna test this with backend please remove this state and pass a prop called selectedChannel
   // const [selectedChannel, setSelectedChannel] = useState({
   //   type: "room",
+        channel:{
+          id:
+          name:
+          owner:
+          avatar:
+          type:
+        }
   //   members: [
   //     {
   //       id: 1,

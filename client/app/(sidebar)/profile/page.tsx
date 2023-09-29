@@ -51,7 +51,7 @@ export default function Profile() {
       <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
       <div className={`profile ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
         <div className="profile-content min-h-screen p-8">
-          <HeaderBar />
+          <HeaderBar data={user} />
           <ProfileCard data={user} />
           <div className="profile-boxes">
             <div className="navbar-boxes">

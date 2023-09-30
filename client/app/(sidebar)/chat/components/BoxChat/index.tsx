@@ -304,9 +304,9 @@ const BoxChat = ({
         setMessages((prevMessages: any) => [...prevMessages, sendedMessage]);
         return
       });
-      socket.on('disconnected', () =>{
-        console.log("disconnected");
-      })
+      // socket.on('disconnected', () =>{
+      //   console.log("disconnected");
+      // })
     });
     return () => {
       socket.disconnect();

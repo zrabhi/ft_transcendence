@@ -50,6 +50,11 @@ const Chat: React.FC = () => {
         setChannels((prevchannels: any) => [...prevchannels, ...responseRooms]);
       } catch (error) {}
     })();
+    (async () => {
+        const reponse = await getRequest(`${baseChatUrl}/getChannels`);
+        setOtherChannels(reponse);
+    })
+    ()
   }, []);
   useEffect(() => {
     socket = io("http://127.0.0.1:8080/chat", {
@@ -95,10 +100,10 @@ const Chat: React.FC = () => {
         setSelectedChannel(null); // the  the channel here for other usersss
         setChannels(updatedChannel);
       });
-      socket.on("disconnected", () => {
-        console.log("socket chat disconnected");
-        // socket.disconnect();
-      })
+      // socket.on("disconnected", () => {
+      //   console.log("socket chat disconnected");
+      //   // socket.disconnect();
+      // })
       socket.on("NewMember", (data: any) => {
         if (data.member === user.username)
           setChannels((prevChannels: any) => [
@@ -170,11 +175,11 @@ const Chat: React.FC = () => {
                         <div className="flex items-center relative">
                           <img
                             src={channel.avatar}
-                            alt={channel.username}
+                            alt={channel?.name}
                             className="avatar mr-2"
                           />
                           <h3 className="text-lg font-semibold text-center">
-                            {channel.username}
+                            {channel?.name}
                           </h3>
                         </div>
                         {/* TODO: onclick if its protected a popup will show up to type password */}

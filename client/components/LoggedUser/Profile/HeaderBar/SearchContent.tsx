@@ -12,7 +12,7 @@ export default function SearchContent({data}: any) {
       try {
         const allUsers = await getRequest(`${baseUrlUsers}/users`);
         const filteredUsers = allUsers.filter((user: any) => {
-          return user.username.includes(searchValue) && user.username !== data.username;
+          return user.username.toLowerCase().includes(searchValue.toLowerCase()) && user.username !== data.username;
           }
         );
         setUsers(filteredUsers);

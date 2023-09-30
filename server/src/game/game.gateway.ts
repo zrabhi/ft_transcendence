@@ -83,7 +83,7 @@ class Queue {
     this.items.push(item);
   }
 
-  dequeue(): Player  {
+  dequeue(): Player | undefined {
     return this.items.shift();
   }
 
@@ -95,8 +95,15 @@ class Queue {
     return this.items.length;
   }
 
-  peek(): Player {
+  peek(): Player | undefined {
     return this.items[0];
+  }
+
+  removeBySocketId(socketId: string): void {
+    const indexToRemove = this.items.findIndex((player) => player.socketid === socketId);
+    if (indexToRemove !== -1) {
+      this.items.splice(indexToRemove, 1);
+    }
   }
 }
 
@@ -121,8 +128,6 @@ function updateballxy(match:Match) : string
 
   if (match.ball.y + match.ball.addy > match.canvas.height || match.ball.y + match.ball.addy < 0)
     match.ball.addy = -match.ball.addy;
-  // console.log(match.rightplayer.bar)
-  // console.log(match.leftplayer.bar)
   if (
     match.ball.x + match.ball.width  >= match.rightplayer.bar?.x &&
     match.ball.x <= match.rightplayer.bar.x + match.rightplayer.bar.width &&
@@ -173,34 +178,31 @@ export class GameGateway{
       leftplayer.opponent = rightplayer;
       this.playing_users[rightplayer.socketid] = rightplayer;
       this.playing_users[leftplayer.socketid] = leftplayer;
-      let tmpmatch = new Match(rightplayer, leftplayer,  new canvas(800,500));
+      let tmpmatch = new Match(rightplayer, leftplayer,  new canvas(1000,600));
       this.matchs[rightplayer.socketid] = tmpmatch;
       this.matchs[leftplayer.socketid] = tmpmatch;
-
-      
       this.server.to(rightplayer.socketid).emit('matched right', leftplayer.socketid);
       this.server.to(leftplayer.socketid).emit('matched left', rightplayer.socketid);
     }else{
       this.waiting_users.enqueue(tmplayer);
     }
     console.log(`User connected to game gateway with ID: ${socketId}`);
-    // console.log(this.waiting_users)
-    // console.log(this.matchs);
   }
   
   handleDisconnect(client: Socket) {
     const socketId = client.id;
+    console.log(this.waiting_users);
+    this.waiting_users.removeBySocketId(client.id);
     console.log(`User disconnected with ID: ${socketId}`);
+    console.log(this.waiting_users);
   }
   
   
   @SubscribeMessage('bar')
   bar(@MessageBody() bar_y: number, @ConnectedSocket() client: Socket): void {
     const currentPlayer = this.playing_users[client.id];
-    // console.log(bar_y)
     if (currentPlayer && currentPlayer.opponent) {
       currentPlayer.opponent.opponent_bar = bar_y;
-
       currentPlayer.bar ? (currentPlayer.bar.starty  = bar_y) : true;
       this.server.to(client.id).emit('match frame', {
         oppy: currentPlayer.opponent_bar,

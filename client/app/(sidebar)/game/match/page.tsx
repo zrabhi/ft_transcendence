@@ -136,18 +136,6 @@ export default function match()
   
     useEffect(() => {
       selectedcolor = localStorage.getItem("selectedMapColor") as string;
-      // const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-      // const ctx = canvas.getContext("2d") as any;
-
-      // ctx.font = "18px 'Press Start 2P'";
-      // let text = "WAITING FOR AN OTHER USER TO JOIN";
-      // let textwidth = ctx.measureText(text).width;
-      // let textheight = 48;
-      // // ctx.fillStyle = selectedcolor;
-      // // ctx.fillRect(0, 0, canvas.width, canvas.height);
-      // ctx.fillStyle = "white";
-      // ctx.fillText(text, (canvas.width - textwidth) / 2, canvas.height  / 5);
-
       socket = io('http://127.0.0.1:8080/matching');
       socket.on('connect', () => {
         console.log('Connected to WebSocket');
@@ -156,7 +144,7 @@ export default function match()
         console.log("i match this : " , data);
         opponent = data;
         side = 'right';
-        launchGame(); 
+        launchGame();
       })
       socket.on('matched left', (data:any) => {
         console.log("i match this : " , data);

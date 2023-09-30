@@ -46,8 +46,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (cookie.access_token === "" || !cookie.access_token)
-      router.replace("/login");
+  if (cookie.access_token === "" || !cookie.access_token)
+  router.replace("/login");
   }, []);
   const checkPath = () => {
     setPathname("");
@@ -78,38 +78,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (!checkPath()) return;
-    (async () => {
-      const response = await getRequest(`${baseUrlUsers}/user`);
-      if (response.error) {
-        setLoginError(response);
-        remove("access_token");
-        router.push("/login");
-        return false;
-      }
+  if (!checkPath()) return;
+  (async () => {
+  const response = await getRequest(`${baseUrlUsers}/user`);
+  if (response.error) {
+  setLoginError(response);
+  remove("access_token");
+  router.push("/login");
+  return false;
+  }
       response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
-      console.log(response);
-      setUser(response);
-      return true;
-    })();
-    (async () => {
-      const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
-      setBlockedUsers(response);
-    })();
+  console.log(response);
+  setUser(response);
+  return true;
+  })();
+  (async () => {
+  const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
+  setBlockedUsers(response);
+  })();
 
-    // (async () => {
-    //   notifSocket = io("http://127.0.0.1:8080/notifications", {
-    //     auth:{
-    //       token:cookie.access_token,
-    //     }
-    //   });
-    //   notifSocket.on("connected",()=>{
-    //     console.log("notification notifSocket connected");
-    //   });
-    // })();
-    // return () => {
-    //   notifSocket.disconnect();
-    // };
+  // (async () => {
+  //   notifSocket = io("http://127.0.0.1:8080/notifications", {
+  //     auth:{
+  //       token:cookie.access_token,
+  //     }
+  //   });
+  //   notifSocket.on("connected",()=>{
+  //     console.log("notification notifSocket connected");
+  //   });
+  // })();
+  // return () => {
+  //   notifSocket.disconnect();
+  // };
   }, []);
 
   const updatingInfos = useCallback(

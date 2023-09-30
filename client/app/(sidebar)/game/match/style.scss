@@ -1,12 +1,16 @@
 @import '@/app/globals.scss';
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-.core{
+body {
+    overflow-y: hidden;
+}
+
+.core {
     background-color: $blue-bg-color;
     border-radius: 15px;
     align-items: center;
     flex-direction: column;
-    height: calc(100% - 3rem);
+    height: calc(100% - 4rem);
 }
 
 .score{
@@ -30,7 +34,6 @@
     overflow: hidden;
     background-image: url('https://i.gifer.com/origin/3f/3face8da2a6c3dcd27cb4a1aaa32c926_w200.gif');
     background-position: center center;
-    // background-color: $main-bg-color;
     background-color: whitesmoke;
     background-repeat: no-repeat;
 }

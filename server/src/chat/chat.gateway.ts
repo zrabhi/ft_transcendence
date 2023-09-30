@@ -61,13 +61,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       },
     );
     if (!payload) return client.disconnect(true);
+    this.server.to(payload.id).emit('disconnected', '');
     this.connectedUsers.delete(payload.id);
     console.log(`Client disconnected   id ${client.id}`);
+    // client.disconnect(true);
   }
   @SubscribeMessage('joinChat')
-  handleJoinChat(
-  @ConnectedSocket() client: Socket,
-  @MessageBody() data: any) {
+  handleJoinChat(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     // console.log("client joined chat with ", data.id, this.connectedUsers.get(client));
 
     client.join(data.id);
@@ -101,7 +101,49 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(member.userId).emit('leftRoom', data.channelId);
     }
   }
-
+  @SubscribeMessage('addMember')
+  async handleAddMmember(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    console.log('data =>', data);
+    const payload = await this.jwtService.verifyAsync(data.token, {
+      secret: process.env.JWT_SECRET,
+    });
+    if (!payload) return client.disconnect(true);
+    const result = await this.chatService.handleAddMember(
+      payload,
+      data.channelId,
+      data.username,
+    );
+    const channel = await this.prismaService.channel.findUnique({
+      where:{
+        id: data.channelId
+      },
+      include:{
+        members:true
+      }
+    })
+    const addedUser = await this.userService.findUserName(data.username)
+    // check if there is multiple users to be added
+    if (result.success) {
+      for (const member of channel.members) {
+        this.server.to(member.userId).emit('New Member', {
+          channelName: channel.name,
+          member: data.username,
+          role:"Member",
+          avatar: addedUser.avatar,
+          status:addedUser.status,
+          id:channel.members[channel.members.length - 1],
+          lastMessage: result.lastMessage
+        });
+      }
+    } else {
+      this.server
+        .to(payload.id)
+        .emit('error occored', { errorMessage: result?.error });
+    }
+  }
   @SubscribeMessage('deleteChannel')
   async handleDeletChannel(
     @ConnectedSocket() client: Socket,
@@ -231,6 +273,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(member.userId).emit('lastMessage', lastMessage);
     }
     this.chatService.saveMessageToChannel(payload, data);
-    this.server.to(data.channelId).emit('message', messageInfo);
+    return this.server.to(data.channelId).emit('message', messageInfo);
   }
 }

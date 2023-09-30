@@ -353,10 +353,10 @@ export class ChatService {
         where: {
           id: channel_id,
         },
-        include:{
-          members:true,
-          messages:true,
-        }
+        include: {
+          members: true,
+          messages: true,
+        },
       });
       return { success: true };
     } catch (err) {
@@ -399,7 +399,66 @@ export class ChatService {
       }
     }
   }
-
+  async handleAddMember(user: any, channelId: string, username: string) {
+    const currUser = await this._user.findUserById(user.id);
+    const addedUser = await this._user.findUserName(username);
+    const channel = await this._prisma.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+      include: {
+        members: true,
+        messages: true,
+      },
+    });
+    let lastConvo = [];
+    if (!channel || !addedUser)
+      return {
+        success: false,
+        error: 'No channel found or the user to be added',
+      };
+    if (channel.owner != currUser.username)
+      return { success: false, error: 'you are not allowed to do this action' };
+    for (const member of channel.members) {
+      if (member.userId === addedUser.id)
+        return { success: false, error: 'member already exists' };
+    }
+    try {
+      await this._prisma.channelMembers.create({
+        data: {
+          channelId: channel.id,
+          userId: addedUser.id,
+          role: 'MEMBER',
+        },
+      });
+      const lastMessage = channel.messages[channel.messages.length - 1];
+      if (!lastMessage)
+        return {
+          success: true,
+          error: 'member added successfully',
+          channel: channel,
+        };
+      const lastConvo = {
+        type: 'room',
+        channel: {
+          id: channel.id,
+          name: channel.name, /// it ay be deleteedd
+          avatar: channel.avatar,
+          message: lastMessage.content,
+          time: lastMessage.created_at,
+          status: '',
+        },
+      };
+      return {
+        success: true,
+        error: 'member added successfully',
+        channel: channel,
+        lastMessage: lastConvo,
+      };
+    } catch (err) {
+      return { success: false, error: 'error occured' };
+    }
+  }
   //////////////////// Ban method && Mute Method && Set As Admin /////////////////////////////////////
   async handleSetAsAdmin(user: any, channel_id: string, userToBeSet: string) {
     const currUser = await this._user.findUserById(user.id);

@@ -66,9 +66,9 @@
     {
       "id": "pointer:pointer",
       "typeName": "pointer",
-      "x": 987.6265396743722,
-      "y": -295.9728124848889,
-      "lastActivityTimestamp": 1695890849009,
+      "x": 55.16567968144602,
+      "y": 406.22120601999893,
+      "lastActivityTimestamp": 1696104983183,
       "meta": {}
     },
     {
@@ -79,9 +79,9 @@
       "typeName": "page"
     },
     {
-      "x": 244.41554997167395,
-      "y": 1302.0298754979735,
-      "z": 0.27746003210194603,
+      "x": 817.2889968092483,
+      "y": 40.59791379143243,
+      "z": 0.5071001244208689,
       "meta": {},
       "id": "camera:page:HACXhvVar9IGAdZ9poIQG",
       "typeName": "camera"
@@ -89,9 +89,7 @@
     {
       "editingId": null,
       "croppingId": null,
-      "selectedIds": [
-        "shape:08GxmDhWTXup_UsuMxPV8"
-      ],
+      "selectedIds": [],
       "hoveredId": null,
       "erasingIds": [],
       "hintingIds": [],
@@ -106,7 +104,7 @@
       "opacityForNextShape": 1,
       "stylesForNextShape": {
         "tldraw:geo": "rectangle",
-        "tldraw:color": "light-green",
+        "tldraw:color": "black",
         "tldraw:dash": "draw",
         "tldraw:fill": "none",
         "tldraw:size": "m"
@@ -125,8 +123,8 @@
       "screenBounds": {
         "x": 0,
         "y": 0,
-        "w": 677.5,
-        "h": 635
+        "w": 710,
+        "h": 453.33331298828125
       },
       "zoomBrush": null,
       "isGridMode": false,
@@ -691,8 +689,8 @@
       "typeName": "shape"
     },
     {
-      "x": -422.39856848909574,
-      "y": 349.5199001130769,
+      "x": -461.3817828949864,
+      "y": 715.8149383592765,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,
@@ -702,7 +700,7 @@
         "color": "black",
         "size": "xl",
         "w": 365.4641899554615,
-        "text": "Error object from socket",
+        "text": "list channels",
         "font": "draw",
         "align": "middle",
         "autoSize": false,
@@ -911,8 +909,8 @@
       "typeName": "shape"
     },
     {
-      "x": 750.3713608582768,
-      "y": -218.07922279288567,
+      "x": 763.8754386011019,
+      "y": -226.4662744170617,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,
@@ -934,8 +932,8 @@
       "typeName": "shape"
     },
     {
-      "x": 984.8480024648786,
-      "y": -153.2700455659009,
+      "x": 985.4239432966212,
+      "y": -159.844583636398,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,
@@ -1026,8 +1024,8 @@
       "typeName": "shape"
     },
     {
-      "x": 295.281160854312,
-      "y": 119.25699815960093,
+      "x": 293.281160854312,
+      "y": 112.25699815960093,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,
@@ -1049,36 +1047,12 @@
       "typeName": "shape"
     },
     {
-      "x": 227.96230239788292,
-      "y": 732.8457471512172,
-      "rotation": 0,
-      "isLocked": false,
-      "opacity": 1,
-      "meta": {},
-      "type": "text",
-      "props": {
-        "color": "light-blue",
-        "size": "m",
-        "w": 8,
-        "text": "",
-        "font": "draw",
-        "align": "middle",
-        "autoSize": true,
-        "scale": 1
-      },
-      "parentId": "page:HACXhvVar9IGAdZ9poIQG",
-      "index": "aU",
-      "id": "shape:l-fnacL2t7ki0kDk5kpeA",
-      "typeName": "shape"
-    },
-    {
       "x": -269.3742832471021,
       "y": 791.5889825617087,
       "rotation": 0,
       "isLocked": false,
       "opacity": 1,
       "meta": {},
-      "id": "shape:oKv9qgrloCeaNNNxe3Fyz",
       "type": "text",
       "props": {
         "color": "light-green",
@@ -1092,6 +1066,99 @@
       },
       "parentId": "page:HACXhvVar9IGAdZ9poIQG",
       "index": "aV",
+      "id": "shape:oKv9qgrloCeaNNNxe3Fyz",
+      "typeName": "shape"
+    },
+    {
+      "x": -392.2663405240652,
+      "y": 362.01103358908017,
+      "rotation": 0,
+      "isLocked": false,
+      "opacity": 1,
+      "meta": {},
+      "type": "note",
+      "parentId": "page:HACXhvVar9IGAdZ9poIQG",
+      "index": "aW",
+      "props": {
+        "color": "yellow",
+        "size": "m",
+        "text": "",
+        "font": "draw",
+        "align": "middle",
+        "verticalAlign": "middle",
+        "growY": 0,
+        "url": ""
+      },
+      "id": "shape:ILJ3xLox2BqD0kvDtVf1V",
+      "typeName": "shape"
+    },
+    {
+      "x": -86.38178289498637,
+      "y": 715.8149383592765,
+      "rotation": 0,
+      "isLocked": false,
+      "opacity": 1,
+      "meta": {},
+      "type": "text",
+      "props": {
+        "color": "black",
+        "size": "xl",
+        "w": 365.4641899554615,
+        "text": "add members",
+        "font": "draw",
+        "align": "middle",
+        "autoSize": false,
+        "scale": 1
+      },
+      "parentId": "page:HACXhvVar9IGAdZ9poIQG",
+      "index": "aM",
+      "id": "shape:yf0Ul0MX62CAu8hJ4o1nl",
+      "typeName": "shape"
+    },
+    {
+      "x": 288.6182171050136,
+      "y": 715.8149383592765,
+      "rotation": 0,
+      "isLocked": false,
+      "opacity": 1,
+      "meta": {},
+      "type": "text",
+      "props": {
+        "color": "black",
+        "size": "xl",
+        "w": 365.4641899554615,
+        "text": "mute (add time)",
+        "font": "draw",
+        "align": "middle",
+        "autoSize": false,
+        "scale": 1
+      },
+      "parentId": "page:HACXhvVar9IGAdZ9poIQG",
+      "index": "aMV",
+      "id": "shape:56VuriMSrAZo5hv6BynM_",
+      "typeName": "shape"
+    },
+    {
+      "x": -348.05101725021524,
+      "y": 353.00956985613016,
+      "rotation": 0,
+      "isLocked": false,
+      "opacity": 1,
+      "meta": {},
+      "id": "shape:OOshfLZXgrkjuSDW8UMwE",
+      "type": "text",
+      "props": {
+        "color": "black",
+        "size": "m",
+        "w": 110.56182926926857,
+        "text": "error adding member when the channel have no mesasges",
+        "font": "draw",
+        "align": "middle",
+        "autoSize": false,
+        "scale": 1
+      },
+      "parentId": "page:HACXhvVar9IGAdZ9poIQG",
+      "index": "aX",
       "typeName": "shape"
     }
   ]

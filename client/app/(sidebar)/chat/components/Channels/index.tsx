@@ -25,11 +25,6 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel, setMessages }
   const [selectedChannels, setSelectedChannels] = useState([]);
 
   const handleClickUserMessage = async (channel: any) => {
-    // const response = await postRequest( //TODO: ERROR IN
-    //   `${baseChatUrl}/create/dm`,
-    //   JSON.stringify({ username: user.username, memberLimit: 2 })
-    // );
-    // replacing create/dm with get channel
     console.log("in channels component",channel.id);
     const response = await getRequest(
       `${baseChatUrl}/getChannel/${channel.id}`

@@ -121,6 +121,21 @@ export class ChatController {
       return res.status(200).json(result);
     } catch (err) {}
   }
+  // get channels
+  @Put('addMember/:channelId/:username')
+  @UseGuards(JwtAuthGuard)
+  async handleAddMemberToRoom(
+    @Param('username') username: string,
+    @Param('channelId') channelId: string,
+    @UserInfo() user: any,
+    @Res() res: Response)
+  {
+    const result = await this.chatService.handleAddMember(user,
+      channelId,username);
+    if (!result.success)
+      return res.status(400).json(result);
+    return res.status(200).json(result);
+  }
   @Put('joinroom/:name/:password')
   @UseGuards(JwtAuthGuard)
   async handleJoinChannelRoom(

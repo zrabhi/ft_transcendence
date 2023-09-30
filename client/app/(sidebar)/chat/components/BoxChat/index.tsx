@@ -65,6 +65,7 @@ const BoxChat = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // state for dropdown
   const [isPopupOpen, setIsPopupOpen] = useState(false); // state for members popup
 
+  const [selectedUsers, setSelectedUsers] = useState<any>([]);
   const [isAddMemberPopupOpen, setIsAddMemberPopupOpen] = useState(false);
   const [checkboxes, setCheckboxes] = useState<CheckboxesState>({
     owner: true,
@@ -75,11 +76,11 @@ const BoxChat = ({
     "Owner" | "Admin" | "Member"
   >("Member");
 
-  
+
   const [chat, setChat] = useState({}); // id && tyoe && avatar && username && message
   const [cookie] = useCookies(["access_token"]);
   const { user, blockedUsers, setBlockedUsers } = useContext(AuthContext);
-  
+
   const getRoleOptions = (type: string) => {
     if (type === "PUBLIC" || type === "PRIVATE" || type === "PROTECTED") {
       return {
@@ -262,6 +263,7 @@ const BoxChat = ({
   useEffect(() => {
     console.log("selected channe sis =>", selectedChannel);
     getCurrentUserRole();
+    setSelectedUsers([]);
     (async () => {
       const response = await getRequest(
         `${baseChatUrl}/getMessages/${selectedChannel?.channel?.id}`
@@ -300,7 +302,11 @@ const BoxChat = ({
           sendedMessage.avatar = messageInfo.avatar;
         } else sendedMessage = messageInfo;
         setMessages((prevMessages: any) => [...prevMessages, sendedMessage]);
+        return
       });
+      socket.on('disconnected', () =>{
+        console.log("disconnected");
+      })
     });
     return () => {
       socket.disconnect();
@@ -325,7 +331,6 @@ const BoxChat = ({
       token: cookie.access_token,
       time: time.getHours() + ":" + time.getMinutes(),
     };
-    console.log("socket ", socket);
     socket.emit("message", body);
     setMessage("");
   };
@@ -408,7 +413,7 @@ const BoxChat = ({
   };
 
   // to handle the invites, i Added this method to invite  multiples users in one invite
-  const [selectedUsers, setSelectedUsers] = useState<any>([]);
+ 
 
   const handleCheckChange = (username: string) => {
     if (selectedUsers.includes(username)) {
@@ -450,6 +455,19 @@ const BoxChat = ({
     setFilteredUserList(filtered);
   };
 
+
+  const InviteUsers =(e: any)=>
+  {
+    e.preventDefault();
+    if (selectedUsers.length === 0)
+      return;
+    const data = {
+      channelId: selectedChannel.channel.id,
+      username:selectedUsers[0],
+      token:cookie.access_token
+    }
+    socket.emit("addMember", data);
+  }
   return (
     <div className="box-chat">
       <div className="box-chat-container relative inline-block text-left z-1">
@@ -485,7 +503,7 @@ const BoxChat = ({
               )}
               {separateOptions.map((option: any, index: Key) => (
                 <div
-                  key={index}
+                  key={index} //changed previous value "index&"
                   className={`block px-4 py-2 text-sm text-red-600 hover:bg-gray-300 hover:text-red-600 font-semibold cursor-pointer`}
                   role="menuitem"
                   onClick={() => handleOptionClick(option.action)}
@@ -505,7 +523,7 @@ const BoxChat = ({
                 message.reciever ? (
                   <div
                     className="self-end bg-[#654795] text-white rounded-3xl p-1 flex items-center"
-                    key={"index"}
+                    key={index}
                   >
                     <span className="mr-2">
                       <img
@@ -524,7 +542,7 @@ const BoxChat = ({
                 ) : (
                   <div
                     className="self-start bg-gray-200 rounded-3xl p-1 flex items-center"
-                    key={"index&"}
+                    key={index}
                   >
                     <span className="mr-4">
                       <img
@@ -682,7 +700,7 @@ const BoxChat = ({
               <button
                 type="button"
                 className="focus:outline-none text-white rounded-3xl bg-[#654795]  font-medium  text-sm px-5 py-2.5 "
-                onClick={() => alert("send invites from here")} // it's an array of selected users to invite them
+                onClick={(e) => InviteUsers(e)} // it's an array of selected users to invite them
               >
                 Invite {selectedUsers.length}
               </button>

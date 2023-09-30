@@ -128,7 +128,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // check if there is multiple users to be added
     if (result.success) {
       for (const member of channel.members) {
-        this.server.to(member.userId).emit('New Member', {
+        this.server.to(member.userId).emit('NewMember', {
           channelName: channel.name,
           member: data.username,
           role:"Member",

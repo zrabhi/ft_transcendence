@@ -99,7 +99,7 @@ const Chat: React.FC = () => {
         console.log("socket chat disconnected");
         // socket.disconnect();
       })
-      socket.on("New Member", (data: any) => {
+      socket.on("NewMember", (data: any) => {
         if (data.member === user.username)
           setChannels((prevChannels: any) => [
             data.lastMessage,

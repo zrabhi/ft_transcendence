@@ -1,38 +1,56 @@
-// import React from 'react'
-// import { useState, useEffect } from 'react';
-// import { FaUserFriends, FaHistory, FaListOl } from "react-icons/fa";
-// import { ImStatsBars } from "react-icons/im";
-// import { GiAchievement } from "react-icons/gi";
+import React from 'react'
+import { useState, useEffect } from 'react';
+import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
+import ProfileCard from '../ProfileCard/ProfileCard';
+import Image from 'next/image';
 
 export default function UserProfile({ username }: { username: string }) {
-  // const [activeItem, setActiveItem] = useState<number>(2);
-  // const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const listItemWidth = 100 / menuItems.length;
-  //   const left = `calc(${listItemWidth * activeItem}% + ${listItemWidth / 2}%)`;
-  //   const indicator = document.querySelector('.indicator') as HTMLElement;
-  //   if (indicator) {
-  //     indicator.style.left = left;
-  //   }
-  // }, [activeItem]);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const allUsers = await getRequest(`${baseUrlUsers}/users`);
+        const currentUser = allUsers.filter((user: any) => user.username === username );
+        console.log(currentUser.length);
+        if (currentUser.length === 0) return setUser(null)
+        else {
+          // setUser(currentUser);
+          // // console.log(user.length)
+          console.log(currentUser[0].username);
+          setUser(currentUser[0]);
+          // console.log(user.username);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
 
-  // const handleItemClick = (index: number) => {
-  //   setActiveItem(index);
-  // };
+    fetchUsers();
 
-  // const menuItems = [
-  //   { icon: <FaUserFriends />, text: 'Friends' },
-  //   { icon: <FaHistory />, text: 'History' },
-  //   { icon: <FaListOl />, text: 'Leaderboard' },
-  //   { icon: <ImStatsBars />, text: 'Statistics' },
-  //   { icon: <GiAchievement />, text: 'Achievements' },
-  // ];
+    const debouncedFetchUsers = setTimeout(() => {
+      fetchUsers();
+    }, 300);
 
+    return () => {
+      clearTimeout(debouncedFetchUsers);
+    };
+  }, [username]);
+
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <div>User not found</div>;
   return (
     <div className='text-slate-50'>
       UserProfile
-      <h1>{username}</h1>
+      <h1>the user is : {user.username}</h1>
+      <Image
+        src={user.avatar}
+        alt="User Avatar"
+        width={100}
+        height={100}
+      />
     </div>
   )
 }

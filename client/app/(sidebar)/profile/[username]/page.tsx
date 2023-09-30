@@ -7,7 +7,8 @@ import HeaderBar from "@/components/LoggedUser/Profile/HeaderBar/HeaderBar";
 import NavMenu from "@/components/LoggedUser/Profile/NavMenu/NavMenu";
 import UserProfile from "@/components/LoggedUser/Profile/UserProfile/UserProfile";
 
-export default function Profile() {
+export default function Page({params}: {params: {username: string} }) {
+  const { username } = params;
   const { getUserData, user } = useContext(AuthContext);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
@@ -17,9 +18,9 @@ export default function Profile() {
       <div className={`profile ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
         <div className="profile-content min-h-screen p-8">
           <HeaderBar data={user} />
-          <UserProfile username={user.username} />
+          <UserProfile username={username} />
+          <NavMenu />
         </div>
-      <NavMenu />
       </div>
     </div>
   );

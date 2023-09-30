@@ -38,22 +38,22 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
       </div>
       <div className="sidebar-nav h-1/3 ">
         <div className="to-home">
-          <Link href='home'>
+          <Link href='/home'>
             <CgHomeAlt size={24} className="icon" />
           </Link>
         </div>
         <div className="to-profile">
-          <Link href='profile'>
+          <Link href='/profile'>
             <CgProfile size={24} className="icon" />
           </Link>
         </div>
         <div className="to-chat">
-          <Link href='chat'>
+          <Link href='/chat'>
             <PiChatsFill size={24} className="icon" />
           </Link>
         </div>
         <div className="to-game">
-          <Link href='game'>
+          <Link href='/game'>
             <CgGames size={24} className="icon" />
           </Link>
         </div>

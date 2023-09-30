@@ -1,6 +1,9 @@
 @import '@/app/globals.scss';
 
 .nav-menu {
+  background-color: $blue-bg-color;
+  border-radius: .5rem;
+  margin-top: 2rem;
   ul {
     .list {
       a {

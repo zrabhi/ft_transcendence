@@ -1,13 +1,11 @@
 @import '@/app/globals.scss';
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-
-
 .core{
     background-color: $blue-bg-color;
     border-radius: 15px;
     align-items: center;
-    
+    height: calc(100% - 3rem);
 }
 .maps{
     background-color: $main-bg-color;

@@ -186,18 +186,18 @@ export default function match()
     <div className={`game ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
         <div className="game-content min-h-screen p-8">
             <HeaderBar />
-            <div className="core min-h-screen flex">
+            <div className="core  flex">
                 <div className="score flex">
                     <div className="player player1">
                         <div className='avatar'>
                             <img src="/images/avatar1"  alt="avatar" />
                         </div>
-                        <div>PLAYER1</div>
+                        <div className='player-name invisible lg:visible ' >PLAYER1</div>
                         <div className="score1">9</div>
                     </div>
                     <div className="player player2">
                         <div className="score2">8</div>
-                        <div>PLAYER2</div>
+                        <div className='player-name invisible lg:visible ' >PLAYER2</div>
                         <div className='avatar'>
                             <img src="/images/avatar1" alt="avatar" />
                         </div>

@@ -1,16 +1,17 @@
 @import '@/app/globals.scss';
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-body {
-    overflow-y: hidden;
-}
 
 .core {
     background-color: $blue-bg-color;
     border-radius: 15px;
     align-items: center;
     flex-direction: column;
-    height: calc(100% - 4rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    // max-height: 100vh; /* Set a maximum height of 100% viewport height */
+    overflow: hidden;
 }
 
 .score{
@@ -25,10 +26,6 @@ body {
 
 .table{
     margin: 3%;
-    max-height: 200px;
-    max-width: 1000px;
-    width: 100%;
-    height: 100%;
     border: 3px black solid;
     border-radius: 15px;
     overflow: hidden;

@@ -12,7 +12,7 @@ export default function match()
 {
     const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
     const io = require("socket.io-client");
-    let selectedcolor : string;
+    let selectedcolor = 'black';
     let socket: Socket;
 
     const [myscore, setmyscore] = useState(0);
@@ -136,19 +136,19 @@ export default function match()
   
     useEffect(() => {
       selectedcolor = localStorage.getItem("selectedMapColor") as string;
-      const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-      const ctx = canvas.getContext("2d") as any;
+      // const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+      // const ctx = canvas.getContext("2d") as any;
 
-      ctx.font = "18px 'Press Start 2P'";
-      let text = "Matching...";
-      let textwidth = ctx.measureText(text).width;
-      let textheight = 48;
-      ctx.fillStyle = selectedcolor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "white";
-      ctx.fillText(text, (canvas.width - textwidth) / 2, canvas.height  / 2);
+      // ctx.font = "18px 'Press Start 2P'";
+      // let text = "WAITING FOR AN OTHER USER TO JOIN";
+      // let textwidth = ctx.measureText(text).width;
+      // let textheight = 48;
+      // // ctx.fillStyle = selectedcolor;
+      // // ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // ctx.fillStyle = "white";
+      // ctx.fillText(text, (canvas.width - textwidth) / 2, canvas.height  / 5);
 
-      socket = io('http://127.0.0.1:3003');
+      socket = io('http://127.0.0.1:8080/matching');
       socket.on('connect', () => {
         console.log('Connected to WebSocket');
       });
@@ -204,7 +204,7 @@ export default function match()
                     </div>
                 </div>
                 <div className="table">
-                    <canvas id="canvas"></canvas>
+                    <canvas id="canvas" width={1000} height={600}></canvas>
                 </div>
             </div>         
         </div>

@@ -146,7 +146,7 @@ function updateballxy(match:Match) : string
   return 'ok'
 }
 
-@WebSocketGateway()
+@WebSocketGateway({namespace:"matching"})
 export class GameGateway{
   @WebSocketServer()
   server: Server;
@@ -183,7 +183,7 @@ export class GameGateway{
     }else{
       this.waiting_users.enqueue(tmplayer);
     }
-    console.log(`User connected with ID: ${socketId}`);
+    console.log(`User connected to game gateway with ID: ${socketId}`);
     // console.log(this.waiting_users)
     // console.log(this.matchs);
   }
@@ -236,7 +236,5 @@ init(@MessageBody() data: any, @ConnectedSocket() client: Socket): void {
     this.playing_users[client.id].bar.length = 100;
     this.playing_users[client.id].bar.width = 15;
   }
-
-  // console.log(match);
 }
 }

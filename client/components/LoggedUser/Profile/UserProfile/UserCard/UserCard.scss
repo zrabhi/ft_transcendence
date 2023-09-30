@@ -1,0 +1,61 @@
+@import '@/app/globals.scss';
+
+.profile-card {
+  background-color: $blue-bg-color;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  background-image: url('./../../../../../public/images/cover.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: color-burn;
+  box-shadow: inset 0 0 10rem 5rem  $blue-bg-color;
+
+  .avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 20px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .user-details {
+    margin-bottom: 20px;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: space-between;
+
+    .stat-item {
+      flex: 1;
+      margin: 0 10px;
+      padding: 10px;
+      background-color: $main-bg-color;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      color: $main-text-color;
+      h4 {
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+
+      p {
+        font-size: 16px;
+        margin: 0;
+      }
+    }
+  }
+}

@@ -123,6 +123,9 @@ const Chat: React.FC = () => {
           setSelectedChannel(updatedSelectedChannel);
         }
       });
+      socket.on("disconnect", () => {
+        socket.off("latMessage")
+      });
     });
     return () => {
       socket.disconnect();

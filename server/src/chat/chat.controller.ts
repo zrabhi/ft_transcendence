@@ -206,9 +206,8 @@ export class ChatController {
       channelId,
       user.id,
     );
-    console.log('all messages here =>', result.allMessages);
-    console.log('members are here =>', result.users);
-
+    // console.log('all messages here =>', result.allMessages);
+    // console.log('members are here =>', result.users);
     res.status(200).json(result);
   }
   @UseGuards(JwtAuthGuard)

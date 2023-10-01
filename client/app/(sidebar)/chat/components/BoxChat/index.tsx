@@ -304,12 +304,13 @@ const BoxChat = ({
         setMessages((prevMessages: any) => [...prevMessages, sendedMessage]);
         return
       });
-      // socket.on('disconnected', () =>{
-      //   console.log("disconnected");
-      // })
+      socket.on("disconnect", () => {
+        socket.off("message");
+      });
     });
     return () => {
-      socket.disconnect();
+      // socket.off("message");
+     socket.disconnect();
     };
   }, [selectedChannel]);
 

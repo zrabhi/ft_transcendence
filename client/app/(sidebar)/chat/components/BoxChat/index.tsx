@@ -225,7 +225,7 @@ const BoxChat = ({
   }
 
   function handleBanMember(user: any) {
-    console.log("user clocked ", user);
+    // console.log("user clocked ", user);
     alert(` Ban member from room`);
   }
 
@@ -256,14 +256,16 @@ const BoxChat = ({
     const currentUser = selectedChannel?.members?.find((member: any) => {
       return member.name === user.username;
     });
-    console.log("currentUser", currentUser);
+    // console.log("currentUser", currentUser);
     setCurrentUserRole(currentUser?.role);
   };
   // trying to create socket to connect with other user here
   useEffect(() => {
-    console.log("selected channe sis =>", selectedChannel);
+    // console.log("selected channe sis =>", selectedChannel);
     getCurrentUserRole();
     setSelectedUsers([]);
+    console.log("selected channe sis", selectedChannel);
+
     (async () => {
       const response = await getRequest(
         `${baseChatUrl}/getMessages/${selectedChannel?.channel?.id}`
@@ -274,7 +276,7 @@ const BoxChat = ({
         ...prevMessages,
         ...response.allMessages,
       ]); //reminderr
-      console.log("chat ", selectedChat);
+      // console.log("chat ", selectedChat);
     })();
 
     setChat(selectedChat);
@@ -374,7 +376,7 @@ const BoxChat = ({
   };
 
   const renderActions = (role: "Owner" | "Admin" | "Member", user: any) => {
-    console.log("role user", user);
+    // console.log("role user", user);
     if (role in actionOptions) {
       return (
         <div className="mt-2">

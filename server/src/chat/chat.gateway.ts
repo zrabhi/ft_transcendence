@@ -17,6 +17,7 @@ import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { channel } from 'diagnostics_channel';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -63,7 +64,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!payload) return client.disconnect(true);
     // this.server.to(payload.id).emit('disconnected', '');
     this.connectedUsers.delete(payload.id);
-    console.log(`Client disconnected   id ${client.id}`);
+    // console.log(`Client disconnected   id ${client.id}`);
     // client.disconnect(true);
   }
   @SubscribeMessage('joinChat')
@@ -99,6 +100,42 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (const member of channel.members) {
       if (member.userId != user.id)
         this.server.to(member.userId).emit('leftRoom', data.channelId);
+    }
+  }
+  @SubscribeMessage('joinNewChannel')
+  async handleJoinNewChannel(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ){
+    const payload = await this.jwtService.verifyAsync(data.token, {
+      secret: process.env.JWT_SECRET,
+    });
+    if (!payload) return client.disconnect(true);
+    const result = await this.chatService.handleJoinChannelRoom(data.channelName,
+      payload,data.password)
+    if (result.channel === undefined)
+      {
+        // error occured here
+      }
+    const currUser = await this.userService.findUserById(payload.id);
+    const channel = await this.prismaService.channel.findUnique({
+      where:{
+        id: result.channel.id
+      },
+      include:{
+        members:true
+      }
+    })
+    for (const member of channel.members)
+    {
+      this.server.to(member.userId).emit("memberJoinned", {
+       channelId: channel.id,
+        id:channel.members.length,
+        name:currUser.username,
+        status: currUser.status,
+        avatar:currUser.avatar,
+        role:"Member"
+      })
     }
   }
   @SubscribeMessage('addMember')

@@ -7,6 +7,7 @@ import {
   baseChatUrl,
   baseUrlUsers,
   getRequest,
+  putRequest,
 } from "@/app/context/utils/service";
 import Channels from "./components/Channels";
 import BoxChat from "./components/BoxChat";
@@ -51,10 +52,9 @@ const Chat: React.FC = () => {
       } catch (error) {}
     })();
     (async () => {
-        const reponse = await getRequest(`${baseChatUrl}/getChannels`);
-        setOtherChannels(reponse);
-    })
-    ()
+      const reponse = await getRequest(`${baseChatUrl}/getChannels`);
+      setOtherChannels(reponse);
+    })();
   }, []);
   useEffect(() => {
     socket = io("http://127.0.0.1:8080/chat", {
@@ -81,7 +81,7 @@ const Chat: React.FC = () => {
             channel?.channel && channel?.channel?.id != messageInfo?.channel?.id
           );
         });
-        console.log("updated channel", updatedChannel, previousChannels);
+        // console.log("updated channel", updatedChannel, previousChannels);
         !checker
           ? setChannels((prevChannels: any) => [messageInfo, ...prevChannels])
           : setChannels(() => [...updatedChannel, ...previousChannels]);
@@ -104,6 +104,41 @@ const Chat: React.FC = () => {
       //   console.log("socket chat disconnected");
       //   // socket.disconnect();
       // })
+      socket.on("memberJoinned", (data: any) => {
+        console.log("data from socket", data);
+        if (user.username != data.name) {
+          if (
+            selectedChannel &&
+            selectedChannel?.channel &&
+            selectedChannel?.channel.id === data.channelId
+          ) {
+            selectedChannel?.members.push({
+              id: data.id,
+              name: data.name,
+              status:data.status,
+              avatar: data.avatar,
+              role: data.role,
+            });
+          }
+          return;
+        }
+        let desiredChannel: any = otherChannels.filter((channel: any) => {
+          return channel.channel.id === data.channelId;
+        });
+        desiredChannel[0]?.members.push({
+          id: desiredChannel[0]?.members.length,
+          name: user.username,
+          avatar: user.avatar,
+          role: "Member",
+        });
+        console.log(desiredChannel);
+        setSelectedChannel(desiredChannel[0]);
+        setSelectedChat(desiredChannel[0]?.channel);
+        let NewOtherChahnnels = otherChannels.filter((channel: any) => {
+          return channel.channel.id != data.channelId;
+        })
+        setOtherChannels(NewOtherChahnnels);
+      });
       socket.on("NewMember", (data: any) => {
         if (data.member === user.username)
           setChannels((prevChannels: any) => [
@@ -112,7 +147,7 @@ const Chat: React.FC = () => {
           ]);
         else {
           alert(`${data.member} is now in ${data?.channelName} room`); // replace it with something to show that new user has been added
-          let updatedSelectedChannel = selectedChannel
+          let updatedSelectedChannel = selectedChannel;
           updatedSelectedChannel?.members.push({
             name: data.member,
             role: data.role,
@@ -124,7 +159,7 @@ const Chat: React.FC = () => {
         }
       });
       socket.on("disconnect", () => {
-        socket.off("latMessage")
+        socket.off("latMessage");
       });
     });
     return () => {
@@ -132,6 +167,33 @@ const Chat: React.FC = () => {
     };
   }, [socket]);
 
+  const handleJoinChannel = async (e: any, channelName: string) => {
+    e.preventDefault();
+    let password = "fdf";
+    socket.emit("joinNewChannel", {
+      channelName: channelName,
+      password: password,
+      token:cookie.access_token
+    });
+    // const response = await putRequest(`${baseChatUrl}/joinroom/${channelName}/${password}`,
+    //   ""
+    // );
+    // if (response?.channel === undefined) {
+    //   // error heree
+    // } else {
+    //   let desiredChannel :any = otherChannels.filter((channel: any) => {
+    //     return channel.channel.id === response.channel.id;
+    //   });
+    //   desiredChannel[0]?.members.push({
+    //     id:desiredChannel[0]?.members.length,
+    //     name: user.username,
+    //     avatar:user.avatar,
+    //     role:"Member"
+    //   });
+    //   console.log(desiredChannel);
+    //   setSelectedChannel(desiredChannel[0]);
+    //   setSelectedChat(desiredChannel[0]?.channel)
+  };
   // TODO :?  --- GET CONNECTED USER FRIENDS
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
   // add header bar to work in notification
@@ -172,26 +234,30 @@ const Chat: React.FC = () => {
                   className="flex flex-col mx-4 max-h-600px overflow-y-auto"
                   style={{ width: "350px", maxWidth: "350px", height: "600px" }}
                 >
-                  {otherChannels.map((channel) => (
-                    <div className="w-full p-4" key={channel.id}>
+                  {otherChannels.map((channel: any) => (
+                    <div className="w-full p-4" key={channel.channel?.id}>
                       <div className="flex items-center content-center justify-between bg-[#050A30] rounded-3xl text-white shadow-lg p-4">
                         <div className="flex items-center relative">
                           <img
-                            src={channel.avatar}
-                            alt={channel?.name}
+                            src={channel?.channel?.avatar}
+                            alt={channel?.channel?.name}
                             className="avatar mr-2"
                           />
                           <h3 className="text-lg font-semibold text-center">
-                            {channel?.name}
+                            {channel?.channel?.name}
                           </h3>
                         </div>
                         {/* TODO: onclick if its protected a popup will show up to type password */}
                         <button
-                          onClick={() => alert("join a channel here")}
+                          onClick={(e) =>
+                            handleJoinChannel(e, channel.channel.name)
+                          }
                           className="flex justify-between items-center gap-1 bg-[#654795]  text-white font-semibold py-2 px-4 rounded-3xl focus:outline-none"
                         >
                           Join{" "}
-                          {channel.type === "PROTECTED" && <AiOutlineKey />}
+                          {channel.channel?.type === "PROTECTED" && (
+                            <AiOutlineKey />
+                          )}
                         </button>
                       </div>
                     </div>

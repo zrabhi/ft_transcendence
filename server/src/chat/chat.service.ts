@@ -25,18 +25,36 @@ export class ChatService {
     });
     const rooms = [];
     for (const channel of channels) {
+      const members = [];
       if (channel.type === 'DM' || channel.type === 'PRIVATE') continue;
       const searchedUser = channel.members.filter((member: any) => {
         return member.userId === currUser.id;
       });
       if (searchedUser[0]) continue;
       else {
-        rooms.push(channel);
-      }
+        let Key = 0;
+        for (const member of channel.members) {
+          const user = await this._user.findUserById(member.userId);
+          let checker = 'Member';
+          if (member.role === 'ADMIN') checker = 'Admin';
+          if (member.role === 'OWNER') checker = 'Owner';
+          members.push({
+            id: Key++,
+            name: user.username,
+            avatar: user.avatar,
+            status: user.status,
+            role: checker,
+          });
+        }
+        rooms.push({
+          channel: channel,
+          members: members,
+        });
     }
+  }
     console.log('channels listed are ', rooms);
     return rooms;
-  }
+}
   async getCHannelRoom(channelName: string) {
     return this._prisma.channel.findMany({
       where: {

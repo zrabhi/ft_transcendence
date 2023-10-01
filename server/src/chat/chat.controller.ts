@@ -149,8 +149,8 @@ export class ChatController {
       user,
       password,
     );
-    if (result.channel === undefined) return res.status(400).json(result.error);
-    return res.status(200).json(`${user.username} has joined channel`);
+    if (result.channel === undefined) return res.status(400).json(result);
+    return res.status(200).json(result);
   }
   /// channel roles
   @UseGuards(JwtAuthGuard)

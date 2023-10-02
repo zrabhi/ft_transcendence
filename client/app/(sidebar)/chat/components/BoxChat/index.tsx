@@ -151,7 +151,7 @@ const BoxChat = ({
     Owner: [
       { text: "Ban", action: handleBanMember }, // change to handle Ban and username of the banned one must be provided
       { text: "Mute", action: handleMuteMember }, // change to handle Mute
-      { text: "Set as admin", action: handleShowMembers }, // change to handle set As ADMIN
+      { text: "Set as admin", action: handleSetAsAdmin }, // change to handle set As ADMIN
     ],
     Admin: [
       { text: "Ban", action: handleBanMember }, // change to handle Ban
@@ -188,14 +188,11 @@ const BoxChat = ({
 
   // Action functions
   async function handleDeleteRoom() {
-    // handle delete room action
     const body = {
       channelId: selectedChannel.channel.id,
       token: cookie.access_token,
     };
     socket.emit("deleteChannel", body);
-    // delete the channel for the current user (this action must be done on root page )
-    alert("Delete Room action");
   }
 
   function handleAddMember() {
@@ -216,7 +213,7 @@ const BoxChat = ({
     );
     if (!response.success) {
       showSnackbar(`${response.message}`, false);
-      return ;
+      return;
       // error has been  occured here
       // in response.error you will find the error occured
     }
@@ -225,12 +222,12 @@ const BoxChat = ({
       token: cookie.access_token,
       name: user.username,
     });
-    let updatedChannels = channels.filter((channel : any)=> {
-      return channel?.channel?.id != selectedChannel.channel.id
-    })
+    let updatedChannels = channels.filter((channel: any) => {
+      return channel?.channel?.id != selectedChannel.channel.id;
+    });
     setSelectedChannel(null);
-    setChannels(updatedChannels)
-    showSnackbar("You left the channel successfully",true);
+    setChannels(updatedChannels);
+    showSnackbar("You left the channel successfully", true);
   }
 
   function handleBanMember(user: any) {
@@ -242,16 +239,23 @@ const BoxChat = ({
     // / i need the user name of the MUTED person
     alert("Mute member!!");
   }
-  async function handleSetAsAdmin(username: string) {
+  async function handleSetAsAdmin(user: any) {
+    socket.emit("setAdmin", {
+      channelId: selectedChannel?.channel?.id,
+      username: user?.name,
+      token:cookie.access_token
+    });
+    console.log("new asmin +++", user);
+
     // i will change this implenetation to sockets
-    const response = await putRequest(
-      `${baseChatUrl}/setadmin/${selectedChannel.channel.id}/${username}`,
-      ""
-    );
-    if (!response.success) {
-      // error has been  occured here
-      // in response.error you will find the error occured
-    }
+    // const response = await putRequest(
+    //   `${baseChatUrl}/setadmin/${selectedChannel.channel.id}/${username}`,
+    //   ""
+    // );
+    // if (!response.success) {
+    //   // error has been  occured here
+    //   // in response.error you will find the error occured
+    // }
 
     alert("Set the member As Admin ");
   }
@@ -490,7 +494,7 @@ const BoxChat = ({
             >
               {nonSeparateOptions.map((option: any, index: Key) => (
                 <div
-                  key={"unseparated"+index}
+                  key={"unseparated" + index}
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-300 hover:text-gray-900 font-semibold cursor-pointer"
                   role="menuitem"
                   onClick={() => handleOptionClick(option.action)}
@@ -503,7 +507,7 @@ const BoxChat = ({
               )}
               {separateOptions.map((option: any, index: Key) => (
                 <div
-                  key={"separated"+index} //changed previous value "index&"
+                  key={"separated" + index} //changed previous value "index&"
                   className={`block px-4 py-2 text-sm text-red-600 hover:bg-gray-300 hover:text-red-600 font-semibold cursor-pointer`}
                   role="menuitem"
                   onClick={() => handleOptionClick(option.action)}

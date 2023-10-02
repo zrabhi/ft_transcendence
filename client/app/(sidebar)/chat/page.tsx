@@ -134,6 +134,8 @@ const Chat: React.FC = () => {
             `the owner  ${data.username}  deleted  ${data.name} Room`,
             true
           );
+        else
+          showSnackbar(`Room has been deleted`, true)
         setSelectedChannel(null); // the  the channel here for other usersss
         setChannels(updatedChannel);
       });
@@ -175,6 +177,30 @@ const Chat: React.FC = () => {
           true
         );
         setOtherChannels(NewOtherChahnnels);
+      });
+      socket.on("newAdmin", (data: any) => {
+        console.log("data from socket", data);
+        if (user.username === data.user)
+          showSnackbar(`Your now admin of ${data.channelName} Room `, true)
+        if (
+          selectedChannel &&
+          selectedChannel?.channel &&
+          selectedChannel?.channel?.name === data.channelName
+        ){
+          let previousChannel = selectedChannel;
+          previousChannel?.members.map((member :any) => {
+            if (member.name === data.user)
+            {
+              console.log("----+++", member);
+
+                member.role ="Admin"
+                console.log("Nooww , ----+++", member);
+            }
+            // return member
+          })
+          setSelectedChannel(previousChannel)
+        }
+        showSnackbar(`${data.user} is now admin of ${data.channelName}`, true)
       });
       socket.on("NewMember", (data: any) => {
         if (data.member === user.username)

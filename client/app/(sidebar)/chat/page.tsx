@@ -46,58 +46,7 @@ const Chat: React.FC = () => {
   const [selectedChat, setSelectedChat] = useState<chat>(); // to set the user selected
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
-  const [otherChannels, setOtherChannels] = useState([
-    {
-      channel: {
-        id: "id1",
-        name: "channel 1",
-        type: "PROTECTED",
-        avatar: "avatar",
-        message: "",
-        status: "",
-      },
-    },
-    {
-      channel: {
-        id: "id1",
-        name: "channel 2",
-        type: "PROTECTED",
-        avatar: "avatar",
-        message: "",
-        status: "",
-      },
-    },
-    {
-      channel: {
-        id: "id1",
-        name: "channel 3",
-        type: "PUBLIC",
-        avatar: "avatar",
-        message: "",
-        status: "",
-      },
-    },
-    {
-      channel: {
-        id: "id1",
-        name: "channel 4",
-        type: "PROTECTED",
-        avatar: "avatar",
-        message: "",
-        status: "",
-      },
-    },
-    {
-      channel: {
-        id: "id1",
-        name: "channel 5",
-        type: "PROTECTED",
-        avatar: "avatar",
-        message: "",
-        status: "",
-      },
-    },
-  ]);
+  const [otherChannels, setOtherChannels] = useState([]);
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
   const { user } = useContext(AuthContext);
   const [cookie] = useCookies(["access_token"]);
@@ -288,7 +237,7 @@ const Chat: React.FC = () => {
               setSelectedChannel={setSelectedChannel}
               setSelectedChat={setSelectedChat}
             />
-            {selectedChannel && (
+            {selectedChannel ? (
               <BoxChat
                 setSelectedChannel={setSelectedChannel}
                 setMessages={setMessages}
@@ -299,8 +248,8 @@ const Chat: React.FC = () => {
                 setChannels={setChannels}
                 users={users}
               />
-            )}
-            {otherChannels && otherChannels.length > 0 && (
+            ): <div className="text-white text-xl flex justify-center items-center"> You need to select a chat! </div>}
+            {otherChannels && otherChannels.length > 0 ? (
               <div className="flex flex-col justify-start items-center">
                 <h2 className="text-2xl mx-auto my-4 text-white font-semibold">
                   <strong>channels</strong>
@@ -377,7 +326,7 @@ const Chat: React.FC = () => {
                   </Modal>
                 </div>
               </div>
-            )}
+            ) : <div className="text-white text-xl flex justify-center items-center"> There is no channels to join, Try to create one! </div>}
             <Friends
               setSelectedChannel={setSelectedChannel}
               setSelectedChat={setSelectedChat}

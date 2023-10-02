@@ -79,8 +79,8 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel, setMessages }
           />
         )}
 
-        {selectedChannels.length > 0 &&
-          selectedChannels?.map((channel: any, index: Number) => {
+        {selectedChannels.length > 0 ?
+          (selectedChannels?.map((channel: any, index: Number) => {
             return (
               <UserCard
                 channel={channel.channel}
@@ -88,7 +88,8 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel, setMessages }
                 onClick={() => handleClickUserMessage(channel.channel)} // replacing channel with channel.channel
               />
             );
-          })}
+          })) : <div className="text-white text-lg flex justify-center items-center mt-4"> You have no messages yet! </div>
+        }
       </div>
     </div>
   );

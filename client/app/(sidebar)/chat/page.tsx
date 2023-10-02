@@ -211,6 +211,7 @@ const Chat: React.FC = () => {
 
     setSelectedJoinChannel(null);
     setPassword("");
+    setOpenPasswordModal(false);
     // const response = await putRequest(`${baseChatUrl}/joinroom/${channelName}/${password}`,
     //   ""
     // );

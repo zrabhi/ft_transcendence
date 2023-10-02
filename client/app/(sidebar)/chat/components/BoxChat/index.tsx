@@ -493,7 +493,7 @@ const BoxChat = ({
             >
               {nonSeparateOptions.map((option: any, index: Key) => (
                 <div
-                  key={index}
+                  key={"unseparated"+index}
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-300 hover:text-gray-900 font-semibold cursor-pointer"
                   role="menuitem"
                   onClick={() => handleOptionClick(option.action)}
@@ -506,7 +506,7 @@ const BoxChat = ({
               )}
               {separateOptions.map((option: any, index: Key) => (
                 <div
-                  key={index} //changed previous value "index&"
+                  key={"separated"+index} //changed previous value "index&"
                   className={`block px-4 py-2 text-sm text-red-600 hover:bg-gray-300 hover:text-red-600 font-semibold cursor-pointer`}
                   role="menuitem"
                   onClick={() => handleOptionClick(option.action)}

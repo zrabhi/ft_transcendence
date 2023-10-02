@@ -20,6 +20,7 @@ import { useCookies } from "react-cookie";
 import { Message } from "@/interfaces/ChatTypes";
 import { AuthContext } from "@/app/context/AuthContext";
 import Modal from "react-modal";
+import { showSnackbar } from "@/app/context/utils/showSnackBar";
 // Modal.setAppElement("div");
 const customStyles = {
   content: {
@@ -228,7 +229,7 @@ const BoxChat = ({
     })
     setSelectedChannel(null);
     setChannels(updatedChannels)
-    alert("Leave Room action");
+    showSnackbar("You left the channel successfully",true);
   }
 
   function handleBanMember(user: any) {
@@ -395,14 +396,8 @@ const BoxChat = ({
                   ? "red"
                   : option.text === "Mute"
                   ? "green"
-                  : "yellow"
-              }-600 hover:text-${
-                option.text === "Ban"
-                  ? "red"
-                  : option.text === "Mute"
-                  ? "green"
-                  : "yellow"
-              }-800 mr-2`}
+                  : "orange"
+              }-600 mr-2`}
               onClick={() => option.action(user)}
             >
               {(role === "Owner" &&
@@ -644,7 +639,7 @@ const BoxChat = ({
                         <div className="relative">
                           <div
                             className={`w-4 h-4 absolute top-2 right-3 rounded-full ${
-                              user.status === "Online"
+                              user.status === "ONLINE"
                                 ? "bg-green-500"
                                 : "bg-gray-500"
                             }`}

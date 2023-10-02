@@ -60,7 +60,7 @@ const Chat: React.FC = () => {
       // it will disapear after 4 sec
   useEffect(() => {
     showSnackbar("TEST", false);
-    showSnackbar("TEST", true);
+    showSnackbar("Connected", true);
   }, []);
 
   useEffect(() => {
@@ -114,6 +114,8 @@ const Chat: React.FC = () => {
         !checker
           ? setChannels((prevChannels: any) => [messageInfo, ...prevChannels])
           : setChannels(() => [...updatedChannel, ...previousChannels]);
+        if (user.username != messageInfo?.channel?.username)
+          showSnackbar("You have new message", true);
       });
 
       socket.on("channelDeleted", (data: socketResponse) => {
@@ -210,6 +212,8 @@ const Chat: React.FC = () => {
   const handleJoinChannel = async (e: any, channelName: string, password: string) => {
     e.preventDefault();
     // let password = "fdf";
+    console.log("channel name", channelName, password);
+    
     socket.emit("joinNewChannel", {
       channelName: channelName,
       password: password,
@@ -297,6 +301,7 @@ const Chat: React.FC = () => {
                               setOpenPasswordModal(true);
                               setSelectedJoinChannel(channel);
                             } else {
+                              
                               handleJoinChannel(e, channel.channel.name, password);
                             }
                           }}
@@ -337,7 +342,7 @@ const Chat: React.FC = () => {
                       <button
                         type="button"
                         className="gap-1 bg-[#654795]  text-white font-semibold py-2 px-4 rounded-3xl focus:outline-none"
-                        onClick={(e)=> handleJoinChannel(e, selectedChannel?.channel?.name, password)}
+                        onClick={(e)=> handleJoinChannel(e, selectedJoinChannel?.channel?.name, password)}
                       >
                         Valid
                       </button>

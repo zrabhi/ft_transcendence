@@ -15,14 +15,14 @@ import { LoginError, User, userInit, LoginErrorInit } from "./utils/types";
 import { baseUrlAuth } from "./utils/service";
 import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
-import {blockedUsers} from "@/interfaces/channels";
+import { blockedUsers } from "@/interfaces/channels";
 import io, { Socket } from "socket.io-client";
 // import socketIO from 'socket.io-client';
 // ADDED BY ZAC
-  /// create useState Where you can get blocked users && update it when the users is blocked from chat
-  /// the resposne from back end is the username of the blocked user
-  // we will change change to context api and we must always setBlockedUsers if new user have been block by the current user
-let notifSocket: Socket
+/// create useState Where you can get blocked users && update it when the users is blocked from chat
+/// the resposne from back end is the username of the blocked user
+// we will change change to context api and we must always setBlockedUsers if new user have been block by the current user
+let notifSocket: Socket;
 export const AuthContext = createContext<any>({});
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User>(userInit);
@@ -33,9 +33,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentWindow, setCurrentWindow] = useState("");
   const [pathname, setPathname] = useState<string>("");
   const [blockedUsers, setBlockedUsers] = useState<blockedUsers[]>([]);
- 
+
   // here we will aded states to save data cames from sockets
-  
+
   const Urls = {
     home: "",
     gameHistory: "game-history",
@@ -77,25 +77,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(response);
   };
 
-  // useEffect(() => {
-  // if (!checkPath()) return;
-  // (async () => {
-  // const response = await getRequest(`${baseUrlUsers}/user`);
-  // if (response.error) {
-  // setLoginError(response);
-  // remove("access_token");
-  // router.push("/login");
-  // return false;
-  // }
-  //     response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
-  // console.log(response);
-  // setUser(response);
-  // return true;
-  // })();
-  // (async () => {
-  // const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
-  // setBlockedUsers(response);
-  // })();
+  useEffect(() => {
+    if (!checkPath()) return;
+    (async () => {
+      const response = await getRequest(`${baseUrlUsers}/user`);
+      if (response.error) {
+        setLoginError(response);
+        remove("access_token");
+        router.push("/login");
+        return false;
+      }
+      response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
+      console.log(response);
+      setUser(response);
+      return true;
+    })();
+    (async () => {
+      const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
+      setBlockedUsers(response);
+    })();
+  }, []);
 
   // // (async () => {
   // //   notifSocket = io("http://127.0.0.1:8080/notifications", {
@@ -172,8 +173,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return true;
   }, []);
 
-
-
   // const socket = socketIO.connect('https://1997-196-65-77-2.ngrok-free.app');
 
   return (
@@ -189,10 +188,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         fetchUserData,
         blockedUsers,
         setBlockedUsers,
-        notifSocket
+        notifSocket,
       }}
     >
-      <div id='snackbar'></div>
+      <div id="snackbar"></div>
       {children}
     </AuthContext.Provider>
   );

@@ -15,9 +15,7 @@ const UserCard = ({ channel, onClick }: any): JSX.Element => {
     return (
       <div className="user-card-content">
         <img
-          className="mb-3 rounded-full shadow-lg"
-          width={"50px"}
-          height={"50px"}
+          className="mb-3 rounded-full shadow-lg avatar"
           src={user?.avatar}
           alt={user?.username ? user.username : "#" + user?.name}
         />

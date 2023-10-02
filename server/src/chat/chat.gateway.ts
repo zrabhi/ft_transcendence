@@ -111,6 +111,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       payload,data.password)
     if (result.channel === undefined)
       {
+        return ;
         // error occured here
       }
     const currUser = await this.userService.findUserById(payload.id);

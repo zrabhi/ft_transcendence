@@ -22,6 +22,7 @@ import { AiOutlineClose, AiOutlineKey } from "react-icons/ai";
 import { array } from "yup";
 import { AuthContext } from "@/app/context/AuthContext";
 import Modal from "react-modal";
+import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 const customStyles = {
   content: {
@@ -53,6 +54,14 @@ const Chat: React.FC = () => {
 
   const [password, setPassword] = useState("");
   const [selectedJoinChannel, setSelectedJoinChannel] = useState<any>(null);
+
+
+  // just an example of how to use this function
+      // it will disapear after 4 sec
+  useEffect(() => {
+    showSnackbar("TEST", false);
+    showSnackbar("TEST", true);
+  }, []);
 
   useEffect(() => {
     (async () => {

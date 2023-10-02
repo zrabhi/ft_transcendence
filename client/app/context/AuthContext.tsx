@@ -192,6 +192,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         notifSocket
       }}
     >
+      <div id='snackbar'></div>
       {children}
     </AuthContext.Provider>
   );

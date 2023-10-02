@@ -237,6 +237,8 @@ const BoxChat = ({
 
   function handleMuteMember(user: any) {
     // / i need the user name of the MUTED person
+    console.log("im here");
+    
     socket.emit("mute",
     {channel_id:selectedChannel?.channel?.id,
       username: user?.name,

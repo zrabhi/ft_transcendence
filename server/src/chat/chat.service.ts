@@ -8,6 +8,7 @@ import { User } from 'src/auth/decorator/user-decorator';
 import { Channel } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
 @Injectable()
 export class ChatService {
   constructor(
@@ -540,8 +541,39 @@ export class ChatService {
     }
     return searchedUser[0];
   }
+  async handleAutoUnmute()
+  {
+    const channels = await this._prisma.channel.findMany({
+    include:{
+      members:true,
+    }
+    })
+    for (const channel of channels) {
+      for (const member of channel.members)
+      {
+        if (member.isMuted)
+        {
+          if (member.mutedTime < Date.now().toString())
+          {
+            console.log("true");
+
+            await this._prisma.channelMembers.update({
+              where: {
+                id: member.id
+              },
+              data:{
+                isMuted:false,
+              }
+            })
+          }
+        }
+      }
+    }
+  }
 
   async handleUserMute(user: any, channel_id: string, userToBeMuted: string) {
+    let time = Date.now() + 300000;
+    console.log("logo", time)
     const currUser = await this._user.findUserById(user.id);
     const mutedUser = await this._user.findUserName(userToBeMuted);
     const channel = await this._prisma.channel.findUnique({
@@ -577,11 +609,13 @@ export class ChatService {
             success: false,
           };
         else {
+          console.log("muting user");
           await this._prisma.channelMembers.update({
             where: {
               id: searchedUser[0].id,
             },
             data: {
+              mutedTime:time.toString(),
               isMuted: true,
             },
           });

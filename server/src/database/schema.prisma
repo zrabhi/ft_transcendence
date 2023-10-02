@@ -206,6 +206,7 @@ model ChannelMembers{
 
   role Role
   isBanned Boolean @default(false)
+  mutedTime String? 
   isMuted Boolean @default(false)
 }
 

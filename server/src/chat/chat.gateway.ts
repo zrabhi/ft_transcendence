@@ -265,6 +265,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!payload) return client.disconnect(true);
     /// mute the user here
     try {
+      console.log("im hereee");
       await this.chatService.handleUserMute(
         payload,
         data.channel_id,
@@ -287,6 +288,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           });
       }
     } catch (err) {
+      console.log(err);
+      
       return;
     }
   }
@@ -325,6 +328,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
     if (!payload) return client.disconnect(true);
     const user = await this.userService.findUserById(payload.id);
+    await this.chatService.handleAutoUnmute();
     const channel = await this.prismaService.channel.findUnique({
       where: {
         id: data.channelId,

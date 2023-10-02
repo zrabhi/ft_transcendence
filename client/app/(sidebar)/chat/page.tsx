@@ -18,21 +18,93 @@ import io, { Socket } from "socket.io-client";
 import { useCookies } from "react-cookie";
 import { socketResponse } from "@/interfaces/socketResponse";
 import HeaderBar from "@/components/LoggedUser/Profile/HeaderBar/HeaderBar";
-import { AiOutlineKey } from "react-icons/ai";
+import { AiOutlineClose, AiOutlineKey } from "react-icons/ai";
 import { array } from "yup";
 import { AuthContext } from "@/app/context/AuthContext";
+import Modal from "react-modal";
+
+const customStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+    width: "400px",
+    maxWidth: "500px",
+    height: "200px",
+    maxHeight: "200px",
+  },
+};
 
 // when adding notification we must add the  message sended by  the user in last messages
 let socket: Socket;
 const Chat: React.FC = () => {
+  const [openPasswordModal, setOpenPasswordModal] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState<any>(null); // to set the channel selected
   const [selectedChat, setSelectedChat] = useState<chat>(); // to set the user selected
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
-  const [otherChannels, setOtherChannels] = useState<channels[]>([]);
+  const [otherChannels, setOtherChannels] = useState([
+    {
+      channel: {
+        id: "id1",
+        name: "channel 1",
+        type: "PROTECTED",
+        avatar: "avatar",
+        message: "",
+        status: "",
+      },
+    },
+    {
+      channel: {
+        id: "id1",
+        name: "channel 2",
+        type: "PROTECTED",
+        avatar: "avatar",
+        message: "",
+        status: "",
+      },
+    },
+    {
+      channel: {
+        id: "id1",
+        name: "channel 3",
+        type: "PUBLIC",
+        avatar: "avatar",
+        message: "",
+        status: "",
+      },
+    },
+    {
+      channel: {
+        id: "id1",
+        name: "channel 4",
+        type: "PROTECTED",
+        avatar: "avatar",
+        message: "",
+        status: "",
+      },
+    },
+    {
+      channel: {
+        id: "id1",
+        name: "channel 5",
+        type: "PROTECTED",
+        avatar: "avatar",
+        message: "",
+        status: "",
+      },
+    },
+  ]);
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
   const { user } = useContext(AuthContext);
   const [cookie] = useCookies(["access_token"]);
+
+  const [password, setPassword] = useState("");
+  const [selectedJoinChannel, setSelectedJoinChannel] = useState<any>(null);
+
   useEffect(() => {
     (async () => {
       const response = await getRequest(`${baseUrlUsers}/users`);
@@ -115,7 +187,7 @@ const Chat: React.FC = () => {
             selectedChannel?.members.push({
               id: data.id,
               name: data.name,
-              status:data.status,
+              status: data.status,
               avatar: data.avatar,
               role: data.role,
             });
@@ -136,7 +208,7 @@ const Chat: React.FC = () => {
         setSelectedChat(desiredChannel[0]?.channel);
         let NewOtherChahnnels = otherChannels.filter((channel: any) => {
           return channel.channel.id != data.channelId;
-        })
+        });
         setOtherChannels(NewOtherChahnnels);
       });
       socket.on("NewMember", (data: any) => {
@@ -167,14 +239,17 @@ const Chat: React.FC = () => {
     };
   }, [socket]);
 
-  const handleJoinChannel = async (e: any, channelName: string) => {
+  const handleJoinChannel = async (e: any, channelName: string, password: string) => {
     e.preventDefault();
-    let password = "fdf";
+    // let password = "fdf";
     socket.emit("joinNewChannel", {
       channelName: channelName,
       password: password,
-      token:cookie.access_token
+      token: cookie.access_token,
     });
+
+    setSelectedJoinChannel(null);
+    setPassword("");
     // const response = await putRequest(`${baseChatUrl}/joinroom/${channelName}/${password}`,
     //   ""
     // );
@@ -249,9 +324,14 @@ const Chat: React.FC = () => {
                         </div>
                         {/* TODO: onclick if its protected a popup will show up to type password */}
                         <button
-                          onClick={(e) =>
-                            handleJoinChannel(e, channel.channel.name)
-                          }
+                          onClick={(e) => {
+                            if (channel.channel.type === "PROTECTED") {
+                              setOpenPasswordModal(true);
+                              setSelectedJoinChannel(channel);
+                            } else {
+                              handleJoinChannel(e, channel.channel.name, password);
+                            }
+                          }}
                           className="flex justify-between items-center gap-1 bg-[#654795]  text-white font-semibold py-2 px-4 rounded-3xl focus:outline-none"
                         >
                           Join{" "}
@@ -262,6 +342,39 @@ const Chat: React.FC = () => {
                       </div>
                     </div>
                   ))}
+                  <Modal
+                    isOpen={openPasswordModal}
+                    style={customStyles}
+                    contentLabel="Modal"
+                  >
+                    <div className="flex justify-between items-center mb-3 z-10">
+                      <h2 className="font-bold">Write the password of #{selectedJoinChannel?.channel?.name}</h2>
+                      <AiOutlineClose
+                        className={"cursor-pointer"}
+                        onClick={() => {
+                          // setAvatarPreview(null);
+                          setOpenPasswordModal(false);
+                        }}
+                      />
+                    </div>
+                    <hr className="h-1 mx-auto bg-[#654795] border-0 rounded my-8 dark:bg-gray-700" />
+                    <div className="flex justify-between items-baseline gap-1 content-center w-full">
+                      <input
+                        type="password"
+                        placeholder="Type Password..."
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className=" flex p-3 pl-10 text-xl text-white mb-2 rounded-3xl bg-[#1F1F1F] focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      />
+                      <button
+                        type="button"
+                        className="gap-1 bg-[#654795]  text-white font-semibold py-2 px-4 rounded-3xl focus:outline-none"
+                        onClick={(e)=> handleJoinChannel(e, selectedChannel?.channel?.name, password)}
+                      >
+                        Valid
+                      </button>
+                    </div>
+                  </Modal>
                 </div>
               </div>
             )}

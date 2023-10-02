@@ -30,7 +30,7 @@ export class ChatService {
       const searchedUser = channel.members.filter((member: any) => {
         return member.userId === currUser.id;
       });
-      if (searchedUser[0]) continue;
+      if (searchedUser[0] || searchedUser[0].isBanned) continue;
       else {
         let Key = 0;
         for (const member of channel.members) {
@@ -142,6 +142,17 @@ export class ChatService {
         },
       });
       // Todo: create PRIVATE channel
+    }
+    if (type === 'PRIVATE') {
+      channel = await this._prisma.channel.create({
+        data: {
+          name: name,
+          owner: user.username,
+          type: 'PRIVATE',
+          member_limit: memberLimit,
+        },
+      });
+      console.log(channel);
     }
     await this._prisma.channelMembers.create({
       data: {
@@ -478,7 +489,7 @@ export class ChatService {
     }
   }
   //////////////////// Ban method && Mute Method && Set As Admin /////////////////////////////////////
-  async handleSetAsAdmin(user: any, channel_id: string, userToBeSet: string) {
+  async handleSetAsAdmin(user: any, channel_id: string, userToBeSet: string) : Promise<any> {
     const currUser = await this._user.findUserById(user.id);
     const newAdmin = await this._user.findUserName(userToBeSet);
     const channel = await this._prisma.channel.findUnique({

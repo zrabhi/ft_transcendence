@@ -235,9 +235,13 @@ const BoxChat = ({
     alert(` Ban member from room`);
   }
 
-  function handleMuteMember() {
+  function handleMuteMember(user: any) {
     // / i need the user name of the MUTED person
-    alert("Mute member!!");
+    socket.emit("mute",
+    {channel_id:selectedChannel?.channel?.id,
+      username: user?.name,
+      token:cookie.access_token
+    })
   }
   async function handleSetAsAdmin(user: any) {
     socket.emit("setAdmin", {

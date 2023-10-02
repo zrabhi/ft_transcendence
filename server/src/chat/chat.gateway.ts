@@ -74,6 +74,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.join(data.id);
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  @SubscribeMessage('setAdmin')
+  async handleSetAdmin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    const payload = await this.jwtService.verifyAsync(data.token, {
+      secret: process.env.JWT_SECRET,
+    });
+    if (!payload) return client.disconnect(true);
+    const user = await this.userService.findUserById(payload.id);
+    const result = await this.chatService.handleSetAsAdmin(
+      payload,
+      data.channelId,
+      data.username,
+    );
+    if (!result?.success) {
+      // erro occured
+      return;
+    }
+    const channel = await this.prismaService.channel.findUnique({
+      where: {
+        id: data.channelId,
+      },
+      include: {
+        members: true,
+      },
+    });
+    for (const member of channel.members) {
+      this.server
+        .to(member.userId)
+        .emit('newAdmin', { channelName: channel.name, user: data.username });
+    }
+  }
   @SubscribeMessage('LeaveChannel')
   async handledLeaveRoom(
     @ConnectedSocket() client: Socket,
@@ -95,13 +128,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // Todo: resturn error message id something  wrong happend
     for (const member of channel.members) {
       if (member.userId != user.id)
-        this.server
-          .to(member.userId)
-          .emit('leftRoom', {
-            channelName: channel.name,
-            id: data.channelId,
-            name: data.name
-          });
+        this.server.to(member.userId).emit('leftRoom', {
+          channelName: channel.name,
+          id: data.channelId,
+          name: data.name,
+        });
     }
   }
   @SubscribeMessage('joinNewChannel')
@@ -134,7 +165,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (const member of channel.members) {
       this.server.to(member.userId).emit('memberJoinned', {
         channelId: channel.id,
-        channelName:channel.name,
+        channelName: channel.name,
         id: channel.members.length,
         name: currUser.username,
         status: currUser.status,
@@ -239,7 +270,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         data.channel_id,
         data.username,
       );
-    } catch (err) {}
+      const channel = await this.prismaService.channel.findUnique({
+        where: {
+          id: data.channel_id,
+        },
+        include: {
+          members: true,
+        },
+      });
+      for (const member of channel.members) {
+        this.server
+          .to(member.userId)
+          .emit('userMuted', {
+            channelName: channel.name,
+            user: data.username,
+          });
+      }
+    } catch (err) {
+      return;
+    }
   }
   @SubscribeMessage('ban')
   async handleBannedUser(
@@ -310,10 +359,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       avatar: user.avatar,
       content: data.message,
     };
+    /// check here if the user time muted is ended if do (set is muted to false)
     for (const member of channel.members) {
-      if ((member.isBanned || member.isMuted) && member.userId === user.id) {
-        this.server.to(data.channelId).emit('muted or muted');
+      if (member.isMuted && member.userId === user.id) {
+         this.server
+          .to(member.userId
+            )
+          .emit('Yourmuted', { channelName: channel.name });
+        return ;
       }
+    }
+    for (const member of channel.members)
+    {
       this.server.to(member.userId).emit('lastMessage', lastMessage);
     }
     this.chatService.saveMessageToChannel(payload, data);

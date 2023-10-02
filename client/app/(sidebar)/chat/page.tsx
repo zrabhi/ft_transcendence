@@ -139,6 +139,15 @@ const Chat: React.FC = () => {
         setSelectedChannel(null); // the  the channel here for other usersss
         setChannels(updatedChannel);
       });
+      socket.on("userMuted", (data: any) => {
+        if (user.username === data.user)
+          showSnackbar(`${data.user} you have mutued from ${data.channelName}`, true);
+        else
+          showSnackbar(`${data.user} is muted`, true);
+      })
+      socket.on("Yourmuted", (data: any) => {
+        showSnackbar(`Message can be sent because you have been muted`, false)
+      } )
       socket.on("memberJoinned", (data: any) => {
         console.log("data from socket", data);
         if (user.username != data.name) {
@@ -190,13 +199,7 @@ const Chat: React.FC = () => {
           let previousChannel = selectedChannel;
           previousChannel?.members.map((member :any) => {
             if (member.name === data.user)
-            {
-              console.log("----+++", member);
-
                 member.role ="Admin"
-                console.log("Nooww , ----+++", member);
-            }
-            // return member
           })
           setSelectedChannel(previousChannel)
         }

@@ -110,7 +110,7 @@ export class ChatService {
     const user = await this._user.findUserById(user_id);
 
     const result = await this.checkChannelRoomExistence(name);
-    if (result) return { error: 'Channel already exists', channel: undefined };
+    if (result) return { error: 'Room already exists', channel: undefined };
     let channel: any;
     console.log('type', type);
 
@@ -128,7 +128,7 @@ export class ChatService {
     if (type === 'PROTECTED') {
       if (!password)
         return {
-          error: 'Password must be set with PROTECTED channels',
+          error: 'Password must be set with PROTECTED Rooms',
           channel: undefined,
         };
       const channelPassword = await bcrypt.hash(password, 10);

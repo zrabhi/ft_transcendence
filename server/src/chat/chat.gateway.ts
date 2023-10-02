@@ -54,7 +54,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(client.id).emit('connected', 'Hello world!');
   }
 
- async  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
     const payload = await this.jwtService.verifyAsync(
       client.handshake.auth.token,
       {
@@ -95,44 +95,52 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // Todo: resturn error message id something  wrong happend
     for (const member of channel.members) {
       if (member.userId != user.id)
-        this.server.to(member.userId).emit('leftRoom', {id: data.channelId, name: data.name});
+        this.server
+          .to(member.userId)
+          .emit('leftRoom', {
+            channelName: channel.name,
+            id: data.channelId,
+            name: data.name
+          });
     }
   }
   @SubscribeMessage('joinNewChannel')
   async handleJoinNewChannel(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
-  ){
+  ) {
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
     if (!payload) return client.disconnect(true);
-    const result = await this.chatService.handleJoinChannelRoom(data.channelName,
-      payload,data.password)
-    if (result.channel === undefined)
-      {
-        return ;
-        // error occured here
-      }
+    const result = await this.chatService.handleJoinChannelRoom(
+      data.channelName,
+      payload,
+      data.password,
+    );
+    if (result.channel === undefined) {
+      return;
+      // error occured here
+    }
     const currUser = await this.userService.findUserById(payload.id);
     const channel = await this.prismaService.channel.findUnique({
-      where:{
-        id: result.channel.id
+      where: {
+        id: result.channel.id,
       },
-      include:{
-        members:true
-      }
-    })
-    for (const member of channel.members)
-    {
-      this.server.to(member.userId).emit("memberJoinned", {
-       channelId: channel.id,
-        id:channel.members.length,
-        name:currUser.username,
+      include: {
+        members: true,
+      },
+    });
+    for (const member of channel.members) {
+      this.server.to(member.userId).emit('memberJoinned', {
+        channelId: channel.id,
+        channelName:channel.name,
+        id: channel.members.length,
+        name: currUser.username,
         status: currUser.status,
-        avatar:currUser.avatar,
-        role:"Member"
-      })
+        avatar: currUser.avatar,
+        role: 'Member',
+      });
     }
   }
   @SubscribeMessage('addMember')
@@ -151,25 +159,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.username,
     );
     const channel = await this.prismaService.channel.findUnique({
-      where:{
-        id: data.channelId
+      where: {
+        id: data.channelId,
       },
-      include:{
-        members:true
-      }
-    })
-    const addedUser = await this.userService.findUserName(data.username)
+      include: {
+        members: true,
+      },
+    });
+    const addedUser = await this.userService.findUserName(data.username);
     // check if there is multiple users to be added
     if (result.success) {
       for (const member of channel.members) {
         this.server.to(member.userId).emit('NewMember', {
           channelName: channel.name,
           member: data.username,
-          role:"Member",
+          role: 'Member',
           avatar: addedUser.avatar,
-          status:addedUser.status,
-          id:channel.members[channel.members.length - 1],
-          lastMessage: result.lastMessage
+          status: addedUser.status,
+          id: channel.members[channel.members.length - 1],
+          lastMessage: result.lastMessage,
         });
       }
     } else {
@@ -204,6 +212,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     )) as any;
     const response = {
       channelId: data.channelId,
+      name: channel.name,
+      username: user.username,
       success: result.success,
       error: result.error,
     };

@@ -92,7 +92,6 @@ const Chat: React.FC = () => {
       },
     });
     socket.on("connected", () => {
-      console.log("socket connected");
       socket.on("lastMessage", (messageInfo: any) => {
         let checker = false;
         let updatedChannel: any = channels.filter((channel: any) => {
@@ -114,7 +113,10 @@ const Chat: React.FC = () => {
           ? setChannels((prevChannels: any) => [messageInfo, ...prevChannels])
           : setChannels(() => [...updatedChannel, ...previousChannels]);
         if (user.username != messageInfo?.channel?.username)
-          showSnackbar("You have new message", true);
+          showSnackbar(
+            `You have new message from ${messageInfo?.channel?.username}`,
+            true
+          );
       });
 
       socket.on("channelDeleted", (data: socketResponse) => {
@@ -127,16 +129,18 @@ const Chat: React.FC = () => {
             return [];
           return channel;
         });
+        if (user.username != data.username)
+          showSnackbar(
+            `the owner  ${data.username}  deleted  ${data.name} Room`,
+            true
+          );
         setSelectedChannel(null); // the  the channel here for other usersss
         setChannels(updatedChannel);
       });
-      // socket.on("disconnected", () => {
-      //   console.log("socket chat disconnected");
-      //   // socket.disconnect();
-      // })
       socket.on("memberJoinned", (data: any) => {
         console.log("data from socket", data);
         if (user.username != data.name) {
+          showSnackbar(`${data.name} joinned ${data.channelName} Room`, true);
           if (
             selectedChannel &&
             selectedChannel?.channel &&
@@ -161,12 +165,15 @@ const Chat: React.FC = () => {
           avatar: user.avatar,
           role: "Member",
         });
-        console.log(desiredChannel);
         setSelectedChannel(desiredChannel[0]);
         setSelectedChat(desiredChannel[0]?.channel);
         let NewOtherChahnnels = otherChannels.filter((channel: any) => {
           return channel.channel.id != data.channelId;
         });
+        showSnackbar(
+          `${data.name} you have successfully joined ${data.channelName}`,
+          true
+        );
         setOtherChannels(NewOtherChahnnels);
       });
       socket.on("NewMember", (data: any) => {
@@ -176,7 +183,10 @@ const Chat: React.FC = () => {
             ...prevChannels,
           ]);
         else {
-          alert(`${data.member} is now in ${data?.channelName} room`); // replace it with something to show that new user has been added
+          showSnackbar(
+            `${data.member} is now in ${data?.channelName} room`,
+            true
+          );
           let updatedSelectedChannel = selectedChannel;
           updatedSelectedChannel?.members.push({
             name: data.member,
@@ -189,21 +199,28 @@ const Chat: React.FC = () => {
         }
       });
       socket.on("leftRoom", (data: any) => {
-        if (selectedChannel && selectedChannel.channel
-          && selectedChannel.channel.id === data.id)
-          {
-            let updatedMembers = selectedChannel.members.filter((member: any) =>
-            {
-                return (member.name != data.name)
-            })
-            setSelectedChannel((prevChannel: any) => ({...prevChannel, members: updatedMembers}))
-          }
-      })
+        if (user?.username != data?.name)
+          showSnackbar(`${data?.name} left ${data.channelName} Room`, true);
+        if (
+          selectedChannel &&
+          selectedChannel.channel &&
+          selectedChannel.channel.id === data.id
+        ) {
+          let updatedMembers = selectedChannel.members.filter((member: any) => {
+            return member.name != data.name;
+          });
+          setSelectedChannel((prevChannel: any) => ({
+            ...prevChannel,
+            members: updatedMembers,
+          }));
+        }
+      });
       socket.on("disconnect", () => {
         socket.off("latMessage");
       });
     });
     return () => {
+      // socket.off("latMessage");
       socket.disconnect();
     };
   }, [socket]);
@@ -216,7 +233,7 @@ const Chat: React.FC = () => {
     e.preventDefault();
     // let password = "fdf";
     console.log("channel name", channelName, password);
-    
+
     socket.emit("joinNewChannel", {
       channelName: channelName,
       password: password,
@@ -310,7 +327,11 @@ const Chat: React.FC = () => {
                               setOpenPasswordModal(true);
                               setSelectedJoinChannel(channel);
                             } else {
-                              handleJoinChannel(e, channel.channel.name, password);
+                              handleJoinChannel(
+                                e,
+                                channel.channel.name,
+                                password
+                              );
                             }
                           }}
                           className="flex justify-between items-center gap-1 bg-[#654795]  text-white font-semibold py-2 px-4 rounded-3xl focus:outline-none"

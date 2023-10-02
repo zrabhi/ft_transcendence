@@ -18,6 +18,7 @@ import Modal from "react-modal";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
 import * as Yup from "yup";
+import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 
 const Channels = ({ channels, setSelectedChat, setSelectedChannel, setMessages }: any) => {
@@ -236,9 +237,7 @@ const ModalContainer = ({
       JSON.stringify(roomForm)
       );
     if (response.error) {
-      //  render error message in (ERRORMESSAGE component)
-        // this means there is already a channel with the name given (room.From.name)
-      alert(`${roomForm.name} already exists`)
+      showSnackbar(`${response.message}`, false);
       return ;
     }
     setMessages([]);

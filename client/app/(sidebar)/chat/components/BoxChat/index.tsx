@@ -215,6 +215,7 @@ const BoxChat = ({
       ""
     );
     if (!response.success) {
+      showSnackbar(`${response.message}`, false);
       return ;
       // error has been  occured here
       // in response.error you will find the error occured

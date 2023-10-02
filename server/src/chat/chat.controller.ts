@@ -75,7 +75,6 @@ export class ChatController {
       user.id,
       createRoom,
     );
-    console.log('create rooom result ', result);
 
     if (result.channel === undefined) return res.status(400).json(result.error);
     const members = [];

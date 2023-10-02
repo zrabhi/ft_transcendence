@@ -7,6 +7,6 @@ export const showSnackbar = (message: string, isSuccess: boolean): void => {
 
     setTimeout(() => {
       snackbar.style.display = "none";
-    }, 3000); // Hide the snackbar after 3 seconds (adjust as needed)
+    }, 5000); // Hide the snackbar after 3 seconds (adjust as needed)
   }
 };

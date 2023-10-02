@@ -55,9 +55,8 @@ const Chat: React.FC = () => {
   const [password, setPassword] = useState("");
   const [selectedJoinChannel, setSelectedJoinChannel] = useState<any>(null);
 
-
   // just an example of how to use this function
-      // it will disapear after 4 sec
+  // it will disapear after 3 sec
   useEffect(() => {
     showSnackbar("TEST", false);
     showSnackbar("TEST", true);
@@ -197,7 +196,11 @@ const Chat: React.FC = () => {
     };
   }, [socket]);
 
-  const handleJoinChannel = async (e: any, channelName: string, password: string) => {
+  const handleJoinChannel = async (
+    e: any,
+    channelName: string,
+    password: string
+  ) => {
     e.preventDefault();
     // let password = "fdf";
     socket.emit("joinNewChannel", {
@@ -257,7 +260,12 @@ const Chat: React.FC = () => {
                 setChannels={setChannels}
                 users={users}
               />
-            ): <div className="text-white text-xl flex justify-center items-center"> You need to select a chat! </div>}
+            ) : (
+              <div className="text-white text-xl flex justify-center items-center">
+                {" "}
+                You need to select a chat!{" "}
+              </div>
+            )}
             {otherChannels && otherChannels.length > 0 ? (
               <div className="flex flex-col justify-start items-center">
                 <h2 className="text-2xl mx-auto my-4 text-white font-semibold">
@@ -287,7 +295,11 @@ const Chat: React.FC = () => {
                               setOpenPasswordModal(true);
                               setSelectedJoinChannel(channel);
                             } else {
-                              handleJoinChannel(e, channel.channel.name, password);
+                              handleJoinChannel(
+                                e,
+                                channel.channel.name,
+                                password
+                              );
                             }
                           }}
                           className="flex justify-between items-center gap-1 bg-[#654795]  text-white font-semibold py-2 px-4 rounded-3xl focus:outline-none"
@@ -306,7 +318,10 @@ const Chat: React.FC = () => {
                     contentLabel="Modal"
                   >
                     <div className="flex justify-between items-center mb-3 z-10">
-                      <h2 className="font-bold">Write the password of #{selectedJoinChannel?.channel?.name}</h2>
+                      <h2 className="font-bold">
+                        Write the password of #
+                        {selectedJoinChannel?.channel?.name}
+                      </h2>
                       <AiOutlineClose
                         className={"cursor-pointer"}
                         onClick={() => {
@@ -327,7 +342,13 @@ const Chat: React.FC = () => {
                       <button
                         type="button"
                         className="gap-1 bg-[#654795]  text-white font-semibold py-2 px-4 rounded-3xl focus:outline-none"
-                        onClick={(e)=> handleJoinChannel(e, selectedChannel?.channel?.name, password)}
+                        onClick={(e) =>
+                          handleJoinChannel(
+                            e,
+                            selectedChannel?.channel?.name,
+                            password
+                          )
+                        }
                       >
                         Valid
                       </button>
@@ -335,7 +356,13 @@ const Chat: React.FC = () => {
                   </Modal>
                 </div>
               </div>
-            ) : <div className="text-white text-xl flex justify-center items-center"> There is no channels to join, Try to create one! </div>}
+            ) : (
+              <div className="text-white text-xl flex flex-col justify-center items-center">
+                {" "}
+                <h2>There is no channels to join,</h2>
+                <h2>Try to create one!</h2>{" "}
+              </div>
+            )}
             <Friends
               setSelectedChannel={setSelectedChannel}
               setSelectedChat={setSelectedChat}

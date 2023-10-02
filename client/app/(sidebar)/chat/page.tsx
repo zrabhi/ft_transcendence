@@ -81,7 +81,6 @@ const Chat: React.FC = () => {
             channel?.channel && channel?.channel?.id != messageInfo?.channel?.id
           );
         });
-        // console.log("updated channel", updatedChannel, previousChannels);
         !checker
           ? setChannels((prevChannels: any) => [messageInfo, ...prevChannels])
           : setChannels(() => [...updatedChannel, ...previousChannels]);
@@ -158,6 +157,17 @@ const Chat: React.FC = () => {
           setSelectedChannel(updatedSelectedChannel);
         }
       });
+      socket.on("leftRoom", (data: any) => {
+        if (selectedChannel && selectedChannel.channel
+          && selectedChannel.channel.id === data.id)
+          {
+            let updatedMembers = selectedChannel.members.filter((member: any) =>
+            {
+                return (member.name != data.name)
+            })
+            setSelectedChannel((prevChannel: any) => ({...prevChannel, members: updatedMembers}))
+          }
+      })
       socket.on("disconnect", () => {
         socket.off("latMessage");
       });

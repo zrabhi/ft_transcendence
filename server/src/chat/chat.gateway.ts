@@ -74,7 +74,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.join(data.id);
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  @SubscribeMessage('leaveRoom')
+  @SubscribeMessage('LeaveChannel')
   async handledLeaveRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
@@ -92,14 +92,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         members: true,
       },
     });
-    const result = await this.chatService.handleLeaveChannel(
-      user,
-      data.channelID,
-    );
     // Todo: resturn error message id something  wrong happend
     for (const member of channel.members) {
       if (member.userId != user.id)
-        this.server.to(member.userId).emit('leftRoom', data.channelId);
+        this.server.to(member.userId).emit('leftRoom', {id: data.channelId, name: data.name});
     }
   }
   @SubscribeMessage('joinNewChannel')

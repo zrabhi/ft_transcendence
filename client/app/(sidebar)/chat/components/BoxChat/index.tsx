@@ -76,7 +76,6 @@ const BoxChat = ({
     "Owner" | "Admin" | "Member"
   >("Member");
 
-
   const [chat, setChat] = useState({}); // id && tyoe && avatar && username && message
   const [cookie] = useCookies(["access_token"]);
   const { user, blockedUsers, setBlockedUsers } = useContext(AuthContext);
@@ -109,7 +108,7 @@ const BoxChat = ({
     }
   };
 
-  const roleOptions : any = selectedChannel
+  const roleOptions: any = selectedChannel
     ? getRoleOptions(selectedChannel?.channel?.type)
     : {};
 
@@ -147,7 +146,7 @@ const BoxChat = ({
   }
 
   // change it to async
-  const actionOptions : any = {
+  const actionOptions: any = {
     Owner: [
       { text: "Ban", action: handleBanMember }, // change to handle Ban and username of the banned one must be provided
       { text: "Mute", action: handleMuteMember }, // change to handle Mute
@@ -215,12 +214,20 @@ const BoxChat = ({
       ""
     );
     if (!response.success) {
+      return ;
       // error has been  occured here
       // in response.error you will find the error occured
     }
-    /// else
-    /// setSelectedchannel to an empty array
-    //handle leave room action
+    socket.emit("LeaveChannel", {
+      channelId: selectedChannel.channel.id,
+      token: cookie.access_token,
+      name: user.username,
+    });
+    let updatedChannels = channels.filter((channel : any)=> {
+      return channel?.channel?.id != selectedChannel.channel.id
+    })
+    setSelectedChannel(null);
+    setChannels(updatedChannels)
     alert("Leave Room action");
   }
 
@@ -304,7 +311,7 @@ const BoxChat = ({
           sendedMessage.avatar = messageInfo.avatar;
         } else sendedMessage = messageInfo;
         setMessages((prevMessages: any) => [...prevMessages, sendedMessage]);
-        return
+        return;
       });
       socket.on("disconnect", () => {
         socket.off("message");
@@ -312,7 +319,7 @@ const BoxChat = ({
     });
     return () => {
       // socket.off("message");
-     socket.disconnect();
+      socket.disconnect();
     };
   }, [selectedChannel]);
 
@@ -416,7 +423,6 @@ const BoxChat = ({
   };
 
   // to handle the invites, i Added this method to invite  multiples users in one invite
- 
 
   const handleCheckChange = (username: string) => {
     if (selectedUsers.includes(username)) {
@@ -427,7 +433,6 @@ const BoxChat = ({
       setSelectedUsers([...selectedUsers, username]);
     }
   };
-
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -444,7 +449,6 @@ const BoxChat = ({
   // this state is for the search bar to filter easily
   const [filteredUserList, setFilteredUserList] = useState(usersList);
 
-
   // function to fo filter onChange
   const handleSearchInputChange = (e: any) => {
     const query = e.target.value.toLowerCase();
@@ -458,19 +462,16 @@ const BoxChat = ({
     setFilteredUserList(filtered);
   };
 
-
-  const InviteUsers =(e: any)=>
-  {
+  const InviteUsers = (e: any) => {
     e.preventDefault();
-    if (selectedUsers.length === 0)
-      return;
+    if (selectedUsers.length === 0) return;
     const data = {
       channelId: selectedChannel.channel.id,
-      username:selectedUsers[0],
-      token:cookie.access_token
-    }
+      username: selectedUsers[0],
+      token: cookie.access_token,
+    };
     socket.emit("addMember", data);
-  }
+  };
   return (
     <div className="box-chat">
       <div className="box-chat-container relative inline-block text-left z-1">

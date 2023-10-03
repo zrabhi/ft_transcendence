@@ -14,6 +14,7 @@ export default function match()
     const io = require("socket.io-client");
     let selectedcolor = 'black';
     let socket: Socket;
+    let count = 0;
 
     const [myscore, setmyscore] = useState(0);
     const [oppscore, setoppscore] = useState(0);
@@ -31,7 +32,7 @@ export default function match()
       y: 100,
       addx: 2,
       addy: 2,
-      width: 10,
+      width: 12,
     };
   
     const leftbar = {
@@ -58,60 +59,50 @@ export default function match()
     };
   
     const drawbars = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
-      ctx.fillStyle = "white";
       if(side == 'right')
       {
         if (upkey && rightbar.starty + 5 > 0)
-          rightbar.starty -= 5;
-        else if (downkey && rightbar.starty + rightbar.length + 5 < canvas.height)
-          rightbar.starty += 5;
+        rightbar.starty -= 5;
+      else if (downkey && rightbar.starty + rightbar.length + 5 < canvas.height)
+      rightbar.starty += 5;
         socket.emit('bar',rightbar.starty)
       }
       else {
         if (upkey && leftbar.starty + 5 > 0)
           leftbar.starty -= 5;
-        else if (downkey && leftbar.starty + leftbar.length + 5 < canvas.height)
-          leftbar.starty += 5;
-        socket.emit('bar',leftbar.starty)
-      }
+      else if (downkey && leftbar.starty + leftbar.length + 5 < canvas.height)
+        leftbar.starty += 5;
+      socket.emit('bar',leftbar.starty)
+  }
   
+      ctx.fillStyle = "white";
       ctx.fillRect(rightbar.x, rightbar.starty, rightbar.width, rightbar.length);
       ctx.fillRect(leftbar.x, leftbar.starty, leftbar.width, leftbar.length);
     };
   
     const draw = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
-        selectedcolor ? ctx.fillStyle = selectedcolor : true;
+      selectedcolor ? ctx.fillStyle = selectedcolor : true;
+      count++;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = "white";
       ctx.fillRect(canvas.width / 2 - 2, 0, 4, canvas.height);
-      ctx.strokeStyle = "white";
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, Math.PI * 2, true);
-      ctx.closePath();
-      ctx.stroke();
       drawbars(canvas, ctx);
-      if (drawBall(canvas, ctx))
+      drawBall(canvas, ctx);
+      if(game)
         raf = window.requestAnimationFrame(() => draw(canvas, ctx));
-      // else {
-      //   game = false;
-      //   let text = "YOU LOSE!";
-      //   ctx.font = "48px serif";
-      //   let textwidth = ctx.measureText(text).width;
-      //   let textheight = 48;
-      //   ctx.fillStyle = "black";
-      //   ctx.fillRect(0, 0, canvas.width, canvas.height);
-      //   ctx.fillStyle = "#ffffff";
-      //   ctx.fillText(text, (canvas.width - textwidth) / 2, (canvas.height - textheight) / 2);
-      // }
+      else
+      {
+        console.log('here we stop drawing');
+        ctx?.clearRect(0,0,canvas.width, canvas.height);
+      }
     };
   
     const launchGame = () => {
       const canvas = document.getElementById("canvas") as HTMLCanvasElement;
       const ctx = canvas.getContext("2d");
       leftbar.x = 100;
-      rightbar.x = canvas.width - 50 - rightbar.width;
-      if (game == false) {
+      rightbar.x = canvas.width - 100 - rightbar.width;
+      if(game == false) {
         Ball.addx = Ball.addx;
         console.log(game);
         game = true;
@@ -121,8 +112,41 @@ export default function match()
           canvasw:canvas.width,
           canvash:canvas.height
         })
-        draw(canvas, ctx);
+        socket.on('start', ()=>
+        {
+          draw(canvas, ctx!);
+        })
+        socket.on('opponent quit',()=>{
+          game = false;
+          const tableElement = document.getElementById('canvas');
+          if (tableElement) {
+            tableElement.style.backgroundImage = 'url("https://superposition-lyon.com/wp-content/uploads/2023/01/game-over-blanc.jpeg")'
+            tableElement.style.backgroundPosition = "center center";
+            tableElement.style.backgroundColor = "black";
+            tableElement.style.backgroundRepeat= "no-repeat";
+          }
+        })
       }
+      socket.on('right win', () => {
+        game = false;
+        const tableElement = document.getElementById('canvas');
+          if (tableElement) {
+            tableElement.style.backgroundImage = 'url("https://superposition-lyon.com/wp-content/uploads/2023/01/game-over-blanc.jpeg")'
+            tableElement.style.backgroundPosition = "center center";
+            tableElement.style.backgroundColor = "black";
+            tableElement.style.backgroundRepeat= "no-repeat";
+          }
+      })
+      socket.on('left win', () => {
+        game = false;
+        const tableElement = document.getElementById('canvas');
+          if (tableElement) {
+            tableElement.style.backgroundImage = 'url("https://superposition-lyon.com/wp-content/uploads/2023/01/game-over-blanc.jpeg")'
+            tableElement.style.backgroundPosition = "center center";
+            tableElement.style.backgroundColor = "black";
+            tableElement.style.backgroundRepeat= "no-repeat";
+          }
+      })
       window.addEventListener("keydown", (e) => {
         if (e.key == "ArrowUp") upkey = true;
         else if (e.key == "ArrowDown") downkey = true;
@@ -150,7 +174,7 @@ export default function match()
         console.log("i match this : " , data);
         opponent = data;
         side = 'left';
-        launchGame(); 
+        launchGame();
       })
       
       socket.on('match frame',(data:any)=>{
@@ -158,7 +182,7 @@ export default function match()
         Ball.y = data.bally;
         setmyscore(data.myscore);
         setoppscore(data.oppscore);
-        console.log(Ball)
+      
         if(side == 'left')
         {
           rightbar.starty = data.oppy;
@@ -169,23 +193,23 @@ export default function match()
       })
     }, []);
 
-    const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+    
+    // const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+    // useEffect(() => {
+    //   const handleResize = () => {
+    //     // Update the state with the new viewport height
+    //     setViewportHeight((window.innerHeight));
 
-    useEffect(() => {
-      const handleResize = () => {
-        // Update the state with the new viewport height
-        setViewportHeight((window.innerHeight));
-
-        console.log(viewportHeight);
-      };
-      // Attach the resize event listener
-      window.addEventListener("resize", handleResize);
+    //     console.log(viewportHeight);
+    //   };
+    //   // Attach the resize event listener
+    //   window.addEventListener("resize", handleResize);
   
-      // Remove the event listener when the component unmounts
-      return () => {
-        window.removeEventListener("resize", handleResize);
-      };
-    }, [window.innerHeight]);
+    //   // Remove the event listener when the component unmounts
+    //   return () => {
+    //     window.removeEventListener("resize", handleResize);
+    //   };
+    // }, [window.innerHeight]);
 
     return (
     <div className="logged-user">
@@ -193,24 +217,24 @@ export default function match()
     <div className={`game ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
         <div className="game-content min-h-screen p-8">
             <HeaderBar />
-            <div className={`core flex w-full`} style={{ height: `${viewportHeight - 200}px` }}>
+            <div className={`core flex w-full`} style={{ height: `${800 - 200}px` }}>
                 <div className="score flex">
                     <div className="player player1">
                         <div className='avatar'>
                             <img src="/images/avatar1"  alt="avatar" />
                         </div>
                         <div className='player-name invisible lg:visible ' >PLAYER1</div>
-                        <div className="score1">9</div>
+                        <div className="score1">{myscore}</div>
                     </div>
                     <div className="player player2">
-                        <div className="score2">8</div>
+                        <div className="score2">{oppscore}</div>
                         <div className='player-name invisible lg:visible ' >PLAYER2</div>
                         <div className='avatar'>
                             <img src="/images/avatar1" alt="avatar" />
                         </div>
                     </div>
                 </div>
-                <div className="table">
+                <div className="table" id='table'>
                     <canvas id="canvas" width={1000} height={600}></canvas>
                 </div>
             </div>         

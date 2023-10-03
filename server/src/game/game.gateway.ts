@@ -10,6 +10,10 @@ class Player {
   match : Match;
   opponent: Player;
   opponent_bar: number;
+  isready = false;
+  isposed = false;
+  isquit = false;
+  isongame = false;
 
   constructor(socketid: string) {
     this.score = 0;
@@ -45,7 +49,6 @@ class canvas  {
   }
 }
 
-
 class Match {
   rightplayer: Player;
   leftplayer: Player;
@@ -59,6 +62,7 @@ class Match {
     this.canvas = canvas; 
   }
 }
+
 class bar{
   x:number;
   y:number;
@@ -191,10 +195,14 @@ export class GameGateway{
   
   handleDisconnect(client: Socket) {
     const socketId = client.id;
-    console.log(this.waiting_users);
-    this.waiting_users.removeBySocketId(client.id);
+    if(this.playing_users[client.id])
+    {
+      this.server.to(this.playing_users[client.id].opponent.socketid).emit('opponent quit');
+      //the opponent will win directly with score 3-0
+    }
+    else
+      this.waiting_users.removeBySocketId(client.id);
     console.log(`User disconnected with ID: ${socketId}`);
-    console.log(this.waiting_users);
   }
   
   
@@ -211,7 +219,13 @@ export class GameGateway{
         myscore: this.playing_users[client.id].score,
         oppscore: this.playing_users[client.id].opponent.score
       });
-      updateballxy(this.matchs[client.id]);
+      let ret = updateballxy(this.matchs[client.id]);
+      if(ret != 'ok')
+      {
+        this.server.to(client.id).emit(ret);
+        this.server.to(this.playing_users[client.id].opponent.socketid).emit(ret);
+      }
+
   } else {
     console.error('Player or opponent is undefined.');
   }
@@ -224,19 +238,23 @@ init(@MessageBody() data: any, @ConnectedSocket() client: Socket): void {
   const match = this.matchs[client.id];
   match.canvas.width = data.canvasw;
   match.canvas.height = data.canvash;
-
-  // Set the initial position of the ball here
   match.ball.x = match.canvas.width / 2;
   match.ball.y = match.canvas.height / 2;
   if(this.playing_users[client.id].bar)
   {
-    console.log('coucou')
+    console.log('server get init')
     if(this.playing_users[client.id].side == 'right')
       this.playing_users[client.id].bar.x = match.canvas.width - 65;
     else
       this.playing_users[client.id].bar.x = 100;
     this.playing_users[client.id].bar.length = 100;
     this.playing_users[client.id].bar.width = 15;
+  }
+  this.playing_users[client.id].isready = true;
+  if(this.playing_users[client.id].isready && this.playing_users[client.id].isready)
+  {
+    this.server.to(client.id).emit('start');
+    this.server.to(this.playing_users[client.id].opponent.socketid).emit('start');
   }
 }
 }

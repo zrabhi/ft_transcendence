@@ -193,31 +193,13 @@ export default function match()
       })
     }, []);
 
-    
-    // const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
-    // useEffect(() => {
-    //   const handleResize = () => {
-    //     // Update the state with the new viewport height
-    //     setViewportHeight((window.innerHeight));
-
-    //     console.log(viewportHeight);
-    //   };
-    //   // Attach the resize event listener
-    //   window.addEventListener("resize", handleResize);
-  
-    //   // Remove the event listener when the component unmounts
-    //   return () => {
-    //     window.removeEventListener("resize", handleResize);
-    //   };
-    // }, [window.innerHeight]);
-
     return (
     <div className="logged-user">
     <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
     <div className={`game ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
         <div className="game-content min-h-screen p-8">
             <HeaderBar />
-            <div className={`core flex w-full`} style={{ height: `${800 - 200}px` }}>
+            <div className={`core flex w-full`} >
                 <div className="score flex">
                     <div className="player player1">
                         <div className='avatar'>

@@ -139,6 +139,67 @@ const Chat: React.FC = () => {
         setSelectedChannel(null); // the  the channel here for other usersss
         setChannels(updatedChannel);
       });
+      socket.on("userKicked", (data: any) => {
+        if (
+          selectedChannel &&
+          selectedChannel?.channel &&
+          selectedChannel?.channel.id === data.channelId
+        ){
+          let updatedMembers = selectedChannel.members.filter((member: any) => {
+            return member.name != data.name;
+          });
+          setSelectedChannel((prevChannel: any) => ({
+            ...prevChannel,
+            members: updatedMembers,
+          }));
+        }
+        showSnackbar(`${data.name} has been kicked from ${data.channelName} Room`, true);
+      })
+      socket.on("yourKicked", (data: any)=> {
+        if (user.username === data.name)
+        {
+          let updatedChannels = channels.map((channel: any) => {
+            if (channel?.channel && channel?.channel.id === data.channelId)
+              return [];
+            return channel;
+          });
+          setSelectedChannel(null);
+          setChannels(updatedChannels);
+          showSnackbar(`${data.name} you have been kicked from ${data.channelName}`, false)
+        }
+      })
+
+      socket.on("userBanned", (data : any) =>
+      {
+        // TODO:added user to the banned list (in show mmembers) (Selectedchannel.bannedUsers)
+        if (
+          selectedChannel &&
+          selectedChannel?.channel &&
+          selectedChannel?.channel.id === data.channelId
+        ){
+          let updatedMembers = selectedChannel.members.filter((member: any) => {
+            return member.name != data.name;
+          });
+          setSelectedChannel((prevChannel: any) => ({
+            ...prevChannel,
+            members: updatedMembers,
+          }));
+        }
+        showSnackbar(`${data.name} has been banned from ${data.channelName} Room`, true);
+      })
+      socket.on("yourBanned", (data: any)=> {
+        if (user.username === data.name)
+        {
+          let updatedChannels = channels.map((channel: any) => {
+            if (channel?.channel && channel?.channel.id === data.channelId)
+              return [];
+            return channel;
+          });
+          setSelectedChannel(null);
+          setChannels(updatedChannels);
+          showSnackbar(`${data.name} you have been banned from ${data.channelName}`, false)
+        }
+      })
       socket.on("userMuted", (data: any) => {
         if (user.username === data.user)
           showSnackbar(`${data.user} you have mutued from ${data.channelName}`, true);

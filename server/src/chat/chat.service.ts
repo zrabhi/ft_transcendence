@@ -22,16 +22,25 @@ export class ChatService {
     const channels = await this._prisma.channel.findMany({
       include: {
         members: true,
+        banedUsers:true,
       },
     });
     const rooms = [];
     for (const channel of channels) {
       const members = [];
+      let checker = false;
       if (channel.type === 'DM' || channel.type === 'PRIVATE') continue;
       const searchedUser = channel.members.filter((member: any) => {
         return member.userId === currUser.id;
       });
-      if (searchedUser[0] || searchedUser[0].isBanned) continue;
+      if (searchedUser[0] || searchedUser[0]) continue;
+      for (const banned of channel.banedUsers)
+      {
+        if (banned.userId === currUser.id)
+          checker = true;
+      }
+      if (checker)
+        continue;
       else {
         let Key = 0;
         for (const member of channel.members) {
@@ -70,6 +79,7 @@ export class ChatService {
       },
       include: {
         members: true,
+        banedUsers:true,
       },
     });
     return channel;
@@ -368,6 +378,8 @@ export class ChatService {
     return Rooms;
   }
   async handleDeleteRoom(channel_id: string, user: any) {
+    if (!channel_id)
+      return {success: false, error: "fields are empty"}
     try {
       const channel = await this._prisma.channel.findUnique({
         where: {
@@ -394,6 +406,8 @@ export class ChatService {
     }
   }
   async handleLeaveChannel(currUser: any, channel_id: string) {
+    if (!channel_id)
+      return {success: false, error: "fields are empty"}
     const channel = await this._prisma.channel.findUnique({
       where: {
         id: channel_id,
@@ -430,6 +444,8 @@ export class ChatService {
     }
   }
   async handleAddMember(user: any, channelId: string, username: string) {
+    if (!channelId || !username)
+      return {success: false, error: "fields are empty"}
     const currUser = await this._user.findUserById(user.id);
     const addedUser = await this._user.findUserName(username);
     const channel = await this._prisma.channel.findUnique({
@@ -491,6 +507,8 @@ export class ChatService {
   }
   //////////////////// Ban method && Mute Method && Set As Admin /////////////////////////////////////
   async handleSetAsAdmin(user: any, channel_id: string, userToBeSet: string) : Promise<any> {
+    if (!channel_id || !userToBeSet)
+      return {success: false, error: "fields are empty"}
     const currUser = await this._user.findUserById(user.id);
     const newAdmin = await this._user.findUserName(userToBeSet);
     const channel = await this._prisma.channel.findUnique({
@@ -555,8 +573,6 @@ export class ChatService {
         {
           if (member.mutedTime < Date.now().toString())
           {
-            console.log("true");
-
             await this._prisma.channelMembers.update({
               where: {
                 id: member.id
@@ -572,6 +588,8 @@ export class ChatService {
   }
 
   async handleUserMute(user: any, channel_id: string, userToBeMuted: string) {
+    if (!channel_id || !userToBeMuted)
+      return {success: false, error: "fields are empty"}
     let time = Date.now() + 300000;
     console.log("logo", time)
     const currUser = await this._user.findUserById(user.id);
@@ -603,13 +621,12 @@ export class ChatService {
         member.userId === currUser.id &&
         (member.role === 'ADMIN' || member.role === 'OWNER')
       ) {
-        if (searchedUser.role === 'ADMIN' && member.role === 'ADMIN')
+        if (searchedUser[0].role === 'ADMIN' && member.role === 'ADMIN')
           return {
-            error: 'channels admins Cant ban each other',
+            error: 'channels admins Cant Mute each other',
             success: false,
           };
         else {
-          console.log("muting user");
           await this._prisma.channelMembers.update({
             where: {
               id: searchedUser[0].id,
@@ -622,6 +639,186 @@ export class ChatService {
           return { success: true, message: 'the user muted succesfully' };
           //mute the user (the user will be muted drom the admin ) // the ( isMuted)attribute in channelMembers will change to true
         }
+      }
+    }
+  }
+  async handleBanUser(user: any, channel_id: string, userToBeBanned: string)
+  {
+    if (!channel_id || !userToBeBanned)
+      return {success: false, error: "fields are empty"}
+    const currentUser = await this._user.findUserById(user.id);
+    const bannedUser = await this._user.findUserName(userToBeBanned);
+    const channel = await this._prisma.channel.findUnique({
+      where: {
+        id: channel_id,
+      },
+      include:{
+        members: true,
+        banedUsers: true,
+      }
+    })
+    if (bannedUser.username === channel.owner)
+      return {
+        error: `channel owner ${bannedUser.username} cant be banned by the  Members or Admins`,
+        success: false,
+      };
+    for (const user of channel.banedUsers)
+    {
+      if (user.userId === bannedUser.id)
+        return {
+          error:`User ${bannedUser.username} is already banned from the channel`,
+          success: false,
+        }
+    }
+    let searchedUser: any = channel.members.filter((member) => {
+      return member.userId === bannedUser.id;
+    });
+    if (!searchedUser[0])
+      return {
+        error: `${userToBeBanned} is not on this channel`,
+        success: false,
+      };
+    for (const member of channel.members)
+    {
+      if (searchedUser[0].id === member.id) continue;
+      if (
+        member.userId === currentUser.id &&
+        (member.role === 'ADMIN' || member.role === 'OWNER')
+      ){
+        if (searchedUser[0].role === 'ADMIN' && member.role === 'ADMIN')
+        {
+          return {
+            error: 'channels admins Cant Ban each other',
+            success: false,
+          };
+        }
+        else{
+          try{
+            await this._prisma.channelBan.create({
+              data:{
+                userId:bannedUser.id,
+                channelId:channel.id,
+              }
+            })
+
+            await this._prisma.channelMembers.delete({
+              where:{
+                id:searchedUser[0].id,
+              }})
+            }catch(err)
+            {
+              return {
+                success:false,
+                error:"error ocured"
+              }
+            }
+            return {success:true, message:"user banned successfully"}
+        }
+      }
+    }
+  }
+  async handleKickUser(user: any, channel_id: string, userToBeKicked: string)
+  {
+    if (!channel_id || !userToBeKicked)
+      return {success: false, error: "fields are empty"}
+    const currentUser = await this._user.findUserById(user.id);
+    const kickedUser = await this._user.findUserName(userToBeKicked);
+    const channel = await this._prisma.channel.findUnique({
+      where: {
+        id: channel_id,
+      },
+      include:{
+        members: true,
+        banedUsers: true,
+      }
+    })
+    if (kickedUser.username === channel.owner)
+      return {
+        error: `channel owner ${kickedUser.username} cant be kicked by the  Members or Admins`,
+        success: false,
+      };
+      let searchedUser: any = channel.members.filter((member) => {
+        return member.userId === kickedUser.id;
+      });
+      if (!searchedUser[0])
+      return {
+        error: `${userToBeKicked} is not on this channel`,
+        success: false,
+      };
+      console.log(searchedUser);
+      for (const member of channel.members) {
+        if (searchedUser[0].id === member.id) continue;
+        console.log('searched user ', member.userId);
+        if (
+          member.userId === currentUser.id &&
+          (member.role === 'ADMIN' || member.role === 'OWNER')
+        ) {
+          if (searchedUser[0].role === 'ADMIN' && member.role === 'ADMIN')
+          {
+            return {
+              error: 'channels admins Cant Kick each other',
+              success: false,
+            };
+          }
+          else{
+            try{
+              await this._prisma.channelMembers.delete({
+                where:{
+                  id:searchedUser[0].id,
+                }})
+            }catch(err)
+            {
+              return {success: false, error: "error ocured"}
+            }
+            return {success:true, message:"user has been kicked successfully"}
+          }
+        }
+    }
+  }
+  async handleUnbanUser(user: any, channel_id: string, userToBeUnban: string)
+  {
+    if (!channel_id || !userToBeUnban)
+      return {success: false, error: "fields are empty"}
+    const currentUser = await this._user.findUserById(user.id);
+    const bannedUser = await this._user.findUserName(userToBeUnban);
+    const channel = await this._prisma.channel.findUnique({
+      where: {
+        id: channel_id,
+      },
+      include:{
+        members: true,
+        banedUsers: true,
+      }
+    })
+    if (bannedUser.username === channel.owner)
+      return {
+        error: `channel owner ${bannedUser.username} cant be banned by the  Members or Admins`,
+        success: false,
+      };
+      let searchedUser: any = channel.banedUsers.filter((member) => {
+        return member.userId === bannedUser.id;
+      });
+      if (!searchedUser[0])
+      return {
+        error: `${userToBeUnban} is not banned`,
+        success: false,
+      };
+    for (const member of channel.members){
+      if (
+        member.userId === currentUser.id &&
+        (member.role === 'ADMIN' || member.role === 'OWNER')
+      ) {
+          try{
+            await this._prisma.channelBan.delete({
+              where:{
+                id: searchedUser[0].id
+              }
+            })
+          }catch(err)
+          {
+            return {success: false, error: "error ocured"}
+          }
+          return {success:true, message:"user unbanned successfully"}
       }
     }
   }

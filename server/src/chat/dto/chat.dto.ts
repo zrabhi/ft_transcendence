@@ -74,11 +74,14 @@ export class getChannelDmDto
 
   user: any;
 }
-export class banDto {
-  @IsString()
-  username: string
 
+
+
+export class actionsDto {
   @IsString()
   @IsNotEmpty()
-  channel_id: string
+  channelId: string
+  @IsString()
+  @IsNotEmpty()
+  username: string
 }

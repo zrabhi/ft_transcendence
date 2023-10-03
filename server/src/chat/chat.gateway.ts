@@ -41,7 +41,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private connectedUsers = new Map<String, Socket>();
 
   async handleConnection(client: Socket) {
-    const payload = await this.jwtService.verifyAsync(
+    try{
+      const payload = await this.jwtService.verifyAsync(
       client.handshake.auth.token,
       {
         secret: process.env.JWT_SECRET,
@@ -52,9 +53,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // const newUser = await this.userService.findUserById(payload.id);
     this.connectedUsers.set(payload.id, client);
     this.server.to(client.id).emit('connected', 'Hello world!');
+    }catch(err)
+    {
+      console.log("error while trying to connect");
+      return client.disconnect(true);
+    }
   }
 
   async handleDisconnect(client: Socket) {
+    try{
     const payload = await this.jwtService.verifyAsync(
       client.handshake.auth.token,
       {
@@ -64,6 +71,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!payload) return client.disconnect(true);
     // this.server.to(payload.id).emit('disconnected', '');
     this.connectedUsers.delete(payload.id);
+    }catch (err) {
+      return client.disconnect(true);
+    }
     // console.log(`Client disconnected   id ${client.id}`);
     // client.disconnect(true);
   }
@@ -79,6 +89,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
+    try{
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
@@ -106,12 +117,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(member.userId)
         .emit('newAdmin', { channelName: channel.name, user: data.username });
     }
+  }catch (err) {
+
+    return client.disconnect(true);
+  }
   }
   @SubscribeMessage('LeaveChannel')
   async handledLeaveRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
+    try{
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
@@ -133,13 +149,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           id: data.channelId,
           name: data.name,
         });
+    }}catch(err)
+    {
+      return client.disconnect(true);
     }
   }
+
   @SubscribeMessage('joinNewChannel')
   async handleJoinNewChannel(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
+    try{
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
@@ -173,14 +194,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         role: 'Member',
       });
     }
+  }catch(err)
+  {
+    return client.disconnect(true);
+  }
   }
   @SubscribeMessage('addMember')
   async handleAddMmember(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    console.log('data =>', data);
-    const payload = await this.jwtService.verifyAsync(data.token, {
+    try{
+      const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
     if (!payload) return client.disconnect(true);
@@ -216,6 +241,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(payload.id)
         .emit('error occored', { errorMessage: result?.error });
     }
+    }catch(err)
+    {
+      return client.disconnect(true)
+    }
   }
   @SubscribeMessage('deleteChannel')
   async handleDeletChannel(
@@ -223,6 +252,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: any,
   ) {
     // checking the access token of user is still valid if not the socket is the disconnected and the action not made
+    try{
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
@@ -252,6 +282,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (const member of channel.members) {
       this.server.to(member.userId).emit('channelDeleted', response);
     }
+  }catch(err)
+  {
+    return client.disconnect(true)
+  }
   }
   @SubscribeMessage('mute')
   async handleMutedUser(
@@ -259,13 +293,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: any,
   ) {
     // checking the access token of user is still valid if not the socket is the disconnected and the action not made
+    try {
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
     if (!payload) return client.disconnect(true);
     /// mute the user here
-    try {
-      console.log("im hereee");
+      console.log('im hereee');
       await this.chatService.handleUserMute(
         payload,
         data.channel_id,
@@ -280,17 +314,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         },
       });
       for (const member of channel.members) {
-        this.server
-          .to(member.userId)
-          .emit('userMuted', {
-            channelName: channel.name,
-            user: data.username,
-          });
+        this.server.to(member.userId).emit('userMuted', {
+          channelName: channel.name,
+          user: data.username,
+        });
       }
     } catch (err) {
       console.log(err);
-      
-      return;
+
+      return client.disconnect(true);;
     }
   }
   @SubscribeMessage('ban')
@@ -299,11 +331,91 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: any,
   ) {
     // checking the access token of user is still valid if not the socket is the disconnected and the action not made
+    try {
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
     if (!payload) return client.disconnect(true);
-    //TODO : HANDLE BAN ACTION HERE
+      const bannedUser = await this.userService.findUserName(data.username);
+      const result = await this.chatService.handleBanUser(
+        payload,
+        data.channelId,
+        data.username,
+      );
+      if (!result.success) {
+        // error ocured here
+        return;
+      }
+      const channel = await this.prismaService.channel.findUnique({
+        where: {
+          id: data.channelId,
+        },
+        include: {
+          members: true,
+        },
+      });
+      const Sentdata = {
+        channelId: channel.id,
+        channelName:channel.name,
+        name: bannedUser.username,
+      }
+      for (const member of channel.members) {
+        this.server
+          .to(member.userId)
+          .emit('userBanned', Sentdata);
+      }
+      return this.server.to(bannedUser.id).emit("yourBanned", Sentdata)
+    } catch (err) {
+      return client.disconnect(true);
+    }
+  }
+  @SubscribeMessage('kick')
+  async handleKickUser(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  )
+  {
+    try{
+    const payload = await this.jwtService.verifyAsync(data.token, {
+      secret: process.env.JWT_SECRET,
+    });
+    if (!payload) return client.disconnect(true);
+    const kickedUser =  await this.userService.findUserName(data.username);
+    const result = await this.chatService.handleKickUser(
+      payload,
+      data.channelId,
+      data.username,
+    );
+    if (!result.success) {
+      // error ocured here
+      return;
+    }
+    const channel = await this.prismaService.channel.findUnique({
+      where: {
+        id: data.channelId,
+      },
+      include: {
+        members: true,
+      },
+    });
+    const Sentdata = {
+      channelId: channel.id,
+      channelName:channel.name,
+      name: kickedUser.username,
+    }
+    for (const member of channel.members) {
+      this.server
+        .to(member.userId)
+        .emit('userKicked', Sentdata);
+    }
+    return this.server.to(kickedUser.id).emit("yourKicked", Sentdata);
+
+    }catch(err)
+    {
+        //error ocured here
+        return client.disconnect(true);;
+    }
+
   }
   @SubscribeMessage('block')
   async handleblockeedUser(
@@ -366,15 +478,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     /// check here if the user time muted is ended if do (set is muted to false)
     for (const member of channel.members) {
       if (member.isMuted && member.userId === user.id) {
-         this.server
-          .to(member.userId
-            )
+        this.server
+          .to(member.userId)
           .emit('Yourmuted', { channelName: channel.name });
-        return ;
+        return;
       }
     }
-    for (const member of channel.members)
-    {
+    for (const member of channel.members) {
       this.server.to(member.userId).emit('lastMessage', lastMessage);
     }
     this.chatService.saveMessageToChannel(payload, data);

@@ -15,7 +15,7 @@ import { UserInfo } from 'src/auth/decorator/user-decorator';
 import { UserService } from 'src/user/user.service';
 import { ChatService } from './chat.service';
 import {
-  banDto,
+  actionsDto,
   createDmDto,
   createRoomDto,
   getChannelDmDto,
@@ -127,12 +127,14 @@ export class ChatController {
     @Param('username') username: string,
     @Param('channelId') channelId: string,
     @UserInfo() user: any,
-    @Res() res: Response)
-  {
-    const result = await this.chatService.handleAddMember(user,
-      channelId,username);
-    if (!result.success)
-      return res.status(400).json(result);
+    @Res() res: Response,
+  ) {
+    const result = await this.chatService.handleAddMember(
+      user,
+      channelId,
+      username,
+    );
+    if (!result.success) return res.status(400).json(result);
     return res.status(200).json(result);
   }
   @Put('joinroom/:name/:password')
@@ -176,9 +178,19 @@ export class ChatController {
         role: checker,
       });
     }
+    const bannedUsers = [];
+    for (const banned of channel.banedUsers)
+    {
+      const user = await this.userService.findUserById(banned.userId);
+      bannedUsers.push({
+        name:user.username,
+        avatar: user.avatar,
+      });
+    }
     const data = {
       channel: channel,
       members: members,
+      bannedUsers: bannedUsers,
     };
     res.status(200).json(data);
   }
@@ -216,19 +228,6 @@ export class ChatController {
     res.status(200).json(result);
     /// handle get channels expect private one's
   }
-  // @UseGuards(JwtAuthGuard)
-  // @Get('getMessages/:channelId')
-  // async handleGetMessagesRoom(
-  //   @Param('channelId') channelId: string,
-  //   @UserInfo() user: User,
-  //   @Res() res: Response,
-  // ) {
-  //   const result = await this.chatService.handleGetRoomMessages(
-  //     channelId,
-  //     user.id,
-  //   );
-  //   res.status(200).json(result);
-  // }
   @UseGuards(JwtAuthGuard)
   @Get('channelsDm')
   async handleGetChannelsDm(@Res() res: Response, @UserInfo() user: User) {
@@ -301,18 +300,66 @@ export class ChatController {
 
   @Put('mute')
   @UseGuards(JwtAuthGuard)
-  async handleBanUser(
+  async handleMuteUser(
     @UserInfo() user: User,
     @Res() res: Response,
-    @Body() banInfo: banDto,
+    @Body() muteInfo: actionsDto,
   ) {
-    const { channel_id, username } = banInfo;
+    const { channelId, username } = muteInfo;
     const result = await this.chatService.handleUserMute(
       user,
-      channel_id,
+      channelId,
       username,
     );
     res.status(200).json(result);
+  }
+  @Put('ban')
+  @UseGuards(JwtAuthGuard)
+  async handleBanUser(
+    @UserInfo() user: User,
+    @Res() res: Response,
+    @Body() body: actionsDto,
+  ) {
+    const { channelId, username } = body;
+    const result = await this.chatService.handleBanUser(
+      user,
+      channelId,
+      username,
+    );
+    if (!result.success) return res.status(400).json(result);
+    return res.status(200).json(result);
+  }
+  @Put('unban')
+  @UseGuards(JwtAuthGuard)
+  async handleUnbanUser(
+    @UserInfo() user: User,
+    @Res() res: Response,
+    @Body() body: actionsDto,
+  )
+  {
+    const { channelId, username } = body;
+    const result = await this.chatService.handleUnbanUser(
+      user,
+      channelId,
+      username
+    )
+    if (!result.success) return res.status(400).json(result);
+    return res.status(200).json(result);
+  }
+  @Put('kick')
+  @UseGuards(JwtAuthGuard)
+  async handleKickUser(
+    @UserInfo() user: User,
+    @Res() res: Response,
+    @Body() body: actionsDto,
+  ){
+    const {channelId, username} = body
+    const result = await this.chatService.handleKickUser(
+      user,
+      channelId,
+      username);
+    if (!result.success) return res.status(400).json(result);
+    return res.status(200).json(result);
   }
   @Put('setadmin/:channelId/:username')
   @UseGuards(JwtAuthGuard)

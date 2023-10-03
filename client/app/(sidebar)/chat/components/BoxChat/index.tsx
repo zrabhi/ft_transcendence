@@ -230,15 +230,28 @@ const BoxChat = ({
     showSnackbar("You left the channel successfully", true);
   }
 
+
+  function handleKickMember(user: any)
+  {
+    socket.emit("kick", {
+      channelId: selectedChannel?.channel?.id,
+      username:user?.name,
+      token:cookie.access_token
+    })
+  }
   function handleBanMember(user: any) {
+    // testing kick in ban
+    socket.emit("ban", {
+      channelId: selectedChannel?.channel?.id,
+      username:user?.name,
+      token:cookie.access_token
+    })
     // console.log("user clocked ", user);
-    alert(` Ban member from room`);
   }
 
   function handleMuteMember(user: any) {
     // / i need the user name of the MUTED person
     console.log("im here");
-    
     socket.emit("mute",
     {channel_id:selectedChannel?.channel?.id,
       username: user?.name,
@@ -712,7 +725,7 @@ const BoxChat = ({
                 className="focus:outline-none text-white rounded-3xl bg-[#654795]  font-medium  text-sm px-5 py-2.5 "
                 onClick={(e) => InviteUsers(e)} // it's an array of selected users to invite them
               >
-                Invite {selectedUsers.length}
+                Add {selectedUsers.length}
               </button>
             )}
             <AiOutlineClose

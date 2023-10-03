@@ -56,7 +56,7 @@ export default function match()
       ctx.closePath();
       ctx.fill();
       return 1;
-    };
+    }; 
   
     const drawbars = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
       if(side == 'right')

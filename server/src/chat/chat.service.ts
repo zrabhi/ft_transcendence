@@ -194,6 +194,7 @@ export class ChatService {
             reciever: user.username,
             avatar: user.avatar,
             time: message.time,
+            blocked: false,
             content: message.content,
           });
         else {
@@ -202,6 +203,7 @@ export class ChatService {
             sender: otherUser.username,
             avatar: otherUser.avatar,
             time: message.time,
+            blocked: false,
             content: message.content,
           });
         }
@@ -222,6 +224,7 @@ export class ChatService {
     }
     return { allMessages, users }; // returning all messages and users in channel
   }
+
 
   async handleGetRoomMessages(channel_id: string, user_id: string) {
     const user = await this._user.findUserById(user_id);

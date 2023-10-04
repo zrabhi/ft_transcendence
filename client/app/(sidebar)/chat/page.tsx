@@ -49,16 +49,15 @@ const Chat: React.FC = () => {
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
   const [otherChannels, setOtherChannels] = useState([]);
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
-  const { user } = useContext(AuthContext);
+  const { user, setBlockedUsers,setUserBlockedMe} = useContext(AuthContext);
   const [cookie] = useCookies(["access_token"]);
 
   const [password, setPassword] = useState("");
   const [selectedJoinChannel, setSelectedJoinChannel] = useState<any>(null);
 
   // just an example of how to use this function
-  // it will disapear after 3 sec
+  // it will disapear after 5 sec
   useEffect(() => {
-    showSnackbar("TEST", false);
     showSnackbar("Connected", true);
   }, []);
 
@@ -305,8 +304,42 @@ const Chat: React.FC = () => {
           }));
         }
       });
+      socket.on("blockedUser", () =>{
+        showSnackbar("you cant send message to user who blocked you", false);
+      } )
+      socket.on("messageBlocked", () => {
+        showSnackbar("you cant send message to blocked user", false);
+      })
+      socket.on("yourBlocked", (data: any) => {
+        if (data?.username)
+        {
+          setUserBlockedMe((prev: any) => [...prev, data.username]);
+          showSnackbar(`${data.username} blocked you`,false)
+        }
+      })
+      socket.on("userBlocked", (data: any) => {
+        if (data?.username)
+        {
+          showSnackbar(`you've successfully blocked ${data.username}`, true)
+          setBlockedUsers((prev: any) => ([...prev, data.username]))
+        }
+      })
       socket.on("disconnect", () => {
         socket.off("latMessage");
+        socket.off("YourBlocked");
+        socket.off("userBlocked");
+        socket.off("blockedUser");
+        socket.off("leftRoom");
+        socket.off("NewMember");
+        socket.off("newAdmin");
+        socket.off("memberJoinned");
+        socket.off("userMuted");
+        socket.off("Yourmuted");
+        socket.off("yourBanned");
+        socket.off("userBanned");
+        socket.off("yourKicked");
+        socket.off("userKicked");
+        socket.off("channelDeleted")
       });
     });
     return () => {
@@ -329,28 +362,9 @@ const Chat: React.FC = () => {
       password: password,
       token: cookie.access_token,
     });
-
     setSelectedJoinChannel(null);
     setPassword("");
     setOpenPasswordModal(false);
-    // const response = await putRequest(`${baseChatUrl}/joinroom/${channelName}/${password}`,
-    //   ""
-    // );
-    // if (response?.channel === undefined) {
-    //   // error heree
-    // } else {
-    //   let desiredChannel :any = otherChannels.filter((channel: any) => {
-    //     return channel.channel.id === response.channel.id;
-    //   });
-    //   desiredChannel[0]?.members.push({
-    //     id:desiredChannel[0]?.members.length,
-    //     name: user.username,
-    //     avatar:user.avatar,
-    //     role:"Member"
-    //   });
-    //   console.log(desiredChannel);
-    //   setSelectedChannel(desiredChannel[0]);
-    //   setSelectedChat(desiredChannel[0]?.channel)
   };
   // TODO :?  --- GET CONNECTED USER FRIENDS
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);

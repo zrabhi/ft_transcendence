@@ -534,6 +534,7 @@ export class UserService {
   }
   async findUserByIdWithBlocked(user_id: string) {}
   async handleBlockUser(user: any, username: string) {
+    try{
     const currUser = await this.prismaService.user.findUnique({
       where: {
         id: user.id,
@@ -548,15 +549,21 @@ export class UserService {
       return blocked.blockedId === blockedUser.id;
     });
     if (checker[0]) throw BadRequestException;
-    return await this.prismaService.userBlock.create({
+      await this.prismaService.userBlock.create({
       data: {
         blockerId: currUser.id,
         blockedId: blockedUser.id,
       },
     });
+    return {success: true, message:"user blocked"}
+  }catch(error)
+  {
+    return {success: false, error: "error ocured"}
+  }
   }
 
   async handleUnBlockUser(user: any, username: string) {
+    try{
     const currUser = await this.prismaService.user.findUnique({
       where: {
         id: user.id,
@@ -575,6 +582,10 @@ export class UserService {
         id: checker[0].id,
       },
     });
+    return {success: true, message:"user unblocked"};
+  }catch(e) {
+    return {success: false, error:"error ocured"}
+  }
   }
 
   async handleGetBlockedUsers(user: any) {
@@ -593,9 +604,34 @@ export class UserService {
           id: block.blockedId,
         },
       });
-      users.push({
-        username: searchedUser.username,
+      users.push(
+        searchedUser.username,
+      );
+    }
+    return users;
+  }
+  async handleGetUserblockedMe(user: any)
+  {
+    const currUser = await this.prismaService.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        blockedUser: true,
+      },
+    });
+    const users = [];
+    for (const block of currUser.blockedUser) {
+      const searchedUser = await this.prismaService.user.findUnique({
+        where: {
+          id: block.blockedId,
+        },
       });
+
+      const otherUser = await this.findUserById(block.blockerId);
+      users.push(
+         otherUser.username
+      );
     }
     return users;
   }

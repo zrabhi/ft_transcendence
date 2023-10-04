@@ -235,7 +235,6 @@ export class ChatController {
     let result = (await this.chatService.getAllUserChannelsDm(currUser)) as any;
 
     const data = [];
-    const channels = [];
     for (const channel of result) {
       const searchedUserName = channel.users.filter((username) => {
         if (username != currUser.username) return username;
@@ -256,7 +255,6 @@ export class ChatController {
           time: lastMessage.created_at,
         },
       });
-      // console.log('created at ', lastMessage.created_at);
     }
     res.status(200).json(data);
   }

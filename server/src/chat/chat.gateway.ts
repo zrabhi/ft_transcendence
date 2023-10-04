@@ -101,7 +101,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.username,
     );
     if (!result?.success) {
-      // erro occured
       return;
     }
     const channel = await this.prismaService.channel.findUnique({
@@ -141,7 +140,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         members: true,
       },
     });
-    // Todo: resturn error message id something  wrong happend
     for (const member of channel.members) {
       if (member.userId != user.id)
         this.server.to(member.userId).emit('leftRoom', {
@@ -172,7 +170,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     );
     if (result.channel === undefined) {
       return;
-      // error occured here
     }
     const currUser = await this.userService.findUserById(payload.id);
     const channel = await this.prismaService.channel.findUnique({
@@ -251,13 +248,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    // checking the access token of user is still valid if not the socket is the disconnected and the action not made
     try{
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
     if (!payload) return client.disconnect(true);
-    //TODO: handleLeave Channel here
     const user = await this.userService.findUserById(payload.id);
     const channel = await this.prismaService.channel.findUnique({
       where: {
@@ -292,7 +287,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    // checking the access token of user is still valid if not the socket is the disconnected and the action not made
     try {
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
@@ -330,7 +324,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    // checking the access token of user is still valid if not the socket is the disconnected and the action not made
     try {
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
@@ -387,7 +380,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.username,
     );
     if (!result.success) {
-      // error ocured here
       return;
     }
     const channel = await this.prismaService.channel.findUnique({
@@ -412,8 +404,29 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     }catch(err)
     {
-        //error ocured here
         return client.disconnect(true);;
+    }
+
+  }
+  @SubscribeMessage('unblock')
+  async handleUblockUser(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  )
+  {
+    try{
+      const payload = await this.jwtService.verifyAsync(data.token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!payload) return client.disconnect(true);
+    const result = await this.userService.handleUnBlockUser(payload, data.username);
+      if (!result.success)
+      {
+        return ;
+      }
+      return this.server.to(payload.id).emit("userUnBlocked")
+    }catch (e) {
+      return client.disconnect(true);
     }
 
   }
@@ -422,13 +435,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    // checking the access token of user is still valid if not the socket is the disconnected and the action not made
+    try{
     const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
     if (!payload) return client.disconnect(true);
-    //TODO: HANDLE BLCOK ACTION HERE
+    const current = await this.userService.findUserById(payload.id);
+    const result = await this.userService.handleBlockUser(payload, data.username);
+    if (!result.success)
+    {
+      return ;
+    }
+    const otherUser = await this.userService.findUserName(data.username);
+    this.server.to(otherUser.id).emit("yourBlocked", {username: current.username})
+    return this.server.to(payload.id).emit("userBlocked", {username: data.username})
+  }catch (e) {
+    return client.disconnect(true);
   }
+}
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   @SubscribeMessage('message')
   async handleMessage(
@@ -439,7 +463,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       secret: process.env.JWT_SECRET,
     });
     if (!payload) return client.disconnect(true);
-    const user = await this.userService.findUserById(payload.id);
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: payload.id
+      },
+      include:{
+        userBlock:true,
+        blockedUser:true,
+      }
+    });
+
     await this.chatService.handleAutoUnmute();
     const channel = await this.prismaService.channel.findUnique({
       where: {
@@ -475,7 +508,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       avatar: user.avatar,
       content: data.message,
     };
-    /// check here if the user time muted is ended if do (set is muted to false)
+    if (channel.type === 'DM')
+    {
+      for (const member of channel.members)
+      {
+        for (const blocked of user.userBlock)
+        {
+          if (blocked.blockedId === member.userId)
+              return this.server.to(user.id).emit("messageBlocked",{})
+        }
+        for (const blocked of user.blockedUser)
+        {
+          if (blocked.blockedId === user.id)
+              return this.server.to(user.id).emit("blockedUser",{});
+        }
+      }
+    }
     for (const member of channel.members) {
       if (member.isMuted && member.userId === user.id) {
         this.server

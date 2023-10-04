@@ -66,6 +66,7 @@ const BoxChat = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // state for dropdown
   const [isPopupOpen, setIsPopupOpen] = useState(false); // state for members popup
 
+  const [blockOrUnblock, setBlockOrUnblock] = useState("Block");
   const [selectedUsers, setSelectedUsers] = useState<any>([]);
   const [isAddMemberPopupOpen, setIsAddMemberPopupOpen] = useState(false);
   const [checkboxes, setCheckboxes] = useState<CheckboxesState>({
@@ -79,7 +80,8 @@ const BoxChat = ({
 
   const [chat, setChat] = useState({}); // id && tyoe && avatar && username && message
   const [cookie] = useCookies(["access_token"]);
-  const { user, blockedUsers, setBlockedUsers } = useContext(AuthContext);
+  const { user, blockedUsers, setBlockedUsers, userBlockedMe } =
+    useContext(AuthContext);
 
   const getRoleOptions = (type: string) => {
     if (type === "PUBLIC" || type === "PRIVATE" || type === "PROTECTED") {
@@ -113,17 +115,13 @@ const BoxChat = ({
     ? getRoleOptions(selectedChannel?.channel?.type)
     : {};
 
-  async function handleBlock(username: string) {
+  async function handleBlock() {
+    console.log("-----", selectedChat);
     // username is the selected user to be blocked
-    const response = await putRequest(`${baseUrlUsers}/block/${username}`, "");
-    if (!response.success) {
-      // error has been  occured here
-      // in response.error you will find the error occured
-    }
-    // else
-    // if response.success === true , the will be success message in response.message
-    // show unblock button
-    alert("Block action");
+    socket.emit("block", {
+      username: selectedChat.username,
+      token: cookie.access_token,
+    });
   }
 
   // added by zac
@@ -230,39 +228,37 @@ const BoxChat = ({
     showSnackbar("You left the channel successfully", true);
   }
 
-
-  function handleKickMember(user: any)
-  {
+  function handleKickMember(user: any) {
     socket.emit("kick", {
       channelId: selectedChannel?.channel?.id,
-      username:user?.name,
-      token:cookie.access_token
-    })
+      username: user?.name,
+      token: cookie.access_token,
+    });
   }
   function handleBanMember(user: any) {
     // testing kick in ban
     socket.emit("ban", {
       channelId: selectedChannel?.channel?.id,
-      username:user?.name,
-      token:cookie.access_token
-    })
+      username: user?.name,
+      token: cookie.access_token,
+    });
     // console.log("user clocked ", user);
   }
 
   function handleMuteMember(user: any) {
     // / i need the user name of the MUTED person
     console.log("im here");
-    socket.emit("mute",
-    {channel_id:selectedChannel?.channel?.id,
+    socket.emit("mute", {
+      channel_id: selectedChannel?.channel?.id,
       username: user?.name,
-      token:cookie.access_token
-    })
+      token: cookie.access_token,
+    });
   }
   async function handleSetAsAdmin(user: any) {
     socket.emit("setAdmin", {
       channelId: selectedChannel?.channel?.id,
       username: user?.name,
-      token:cookie.access_token
+      token: cookie.access_token,
     });
     console.log("new asmin +++", user);
 
@@ -293,6 +289,7 @@ const BoxChat = ({
   };
   // trying to create socket to connect with other user here
   useEffect(() => {
+    console.log("blocked me", userBlockedMe, blockedUsers);
     // console.log("selected channe sis =>", selectedChannel);
     getCurrentUserRole();
     setSelectedUsers([]);
@@ -303,12 +300,17 @@ const BoxChat = ({
         `${baseChatUrl}/getMessages/${selectedChannel?.channel?.id}`
       );
       // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.members // (going to remove it cause were not working with this object)
+      let checkBlocked = response?.allMessages?.filter((message: any) => {
+        console.log("message blocked", message.reciever);
+        if (
+          userBlockedMe.includes(message?.sender) ||
+          blockedUsers.includes(message?.sender)
+        )
+          (message.blocked = true), console.log("is blocked yes");
+        return message;
+      });
       setMessages(() => []);
-      setMessages((prevMessages: any) => [
-        ...prevMessages,
-        ...response.allMessages,
-      ]); //reminderr
-      // console.log("chat ", selectedChat);
+      setMessages((prevMessages: any) => [...prevMessages, ...checkBlocked]);
     })();
 
     setChat(selectedChat);
@@ -327,11 +329,13 @@ const BoxChat = ({
           time: messageInfo.time,
           blocked: false,
         };
-        // blockedUsers.filter((user: any) => {
-        //   if (user.username === messageInfo.reciever)
-        //     sendedMessage.blocked = true; // added by zac to checked if the user id blocked bu the currUser
-        // });
+
         if (user.username != messageInfo.reciever) {
+          if (
+            blockedUsers.includes(messageInfo.reciever) ||
+            userBlockedMe.includes(messageInfo.reciever)
+          )
+            sendedMessage.blocked = true;
           sendedMessage.sender = messageInfo.reciever;
           sendedMessage.avatar = messageInfo.avatar;
         } else sendedMessage = messageInfo;
@@ -343,7 +347,6 @@ const BoxChat = ({
       });
     });
     return () => {
-      // socket.off("message");
       socket.disconnect();
     };
   }, [selectedChannel]);
@@ -578,7 +581,7 @@ const BoxChat = ({
 
                     <div style={{ flex: 1 }}>
                       <p className="ml-2" style={{ wordWrap: "break-word" }}>
-                        {!message.blocked
+                        {!message?.blocked
                           ? message.content
                           : "You can't see message from blocked user!"}
                       </p>

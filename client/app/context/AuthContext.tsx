@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentWindow, setCurrentWindow] = useState("");
   const [pathname, setPathname] = useState<string>("");
   const [blockedUsers, setBlockedUsers] = useState<blockedUsers[]>([]);
-
+  const [userBlockedMe, setUserBlockedMe] = useState<blockedUsers[]>([]);
   // here we will aded states to save data cames from sockets
 
   const Urls = {
@@ -96,6 +96,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
       setBlockedUsers(response);
     })();
+    (async () => {
+      const response = await getRequest(`${baseUrlUsers}/UsersBlockedMe`);
+      setUserBlockedMe(response);
+    })();
+
   }, []);
 
   // // (async () => {
@@ -187,6 +192,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         handleDisable2fa,
         fetchUserData,
         blockedUsers,
+        userBlockedMe,
+        setUserBlockedMe,
         setBlockedUsers,
         notifSocket,
       }}

@@ -244,7 +244,7 @@ init(@MessageBody() data: any, @ConnectedSocket() client: Socket): void {
   {
     console.log('server get init')
     if(this.playing_users[client.id].side == 'right')
-      this.playing_users[client.id].bar.x = match.canvas.width - 65;
+      this.playing_users[client.id].bar.x = match.canvas.width - 115;
     else
       this.playing_users[client.id].bar.x = 100;
     this.playing_users[client.id].bar.length = 100;

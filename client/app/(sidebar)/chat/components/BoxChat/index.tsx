@@ -301,7 +301,6 @@ const BoxChat = ({
       );
       // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.members // (going to remove it cause were not working with this object)
       let checkBlocked = response?.allMessages?.filter((message: any) => {
-        console.log("message blocked", message.reciever);
         if (
           userBlockedMe.includes(message?.sender) ||
           blockedUsers.includes(message?.sender)

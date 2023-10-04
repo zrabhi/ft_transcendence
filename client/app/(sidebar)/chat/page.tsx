@@ -267,10 +267,12 @@ const Chat: React.FC = () => {
       });
       socket.on("NewMember", (data: any) => {
         if (data.member === user.username)
+        {
           setChannels((prevChannels: any) => [
             data.lastMessage,
             ...prevChannels,
           ]);
+        }
         else {
           showSnackbar(
             `${data.member} is now in ${data?.channelName} room`,

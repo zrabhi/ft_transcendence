@@ -36,6 +36,20 @@ const customStyles = {
     maxHeight: "600px",
   },
 };
+const customStylesChangeType = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+    width: "500px",
+    maxWidth: "500px",
+    height: "350px",
+    maxHeight: "350px",
+  },
+};
 interface MessageProps {
   reciever?: string;
   sender?: string;
@@ -65,6 +79,7 @@ const BoxChat = ({
   const [message, setMessage] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // state for dropdown
   const [isPopupOpen, setIsPopupOpen] = useState(false); // state for members popup
+  const [isChangeTypePopupOpen, setIsChangeTypePopupOpen] = useState(false); // state for members popup
 
   const [blockOrUnblock, setBlockOrUnblock] = useState("Block");
   const [selectedUsers, setSelectedUsers] = useState<any>([]);
@@ -78,11 +93,11 @@ const BoxChat = ({
     "Owner" | "Admin" | "Member"
   >("Member");
 
-  const [chat, setChat] = useState({}); // id && tyoe && avatar && username && message
+  const [chat, setChat] = useState(); // id && tyoe && avatar && username && message
   const [cookie] = useCookies(["access_token"]);
-  const { user, blockedUsers, setBlockedUsers, userBlockedMe } =
+  const {user, blockedUsers, setBlockedUsers, userBlockedMe } =
     useContext(AuthContext);
-
+  
   const getRoleOptions = (type: string) => {
     if (type === "PUBLIC" || type === "PRIVATE" || type === "PROTECTED") {
       return {
@@ -90,6 +105,7 @@ const BoxChat = ({
           { text: "Delete Room", action: handleDeleteRoom },
           { text: "Add member", action: handleAddMember },
           { text: "Show members", action: handleShowMembers },
+          { text: "Settings", action: handleChangeChannelType },
         ],
         Admin: [
           { text: "Leave Room", action: handleLeaveRoom },
@@ -104,6 +120,7 @@ const BoxChat = ({
     } else if (type === "DM") {
       return [
         { text: "Block", action: handleBlock },
+        { text: "Unblock", action: handleUnblock },
         { text: "Show profile", action: handleShowProfile },
       ];
     } else {
@@ -119,6 +136,14 @@ const BoxChat = ({
     console.log("-----", selectedChat);
     // username is the selected user to be blocked
     socket.emit("block", {
+      username: selectedChat.username,
+      token: cookie.access_token,
+    });
+  }
+  async function handleUnblock() {
+    console.log("-----", selectedChat);
+    // username is the selected user to be blocked
+    socket.emit("unblock", {
       username: selectedChat.username,
       token: cookie.access_token,
     });
@@ -149,11 +174,13 @@ const BoxChat = ({
     Owner: [
       { text: "Ban", action: handleBanMember }, // change to handle Ban and username of the banned one must be provided
       { text: "Mute", action: handleMuteMember }, // change to handle Mute
+      { text: "Kick", action: handleKickMember }, // change to handle Ban and username of the banned one must be provided
       { text: "Set as admin", action: handleSetAsAdmin }, // change to handle set As ADMIN
     ],
     Admin: [
       { text: "Ban", action: handleBanMember }, // change to handle Ban
       { text: "Mute", action: handleMuteMember }, // change to handle Mute
+      { text: "Kick", action: handleKickMember }, // change to handle Ban
     ],
   };
 
@@ -170,7 +197,8 @@ const BoxChat = ({
           (option: any) =>
             option.text === "Delete Room" ||
             option.text === "Leave Room" ||
-            option.text === "Block"
+            option.text === "Block" ||
+            option.text === "Unblock"
         )
       : [];
 
@@ -180,7 +208,8 @@ const BoxChat = ({
           (option: any) =>
             option.text !== "Delete Room" &&
             option.text !== "Leave Room" &&
-            option.text !== "Block"
+            option.text !== "Block" &&
+            option.text !== "Unblock"
         )
       : [];
 
@@ -197,6 +226,14 @@ const BoxChat = ({
     // i need the user name of the added person
     // handle add member action
     setIsAddMemberPopupOpen(true);
+  }
+
+
+  function handleChangeChannelType() {
+    // i need the user name of the added person
+    // handle add member action
+    // setIsAddMemberPopupOpen(true);
+    setIsChangeTypePopupOpen(true);
   }
 
   function handleShowMembers() {
@@ -238,6 +275,16 @@ const BoxChat = ({
   function handleBanMember(user: any) {
     // testing kick in ban
     socket.emit("ban", {
+      channelId: selectedChannel?.channel?.id,
+      username: user?.name,
+      token: cookie.access_token,
+    });
+    // console.log("user clocked ", user);
+  }
+
+  function handleUnBanMember(user: any) {
+    // testing kick in ban
+    socket.emit("unban", {
       channelId: selectedChannel?.channel?.id,
       username: user?.name,
       token: cookie.access_token,
@@ -422,15 +469,20 @@ const BoxChat = ({
                   ? "red"
                   : option.text === "Mute"
                   ? "green"
-                  : "orange"
-              }-600 mr-2`}
+                  : option.text === "Kick"
+                  ? "red"
+                  : "gray"
+              }-600 mr-2 text-xs`}
               onClick={() => option.action(user)}
             >
               {(role === "Owner" &&
                 user.role === "Admin" &&
-                (option.text === "Ban" || option.text === "Mute")) ||
+                (option.text === "Ban" ||
+                  option.text === "Mute" ||
+                  option.text === "Kick")) ||
               (user.role === "Member" &&
                 (option.text === "Ban" ||
+                  option.text === "Kick" ||
                   option.text === "Mute" ||
                   option.text === "Set as admin"))
                 ? option.text
@@ -461,8 +513,12 @@ const BoxChat = ({
   const [usersList, setUsersList] = useState<any>(
     users.filter((user: any) => {
       // Check if the user's id is in the members array
-      return !selectedChannel.members.some(
-        (member: any) => member.name === user.username
+      return (
+        !selectedChannel.members.some(
+          (member: any) => member.name === user.username
+        ) &&
+        !blockedUsers.includes(user.username) &&
+        !userBlockedMe.includes(user.username)
       );
     })
   );
@@ -493,6 +549,29 @@ const BoxChat = ({
     };
     socket.emit("addMember", data);
   };
+
+  const [activeTab, setActiveTab] = useState("members");
+
+  const handleTabChange = (tab: any) => {
+    setActiveTab(tab);
+  };
+
+  const [changeType, setChangeType] = useState({
+    password: "",
+    type: selectedChannel?.channel?.type,
+  });
+  const handleChangeType = (e: any) => {
+    setChangeType((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleClickChangeType = () => {
+    // TODO: send request
+    alert("valid");
+  };
+
   return (
     <div className="box-chat">
       <div className="box-chat-container relative inline-block text-left z-1">
@@ -526,19 +605,108 @@ const BoxChat = ({
               {separateOptions.length > 0 && (
                 <hr className="border-t border-gray-200" />
               )}
+              {/* ADD setting here */}
               {separateOptions.map((option: any, index: Key) => (
-                <div
-                  key={"separated" + index} //changed previous value "index&"
-                  className={`block px-4 py-2 text-sm text-red-600 hover:bg-gray-300 hover:text-red-600 font-semibold cursor-pointer`}
-                  role="menuitem"
-                  onClick={() => handleOptionClick(option.action)}
-                >
-                  {option.text}
-                </div>
+                <>
+                  {blockedUsers.includes(chat?.name) && selectedChannel?.channel?.type === 'DM' &&
+                    option.text === "Unblock" && (
+                      <div
+                        key={"separated" + index} //changed previous value "index&"
+                        className={`block px-4 py-2 text-sm text-red-600 hover:bg-gray-300 hover:text-red-600 font-semibold cursor-pointer`}
+                        role="menuitem"
+                        onClick={() => handleOptionClick(option.action)}
+                      >
+                        {option.text}
+                      </div>
+                    )}
+                  {!blockedUsers.includes(chat?.name) && selectedChannel?.channel?.type === 'DM' &&
+                    option.text === "Block" && (
+                      <div
+                        key={"separated" + index} //changed previous value "index&"
+                        className={`block px-4 py-2 text-sm text-red-600 hover:bg-gray-300 hover:text-red-600 font-semibold cursor-pointer`}
+                        role="menuitem"
+                        onClick={() => handleOptionClick(option.action)}
+                      >
+                        {option.text}
+                      </div>
+                    )}
+                    {
+                      selectedChannel?.channel?.type !== 'DM' &&
+<div
+                        key={"separated" + index} //changed previous value "index&"
+                        className={`block px-4 py-2 text-sm text-red-600 hover:bg-gray-300 hover:text-red-600 font-semibold cursor-pointer`}
+                        role="menuitem"
+                        onClick={() => handleOptionClick(option.action)}
+                      >
+                        {option.text}
+                      </div>
+                    }
+                </>
               ))}
             </div>
           </div>
         )}
+        <Modal
+          isOpen={isChangeTypePopupOpen}
+          style={customStylesChangeType}
+          contentLabel="Modal"
+        >
+          <div className="flex justify-between items-center mb-3 z-10">
+            <h2 className="font-bold">Change Channel Type</h2>
+            <AiOutlineClose
+              className={"cursor-pointer"}
+              onClick={() => {
+                // setAvatarPreview(null);
+                setIsChangeTypePopupOpen(false);
+              }}
+            />
+          </div>
+          <hr className="h-1 mx-auto bg-[#654795] border-0 rounded my-8 dark:bg-gray-700" />
+          <div>
+            <label htmlFor="type" className="block text-gray-700 font-medium">
+              Room Type
+            </label>
+            <select
+              name="type"
+              id="type"
+              className="border border-gray-300 rounded w-full px-3 py-2 my-2"
+              value={changeType.type}
+              onChange={(e) => handleChangeType(e)}
+            >
+              <option value="">Select type of this room</option>
+              <option value="PUBLIC">PUBLIC</option>
+              <option value="PRIVATE">PRIVATE</option>
+              <option value="PROTECTED">PROTECTED</option>
+            </select>
+          </div>
+
+          {changeType.type === "PROTECTED" && (
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-gray-700 font-medium"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                placeholder="Enter your password"
+                className="border border-gray-300 rounded w-full px-3 py-2 my-2"
+                onChange={(e) => handleChangeType(e)}
+                value={changeType.password}
+              />
+            </div>
+          )}
+          <button
+            type="button"
+            className="flex justify-between items-center gap-1 bg-[#654795]  text-white font-semibold py-2 px-4 rounded-3xl focus:outline-none mt-4"
+            onClick={handleClickChangeType}
+          >
+            Valid
+          </button>
+        </Modal>
       </div>
       <div className="box-chat-messages">
         <div className="messages-box flex flex-col flex-grow overflow-y-auto justify-end">
@@ -620,95 +788,188 @@ const BoxChat = ({
             />
           </div>
           <hr className="h-1 mx-auto bg-[#654795] border-0 rounded my-8 dark:bg-gray-700" />
-          <div>
-            <div className="flex justify-between">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="form-checkbox accent-[#654795] h-5 w-5"
-                  checked={checkboxes.owner}
-                  onChange={() => handleChangeCheckbox("owner")}
-                />
-                <span className="text-gray-700">Owner</span>
-              </label>
-
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="form-checkbox accent-[#654795] h-5 w-5"
-                  checked={checkboxes.admins}
-                  onChange={() => handleChangeCheckbox("admins")}
-                />
-                <span className="text-gray-700">Admins</span>
-              </label>
-
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="form-checkbox accent-[#654795] h-5 w-5"
-                  checked={checkboxes.members}
-                  onChange={() => handleChangeCheckbox("members")}
-                />
-                <span className="text-gray-700">Members</span>
-              </label>
-            </div>
+          <div className="flex space-x-4 items-center justify-center mb-4">
+            <button
+              onClick={() => handleTabChange("members")}
+              className={`${
+                activeTab === "members"
+                  ? "bg-[#4B356F] text-white"
+                  : "bg-gray-200 text-gray-600"
+              } py-2 px-4 rounded-md focus:outline-none`}
+            >
+              Members
+            </button>
+            <button
+              onClick={() => handleTabChange("banned")}
+              className={`${
+                activeTab === "banned"
+                  ? "bg-red-500 text-white"
+                  : "bg-gray-200 text-gray-600"
+              } py-2 px-4 rounded-md focus:outline-none focus:bg-red-600`}
+            >
+              Banned Members
+            </button>
+          </div>
+          {activeTab === "members" && (
             <div>
-              {/* Add a scrollable container with a max height */}
-              <div className="max-h-500px overflow-y-auto">
-                <div className="mt-4">
-                  {filteredUsers.map((user: any) => (
-                    <div
-                      key={user.id}
-                      className="bg-[#050A30] shadow-lg rounded-3xl overflow-hidden flex justify-between items-center p-4 mb-4"
-                    >
-                      <div className="flex flex-row items-center">
-                        <div className="relative">
-                          <div
-                            className={`w-4 h-4 absolute top-2 right-3 rounded-full ${
-                              user.status === "ONLINE"
-                                ? "bg-green-500"
-                                : "bg-gray-500"
-                            }`}
-                          />
-                          <img
-                            src={user.avatar}
-                            alt={`${user.name}'s avatar`}
-                            className="w-16 h-16 object-cover rounded-full mr-4"
-                          />
-                        </div>
-                        <div>
-                          <h3 className="text-xl text-white font-semibold">
-                            {user.name}
-                          </h3>
-                          {/* Render the role icon */}
-                          <div className="flex items-center">
-                            {roleIcons[user.role]}
-                            <span
-                              className={`ml-2 font-semibold ${
-                                user.role === "Owner"
-                                  ? "text-[#FF5555]"
-                                  : user.role === "Admin"
-                                  ? "text-[#CDD031]"
-                                  : "text-[#654795]"
+              <div className="flex justify-between">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox accent-[#654795] h-5 w-5"
+                    checked={checkboxes.owner}
+                    onChange={() => handleChangeCheckbox("owner")}
+                  />
+                  <span className="text-gray-700">Owner</span>
+                </label>
+
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox accent-[#654795] h-5 w-5"
+                    checked={checkboxes.admins}
+                    onChange={() => handleChangeCheckbox("admins")}
+                  />
+                  <span className="text-gray-700">Admins</span>
+                </label>
+
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox accent-[#654795] h-5 w-5"
+                    checked={checkboxes.members}
+                    onChange={() => handleChangeCheckbox("members")}
+                  />
+                  <span className="text-gray-700">Members</span>
+                </label>
+              </div>
+              <div>
+                {/* Add a scrollable container with a max height */}
+                <div className="max-h-500px overflow-y-auto">
+                  <div className="mt-4">
+                    {filteredUsers.map((user: any) => (
+                      <div
+                        key={user.id}
+                        className="bg-[#050A30] shadow-lg rounded-3xl overflow-hidden flex justify-between items-center p-4 mb-4"
+                      >
+                        <div className="flex flex-row items-center">
+                          <div className="relative">
+                            <div
+                              className={`w-4 h-4 absolute top-2 right-3 rounded-full ${
+                                user.status === "ONLINE"
+                                  ? "bg-green-500"
+                                  : "bg-gray-500"
                               }`}
-                            >
-                              {user.role}
-                            </span>
+                            />
+                            <img
+                              src={user.avatar}
+                              alt={`${user.name}'s avatar`}
+                              className="w-16 h-16 object-cover rounded-full mr-4"
+                            />
+                          </div>
+                          <div>
+                            <h3 className="text-xl text-white font-semibold">
+                              {user.name}
+                            </h3>
+                            {/* Render the role icon */}
+                            <div className="flex items-center">
+                              {roleIcons[user.role]}
+                              <span
+                                className={`ml-2 font-semibold ${
+                                  user.role === "Owner"
+                                    ? "text-[#FF5555]"
+                                    : user.role === "Admin"
+                                    ? "text-[#CDD031]"
+                                    : "text-[#654795]"
+                                }`}
+                              >
+                                {user.role}
+                              </span>
+                            </div>
                           </div>
                         </div>
+                        <div>
+                          {renderActions(currentUserRole, user)}
+                          {/* "Owner" changed to user.role  */}
+                          {/* the "Admin" is the user connected role in this room channel */}
+                          {/* it can be "Admin" "Owner" "Member" */}
+                        </div>
                       </div>
-                      <div>
-                        {renderActions(currentUserRole, user)}
-                        {/* "Owner" changed to user.role  */}
-                        {/* the "Admin" is the user connected role in this room channel */}
-                        {/* it can be "Admin" "Owner" "Member" */}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
+          {activeTab === "banned" && (
+            <div>
+              <div>
+                {/* Add a scrollable container with a max height */}
+                <div className="max-h-500px overflow-y-auto">
+                  <div className="mt-4">
+                    {selectedChannel?.bannedUsers.map((user: any) => (
+                      <div
+                        key={user.id}
+                        className="bg-[#050A30] shadow-lg rounded-3xl overflow-hidden flex justify-between items-center p-4 mb-4"
+                      >
+                        <div className="flex flex-row items-center">
+                          <div className="relative">
+                            <div
+                              className={`w-4 h-4 absolute top-2 right-3 rounded-full ${
+                                user.status === "ONLINE"
+                                  ? "bg-green-500"
+                                  : "bg-gray-500"
+                              }`}
+                            />
+                            <img
+                              src={user.avatar}
+                              alt={`${user.name}'s avatar`}
+                              className="w-16 h-16 object-cover rounded-full mr-4"
+                            />
+                          </div>
+                          <div>
+                            <h3 className="text-xl text-white font-semibold">
+                              {user.name}
+                            </h3>
+                            {/* Render the role icon */}
+                            <div className="flex items-center">
+                              {roleIcons[user.role]}
+                              <span
+                                className={`ml-2 font-semibold ${
+                                  user.role === "Owner"
+                                    ? "text-[#FF5555]"
+                                    : user.role === "Admin"
+                                    ? "text-[#CDD031]"
+                                    : "text-[#654795]"
+                                }`}
+                              >
+                                {user.role}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          {(currentUserRole === "Owner" ||
+                            currentUserRole === "Admin") && (
+                            <button
+                              key={"index"}
+                              className={`text-red-600 mr-2`}
+                              onClick={() => handleUnBanMember(user)}
+                            >
+                              Unban
+                            </button>
+                          )}
+                          {/* "Owner" changed to user.role  */}
+                          {/* the "Admin" is the user connected role in this room channel */}
+                          {/* it can be "Admin" "Owner" "Member" */}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </Modal>
       )}
 

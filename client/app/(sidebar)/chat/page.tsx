@@ -48,8 +48,8 @@ const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
   const [otherChannels, setOtherChannels] = useState([]);
-  const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
-  const { user, setBlockedUsers,setUserBlockedMe} = useContext(AuthContext);
+  const [users, setUsers] = useState(); // to set users (TODO : changing it to user friends)
+  const { user, setBlockedUsers, setUserBlockedMe } = useContext(AuthContext);
   const [cookie] = useCookies(["access_token"]);
 
   const [password, setPassword] = useState("");
@@ -133,8 +133,7 @@ const Chat: React.FC = () => {
             `the owner  ${data.username}  deleted  ${data.name} Room`,
             true
           );
-        else
-          showSnackbar(`Room has been deleted`, true)
+        else showSnackbar(`Room has been deleted`, true);
         setSelectedChannel(null); // the  the channel here for other usersss
         setChannels(updatedChannel);
       });
@@ -143,7 +142,7 @@ const Chat: React.FC = () => {
           selectedChannel &&
           selectedChannel?.channel &&
           selectedChannel?.channel.id === data.channelId
-        ){
+        ) {
           let updatedMembers = selectedChannel.members.filter((member: any) => {
             return member.name != data.name;
           });
@@ -152,11 +151,13 @@ const Chat: React.FC = () => {
             members: updatedMembers,
           }));
         }
-        showSnackbar(`${data.name} has been kicked from ${data.channelName} Room`, true);
-      })
-      socket.on("yourKicked", (data: any)=> {
-        if (user.username === data.name)
-        {
+        showSnackbar(
+          `${data.name} has been kicked from ${data.channelName} Room`,
+          true
+        );
+      });
+      socket.on("yourKicked", (data: any) => {
+        if (user.username === data.name) {
           let updatedChannels = channels.map((channel: any) => {
             if (channel?.channel && channel?.channel.id === data.channelId)
               return [];
@@ -164,18 +165,20 @@ const Chat: React.FC = () => {
           });
           setSelectedChannel(null);
           setChannels(updatedChannels);
-          showSnackbar(`${data.name} you have been kicked from ${data.channelName}`, false)
+          showSnackbar(
+            `${data.name} you have been kicked from ${data.channelName}`,
+            false
+          );
         }
-      })
+      });
 
-      socket.on("userBanned", (data : any) =>
-      {
+      socket.on("userBanned", (data: any) => {
         // TODO:added user to the banned list (in show mmembers) (Selectedchannel.bannedUsers)
         if (
           selectedChannel &&
           selectedChannel?.channel &&
           selectedChannel?.channel.id === data.channelId
-        ){
+        ) {
           let updatedMembers = selectedChannel.members.filter((member: any) => {
             return member.name != data.name;
           });
@@ -184,11 +187,13 @@ const Chat: React.FC = () => {
             members: updatedMembers,
           }));
         }
-        showSnackbar(`${data.name} has been banned from ${data.channelName} Room`, true);
-      })
-      socket.on("yourBanned", (data: any)=> {
-        if (user.username === data.name)
-        {
+        showSnackbar(
+          `${data.name} has been banned from ${data.channelName} Room`,
+          true
+        );
+      });
+      socket.on("yourBanned", (data: any) => {
+        if (user.username === data.name) {
           let updatedChannels = channels.map((channel: any) => {
             if (channel?.channel && channel?.channel.id === data.channelId)
               return [];
@@ -196,18 +201,23 @@ const Chat: React.FC = () => {
           });
           setSelectedChannel(null);
           setChannels(updatedChannels);
-          showSnackbar(`${data.name} you have been banned from ${data.channelName}`, false)
+          showSnackbar(
+            `${data.name} you have been banned from ${data.channelName}`,
+            false
+          );
         }
-      })
+      });
       socket.on("userMuted", (data: any) => {
         if (user.username === data.user)
-          showSnackbar(`${data.user} you have mutued from ${data.channelName}`, true);
-        else
-          showSnackbar(`${data.user} is muted`, true);
-      })
+          showSnackbar(
+            `${data.user} you have mutued from ${data.channelName}`,
+            true
+          );
+        else showSnackbar(`${data.user} is muted`, true);
+      });
       socket.on("Yourmuted", (data: any) => {
-        showSnackbar(`Message can be sent because you have been muted`, false)
-      } )
+        showSnackbar(`Message can be sent because you have been muted`, false);
+      });
       socket.on("memberJoinned", (data: any) => {
         console.log("data from socket", data);
         if (user.username != data.name) {
@@ -250,30 +260,27 @@ const Chat: React.FC = () => {
       socket.on("newAdmin", (data: any) => {
         console.log("data from socket", data);
         if (user.username === data.user)
-          showSnackbar(`Your now admin of ${data.channelName} Room `, true)
+          showSnackbar(`Your now admin of ${data.channelName} Room `, true);
         if (
           selectedChannel &&
           selectedChannel?.channel &&
           selectedChannel?.channel?.name === data.channelName
-        ){
+        ) {
           let previousChannel = selectedChannel;
-          previousChannel?.members.map((member :any) => {
-            if (member.name === data.user)
-                member.role ="Admin"
-          })
-          setSelectedChannel(previousChannel)
+          previousChannel?.members.map((member: any) => {
+            if (member.name === data.user) member.role = "Admin";
+          });
+          setSelectedChannel(previousChannel);
         }
-        showSnackbar(`${data.user} is now admin of ${data.channelName}`, true)
+        showSnackbar(`${data.user} is now admin of ${data.channelName}`, true);
       });
       socket.on("NewMember", (data: any) => {
-        if (data.member === user.username)
-        {
+        if (data.member === user.username) {
           setChannels((prevChannels: any) => [
             data.lastMessage,
             ...prevChannels,
           ]);
-        }
-        else {
+        } else {
           showSnackbar(
             `${data.member} is now in ${data?.channelName} room`,
             true
@@ -306,26 +313,24 @@ const Chat: React.FC = () => {
           }));
         }
       });
-      socket.on("blockedUser", () =>{
+      socket.on("blockedUser", () => {
         showSnackbar("you cant send message to user who blocked you", false);
-      } )
+      });
       socket.on("messageBlocked", () => {
         showSnackbar("you cant send message to blocked user", false);
-      })
+      });
       socket.on("yourBlocked", (data: any) => {
-        if (data?.username)
-        {
+        if (data?.username) {
           setUserBlockedMe((prev: any) => [...prev, data.username]);
-          showSnackbar(`${data.username} blocked you`,false)
+          showSnackbar(`${data.username} blocked you`, false);
         }
-      })
+      });
       socket.on("userBlocked", (data: any) => {
-        if (data?.username)
-        {
-          showSnackbar(`you've successfully blocked ${data.username}`, true)
-          setBlockedUsers((prev: any) => ([...prev, data.username]))
+        if (data?.username) {
+          showSnackbar(`you've successfully blocked ${data.username}`, true);
+          setBlockedUsers((prev: any) => [...prev, data.username]);
         }
-      })
+      });
       socket.on("disconnect", () => {
         socket.off("latMessage");
         socket.off("YourBlocked");
@@ -341,7 +346,7 @@ const Chat: React.FC = () => {
         socket.off("userBanned");
         socket.off("yourKicked");
         socket.off("userKicked");
-        socket.off("channelDeleted")
+        socket.off("channelDeleted");
       });
     });
     return () => {

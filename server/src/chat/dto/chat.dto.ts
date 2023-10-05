@@ -75,6 +75,16 @@ export class getChannelDmDto
   user: any;
 }
 
+export class channelSettings
+{
+  @IsString()
+  @IsNotEmpty()
+  channelId: string;
+
+  type: string;
+
+  password: string;
+}
 
 
 export class actionsDto {

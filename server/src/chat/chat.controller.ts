@@ -16,6 +16,7 @@ import { UserService } from 'src/user/user.service';
 import { ChatService } from './chat.service';
 import {
   actionsDto,
+  channelSettings,
   createDmDto,
   createRoomDto,
   getChannelDmDto,
@@ -357,6 +358,22 @@ export class ChatController {
       channelId,
       username);
     if (!result.success) return res.status(400).json(result);
+    return res.status(200).json(result);
+  }
+  @Put('channelSettings')
+  @UseGuards(JwtAuthGuard)
+  async handlechannelsettings(
+    @UserInfo() user: User,
+    @Body() Body: channelSettings,
+    @Res() res
+  )
+  {
+    const {channelId, type, password} = Body;
+    const result = await this.chatService.handleChannelSettings(
+      channelId, password, type, user
+    )
+    if (!result.success)
+      return res.status(400).json(result);
     return res.status(200).json(result);
   }
   @Put('setadmin/:channelId/:username')

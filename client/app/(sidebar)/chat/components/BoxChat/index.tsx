@@ -2,8 +2,6 @@ import {
   baseChatUrl,
   baseUrlUsers,
   getRequest,
-  getRequestBody,
-  postRequest,
   putRequest,
 } from "@/app/context/utils/service";
 import { Key, useContext, useEffect, useRef, useState } from "react";
@@ -95,7 +93,7 @@ const BoxChat = ({
 
   const [chat, setChat] = useState(); // id && tyoe && avatar && username && message
   const [cookie] = useCookies(["access_token"]);
-  const {user, blockedUsers, setBlockedUsers, userBlockedMe } =
+  const { user, blockedUsers, setBlockedUsers, userBlockedMe } =
     useContext(AuthContext);
   const getRoleOptions = (type: string) => {
     if (type === "PUBLIC" || type === "PRIVATE" || type === "PROTECTED") {
@@ -119,7 +117,7 @@ const BoxChat = ({
     } else if (type === "DM") {
       return [
         { text: "Block", action: handleBlock },
-        { text: "Unblock", action: handleUnblock},
+        { text: "Unblock", action: handleUnblock },
         { text: "Show profile", action: handleShowProfile },
       ];
     } else {
@@ -210,10 +208,7 @@ const BoxChat = ({
     setIsAddMemberPopupOpen(true);
   }
 
-
   function handleChangeChannelType() {
-    // i need the user name of the added person
-    // handle add member action
     // setIsAddMemberPopupOpen(true);
     setIsChangeTypePopupOpen(true);
   }
@@ -533,8 +528,9 @@ const BoxChat = ({
   };
 
   const [changeType, setChangeType] = useState({
-    password: "",
+    channelId: selectedChannel?.channel?.id,
     type: selectedChannel?.channel?.type,
+    password: "",
   });
   const handleChangeType = (e: any) => {
     setChangeType((prevState) => ({
@@ -543,9 +539,15 @@ const BoxChat = ({
     }));
   };
 
-  const handleClickChangeType = () => {
-    // TODO: send request
-    alert("valid");
+  const handleClickChangeType = async () => {
+    console.log(changeType);
+    const response = await putRequest(
+      `${baseChatUrl}/channelSettings`,
+      JSON.stringify(changeType)
+    );
+    if (response.error) {
+      showSnackbar(response.message.error, false);
+    } else showSnackbar(response.message, true);
   };
 
   return (
@@ -584,7 +586,8 @@ const BoxChat = ({
               {/* ADD setting here */}
               {separateOptions.map((option: any, index: Key) => (
                 <>
-                  {blockedUsers.includes(chat?.username) && selectedChannel?.channel?.type === 'DM' &&
+                  {blockedUsers.includes(chat?.username) &&
+                    selectedChannel?.channel?.type === "DM" &&
                     option.text === "Unblock" && (
                       <div
                         key={"separated" + index} //changed previous value "index&"
@@ -595,7 +598,8 @@ const BoxChat = ({
                         {option.text}
                       </div>
                     )}
-                  {!blockedUsers.includes(chat?.username) && selectedChannel?.channel?.type === 'DM' &&
+                  {!blockedUsers.includes(chat?.username) &&
+                    selectedChannel?.channel?.type === "DM" &&
                     option.text === "Block" && (
                       <div
                         key={"separated" + index} //changed previous value "index&"
@@ -606,17 +610,16 @@ const BoxChat = ({
                         {option.text}
                       </div>
                     )}
-                    {
-                      selectedChannel?.channel?.type !== 'DM' &&
-<div
-                        key={"separated" + index} //changed previous value "index&"
-                        className={`block px-4 py-2 text-sm text-red-600 hover:bg-gray-300 hover:text-red-600 font-semibold cursor-pointer`}
-                        role="menuitem"
-                        onClick={() => handleOptionClick(option.action)}
-                      >
-                        {option.text}
-                      </div>
-                    }
+                  {selectedChannel?.channel?.type !== "DM" && (
+                    <div
+                      key={"separated" + index} //changed previous value "index&"
+                      className={`block px-4 py-2 text-sm text-red-600 hover:bg-gray-300 hover:text-red-600 font-semibold cursor-pointer`}
+                      role="menuitem"
+                      onClick={() => handleOptionClick(option.action)}
+                    >
+                      {option.text}
+                    </div>
+                  )}
                 </>
               ))}
             </div>

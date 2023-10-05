@@ -49,7 +49,13 @@ const Chat: React.FC = () => {
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
   const [otherChannels, setOtherChannels] = useState([]);
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
-  const { user, setBlockedUsers, setUserBlockedMe, blockedUsers, userBlockedMe } = useContext(AuthContext);
+  const {
+    user,
+    setBlockedUsers,
+    setUserBlockedMe,
+    blockedUsers,
+    userBlockedMe,
+  } = useContext(AuthContext);
   const [cookie] = useCookies(["access_token"]);
 
   const [password, setPassword] = useState("");
@@ -173,7 +179,7 @@ const Chat: React.FC = () => {
       });
 
       socket.on("userBanned", (data: any) => {
-        // TODO:added user to the banned list (in show mmembers) (Selectedchannel.bannedUsers)
+        // TODO:added user to the banned list (in show mmebers) (Selectedchannel.bannedUsers)
         if (
           selectedChannel &&
           selectedChannel?.channel &&
@@ -237,6 +243,7 @@ const Chat: React.FC = () => {
           }
           return;
         }
+        setChannels((prev: any) => [data?.lastMessage, ...prev]);
         let desiredChannel: any = otherChannels.filter((channel: any) => {
           return channel.channel.id === data.channelId;
         });
@@ -251,11 +258,11 @@ const Chat: React.FC = () => {
         let NewOtherChahnnels = otherChannels.filter((channel: any) => {
           return channel.channel.id != data.channelId;
         });
+        setOtherChannels(NewOtherChahnnels);
         showSnackbar(
           `${data.name} you have successfully joined ${data.channelName}`,
           true
         );
-        setOtherChannels(NewOtherChahnnels);
       });
       socket.on("newAdmin", (data: any) => {
         console.log("data from socket", data);
@@ -276,10 +283,10 @@ const Chat: React.FC = () => {
       });
       socket.on("NewMember", (data: any) => {
         if (data.member === user.username) {
-          setChannels((prevChannels: any) => [
-            data.lastMessage,
-            ...prevChannels,
-          ]);
+            setChannels((prevChannels: any) => [
+              data.lastMessage,
+              ...prevChannels,
+            ]);
         } else {
           showSnackbar(
             `${data.member} is now in ${data?.channelName} room`,
@@ -333,35 +340,42 @@ const Chat: React.FC = () => {
       });
 
       socket.on("userUnBlocked", (data: any) => {
-        showSnackbar(`you unblocked ${data.username}`, true)
-        let UpdateBlockedUsers = blockedUsers?.filter((member: any) => member != data.username)
+        showSnackbar(`you unblocked ${data.username}`, true);
+        let UpdateBlockedUsers = blockedUsers?.filter(
+          (member: any) => member != data.username
+        );
         setBlockedUsers(UpdateBlockedUsers);
-      })
+      });
       socket.on("yourUnBlocked", (data: any) => {
         showSnackbar(`${data.username} just unblocked you`, true);
-        let UpdateUsersBlockedMe = userBlockedMe.filter((member: any) => member != data.username)
+        let UpdateUsersBlockedMe = userBlockedMe.filter(
+          (member: any) => member != data.username
+        );
         setUserBlockedMe(UpdateUsersBlockedMe);
-      })
-      socket.on("UserUnbanned", (data: any) =>
-      {
+      });
+      socket.on("UserUnbanned", (data: any) => {
         if (user.username != data.username) {
           if (
             selectedChannel &&
             selectedChannel.channel &&
             selectedChannel.channel.id === data.id
           ) {
-            let updatedBannedMembers = selectedChannel?.bannedUsers?.filter((member: any) => {
-              return member.name != data.username;
-            });
+            let updatedBannedMembers = selectedChannel?.bannedUsers?.filter(
+              (member: any) => {
+                return member.name != data.username;
+              }
+            );
             setSelectedChannel((prevChannel: any) => ({
               ...prevChannel,
               bannedUsers: updatedBannedMembers,
             }));
           }
-        }
-        else
-          showSnackbar(`The owner of ${data.channelName} room just unbanned you`, true);
-      })
+        } else
+          showSnackbar(
+            `The owner of ${data.channelName} room just unbanned you`,
+            true
+          );
+      });
       socket.on("disconnect", () => {
         socket.off("YourUnbanned");
         socket.off("lastMessage");
@@ -392,9 +406,6 @@ const Chat: React.FC = () => {
     password: string
   ) => {
     e.preventDefault();
-    // let password = "fdf";
-    console.log("channel name", channelName, password);
-
     socket.emit("joinNewChannel", {
       channelName: channelName,
       password: password,
@@ -420,6 +431,7 @@ const Chat: React.FC = () => {
             <Channels
               setMessages={setMessages}
               channels={channels}
+              setChannels={setChannels}
               setSelectedChannel={setSelectedChannel}
               setSelectedChat={setSelectedChat}
             />

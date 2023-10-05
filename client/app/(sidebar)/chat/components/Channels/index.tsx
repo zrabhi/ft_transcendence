@@ -21,7 +21,7 @@ import * as Yup from "yup";
 import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 
-const Channels = ({ channels, setSelectedChat, setSelectedChannel, setMessages }: any) => {
+const Channels = ({channels, setSelectedChat, setSelectedChannel, setMessages, setChannels, }: any) => {
   const [isChecked, setIsChecked] = useState(false);
   const [selectedChannels, setSelectedChannels] = useState([]);
 
@@ -74,6 +74,7 @@ const Channels = ({ channels, setSelectedChat, setSelectedChannel, setMessages }
       <div>
         {isChecked && (
           <AddNewChannel
+            setChannels={setChannels}
             setSelectedChannel={setSelectedChannel}
             setSelectedChat={setSelectedChat}
             setMessages={setMessages}
@@ -127,7 +128,7 @@ const ChannelsSwitcher = ({ isChecked, setIsChecked }: any) => {
   );
 };
 
-const AddNewChannel = ({ setSelectedChannel, setSelectedChat,  setMessages}: any) => {
+const AddNewChannel = ({ setChannels,setSelectedChannel, setSelectedChat,  setMessages}: any) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => {
@@ -143,6 +144,7 @@ const AddNewChannel = ({ setSelectedChannel, setSelectedChat,  setMessages}: any
         <AiFillPlusCircle /> New Room
       </button>
       <ModalContainer
+        setChannels={setChannels}
         isOpen={isOpen}
         setMessages={setMessages}
         handleOpen={handleOpen}
@@ -202,6 +204,7 @@ const initialValues: FormValues = {
 const ModalContainer = ({
   isOpen,
   handleOpen,
+  setChannels,
   setSelectedChannel,
   setSelectedChat,
   setMessages
@@ -241,9 +244,10 @@ const ModalContainer = ({
       return ;
     }
     setMessages([]);
-    console.log("channel craeted", response); // response value is ,  channel created and (the username , avatar, status , owner ) obkect of the creator
+    console.log("channel craeted", response); 
     setSelectedChannel(response);
-    setSelectedChat(response.channel); /// edited with response.channel
+    setSelectedChat(response.channel);
+    setChannels(response.lastMessage);
     resetForm();
     handleOpen();
   };

@@ -176,8 +176,31 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         },
         include: {
           members: true,
+          messages: true,
         },
       });
+      let message :any;
+      if (channel.messages.length === 0)
+          message= {
+            type:"room",
+            channel: {
+                id: channel.id,
+                name: channel.name,
+                avatar: channel.avatar,
+                message:'',
+                status: ''
+            }};
+      else{
+        message = {
+          type:"room",
+          channel: {
+              id: channel.id,
+              name: channel.name,
+              avatar: channel.avatar,
+              message:channel.messages[channel.messages.length -1].content,
+              status: ''
+          }};
+      }
       for (const member of channel.members) {
         this.server.to(member.userId).emit('memberJoinned', {
           channelId: channel.id,
@@ -187,6 +210,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           status: currUser.status,
           avatar: currUser.avatar,
           role: 'Member',
+          lastMessage: message
         });
       }
     } catch (err) {

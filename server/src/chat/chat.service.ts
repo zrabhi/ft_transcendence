@@ -169,7 +169,22 @@ export class ChatService {
         role: 'OWNER',
       },
     });
-    return { error: undefined, channel: channel, user: user };
+    const lastMessage = {
+      type: 'room',
+      channel: {
+        id: channel.id,
+        name: channel.name,
+        avatar: channel.avatar,
+        message: '',
+        status: '',
+      },
+    };
+    return {
+      error: undefined,
+      channel: channel,
+      user: user,
+      lastMessage: lastMessage,
+    };
   }
 
   async getChannelDmMessages(channel_id: string, user_id: string) {
@@ -849,45 +864,31 @@ export class ChatService {
           });
         }
       }
-    if (type === 'PRIVATE') {
-      if (channel.type === 'PRIVATE')
-        return { success: false, error: 'channel is already private' ,channel: channel}
-      else
-      {
-        await this._prisma.channel.update({
-          where: {
-            id: channel.id,
-          },
-          data: {
-            type: 'PRIVATE',
-          },
-        });
+      if (type === 'PRIVATE') {
+        if (channel.type === 'PRIVATE')
+          return {
+            success: false,
+            error: 'channel is already private',
+            channel: channel,
+          };
+        else {
+          await this._prisma.channel.update({
+            where: {
+              id: channel.id,
+            },
+            data: {
+              type: 'PRIVATE',
+            },
+          });
+        }
       }
-    }
-    if (type === 'PROTECTED') {
-      if (channel.type === 'PROTECTED')
-      {
-        if (!password)
-          return { success: false, error: 'password must be provided'}
-        const matches = await bcrypt.compare(password, channel.password);
-        if (matches)
-            return { success: false, error: 'new password must be provided'}
-        const channelPassword = await bcrypt.hash(password, 10);
-        await this._prisma.channel.update({
-              where: {
-                id: channel.id,
-              },
-              data: {
-                type: 'PROTECTED',
-                password: channelPassword
-              },
-            });
-          return {success: true, message:"password changed successfully", channel: channel}
-      }
-      if (!password)
-        return { success: false, error: 'password must be provided'}
-      else
-        {
+      if (type === 'PROTECTED') {
+        if (channel.type === 'PROTECTED') {
+          if (!password)
+            return { success: false, error: 'password must be provided' };
+          const matches = await bcrypt.compare(password, channel.password);
+          if (matches)
+            return { success: false, error: 'new password must be provided' };
           const channelPassword = await bcrypt.hash(password, 10);
           await this._prisma.channel.update({
             where: {
@@ -895,14 +896,37 @@ export class ChatService {
             },
             data: {
               type: 'PROTECTED',
-              password: channelPassword
+              password: channelPassword,
+            },
+          });
+          return {
+            success: true,
+            message: 'password changed successfully',
+            channel: channel,
+          };
+        }
+        if (!password)
+          return { success: false, error: 'password must be provided' };
+        else {
+          const channelPassword = await bcrypt.hash(password, 10);
+          await this._prisma.channel.update({
+            where: {
+              id: channel.id,
+            },
+            data: {
+              type: 'PROTECTED',
+              password: channelPassword,
             },
           });
         }
-    }
-    return {success: true, message:"channel updated successfully" ,channel: channel}
-  } catch (err) {
-      return {success: false, error:"error ocures"}
+      }
+      return {
+        success: true,
+        message: 'channel updated successfully',
+        channel: channel,
+      };
+    } catch (err) {
+      return { success: false, error: 'error occured' };
     }
   }
 }

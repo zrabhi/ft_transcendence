@@ -56,15 +56,6 @@ export class ChatController {
     };
     res.status(200).json(data);
   }
-  // @Get('getChannel/:channelName')
-  // @UseGuards(JwtAuthGuard)
-  // async handleGetChannel(@UserInfo() user: User, @Res() res: Response,
-  // @Param('channelName') channelName: string)
-  // {
-  //   const result = await this.chatService.getCHannelRoom(channelName);
-  //   res.status(200).json(result);
-  // }
-
   @Post('create/room')
   @UseGuards(JwtAuthGuard)
   async handleCreateChannelRoom(
@@ -180,11 +171,10 @@ export class ChatController {
       });
     }
     const bannedUsers = [];
-    for (const banned of channel.banedUsers)
-    {
+    for (const banned of channel.banedUsers) {
       const user = await this.userService.findUserById(banned.userId);
       bannedUsers.push({
-        name:user.username,
+        name: user.username,
         avatar: user.avatar,
       });
     }
@@ -268,7 +258,19 @@ export class ChatController {
     const channels = [];
     for (const channel of result) {
       const lastMessage = channel.messages[channel.messages.length - 1];
-      if (!lastMessage) continue;
+      if (!lastMessage) {
+        channels.push({
+          type: 'room',
+          channel: {
+            id: channel.id,
+            name: channel.name,
+            avatar: channel.avatar,
+            message: '',
+            status: '',
+          },
+        });
+        continue;
+      }
       const searchedUser = await this.userService.findUserById(
         lastMessage.user_id,
       );
@@ -334,14 +336,13 @@ export class ChatController {
     @UserInfo() user: User,
     @Res() res: Response,
     @Body() body: actionsDto,
-  )
-  {
+  ) {
     const { channelId, username } = body;
     const result = await this.chatService.handleUnbanUser(
       user,
       channelId,
-      username
-    )
+      username,
+    );
     if (!result.success) return res.status(400).json(result);
     return res.status(200).json(result);
   }
@@ -351,12 +352,13 @@ export class ChatController {
     @UserInfo() user: User,
     @Res() res: Response,
     @Body() body: actionsDto,
-  ){
-    const {channelId, username} = body
+  ) {
+    const { channelId, username } = body;
     const result = await this.chatService.handleKickUser(
       user,
       channelId,
-      username);
+      username,
+    );
     if (!result.success) return res.status(400).json(result);
     return res.status(200).json(result);
   }
@@ -365,15 +367,16 @@ export class ChatController {
   async handlechannelsettings(
     @UserInfo() user: User,
     @Body() Body: channelSettings,
-    @Res() res
-  )
-  {
-    const {channelId, type, password} = Body;
+    @Res() res,
+  ) {
+    const { channelId, type, password } = Body;
     const result = await this.chatService.handleChannelSettings(
-      channelId, password, type, user
-    )
-    if (!result.success)
-      return res.status(400).json(result);
+      channelId,
+      password,
+      type,
+      user,
+    );
+    if (!result.success) return res.status(400).json(result);
     return res.status(200).json(result);
   }
   @Put('setadmin/:channelId/:username')

@@ -17,7 +17,7 @@ import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { channel } from 'diagnostics_channel';
+import { channel, subscribe } from 'diagnostics_channel';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -41,37 +41,36 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private connectedUsers = new Map<String, Socket>();
 
   async handleConnection(client: Socket) {
-    try{
+    try {
       const payload = await this.jwtService.verifyAsync(
-      client.handshake.auth.token,
-      {
-        secret: process.env.JWT_SECRET,
-      },
-    );
-    if (!payload) return client.disconnect(true);
-    client.join(payload.id);
-    // const newUser = await this.userService.findUserById(payload.id);
-    this.connectedUsers.set(payload.id, client);
-    this.server.to(client.id).emit('connected', 'Hello world!');
-    }catch(err)
-    {
-      console.log("error while trying to connect");
+        client.handshake.auth.token,
+        {
+          secret: process.env.JWT_SECRET,
+        },
+      );
+      if (!payload) return client.disconnect(true);
+      client.join(payload.id);
+      // const newUser = await this.userService.findUserById(payload.id);
+      this.connectedUsers.set(payload.id, client);
+      this.server.to(client.id).emit('connected', 'Hello world!');
+    } catch (err) {
+      console.log('error while trying to connect');
       return client.disconnect(true);
     }
   }
 
   async handleDisconnect(client: Socket) {
-    try{
-    const payload = await this.jwtService.verifyAsync(
-      client.handshake.auth.token,
-      {
-        secret: process.env.JWT_SECRET,
-      },
-    );
-    if (!payload) return client.disconnect(true);
-    // this.server.to(payload.id).emit('disconnected', '');
-    this.connectedUsers.delete(payload.id);
-    }catch (err) {
+    try {
+      const payload = await this.jwtService.verifyAsync(
+        client.handshake.auth.token,
+        {
+          secret: process.env.JWT_SECRET,
+        },
+      );
+      if (!payload) return client.disconnect(true);
+      // this.server.to(payload.id).emit('disconnected', '');
+      this.connectedUsers.delete(payload.id);
+    } catch (err) {
       return client.disconnect(true);
     }
     // console.log(`Client disconnected   id ${client.id}`);
@@ -89,66 +88,65 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    try{
-    const payload = await this.jwtService.verifyAsync(data.token, {
-      secret: process.env.JWT_SECRET,
-    });
-    if (!payload) return client.disconnect(true);
-    const user = await this.userService.findUserById(payload.id);
-    const result = await this.chatService.handleSetAsAdmin(
-      payload,
-      data.channelId,
-      data.username,
-    );
-    if (!result?.success) {
-      return;
+    try {
+      const payload = await this.jwtService.verifyAsync(data.token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!payload) return client.disconnect(true);
+      const user = await this.userService.findUserById(payload.id);
+      const result = await this.chatService.handleSetAsAdmin(
+        payload,
+        data.channelId,
+        data.username,
+      );
+      if (!result?.success) {
+        return;
+      }
+      const channel = await this.prismaService.channel.findUnique({
+        where: {
+          id: data.channelId,
+        },
+        include: {
+          members: true,
+        },
+      });
+      for (const member of channel.members) {
+        this.server
+          .to(member.userId)
+          .emit('newAdmin', { channelName: channel.name, user: data.username });
+      }
+    } catch (err) {
+      return client.disconnect(true);
     }
-    const channel = await this.prismaService.channel.findUnique({
-      where: {
-        id: data.channelId,
-      },
-      include: {
-        members: true,
-      },
-    });
-    for (const member of channel.members) {
-      this.server
-        .to(member.userId)
-        .emit('newAdmin', { channelName: channel.name, user: data.username });
-    }
-  }catch (err) {
-
-    return client.disconnect(true);
-  }
   }
   @SubscribeMessage('LeaveChannel')
   async handledLeaveRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    try{
-    const payload = await this.jwtService.verifyAsync(data.token, {
-      secret: process.env.JWT_SECRET,
-    });
-    if (!payload) return client.disconnect(true);
-    const user = await this.userService.findUserById(payload.id);
-    const channel = await this.prismaService.channel.findUnique({
-      where: {
-        id: data.channelId,
-      },
-      include: {
-        members: true,
-      },
-    });
-    for (const member of channel.members) {
-      if (member.userId != user.id)
-        this.server.to(member.userId).emit('leftRoom', {
-          channelName: channel.name,
+    try {
+      const payload = await this.jwtService.verifyAsync(data.token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!payload) return client.disconnect(true);
+      const user = await this.userService.findUserById(payload.id);
+      const channel = await this.prismaService.channel.findUnique({
+        where: {
           id: data.channelId,
-          name: data.name,
-        });
-    }}catch(err)
-    {
+        },
+        include: {
+          members: true,
+        },
+      });
+      for (const member of channel.members) {
+        if (member.userId != user.id)
+          this.server.to(member.userId).emit('leftRoom', {
+            channelName: channel.name,
+            id: data.channelId,
+            name: data.name,
+          });
+      }
+    } catch (err) {
       return client.disconnect(true);
     }
   }
@@ -158,89 +156,87 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    try{
-    const payload = await this.jwtService.verifyAsync(data.token, {
-      secret: process.env.JWT_SECRET,
-    });
-    if (!payload) return client.disconnect(true);
-    const result = await this.chatService.handleJoinChannelRoom(
-      data.channelName,
-      payload,
-      data.password,
-    );
-    if (result.channel === undefined) {
-      return;
-    }
-    const currUser = await this.userService.findUserById(payload.id);
-    const channel = await this.prismaService.channel.findUnique({
-      where: {
-        id: result.channel.id,
-      },
-      include: {
-        members: true,
-      },
-    });
-    for (const member of channel.members) {
-      this.server.to(member.userId).emit('memberJoinned', {
-        channelId: channel.id,
-        channelName: channel.name,
-        id: channel.members.length,
-        name: currUser.username,
-        status: currUser.status,
-        avatar: currUser.avatar,
-        role: 'Member',
+    try {
+      const payload = await this.jwtService.verifyAsync(data.token, {
+        secret: process.env.JWT_SECRET,
       });
+      if (!payload) return client.disconnect(true);
+      const result = await this.chatService.handleJoinChannelRoom(
+        data.channelName,
+        payload,
+        data.password,
+      );
+      if (result.channel === undefined) {
+        return;
+      }
+      const currUser = await this.userService.findUserById(payload.id);
+      const channel = await this.prismaService.channel.findUnique({
+        where: {
+          id: result.channel.id,
+        },
+        include: {
+          members: true,
+        },
+      });
+      for (const member of channel.members) {
+        this.server.to(member.userId).emit('memberJoinned', {
+          channelId: channel.id,
+          channelName: channel.name,
+          id: channel.members.length,
+          name: currUser.username,
+          status: currUser.status,
+          avatar: currUser.avatar,
+          role: 'Member',
+        });
+      }
+    } catch (err) {
+      return client.disconnect(true);
     }
-  }catch(err)
-  {
-    return client.disconnect(true);
-  }
   }
   @SubscribeMessage('addMember')
   async handleAddMmember(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    try{
+    try {
       const payload = await this.jwtService.verifyAsync(data.token, {
-      secret: process.env.JWT_SECRET,
-    });
-    if (!payload) return client.disconnect(true);
-    const result = await this.chatService.handleAddMember(
-      payload,
-      data.channelId,
-      data.username,
-    );
-    const channel = await this.prismaService.channel.findUnique({
-      where: {
-        id: data.channelId,
-      },
-      include: {
-        members: true,
-      },
-    });
-    const addedUser = await this.userService.findUserName(data.username);
-    // check if there is multiple users to be added
-    if (result.success) {
-      for (const member of channel.members) {
-        this.server.to(member.userId).emit('NewMember', {
-          channelName: channel.name,
-          member: data.username,
-          role: 'Member',
-          avatar: addedUser.avatar,
-          status: addedUser.status,
-          id: channel.members[channel.members.length - 1],
-          lastMessage: result.lastMessage,
-        });
+        secret: process.env.JWT_SECRET,
+      });
+      if (!payload) return client.disconnect(true);
+      const result = await this.chatService.handleAddMember(
+        payload,
+        data.channelId,
+        data.username,
+      );
+      const channel = await this.prismaService.channel.findUnique({
+        where: {
+          id: data.channelId,
+        },
+        include: {
+          members: true,
+        },
+      });
+      const addedUser = await this.userService.findUserName(data.username);
+      // check if there is multiple users to be added
+      if (result.success) {
+        for (const member of channel.members) {
+          this.server.to(member.userId).emit('NewMember', {
+            channelName: channel.name,
+            member: data.username,
+            role: 'Member',
+            avatar: addedUser.avatar,
+            status: addedUser.status,
+            id: channel.members[channel.members.length - 1],
+            lastMessage: result.lastMessage,
+          });
+        }
+      } else {
+        this.server
+          .to(payload.id)
+          .emit('error occored', { errorMessage: result?.error });
       }
-    } else {
-      this.server
-        .to(payload.id)
-        .emit('error occored', { errorMessage: result?.error });
-    }
-    }catch(err)
-    {
-      return client.disconnect(true)
+    } catch (err) {
+      return client.disconnect(true);
     }
   }
   @SubscribeMessage('deleteChannel')
@@ -248,39 +244,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    try{
-    const payload = await this.jwtService.verifyAsync(data.token, {
-      secret: process.env.JWT_SECRET,
-    });
-    if (!payload) return client.disconnect(true);
-    const user = await this.userService.findUserById(payload.id);
-    const channel = await this.prismaService.channel.findUnique({
-      where: {
-        id: data.channelId,
-      },
-      include: {
-        members: true,
-      },
-    });
-    const result = (await this.chatService.handleDeleteRoom(
-      data.channelId,
-      user,
-    )) as any;
-    const response = {
-      channelId: data.channelId,
-      name: channel.name,
-      username: user.username,
-      success: result.success,
-      error: result.error,
-    };
-    // Todo: return error message id something  wrong happend
-    for (const member of channel.members) {
-      this.server.to(member.userId).emit('channelDeleted', response);
+    try {
+      const payload = await this.jwtService.verifyAsync(data.token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!payload) return client.disconnect(true);
+      const user = await this.userService.findUserById(payload.id);
+      const channel = await this.prismaService.channel.findUnique({
+        where: {
+          id: data.channelId,
+        },
+        include: {
+          members: true,
+        },
+      });
+      const result = (await this.chatService.handleDeleteRoom(
+        data.channelId,
+        user,
+      )) as any;
+      const response = {
+        channelId: data.channelId,
+        name: channel.name,
+        username: user.username,
+        success: result.success,
+        error: result.error,
+      };
+      // Todo: return error message id something  wrong happend
+      for (const member of channel.members) {
+        this.server.to(member.userId).emit('channelDeleted', response);
+      }
+    } catch (err) {
+      return client.disconnect(true);
     }
-  }catch(err)
-  {
-    return client.disconnect(true)
-  }
   }
   @SubscribeMessage('mute')
   async handleMutedUser(
@@ -288,11 +283,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: any,
   ) {
     try {
-    const payload = await this.jwtService.verifyAsync(data.token, {
-      secret: process.env.JWT_SECRET,
-    });
-    if (!payload) return client.disconnect(true);
-    /// mute the user here
+      const payload = await this.jwtService.verifyAsync(data.token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!payload) return client.disconnect(true);
+      /// mute the user here
       console.log('im hereee');
       await this.chatService.handleUserMute(
         payload,
@@ -316,7 +311,47 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch (err) {
       console.log(err);
 
-      return client.disconnect(true);;
+      return client.disconnect(true);
+    }
+  }
+  @SubscribeMessage('unban')
+  async handleUnbanUser(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    try {
+      const payload = await this.jwtService.verifyAsync(data.token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!payload) return client.disconnect(true);
+      const bannedUser = await this.userService.findUserName(data.username);
+      const result = await this.chatService.handleUnbanUser(
+        payload,
+        data.channelId,
+        data.username,
+      );
+      if (!result.success) {
+        // error ocured here
+        return;
+      }
+      for (const member of result.channel.members) {
+        this.server
+          .to(member.userId)
+          .emit('UserUnbanned', {
+            id: result.channel.id,
+            channelName: result.channel.name,
+            username: bannedUser.username,
+          });
+      }
+      return this.server
+        .to(bannedUser.id)
+        .emit('UserUnbanned', {
+          id: result.channel.id,
+          channelName: result.channel.name,
+          username: bannedUser.username,
+        });
+    } catch (err) {
+      return client.disconnect(true);
     }
   }
   @SubscribeMessage('ban')
@@ -325,10 +360,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: any,
   ) {
     try {
-    const payload = await this.jwtService.verifyAsync(data.token, {
-      secret: process.env.JWT_SECRET,
-    });
-    if (!payload) return client.disconnect(true);
+      const payload = await this.jwtService.verifyAsync(data.token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!payload) return client.disconnect(true);
       const bannedUser = await this.userService.findUserName(data.username);
       const result = await this.chatService.handleBanUser(
         payload,
@@ -349,15 +384,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
       const Sentdata = {
         channelId: channel.id,
-        channelName:channel.name,
+        channelName: channel.name,
         name: bannedUser.username,
-      }
+      };
       for (const member of channel.members) {
-        this.server
-          .to(member.userId)
-          .emit('userBanned', Sentdata);
+        this.server.to(member.userId).emit('userBanned', Sentdata);
       }
-      return this.server.to(bannedUser.id).emit("yourBanned", Sentdata)
+      return this.server.to(bannedUser.id).emit('yourBanned', Sentdata);
     } catch (err) {
       return client.disconnect(true);
     }
@@ -366,93 +399,97 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleKickUser(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
-  )
-  {
-    try{
-    const payload = await this.jwtService.verifyAsync(data.token, {
-      secret: process.env.JWT_SECRET,
-    });
-    if (!payload) return client.disconnect(true);
-    const kickedUser =  await this.userService.findUserName(data.username);
-    const result = await this.chatService.handleKickUser(
-      payload,
-      data.channelId,
-      data.username,
-    );
-    if (!result.success) {
-      return;
+  ) {
+    try {
+      const payload = await this.jwtService.verifyAsync(data.token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!payload) return client.disconnect(true);
+      const kickedUser = await this.userService.findUserName(data.username);
+      const result = await this.chatService.handleKickUser(
+        payload,
+        data.channelId,
+        data.username,
+      );
+      if (!result.success) {
+        return;
+      }
+      const channel = await this.prismaService.channel.findUnique({
+        where: {
+          id: data.channelId,
+        },
+        include: {
+          members: true,
+        },
+      });
+      const Sentdata = {
+        channelId: channel.id,
+        channelName: channel.name,
+        name: kickedUser.username,
+      };
+      for (const member of channel.members) {
+        this.server.to(member.userId).emit('userKicked', Sentdata);
+      }
+      return this.server.to(kickedUser.id).emit('yourKicked', Sentdata);
+    } catch (err) {
+      return client.disconnect(true);
     }
-    const channel = await this.prismaService.channel.findUnique({
-      where: {
-        id: data.channelId,
-      },
-      include: {
-        members: true,
-      },
-    });
-    const Sentdata = {
-      channelId: channel.id,
-      channelName:channel.name,
-      name: kickedUser.username,
-    }
-    for (const member of channel.members) {
-      this.server
-        .to(member.userId)
-        .emit('userKicked', Sentdata);
-    }
-    return this.server.to(kickedUser.id).emit("yourKicked", Sentdata);
-
-    }catch(err)
-    {
-        return client.disconnect(true);;
-    }
-
   }
   @SubscribeMessage('unblock')
   async handleUblockUser(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
-  )
-  {
-    try{
+  ) {
+    try {
       const payload = await this.jwtService.verifyAsync(data.token, {
         secret: process.env.JWT_SECRET,
       });
       if (!payload) return client.disconnect(true);
-    const result = await this.userService.handleUnBlockUser(payload, data.username);
-      if (!result.success)
-      {
-        return ;
+      const result = await this.userService.handleUnBlockUser(
+        payload,
+        data.username,
+      );
+      if (!result.success) {
+        return;
       }
-      return this.server.to(payload.id).emit("userUnBlocked")
-    }catch (e) {
+      const currUser = await this.userService.findUserById(payload.id)
+      const otherUser = await this.userService.findUserName(data.username)
+      
+      this.server.to(payload.id).emit('userUnBlocked',{username: data.username});
+      return this.server.to(otherUser.id).emit('yourUnBlocked',{username: currUser.username});
+    } catch (e) {
       return client.disconnect(true);
     }
-
   }
   @SubscribeMessage('block')
   async handleblockeedUser(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    try{
-    const payload = await this.jwtService.verifyAsync(data.token, {
-      secret: process.env.JWT_SECRET,
-    });
-    if (!payload) return client.disconnect(true);
-    const current = await this.userService.findUserById(payload.id);
-    const result = await this.userService.handleBlockUser(payload, data.username);
-    if (!result.success)
-    {
-      return ;
+    try {
+      const payload = await this.jwtService.verifyAsync(data.token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!payload) return client.disconnect(true);
+      const current = await this.userService.findUserById(payload.id);
+      const result = await this.userService.handleBlockUser(
+        payload,
+        data.username,
+      );
+      if (!result.success) {
+        return;
+      }
+      const otherUser = await this.userService.findUserName(data.username);
+      this.server
+        .to(otherUser.id)
+        .emit('yourBlocked', { username: current.username });
+      return this.server
+        .to(payload.id)
+        .emit('userBlocked', { username: data.username });
+    } catch (e) {
+      return client.disconnect(true);
     }
-    const otherUser = await this.userService.findUserName(data.username);
-    this.server.to(otherUser.id).emit("yourBlocked", {username: current.username})
-    return this.server.to(payload.id).emit("userBlocked", {username: data.username})
-  }catch (e) {
-    return client.disconnect(true);
   }
-}
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   @SubscribeMessage('message')
   async handleMessage(
@@ -465,12 +502,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!payload) return client.disconnect(true);
     const user = await this.prismaService.user.findUnique({
       where: {
-        id: payload.id
+        id: payload.id,
       },
-      include:{
-        userBlock:true,
-        blockedUser:true,
-      }
+      include: {
+        userBlock: true,
+        blockedUser: true,
+      },
     });
 
     await this.chatService.handleAutoUnmute();
@@ -508,19 +545,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       avatar: user.avatar,
       content: data.message,
     };
-    if (channel.type === 'DM')
-    {
-      for (const member of channel.members)
-      {
-        for (const blocked of user.userBlock)
-        {
+    if (channel.type === 'DM') {
+      for (const member of channel.members) {
+        for (const blocked of user.userBlock) {
           if (blocked.blockedId === member.userId)
-              return this.server.to(user.id).emit("messageBlocked",{})
+            return this.server.to(user.id).emit('messageBlocked', {});
         }
-        for (const blocked of user.blockedUser)
-        {
+        for (const blocked of user.blockedUser) {
           if (blocked.blockedId === user.id)
-              return this.server.to(user.id).emit("blockedUser",{});
+            return this.server.to(user.id).emit('blockedUser', {});
         }
       }
     }

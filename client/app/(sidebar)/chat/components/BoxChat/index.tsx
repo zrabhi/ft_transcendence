@@ -97,7 +97,6 @@ const BoxChat = ({
   const [cookie] = useCookies(["access_token"]);
   const {user, blockedUsers, setBlockedUsers, userBlockedMe } =
     useContext(AuthContext);
-  
   const getRoleOptions = (type: string) => {
     if (type === "PUBLIC" || type === "PRIVATE" || type === "PROTECTED") {
       return {
@@ -120,7 +119,7 @@ const BoxChat = ({
     } else if (type === "DM") {
       return [
         { text: "Block", action: handleBlock },
-        { text: "Unblock", action: handleUnblock },
+        { text: "Unblock", action: handleUnblock},
         { text: "Show profile", action: handleShowProfile },
       ];
     } else {
@@ -141,28 +140,11 @@ const BoxChat = ({
     });
   }
   async function handleUnblock() {
-    console.log("-----", selectedChat);
     // username is the selected user to be blocked
     socket.emit("unblock", {
       username: selectedChat.username,
       token: cookie.access_token,
     });
-  }
-
-  // added by zac
-  async function handleUnBlock(username: string) {
-    // username of the the person to be unblocked
-    const response = await putRequest(
-      `${baseUrlUsers}/unblock/${username}`,
-      ""
-    );
-    if (!response.success) {
-      // error has been  occured here
-      // in response.error you will find the error occured
-    }
-    // else
-    // if response.success === true , the will be success message in response.message
-    // show block button
   }
 
   function handleShowProfile() {
@@ -273,28 +255,23 @@ const BoxChat = ({
     });
   }
   function handleBanMember(user: any) {
-    // testing kick in ban
     socket.emit("ban", {
       channelId: selectedChannel?.channel?.id,
       username: user?.name,
       token: cookie.access_token,
     });
-    // console.log("user clocked ", user);
   }
 
   function handleUnBanMember(user: any) {
-    // testing kick in ban
     socket.emit("unban", {
       channelId: selectedChannel?.channel?.id,
       username: user?.name,
       token: cookie.access_token,
     });
-    // console.log("user clocked ", user);
+    showSnackbar("user unbanned successfully", true);
   }
 
   function handleMuteMember(user: any) {
-    // / i need the user name of the MUTED person
-    console.log("im here");
     socket.emit("mute", {
       channel_id: selectedChannel?.channel?.id,
       username: user?.name,
@@ -336,7 +313,6 @@ const BoxChat = ({
   };
   // trying to create socket to connect with other user here
   useEffect(() => {
-    console.log("blocked me", userBlockedMe, blockedUsers);
     // console.log("selected channe sis =>", selectedChannel);
     getCurrentUserRole();
     setSelectedUsers([]);
@@ -608,7 +584,7 @@ const BoxChat = ({
               {/* ADD setting here */}
               {separateOptions.map((option: any, index: Key) => (
                 <>
-                  {blockedUsers.includes(chat?.name) && selectedChannel?.channel?.type === 'DM' &&
+                  {blockedUsers.includes(chat?.username) && selectedChannel?.channel?.type === 'DM' &&
                     option.text === "Unblock" && (
                       <div
                         key={"separated" + index} //changed previous value "index&"
@@ -619,7 +595,7 @@ const BoxChat = ({
                         {option.text}
                       </div>
                     )}
-                  {!blockedUsers.includes(chat?.name) && selectedChannel?.channel?.type === 'DM' &&
+                  {!blockedUsers.includes(chat?.username) && selectedChannel?.channel?.type === 'DM' &&
                     option.text === "Block" && (
                       <div
                         key={"separated" + index} //changed previous value "index&"
@@ -907,7 +883,7 @@ const BoxChat = ({
                 {/* Add a scrollable container with a max height */}
                 <div className="max-h-500px overflow-y-auto">
                   <div className="mt-4">
-                    {selectedChannel?.bannedUsers.map((user: any) => (
+                    {selectedChannel?.bannedUsers?.map((user: any) => (
                       <div
                         key={user.id}
                         className="bg-[#050A30] shadow-lg rounded-3xl overflow-hidden flex justify-between items-center p-4 mb-4"

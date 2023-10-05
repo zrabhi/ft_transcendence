@@ -819,9 +819,9 @@ export class ChatService {
             })
           }catch(err)
           {
-            return {success: false, error: "error ocured"}
+            return {success: false, error: "error ocured" }
           }
-          return {success:true, message:"user unbanned successfully"}
+          return {success:true, message:"user unbanned successfully", channel: channel}
       }
     }
   }

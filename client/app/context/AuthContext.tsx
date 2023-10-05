@@ -32,8 +32,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [cookie, setCookie, remove] = useCookies(["access_token"]);
   const [currentWindow, setCurrentWindow] = useState("");
   const [pathname, setPathname] = useState<string>("");
-  const [blockedUsers, setBlockedUsers] = useState<blockedUsers[]>([]);
-  const [userBlockedMe, setUserBlockedMe] = useState<blockedUsers[]>([]);
+  const [blockedUsers, setBlockedUsers] = useState<[]>([]);
+  const [userBlockedMe, setUserBlockedMe] = useState<[]>([]);
   // here we will aded states to save data cames from sockets
 
   const Urls = {

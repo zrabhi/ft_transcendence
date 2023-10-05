@@ -48,8 +48,8 @@ const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
   const [otherChannels, setOtherChannels] = useState([]);
-  const [users, setUsers] = useState(); // to set users (TODO : changing it to user friends)
-  const { user, setBlockedUsers, setUserBlockedMe } = useContext(AuthContext);
+  const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
+  const { user, setBlockedUsers, setUserBlockedMe, blockedUsers, userBlockedMe } = useContext(AuthContext);
   const [cookie] = useCookies(["access_token"]);
 
   const [password, setPassword] = useState("");
@@ -331,8 +331,40 @@ const Chat: React.FC = () => {
           setBlockedUsers((prev: any) => [...prev, data.username]);
         }
       });
+
+      socket.on("userUnBlocked", (data: any) => {
+        showSnackbar(`you unblocked ${data.username}`, true)
+        let UpdateBlockedUsers = blockedUsers?.filter((member: any) => member != data.username)
+        setBlockedUsers(UpdateBlockedUsers);
+      })
+      socket.on("yourUnBlocked", (data: any) => {
+        showSnackbar(`${data.username} just unblocked you`, true);
+        let UpdateUsersBlockedMe = userBlockedMe.filter((member: any) => member != data.username)
+        setUserBlockedMe(UpdateUsersBlockedMe);
+      })
+      socket.on("UserUnbanned", (data: any) =>
+      {
+        if (user.username != data.username) {
+          if (
+            selectedChannel &&
+            selectedChannel.channel &&
+            selectedChannel.channel.id === data.id
+          ) {
+            let updatedBannedMembers = selectedChannel?.bannedUsers?.filter((member: any) => {
+              return member.name != data.username;
+            });
+            setSelectedChannel((prevChannel: any) => ({
+              ...prevChannel,
+              bannedUsers: updatedBannedMembers,
+            }));
+          }
+        }
+        else
+          showSnackbar(`The owner of ${data.channelName} room just unbanned you`, true);
+      })
       socket.on("disconnect", () => {
-        socket.off("latMessage");
+        socket.off("YourUnbanned");
+        socket.off("lastMessage");
         socket.off("YourBlocked");
         socket.off("userBlocked");
         socket.off("blockedUser");
@@ -350,7 +382,6 @@ const Chat: React.FC = () => {
       });
     });
     return () => {
-      // socket.off("latMessage");
       socket.disconnect();
     };
   }, [socket]);

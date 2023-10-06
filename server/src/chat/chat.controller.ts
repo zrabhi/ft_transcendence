@@ -157,6 +157,8 @@ export class ChatController {
     const channel = await this.chatService.getChannelById(channleId);
     const members = [];
     let Key = 0;
+    if (!channel)
+      return [];
     if (channel.members != null &&  channel.members.length > 0)
     {
       for (const member of channel.members) {

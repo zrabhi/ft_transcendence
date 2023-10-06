@@ -91,7 +91,7 @@ const BoxChat = ({
     "Owner" | "Admin" | "Member"
   >("Member");
 
-  const [chat, setChat] = useState(); // id && tyoe && avatar && username && message
+  const [chat, setChat] = useState<any>(); // id && tyoe && avatar && username && message
   const [cookie] = useCookies(["access_token"]);
   const { user, blockedUsers, setBlockedUsers, userBlockedMe } =
     useContext(AuthContext);

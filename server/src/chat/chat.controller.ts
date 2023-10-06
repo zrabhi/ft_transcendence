@@ -146,7 +146,6 @@ export class ChatController {
     if (result.channel === undefined) return res.status(400).json(result);
     return res.status(200).json(result);
   }
-  /// channel roles
   @UseGuards(JwtAuthGuard)
   @Get('getChannel/:channleId')
   async handlegetChannelById(
@@ -158,7 +157,7 @@ export class ChatController {
     const channel = await this.chatService.getChannelById(channleId);
     const members = [];
     let Key = 0;
-    if (channel.members &&  channel.members.length > 0)
+    if (channel.members != null &&  channel.members.length > 0)
     {
       for (const member of channel.members) {
       const user = await this.userService.findUserById(member.userId);

@@ -1,16 +1,33 @@
 "use client";
-import { useContext, useState } from "react";
-import "./style.scss";
+import { useContext, useEffect, useState } from "react";
+import { baseUrlUsers, getRequest } from "@/app/context/utils/service";
 import SideBar from "@/components/LoggedUser/SideBar/SideBar";
 import ProfileCard from "@/components/LoggedUser/Profile/ProfileCard/ProfileCard";
 import { AuthContext } from '@/app/context/AuthContext'
 import HeaderBar from "@/components/LoggedUser/Profile/HeaderBar/HeaderBar";
 import NavMenu from "@/components/LoggedUser/Profile/NavMenu/NavMenu";
+import "./style.scss";
 
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
+  const [friendList, setFriendList] = useState<any>([]);
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
+  const fetchFriendList = async () => {
+    const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
+    setFriendList(friendList);
+  }
+
+  useEffect( () => {
+    try {
+      fetchFriendList();
+      console.log(friendList);
+    }
+    catch (error) {
+      console.error('Error fetching friend list:', error);
+    }
+  }, []);
 
   return (
     <div className="profile-page text-white">

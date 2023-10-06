@@ -73,8 +73,7 @@ const Chat: React.FC = () => {
       setUsers(response);
     })();
   }, []);
-  // testing socket in root chat page
-  // GET all channels already created
+
   useEffect(() => {
     (async () => {
       // TODO: need to be in one request => /channels
@@ -99,7 +98,7 @@ const Chat: React.FC = () => {
     socket.on("connected", () => {
       socket.on("lastMessage", (messageInfo: any) => {
         let checker = false;
-        let updatedChannel: any = channels.filter((channel: any) => {
+        let updatedChannel: any = channels?.filter((channel: any) => {
           if (
             channel?.channel &&
             channel?.channel?.id === messageInfo?.channel?.id
@@ -109,7 +108,7 @@ const Chat: React.FC = () => {
             return channel;
           }
         });
-        let previousChannels = channels.filter((channel: any) => {
+        let previousChannels = channels?.filter((channel: any) => {
           return (
             channel?.channel && channel?.channel?.id != messageInfo?.channel?.id
           );
@@ -129,8 +128,8 @@ const Chat: React.FC = () => {
           alert(data.error);
           return;
         }
-        let updatedChannel = channels.map((channel: any) => {
-          if (channel.channel && channel.channel.id === data.channelId)
+        let updatedChannel = channels?.map((channel: any) => {
+          if (channel?.channel && channel?.channel?.id === data.channelId)
             return [];
           return channel;
         });
@@ -149,7 +148,7 @@ const Chat: React.FC = () => {
           selectedChannel?.channel &&
           selectedChannel?.channel.id === data.channelId
         ) {
-          let updatedMembers = selectedChannel.members.filter((member: any) => {
+          let updatedMembers = selectedChannel?.members?.filter((member: any) => {
             return member.name != data.name;
           });
           setSelectedChannel((prevChannel: any) => ({
@@ -164,7 +163,7 @@ const Chat: React.FC = () => {
       });
       socket.on("yourKicked", (data: any) => {
         if (user.username === data.name) {
-          let updatedChannels = channels.map((channel: any) => {
+          let updatedChannels = channels?.map((channel: any) => {
             if (channel?.channel && channel?.channel.id === data.channelId)
               return [];
             return channel;
@@ -183,9 +182,9 @@ const Chat: React.FC = () => {
         if (
           selectedChannel &&
           selectedChannel?.channel &&
-          selectedChannel?.channel.id === data.channelId
+          selectedChannel?.channel?.id === data.channelId
         ) {
-          let updatedMembers = selectedChannel.members.filter((member: any) => {
+          let updatedMembers = selectedChannel?.members?.filter((member: any) => {
             return member.name != data.name;
           });
           setSelectedChannel((prevChannel: any) => ({
@@ -200,26 +199,26 @@ const Chat: React.FC = () => {
       });
       socket.on("yourBanned", (data: any) => {
         if (user.username === data.name) {
-          let updatedChannels = channels.map((channel: any) => {
-            if (channel?.channel && channel?.channel.id === data.channelId)
+          let updatedChannels = channels?.map((channel: any) => {
+            if (channel?.channel && channel?.channel?.id === data?.channelId)
               return [];
             return channel;
           });
           setSelectedChannel(null);
           setChannels(updatedChannels);
           showSnackbar(
-            `${data.name} you have been banned from ${data.channelName}`,
+            `${data.name} you have been banned from ${data?.channelName}`,
             false
           );
         }
       });
       socket.on("userMuted", (data: any) => {
-        if (user.username === data.user)
+        if (user?.username === data?.user)
           showSnackbar(
-            `${data.user} you have mutued from ${data.channelName}`,
+            `${data?.user} you have mutued from ${data?.channelName}`,
             true
           );
-        else showSnackbar(`${data.user} is muted`, true);
+        else showSnackbar(`${data?.user} is muted`, true);
       });
       socket.on("Yourmuted", (data: any) => {
         showSnackbar(`Message can be sent because you have been muted`, false);
@@ -227,13 +226,13 @@ const Chat: React.FC = () => {
       socket.on("memberJoinned", (data: any) => {
         console.log("data from socket", data);
         if (user.username != data.name) {
-          showSnackbar(`${data.name} joinned ${data.channelName} Room`, true);
+          showSnackbar(`${data?.name} joinned ${data?.channelName} Room`, true);
           if (
             selectedChannel &&
             selectedChannel?.channel &&
-            selectedChannel?.channel.id === data.channelId
+            selectedChannel?.channel?.id === data.channelId
           ) {
-            selectedChannel?.members.push({
+            selectedChannel?.members?.push({
               id: data.id,
               name: data.name,
               status: data.status,
@@ -244,10 +243,10 @@ const Chat: React.FC = () => {
           return;
         }
         setChannels((prev: any) => [data?.lastMessage, ...prev]);
-        let desiredChannel: any = otherChannels.filter((channel: any) => {
-          return channel.channel.id === data.channelId;
+        let desiredChannel: any = otherChannels?.filter((channel: any) => {
+          return channel?.channel?.id === data?.channelId;
         });
-        desiredChannel[0]?.members.push({
+        desiredChannel[0]?.members?.push({
           id: desiredChannel[0]?.members.length,
           name: user.username,
           avatar: user.avatar,
@@ -255,26 +254,26 @@ const Chat: React.FC = () => {
         });
         setSelectedChannel(desiredChannel[0]);
         setSelectedChat(desiredChannel[0]?.channel);
-        let NewOtherChahnnels = otherChannels.filter((channel: any) => {
+        let NewOtherChahnnels = otherChannels?.filter((channel: any) => {
           return channel.channel.id != data.channelId;
         });
         setOtherChannels(NewOtherChahnnels);
         showSnackbar(
-          `${data.name} you have successfully joined ${data.channelName}`,
+          `${data?.name} you have successfully joined ${data?.channelName}`,
           true
         );
       });
       socket.on("newAdmin", (data: any) => {
         console.log("data from socket", data);
-        if (user.username === data.user)
-          showSnackbar(`Your now admin of ${data.channelName} Room `, true);
+        if (user.username === data?.user)
+          showSnackbar(`Your now admin of ${data?.channelName} Room `, true);
         if (
           selectedChannel &&
           selectedChannel?.channel &&
-          selectedChannel?.channel?.name === data.channelName
+          selectedChannel?.channel?.name === data?.channelName
         ) {
           let previousChannel = selectedChannel;
-          previousChannel?.members.map((member: any) => {
+          previousChannel?.members?.map((member: any) => {
             if (member.name === data.user) member.role = "Admin";
           });
           setSelectedChannel(previousChannel);
@@ -293,7 +292,7 @@ const Chat: React.FC = () => {
             true
           );
           let updatedSelectedChannel = selectedChannel;
-          updatedSelectedChannel?.members.push({
+          updatedSelectedChannel?.members?.push({
             name: data.member,
             role: data.role,
             status: data.status,
@@ -308,10 +307,10 @@ const Chat: React.FC = () => {
           showSnackbar(`${data?.name} left ${data.channelName} Room`, true);
         if (
           selectedChannel &&
-          selectedChannel.channel &&
-          selectedChannel.channel.id === data.id
+          selectedChannel?.channel &&
+          selectedChannel?.channel?.id === data.id
         ) {
-          let updatedMembers = selectedChannel.members.filter((member: any) => {
+          let updatedMembers = selectedChannel?.members?.filter((member: any) => {
             return member.name != data.name;
           });
           setSelectedChannel((prevChannel: any) => ({
@@ -348,7 +347,7 @@ const Chat: React.FC = () => {
       });
       socket.on("yourUnBlocked", (data: any) => {
         showSnackbar(`${data.username} just unblocked you`, true);
-        let UpdateUsersBlockedMe = userBlockedMe.filter(
+        let UpdateUsersBlockedMe = userBlockedMe?.filter(
           (member: any) => member != data.username
         );
         setUserBlockedMe(UpdateUsersBlockedMe);
@@ -357,8 +356,8 @@ const Chat: React.FC = () => {
         if (user.username != data.username) {
           if (
             selectedChannel &&
-            selectedChannel.channel &&
-            selectedChannel.channel.id === data.id
+            selectedChannel?.channel &&
+            selectedChannel?.channel?.id === data.id
           ) {
             let updatedBannedMembers = selectedChannel?.bannedUsers?.filter(
               (member: any) => {

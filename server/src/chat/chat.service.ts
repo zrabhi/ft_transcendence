@@ -199,7 +199,7 @@ export class ChatService {
     const allMessages = [];
     console.log('channel', channel_id);
 
-    if (channel.messages.length > 0) {
+    if (channel && channel.messages && channel.messages.length > 0) {
       for (const message of channel.messages) {
         if (message.user_id === user.id)
           allMessages.push({

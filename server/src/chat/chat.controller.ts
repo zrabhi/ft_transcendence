@@ -79,6 +79,7 @@ export class ChatController {
     const data = {
       channel: result.channel,
       members: members,
+      lastMessage: result.lastMessage
     };
     return res.status(200).json(data);
   }
@@ -157,7 +158,9 @@ export class ChatController {
     const channel = await this.chatService.getChannelById(channleId);
     const members = [];
     let Key = 0;
-    for (const member of channel.members) {
+    if (channel.members &&  channel.members.length > 0)
+    {
+      for (const member of channel.members) {
       const user = await this.userService.findUserById(member.userId);
       let checker = 'Member';
       if (member.role === 'ADMIN') checker = 'Admin';
@@ -170,6 +173,7 @@ export class ChatController {
         role: checker,
       });
     }
+  }
     const bannedUsers = [];
     for (const banned of channel.banedUsers) {
       const user = await this.userService.findUserById(banned.userId);

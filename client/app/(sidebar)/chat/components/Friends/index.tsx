@@ -49,7 +49,7 @@ const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
           }`}
       >
         <h3 className="mt-15 text-2xl font-semibold text-white">Friends</h3>
-        {users.length > 0 ? (
+        {users?.length > 0 ? (
           <Card className="friends-list">
             <List className="gap-3.5">
               {users.length > 0 &&

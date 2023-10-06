@@ -279,21 +279,7 @@ const BoxChat = ({
       username: user?.name,
       token: cookie.access_token,
     });
-    console.log("new asmin +++", user);
-
-    // i will change this implenetation to sockets
-    // const response = await putRequest(
-    //   `${baseChatUrl}/setadmin/${selectedChannel.channel.id}/${username}`,
-    //   ""
-    // );
-    // if (!response.success) {
-    //   // error has been  occured here
-    //   // in response.error you will find the error occured
-    // }
-
-    alert("Set the member As Admin ");
   }
-  // Function to handle option click
   function handleOptionClick(action: () => void) {
     action(); // Call the corresponding action function
     setIsDropdownOpen(false); // Close the dropdown after clicking an option
@@ -303,12 +289,9 @@ const BoxChat = ({
     const currentUser = selectedChannel?.members?.find((member: any) => {
       return member.name === user.username;
     });
-    // console.log("currentUser", currentUser);
     setCurrentUserRole(currentUser?.role);
   };
-  // trying to create socket to connect with other user here
   useEffect(() => {
-    // console.log("selected channe sis =>", selectedChannel);
     getCurrentUserRole();
     setSelectedUsers([]);
     console.log("selected channe sis", selectedChannel);
@@ -317,7 +300,6 @@ const BoxChat = ({
       const response = await getRequest(
         `${baseChatUrl}/getMessages/${selectedChannel?.channel?.id}`
       );
-      // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.members // (going to remove it cause were not working with this object)
       let checkBlocked = response?.allMessages?.filter((message: any) => {
         if (
           userBlockedMe.includes(message?.sender) ||
@@ -413,7 +395,7 @@ const BoxChat = ({
     return false;
   });
 
-  filteredUsers.sort((a: any, b: any) => {
+  filteredUsers?.sort((a: any, b: any) => {
     if (a.role === "Owner" && b.role !== "Owner") return -1;
     if (a.role === "Admin" && b.role !== "Owner" && b.role !== "Admin")
       return -1;
@@ -485,7 +467,7 @@ const BoxChat = ({
     users.filter((user: any) => {
       // Check if the user's id is in the members array
       return (
-        !selectedChannel.members.some(
+        !selectedChannel?.members?.some(
           (member: any) => member.name === user.username
         ) &&
         !blockedUsers.includes(user.username) &&
@@ -503,7 +485,7 @@ const BoxChat = ({
     setSearchQuery(query);
 
     // Filter users based on the search query
-    const filtered = usersList.filter((user: any) =>
+    const filtered = usersList?.filter((user: any) =>
       user.username.toLowerCase().includes(query)
     );
 
@@ -570,7 +552,7 @@ const BoxChat = ({
               aria-orientation="vertical"
               aria-labelledby="options-menu"
             >
-              {nonSeparateOptions.map((option: any, index: Key) => (
+              {nonSeparateOptions?.map((option: any, index: Key) => (
                 <div
                   key={"unseparated" + index}
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-300 hover:text-gray-900 font-semibold cursor-pointer"
@@ -580,11 +562,11 @@ const BoxChat = ({
                   {option.text}
                 </div>
               ))}
-              {separateOptions.length > 0 && (
+              {separateOptions?.length > 0 && (
                 <hr className="border-t border-gray-200" />
               )}
               {/* ADD setting here */}
-              {separateOptions.map((option: any, index: Key) => (
+              {separateOptions?.map((option: any, index: Key) => (
                 <>
                   {blockedUsers.includes(chat?.username) &&
                     selectedChannel?.channel?.type === "DM" &&
@@ -826,7 +808,7 @@ const BoxChat = ({
                 {/* Add a scrollable container with a max height */}
                 <div className="max-h-500px overflow-y-auto">
                   <div className="mt-4">
-                    {filteredUsers.map((user: any) => (
+                    {filteredUsers?.map((user: any) => (
                       <div
                         key={user.id}
                         className="bg-[#050A30] shadow-lg rounded-3xl overflow-hidden flex justify-between items-center p-4 mb-4"

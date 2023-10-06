@@ -81,7 +81,7 @@ const Channels = ({channels, setSelectedChat, setSelectedChannel, setMessages, s
           />
         )}
 
-        {selectedChannels.length > 0 ?
+        {selectedChannels?.length > 0 ?
           (selectedChannels?.map((channel: any, index: Number) => {
             return (
               <UserCard
@@ -244,10 +244,10 @@ const ModalContainer = ({
       return ;
     }
     setMessages([]);
-    console.log("channel craeted", response); 
+    console.log("channel craeted", response);
     setSelectedChannel(response);
     setSelectedChat(response.channel);
-    setChannels(response.lastMessage);
+    setChannels((prev: any) => [...prev, response.lastMessage]);
     resetForm();
     handleOpen();
   };

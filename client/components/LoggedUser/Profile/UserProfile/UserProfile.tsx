@@ -13,10 +13,8 @@ export default function UserProfile({ username }: { username: string }) {
       try {
         const allUsers = await getRequest(`${baseUrlUsers}/users`);
         const currentUser = allUsers.filter((user: any) => user.username === username );
-        // console.log(currentUser.length);
         if (currentUser.length === 0) return setUser(null)
         else {
-          // console.log(currentUser[0].username);
           setUser(currentUser[0]);
         }
         setLoading(false);

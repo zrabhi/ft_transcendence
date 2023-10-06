@@ -1,9 +1,16 @@
 import React from 'react';
+import {FaUserClock, FaUserCheck, FaUserPlus } from 'react-icons/fa';
+// faUserPlust for not friend
+// faUserCheck for friend
+// faUserClock for friend request sent
 
 import './UserCard.scss';
 
 export default function UserCard(user: any) {
   user = user.user;
+  // user.isFriend = true;
+  // user.friendRequestSent = true;
+
   return (
     <div className="user-card w-full relative ">
       <div className="background"></div>
@@ -19,8 +26,31 @@ export default function UserCard(user: any) {
       </div>
       <div className="user-details">
         <h2>{user && user.username}</h2>
-        <div className="friend-state">
-          Friend
+        <div className="friend-state flex gap-4 justify-between items-center cursor-pointer hover:opacity-80">
+          <div className="state-msg">
+            { user && user.isFriend ?
+              <p className="">
+                Friends
+              </p>
+              : user && user.friendRequestSent ?
+              <p className="">
+                Friend Request Sent
+              </p>
+              :
+              <p className="">
+                Add Friend
+              </p>
+            }
+          </div>
+          <div className="state-icon">
+            { user && user.isFriend ?
+              <FaUserCheck />
+              : user && user.friendRequestSent ?
+              <FaUserClock />
+              :
+              <FaUserPlus />
+            }
+          </div>
         </div>
         <div className="stats">
           <div className="stat-item">

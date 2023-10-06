@@ -16,13 +16,13 @@ export default function Profile() {
 
   const fetchFriendList = async () => {
     const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
-    setFriendList(friendList);
+    setFriendList([...friendList, "skeet_mail"]);
   }
-
   useEffect( () => {
     try {
       fetchFriendList();
       console.log(friendList);
+      localStorage.setItem('friendList', JSON.stringify(friendList));
     }
     catch (error) {
       console.error('Error fetching friend list:', error);

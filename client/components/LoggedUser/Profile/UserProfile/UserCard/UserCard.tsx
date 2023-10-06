@@ -5,7 +5,7 @@ import './UserCard.scss';
 export default function UserCard(user: any) {
   user = user.user;
   return (
-    <div className="profile-card w-full relative ">
+    <div className="user-card w-full relative ">
       <div className="background"></div>
       <div className="avatar">
         <img
@@ -19,6 +19,9 @@ export default function UserCard(user: any) {
       </div>
       <div className="user-details">
         <h2>{user && user.username}</h2>
+        <div className="friend-state">
+          Friend
+        </div>
         <div className="stats">
           <div className="stat-item">
             <h4>Total Games</h4>

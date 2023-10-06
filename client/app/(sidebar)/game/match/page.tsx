@@ -2,31 +2,37 @@
 import HeaderBar from '@/components/LoggedUser/Profile/HeaderBar/HeaderBar';
 import SideBar from '@/components/LoggedUser/SideBar/SideBar'
 import exp from 'constants';
-import React from 'react'
+import React, { useContext } from 'react'
 import './style.scss'
 import Avatar1 from '@/public/images/avatar1.jpeg'
 import { useEffect, useState} from "react";
 import { Socket } from "socket.io";
+import { AuthContext } from '@/app/context/AuthContext';
+import { useCookies } from "react-cookie";
+import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
 
 export default function match()
 {
+    const [cookie] = useCookies(["access_token"]);
     const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
+    const {user} = useContext(AuthContext);
     const io = require("socket.io-client");
     let selectedcolor = 'black';
     let socket: Socket;
     let count = 0;
 
+    const [opp_username, setoppuser] = useState('opponent');
+    const [opponentUser, setOpponentUser] = useState<any>();
+    const [opp_avatar, setOpponentavatar] = useState<string>()
     const [myscore, setmyscore] = useState(0);
     const [oppscore, setoppscore] = useState(0);
-  
+
     let raf: number;
     let upkey = false;
     let downkey = false;
     let game = false;
     let side: string;
-  
     let opponent : string;
-  
     const Ball = {
       x: 200,
       y: 100,
@@ -96,8 +102,29 @@ export default function match()
         ctx?.clearRect(0,0,canvas.width, canvas.height);
       }
     };
-  
-    const launchGame = () => {
+
+    const getUser = async () =>{
+      
+      const response  = await getRequest(`${baseUrlUsers}/user/${opp_username}`);
+      if (response.error)
+      {
+         /// error here
+      }
+      else{
+        setOpponentUser(response);
+        // setOpponentavatar(response?.avatar);
+      }
+    }
+// useEffect(() => {
+//   if (opp_username === "opponent")
+//     return
+//   (async () => {
+//     await getUser();
+//     console.log(opponentUser);
+    
+//   })()
+// },[])
+    const launchGame =  () => {
       const canvas = document.getElementById("canvas") as HTMLCanvasElement;
       const ctx = canvas.getContext("2d");
       leftbar.x = 100;
@@ -107,7 +134,7 @@ export default function match()
         console.log(game);
         game = true;
         console.log("here we init")
-        socket.emit('init', 
+        socket.emit('init',
         {
           canvasw:canvas.width,
           canvash:canvas.height
@@ -160,30 +187,35 @@ export default function match()
   
     useEffect(() => {
       selectedcolor = localStorage.getItem("selectedMapColor") as string;
-      socket = io('http://127.0.0.1:8080/matching');
+      socket = io('http://127.0.0.1:8080/matching',{
+        auth: {
+          token: cookie.access_token,
+        }});
       socket.on('connect', () => {
         console.log('Connected to WebSocket');
       });
-      socket.on('matched right', (data:any) => {
+      socket.on('matched right',  (data:any) => {
         console.log("i match this : " , data);
-        opponent = data;
+        setoppuser(data.username);
+        setOpponentavatar(data.avatar);
         side = 'right';
         launchGame();
       })
       socket.on('matched left', (data:any) => {
         console.log("i match this : " , data);
-        opponent = data;
+        setoppuser(data.username);
+        setOpponentavatar(data.avatar);
         side = 'left';
         launchGame();
       })
-      
+
       socket.on('match frame',(data:any)=>{
         Ball.x = data.ballx;
         Ball.y = data.bally;
         setmyscore(data.myscore);
         setoppscore(data.oppscore);
-      
-        if(side == 'left')
+
+        if (side == 'left')
         {
           rightbar.starty = data.oppy;
         }
@@ -203,16 +235,16 @@ export default function match()
                 <div className="score flex">
                     <div className="player player1">
                         <div className='avatar'>
-                            <img src="/images/avatar1"  alt="avatar" />
+                            <img src={user?.avatar}  alt="avatar" />
                         </div>
-                        <div className='player-name invisible lg:visible ' >PLAYER1</div>
+                        <div className='player-name invisible lg:visible ' >{user.username}</div>
                         <div className="score1">{myscore}</div>
                     </div>
                     <div className="player player2">
                         <div className="score2">{oppscore}</div>
-                        <div className='player-name invisible lg:visible ' >PLAYER2</div>
+                        <div className='player-name invisible lg:visible ' >{opp_username}</div>
                         <div className='avatar'>
-                            <img src="/images/avatar1" alt="avatar" />
+                            <img src={opp_avatar} alt="avatar" />
                         </div>
                     </div>
                 </div>

@@ -22,8 +22,8 @@ import SocketAdapter from './Socket.Adapter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: "*",
-    methods: ["GET", "POST"],
+    origin: process.env.HOSTNAME,
+    methods: process.env.METHODS,
     credentials: true,
   });
   app.useWebSocketAdapter(new SocketAdapter(app));

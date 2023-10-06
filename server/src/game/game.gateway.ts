@@ -1,8 +1,14 @@
+import { JwtService } from '@nestjs/jwt';
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody , ConnectedSocket} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { UserService } from 'src/user/user.service';
 
 
 class Player {
+  username:string;
+  userid: string;
+  avatar: string;
   score: number;
   socketid: string;
   side: string;
@@ -116,14 +122,14 @@ function updateballxy(match:Match) : string
   if (match.ball.x + match.ball.addx > match.canvas.width)
   {
     match.leftplayer.score++;
-    if(match.leftplayer.score == 10)
+    if(match.leftplayer.score == 4)
       return('left win');
     match.ball.x = match.canvas.width/2;
     match.ball.y = match.canvas.height/2;
   }
   else if(match.ball.x + match.ball.addx < 0)
   {
-    if(match.rightplayer.score == 10)
+    if(match.rightplayer.score == 4)
       return('right win');
     match.rightplayer.score++;
     match.ball.x = match.canvas.width/2;
@@ -163,12 +169,31 @@ export class GameGateway{
   private waiting_users: Queue = new Queue;
   private matchs: Match[] = [];
   private playing_users: Player[] = []
-  
-  handleConnection(client: Socket) {
+  constructor(
+    private prismaService: PrismaService,
+    private jwtService: JwtService,
+    private userService: UserService,
+  ) {}
+
+  async handleConnection(client: Socket) {
+    try{
+      console.log(client.handshake.auth.token);
+      
+      const payload = await this.jwtService.verifyAsync(
+        client.handshake.auth.token,
+        {
+          secret: process.env.JWT_SECRET,
+        },
+    );
+    if (!payload) return client.disconnect(true);
+    const currentUser = await this.userService.findUserById(payload.id)
+    console.log(currentUser);
     const socketId = client.id;
     const tmplayer = new Player(socketId);
-    
-    if(this.waiting_users.size() != 0)
+    tmplayer.username = currentUser.username;
+    tmplayer.avatar = currentUser.avatar;
+    tmplayer.userid = currentUser.id;
+{}    if (this.waiting_users.size() != 0)
     {
       let rightplayer = tmplayer;
       let leftplayer = this.waiting_users.peek();
@@ -185,14 +210,26 @@ export class GameGateway{
       let tmpmatch = new Match(rightplayer, leftplayer,  new canvas(1000,600));
       this.matchs[rightplayer.socketid] = tmpmatch;
       this.matchs[leftplayer.socketid] = tmpmatch;
-      this.server.to(rightplayer.socketid).emit('matched right', leftplayer.socketid);
-      this.server.to(leftplayer.socketid).emit('matched left', rightplayer.socketid);
+      this.server.to(rightplayer.socketid).emit('matched right', 
+      {
+        username : leftplayer.username,
+        avatar:leftplayer.avatar
+      });
+      this.server.to(leftplayer.socketid).emit('matched left', 
+      {
+        username : rightplayer.username,
+        avatar:rightplayer.avatar
+      });
     }else{
       this.waiting_users.enqueue(tmplayer);
     }
-    console.log(`User connected to game gateway with ID: ${socketId}`);
+    console.log(`User connected to game gateway with ID: ${socketId}`)
+  }catch(err)
+  {
+    return client.disconnect(true);
   }
-  
+  }
+
   handleDisconnect(client: Socket) {
     const socketId = client.id;
     if(this.playing_users[client.id])
@@ -204,10 +241,9 @@ export class GameGateway{
       this.waiting_users.removeBySocketId(client.id);
     console.log(`User disconnected with ID: ${socketId}`);
   }
-  
-  
+
   @SubscribeMessage('bar')
-  bar(@MessageBody() bar_y: number, @ConnectedSocket() client: Socket): void {
+ async bar(@MessageBody() bar_y: number, @ConnectedSocket() client: Socket){
     const currentPlayer = this.playing_users[client.id];
     if (currentPlayer && currentPlayer.opponent) {
       currentPlayer.opponent.opponent_bar = bar_y;
@@ -224,6 +260,52 @@ export class GameGateway{
       {
         this.server.to(client.id).emit(ret);
         this.server.to(this.playing_users[client.id].opponent.socketid).emit(ret);
+       let winner: Player;
+       let loser: Player;
+       let cleansheet = false;
+
+       if (ret == 'right win')
+       {
+         winner = this.matchs[client.id].rightplayer;
+         loser = this.matchs[client.id].leftplayer;
+        }
+        else
+        {
+          winner = this.matchs[client.id].leftplayer;
+          loser = this.matchs[client.id].rightplayer;
+        }
+        if(loser.score == 0)
+          cleansheet = true;
+        console.log("winner: " , winner);
+        console.log("loser: ", loser);
+
+        await this.prismaService.match.create({
+          data:{
+            winner_id: winner.userid,
+            loser_id: loser.userid,
+            winner_score: winner.score,
+            loser_score: loser.score
+          }
+        })
+        await this.prismaService.achievement.update({
+          where:{
+            userId: winner.userid,
+          },
+          data:{
+            firstGameAchie : true,
+            firstWinAchie: true,
+            cleanSheetGameAchie: cleansheet
+          }
+        })
+        await this.prismaService.achievement.update({
+          where:{
+            userId: loser.userid,
+          },
+          data:{
+            firstGameAchie : true,
+            firstLoseAchie:true,
+          }
+        })
       }
 
   } else {

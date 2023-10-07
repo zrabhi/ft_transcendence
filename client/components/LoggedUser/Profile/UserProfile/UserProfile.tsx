@@ -23,10 +23,12 @@ export default function UserProfile({ username }: { username: string }) {
       }
     };
 
-    fetchUsers();
+    (async () =>{
+    await fetchUsers()
+    })();
 
-    const debouncedFetchUsers = setTimeout(() => {
-      fetchUsers();
+    const debouncedFetchUsers = setTimeout( async() => {
+      await fetchUsers();
     }, 300);
 
     return () => {

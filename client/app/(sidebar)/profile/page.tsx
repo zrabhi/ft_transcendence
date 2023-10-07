@@ -10,17 +10,21 @@ import "./style.scss";
 
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
-  const [friendList, setFriendList] = useState<any>([]);
+  const [friendList, setFriendList] = useState<any>([]); // firendlsit will contain array of (username, status, avatar)
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const fetchFriendList = async () => {
     const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
+    console.log(friendList);
+    
     setFriendList(friendList);
   }
   useEffect( () => {
     try {
-      fetchFriendList();
+      (async () =>{
+      await fetchFriendList();
+      })() // you should do await in async functions
       // console.log(friendList);
     }
     catch (error) {

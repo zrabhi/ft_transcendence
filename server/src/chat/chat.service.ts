@@ -428,11 +428,11 @@ export class ChatService {
         members: true,
       },
     });
-    if (channel.owner === currUser.username)
-      return {
-        success: false,
-        error: `${currUser.username} your the channel owner (you can delete channel from existence)!`,
-      };
+    // if (channel.owner === currUser.username)
+    //   return {
+    //     success: false,
+    //     error: `${currUser.username} your the channel owner (you can delete channel from existence)!`,
+    //   };
     const searchedUser = channel.members.filter((member: any) => {
       return currUser.id === member.userId;
     });

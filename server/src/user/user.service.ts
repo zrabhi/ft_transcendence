@@ -408,6 +408,37 @@ export class UserService {
     });
   }
 
+  async handleUnFriendUser(user: any, username: string) {
+    try {
+      const currentUser = await this.prismaService.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          friend: true,
+        },
+      });
+      const otherUser = await this.findUserName(username);
+      for (const friend of currentUser.friend) {
+        if (
+          (friend.user_id == currentUser.id ||
+            friend.user_id === otherUser.id) &&
+          (friend.friend_id === currentUser.id ||
+            friend.friend_id === otherUser.id)
+        ) {
+          await this.prismaService.friendship.delete({
+            where: {
+              id: friend.id,
+            },
+          });
+        }
+      }
+      return { success: true, message: 'succeffully updated' };
+    } catch (err) {
+      return { success: false };
+      console.log("error occurred while unfriending user");
+    }
+  }
   async deleteFriendship(user_one: string, user_two: string) {
     const userOne = await this.findUserById(user_one);
     const userTwo = await this.findUserById(user_two);
@@ -534,58 +565,57 @@ export class UserService {
   }
   async findUserByIdWithBlocked(user_id: string) {}
   async handleBlockUser(user: any, username: string) {
-    try{
-    const currUser = await this.prismaService.user.findUnique({
-      where: {
-        id: user.id,
-      },
-      include: {
-        userBlock: true,
-      },
-    });
+    try {
+      const currUser = await this.prismaService.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          userBlock: true,
+        },
+      });
 
-    const blockedUser = await this.findUserName(username);
-    const checker = currUser.userBlock.filter((blocked: any) => {
-      return blocked.blockedId === blockedUser.id;
-    });
-    if (checker[0]) throw BadRequestException;
+      const blockedUser = await this.findUserName(username);
+      const checker = currUser.userBlock.filter((blocked: any) => {
+        return blocked.blockedId === blockedUser.id;
+      });
+      if (checker[0]) throw BadRequestException;
       await this.prismaService.userBlock.create({
-      data: {
-        blockerId: currUser.id,
-        blockedId: blockedUser.id,
-      },
-    });
-    return {success: true, message:"user blocked"}
-  }catch(error)
-  {
-    return {success: false, error: "error ocured"}
-  }
+        data: {
+          blockerId: currUser.id,
+          blockedId: blockedUser.id,
+        },
+      });
+      return { success: true, message: 'user blocked' };
+    } catch (error) {
+      return { success: false, error: 'error ocured' };
+    }
   }
 
   async handleUnBlockUser(user: any, username: string) {
-    try{
-    const currUser = await this.prismaService.user.findUnique({
-      where: {
-        id: user.id,
-      },
-      include: {
-        userBlock: true,
-      },
-    });
-    const otherUser = await this.findUserName(username);
-    const checker = currUser.userBlock.filter((blocked: any) => {
-      return blocked.blockedId === otherUser.id;
-    });
-    if (!checker[0]) throw BadRequestException;
-    await this.prismaService.userBlock.delete({
-      where: {
-        id: checker[0].id,
-      },
-    });
-    return {success: true, message:"user unblocked"};
-  }catch(e) {
-    return {success: false, error:"error ocured"}
-  }
+    try {
+      const currUser = await this.prismaService.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          userBlock: true,
+        },
+      });
+      const otherUser = await this.findUserName(username);
+      const checker = currUser.userBlock.filter((blocked: any) => {
+        return blocked.blockedId === otherUser.id;
+      });
+      if (!checker[0]) throw BadRequestException;
+      await this.prismaService.userBlock.delete({
+        where: {
+          id: checker[0].id,
+        },
+      });
+      return { success: true, message: 'user unblocked' };
+    } catch (e) {
+      return { success: false, error: 'error ocured' };
+    }
   }
 
   async handleGetBlockedUsers(user: any) {
@@ -604,14 +634,11 @@ export class UserService {
           id: block.blockedId,
         },
       });
-      users.push(
-        searchedUser.username,
-      );
+      users.push(searchedUser.username);
     }
     return users;
   }
-  async handleGetUserblockedMe(user: any)
-  {
+  async handleGetUserblockedMe(user: any) {
     const currUser = await this.prismaService.user.findUnique({
       where: {
         id: user.id,
@@ -629,9 +656,7 @@ export class UserService {
       });
 
       const otherUser = await this.findUserById(block.blockerId);
-      users.push(
-         otherUser.username
-      );
+      users.push(otherUser.username);
     }
     return users;
   }
@@ -694,14 +719,72 @@ export class UserService {
       ) {
         const otherUser = await this.findUserById(request.requester_id);
         requests.push({
-          username: otherUser.username,
-          avatar: otherUser.avatar,
-        });
-      }
+          type: 1,
+          usernname:otherUser.username,
+          avatar:otherUser.avatar,
+      })
     }
+  }
     return requests;
   }
 
+  async handleCancleFriendRequest(user: any, username: string) {
+    try {
+      const currentUser = await this.prismaService.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          IncomingRequest: true,
+        },
+      });
+      const otherUser = await this.findUserName(username);
+      for (const request of currentUser.IncomingRequest) {
+        if (
+          request.requester_id === currentUser.id &&
+          request.state === 'PENDING' &&
+          request.requested_id === otherUser.id
+        ) {
+          await this.prismaService.friendRequest.delete({
+            where: {
+              id: request.id,
+            },
+          });
+        }
+      }
+      return { success: true, message: 'friend request deleted successfully' };
+    } catch (err) {
+      return { success: false };
+    }
+  }
+  async getFriendRequestSent(user: any) {
+    try {
+      const currentUser = await this.prismaService.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          OutgoingRequest: true,
+        },
+      });
+      const requests = [];
+      for (const request of currentUser.OutgoingRequest) {
+        if (
+          request.requester_id === currentUser.id &&
+          request.state === 'PENDING'
+        ) {
+          const otherUser = await this.findUserById(request.requested_id);
+          requests.push(
+            otherUser.username,
+          );
+        }
+      }
+      console.log("here request",requests);
+      return { success: true, requests: requests };
+    } catch (err) {
+      return { success: false };
+    }
+  }
   // async getFileUpload(fileTarget, category) {
   //   let userFile: any = undefined;
   //   const assets = await readdir(`./images/${category}`);

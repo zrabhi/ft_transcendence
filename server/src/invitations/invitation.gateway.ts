@@ -13,6 +13,10 @@ import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 
+type userNode = {
+  socket: Socket;
+  id: string;
+};
 @WebSocketGateway({
   namespace: 'notifications',
   cors: {
@@ -27,44 +31,57 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
     private authService: AuthService,
     private prismaService: PrismaService,
     private jwtService: JwtService,
-    // private chatService: ChatService,
     private userService: UserService,
   ) {}
-  private connectedUsers = new Map<String, Socket>();
+  private connectedUsers: userNode[] = [];
   async handleConnection(client: Socket) {
-    const payload = await this.jwtService.verifyAsync(
-      client.handshake.auth.token,
-      {
-        secret: process.env.JWT_SECRET,
-      },
-    );
-    if (!payload) return client.disconnect(true);
-    try{
-        await this.userService.handleUpdateStatus('ONLINE', payload.id)
-    }catch(err)
-    {
-        // we will emit the error the event called (Notif error)
-    }
-    client.join(payload.id);
-    this.connectedUsers.set(payload.id, client);
+    try {
+      const payload = await this.jwtService.verifyAsync(
+        client.handshake.auth.token,
+        {
+          secret: process.env.JWT_SECRET,
+        },
+      );
 
-    this.server.to(client.id).emit('connected', 'Hello world!');
+      if (!payload) return client.disconnect(true);
+      await this.userService.handleUpdateStatus('ONLINE', payload.id);
+      client.join(payload.id);
+      this.connectedUsers.push({ socket: client, id: payload.id });
+    } catch (err) {
+      client.disconnect(true);
+      return;
+    }
   }
 
   async handleDisconnect(client: any) {
-    const payload = await this.jwtService.verifyAsync(
-      client.handshake.auth.token,
-      {
-        secret: process.env.JWT_SECRET,
-      },
+    const index = this.connectedUsers.findIndex(
+      (user) => user.socket.id === client.id,
     );
-    if (!payload) return client.disconnect(true);
-    this.connectedUsers.delete(payload.id);
-    console.log(`Client disconnected   id ${client.id}`); 
-    // SMALL ERROR HERE NEEDS TO BE HANDLED (when connection lost)
+    if (index > -1) {
+      const sockets = this.connectedUsers.filter(
+        (user) => user.id === this.connectedUsers[index].id,
+      );
+      if (sockets.length < 2)
+        await this.userService.handleUpdateStatus(
+          'OFFLINE',
+          this.connectedUsers[index].id,
+        );
+      this.connectedUsers.splice(index, 1);
+    }
   }
 
   @SubscribeMessage('FriendRequest')
   async handleFriendRequest(@ConnectedSocket() client: Socket) {}
-  // here we will add 3 events (game request, friend request, message request)
+
+  @SubscribeMessage('logout')
+  async handleLogout(@ConnectedSocket() client: Socket) {
+    const { id } = this.connectedUsers.find((c) => c.socket.id === client.id);
+    if (!id) return;
+    const userSockets = this.connectedUsers.filter((c) => c.id === id);
+    if (userSockets.length === 0) return;
+    userSockets.forEach((s) => {
+      this.server.to(s.socket.id).emit("logout");
+      s.socket.disconnect();
+    });
+  }
 }

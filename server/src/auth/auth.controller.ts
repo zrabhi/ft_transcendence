@@ -72,7 +72,7 @@ export class AuthController {
 
   @Get('/42/redirect')
   @UseGuards(FtGurad)
-  async handleRedirectFt(@User() user, @Res() response) {
+  async handleRedirectFt(@User() user, @Res() response: Response) {
     try {
       const access_token = await this.authService.extractJwtToken({
         id: user.id,
@@ -84,7 +84,7 @@ export class AuthController {
       else if (user.tfa) return response.redirect(TFALOGIN);
       return response.redirect(PROFILE);
     } catch (err) {
-      // console.log("errrrr => ",err);
+      console.log("errrrr => ",err);
     }
   }
 

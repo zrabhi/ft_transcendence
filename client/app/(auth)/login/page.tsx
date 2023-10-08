@@ -73,7 +73,7 @@ export default function SignIn() {
     e.preventDefault();
     const result = await LogIn(loginInfo);
     if (result) {
-      console.log(user.tfa);
+      // console.log(user.tfa);
       if (user.tfa){
         return router.push("/login/tfalogin");}
       router.push("/profile");
@@ -135,7 +135,10 @@ export default function SignIn() {
                 <div ref={ErrorRef} className="errorRef email-error"></div>
                 <button onClick={handleClickButton} className=""> sign in</button>
                 <div className="auto-auth">
-                  or you can sign in with
+                  <span className="
+                  text-gray-400 text-sm ">
+                    You can sign in with
+                  </span>
                   <div className="logos">
                     <Link href="http://127.0.0.1:8080/api/auth/google/login">
                       <div className="google">

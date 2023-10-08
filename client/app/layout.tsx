@@ -4,10 +4,11 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import Footer from "@/components/MainPage/Footer/Footer";
 import { useCookies } from "react-cookie";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthContext, AuthProvider } from "./context/AuthContext";
 import { CookiesProvider } from 'react-cookie';
+import { InvitationSocketContext } from "./context/notifContext";
 
 
 const metadata: Metadata = {
@@ -27,6 +28,23 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  /// we will chenge it later we i found out best solution
+  // chekc id there is access_toke if so rederect the  user to profile
+  const notifSocket = useContext(InvitationSocketContext);
+  const {setNotif} = useContext(AuthContext);
+  const [cookie, setCookie, remove] = useCookies(['access_token']);
+  const router = useRouter();
+
+  useEffect(() => {
+    notifSocket.on("logout", () =>{
+      console.log("loging out");
+      remove('access_token');
+      router.push("/login");
+    })
+    return ()=>{
+      notifSocket.disconnect();
+    }
+  },[])
   return (
     <html lang="en">
       <body className={roboto.className} suppressHydrationWarning={true}>

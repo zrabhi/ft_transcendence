@@ -6,7 +6,6 @@ import {
 } from "@/app/context/utils/service";
 import { Key, useContext, useEffect, useRef, useState } from "react";
 
-
 import { BsFillSendFill, BsThreeDotsVertical } from "react-icons/Bs";
 import { FaUserFriends } from "react-icons/fa";
 import { RiAdminFill } from "react-icons/ri";
@@ -20,6 +19,8 @@ import { Message } from "@/interfaces/ChatTypes";
 import { AuthContext } from "@/app/context/AuthContext";
 import Modal from "react-modal";
 import { showSnackbar } from "@/app/context/utils/showSnackBar";
+import { InvitationSocketContext } from "@/app/context/notifContext";
+import { useRouter } from "next/navigation";
 // Modal.setAppElement("div");
 const customStyles = {
   content: {
@@ -94,12 +95,15 @@ const BoxChat = ({
 
   const [chat, setChat] = useState<any>(); // id && tyoe && avatar && username && message
   const [cookie] = useCookies(["access_token"]);
+  const router = useRouter();
+
   const { user, blockedUsers, setBlockedUsers, userBlockedMe } =
     useContext(AuthContext);
   const getRoleOptions = (type: string) => {
     if (type === "PUBLIC" || type === "PRIVATE" || type === "PROTECTED") {
       return {
         Owner: [
+          { text: "Leave Room", action: handleLeaveRoom },
           { text: "Delete Room", action: handleDeleteRoom },
           { text: "Add member", action: handleAddMember },
           { text: "Show members", action: handleShowMembers },
@@ -146,8 +150,8 @@ const BoxChat = ({
     });
   }
 
-  function handleShowProfile() {
-    alert("Show profile action");
+  function handleShowProfile(user: any) {
+    router.push(`/profile/${selectedChat.username}`);
   }
 
   // change it to async
@@ -204,8 +208,6 @@ const BoxChat = ({
   }
 
   function handleAddMember() {
-    // i need the user name of the added person
-    // handle add member action
     setIsAddMemberPopupOpen(true);
   }
 
@@ -219,16 +221,13 @@ const BoxChat = ({
   }
 
   async function handleLeaveRoom() {
-    // socket.emit("leaveRoom", );
     const response = await putRequest(
       `${baseChatUrl}/leaveChannel/${selectedChannel.channel.id}`,
       ""
     );
     if (!response.success) {
-      showSnackbar(`${response.message}`, false);
+      showSnackbar(`${response.message.message}`, false);
       return;
-      // error has been  occured here
-      // in response.error you will find the error occured
     }
     socket.emit("LeaveChannel", {
       channelId: selectedChannel.channel.id,
@@ -370,12 +369,19 @@ const BoxChat = ({
       time: time.getHours() + ":" + time.getMinutes(),
     };
     socket.emit("message", body);
+
     setMessage("");
   };
 
   const handleChange = (e: any) => {
     e.preventDefault();
-    setMessage(e.target.value);
+    if (
+      e.target.value != null &&
+      e.target.value.split(" ").length === 1 &&
+      e.target.value.split(" ")[0].length > 30
+    ) {
+      showSnackbar("You can't write a long word", false);
+    } else setMessage(e.target.value);
   };
 
   const toggleDropdown = () => {
@@ -671,55 +677,37 @@ const BoxChat = ({
         </Modal>
       </div>
       <div className="box-chat-messages">
-        <div className="messages-box flex flex-col flex-grow overflow-y-auto justify-end">
-          <div className="flex flex-col space-y-2 p-4">
+        <div className="messages-box flex flex-col">
+          <div className="message-list">
             {messages &&
-              messages?.map((message: MessageProps, index: Key) =>
-                message.reciever ? (
-                  <div
-                    className="self-end bg-[#654795] text-white rounded-3xl p-1 flex items-center"
-                    key={index}
-                  >
-                    <span className="mr-2">
-                      <img
-                        alt={message.sender}
-                        src={message.avatar}
-                        className="avatar-chat"
-                        style={{ width: "40px", height: "40px" }}
-                      />
-                    </span>
-                    <div style={{ flex: 1 }}>
-                      <p className="ml-2" style={{ wordWrap: "break-word" }}>
-                        {message.content}
-                      </p>
-                    </div>
+              messages?.map((message: MessageProps, index: Key) => (
+                <div
+                  className={`mb-3 ${
+                    message.reciever
+                      ? "self-end bg-[#654795] text-white"
+                      : "self-start bg-gray-200"
+                  } rounded-3xl p-1 flex items-center`}
+                  key={index}
+                >
+                  <span>
+                    <img
+                      alt={message.reciever ? message.sender : message.reciever}
+                      src={message.avatar}
+                      className="avatar-chat"
+                      style={{ width: "40px", height: "40px" }}
+                    />
+                  </span>
+                  <div>
+                    <p>
+                      {!message?.blocked
+                        ? message.content
+                        : "You can't see the message from a blocked user!"}
+                    </p>
                   </div>
-                ) : (
-                  <div
-                    className="self-start bg-gray-200 rounded-3xl p-1 flex items-center"
-                    key={index}
-                  >
-                    <span className="mr-4">
-                      <img
-                        alt={message.reciever}
-                        src={message.avatar}
-                        className="avatar-chat"
-                        style={{ width: "40px", height: "40px" }}
-                      />
-                    </span>
-
-                    <div style={{ flex: 1 }}>
-                      <p className="ml-2" style={{ wordWrap: "break-word" }}>
-                        {!message?.blocked
-                          ? message.content
-                          : "You can't see message from blocked user!"}
-                      </p>
-                    </div>
-                  </div>
-                )
-              )}
+                </div>
+              ))}
           </div>
-          <div className="p-4 w-full flex justify-end">
+          <div className="p-4 w-full">
             <div className="relative w-full">
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
                 <BsFillSendFill color={"white"} onClick={sendMessage} />
@@ -734,9 +722,52 @@ const BoxChat = ({
               />
             </div>
           </div>
-          <div ref={ref} />
         </div>
       </div>
+      {/* <div className="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="px-4 py-2 bg-gray-300">
+          <h2 className="text-xl font-semibold text-gray-800">Chat Room</h2>
+        </div>
+        <div className="px-4 py-4">
+          <div className="flex">
+            <div className="flex-shrink-0 mr-3">
+              <img
+                className="w-8 h-8 rounded-full"
+                src="https://via.placeholder.com/40"
+                alt="User Avatar"
+              />
+            </div>
+            <div className="flex-grow">
+              <div className="bg-gray-200 rounded-lg p-2">
+                <p className="text-sm text-gray-600">
+                  Hello! How can I help you?
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex mt-4">
+            <div className="flex-grow">
+              <div className="bg-blue-500 text-white rounded-lg p-2">
+                <p className="text-sm">Hi! I have a question.</p>
+              </div>
+            </div>
+            <div className="flex-shrink-0 ml-3">
+              <img
+                className="w-8 h-8 rounded-full"
+                src="https://via.placeholder.com/40"
+                alt="User Avatar"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="px-4 py-2 bg-gray-300">
+          <input
+            className="w-full px-3 py-2 rounded-full border-2 border-gray-200 focus:outline-none"
+            type="text"
+            placeholder="Type a message..."
+          />
+        </div>
+      </div> */}
       {isPopupOpen && (
         <Modal isOpen={isPopupOpen} style={customStyles} contentLabel="Modal">
           <div className="flex justify-between items-center mb-3 z-10">

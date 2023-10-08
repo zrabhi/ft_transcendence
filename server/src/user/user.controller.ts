@@ -392,9 +392,9 @@ export class UserController {
     @UserInfo() user: User,
     @Res() res: Response,
   ) {
-      const result = await this.userService.handleUnBlockUser(user, username);
-      if (result.success) res.status(200).json(result);
-      else res.status(400).json(result);
+    const result = await this.userService.handleUnBlockUser(user, username);
+    if (result.success) res.status(200).json(result);
+    else res.status(400).json(result);
   }
   @Get('blockedUsers')
   @UseGuards(JwtAuthGuard)
@@ -412,7 +412,7 @@ export class UserController {
       res.status(200).json(result);
     } catch (err) {}
   }
-  
+
   @UseGuards(JwtAuthGuard)
   @Put('updateStatus')
   async handleUpdateStatus(
@@ -472,6 +472,42 @@ export class UserController {
     } catch (err) {
       res.status(400).json('error occured');
     }
+  }
+  @Get('requestFriendSent')
+  @UseGuards(JwtAuthGuard)
+  async handleRequestFriendSent(@UserInfo() user: any, @Res() res: Response) {
+    const result = await this.userService.getFriendRequestSent(user);
+    if (result.success) return res.status(200).json(result.requests);
+    res.status(400).json(result);
+  }
+  @Put('cancelFriendRequest/:username')
+  @UseGuards(JwtAuthGuard)
+  async handleCancleFriendRequest(
+    @Param('username') username: string,
+    @UserInfo() user: any,
+    @Res() res: Response,
+  ) {
+    const result = await this.userService.handleCancleFriendRequest(
+      user,
+      username,
+    );
+    if (result.success) return res.status(200).json(result);
+    return res.status(400).json(result);
+  }
+  @Put('unfriend/:username')
+  @UseGuards(JwtAuthGuard)
+  async handleUnfriendUser(
+    @Param('username') username: string,
+    @UserInfo() user: any,
+    @Res() res: Response,
+  )
+  {
+    const result = await this.userService.handleUnFriendUser(
+      user,
+      username,
+    );
+    if (result.success) return res.status(200).json(result);
+    return res.status(400).json(result);
   }
 
   @Post('friendRequest/:username')

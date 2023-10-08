@@ -22,6 +22,7 @@ import io, { Socket } from "socket.io-client";
 /// create useState Where you can get blocked users && update it when the users is blocked from chat
 /// the resposne from back end is the username of the blocked user
 // we will change change to context api and we must always setBlockedUsers if new user have been block by the current user
+
 let notifSocket: Socket;
 export const AuthContext = createContext<any>({});
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -32,10 +33,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [cookie, setCookie, remove] = useCookies(["access_token"]);
   const [currentWindow, setCurrentWindow] = useState("");
   const [pathname, setPathname] = useState<string>("");
+  const [notif, setNotif] = useState<[]>([]);
   const [blockedUsers, setBlockedUsers] = useState<[]>([]);
   const [userBlockedMe, setUserBlockedMe] = useState<[]>([]);
+  const [friendsList, setFriendsList] = useState<[]>([]);
+  const [friendRequestSent, setFriendRequestSent] = useState<[]>([])
+  const [userFriendRequests, setUserFriendRequests] = useState<any>();
   // here we will aded states to save data cames from sockets
-
   const Urls = {
     home: "",
     gameHistory: "game-history",
@@ -44,10 +48,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     login: "login",
     tfaLogin: "tfalogin",
   };
-
   useEffect(() => {
-  if (cookie.access_token === "" || !cookie.access_token)
-  router.replace("/login");
+    if (cookie.access_token === "" || !cookie.access_token)
+      router.replace("/login");
   }, []);
   const checkPath = () => {
     setPathname("");
@@ -77,29 +80,59 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(response);
   };
 
-  useEffect(() => {
-  if (!checkPath()) return;
-  (async () => {
-  const response = await getRequest(`${baseUrlUsers}/user`);
-  if (response.error) {
-  setLoginError(response);
-  remove("access_token");
-  router.push("/login");
-  return false;
+  const fetchFriendList = async () => {
+    const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
+    console.log(friendList);
+
+    setFriendsList(friendList);
   }
+
+const fetchFriendRequestSent = async () => {
+  try {
+    const response = await getRequest(`${baseUrlUsers}/requestFriendSent`);
+    setFriendRequestSent(response);
+  } catch(err) {
+    console.log("error fetching friendSent");
+  }
+}
+const fetchFriendRequests = async () =>{
+  try {
+    const response = await getRequest(`${baseUrlUsers}/getFriendRequests`);
+    setUserFriendRequests(response);
+  }
+  catch(err)
+  {
+    console.log("error fetching friendRequest");
+  }
+}
+  useEffect(() => {
+    if (!checkPath()) return;
+    (async () => {
+      const response = await getRequest(`${baseUrlUsers}/user`);
+      if (response.error) {
+        setLoginError(response);
+        remove("access_token");
+        router.push("/login");
+        return false;
+      }
       response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
-  console.log(response);
-  setUser(response);
-  return true;
-  })();
-  (async () => {
-  const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
-  setBlockedUsers(response);
-  })();
-  (async () => {
-  const response = await getRequest(`${baseUrlUsers}/UsersBlockedMe`);
-  setUserBlockedMe(response);
-  })();
+      console.log(response);
+      setUser(response);
+      return true;
+    })();
+    (async () => {
+      const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
+      setBlockedUsers(response);
+    })();
+    (async () => {
+      const response = await getRequest(`${baseUrlUsers}/UsersBlockedMe`);
+      setUserBlockedMe(response);
+    })();
+    (async () =>{
+      await fetchFriendList();
+      await fetchFriendRequestSent();
+      await fetchFriendRequests();
+      })()
 
   }, []);
 
@@ -179,6 +212,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   // const socket = socketIO.connect('https://1997-196-65-77-2.ngrok-free.app');
+// useEffect(() =>
+// {
+// notifSocket = io("http://127.0.0.1:8080/notifications",{
+//     auth:{
+//       token:cookie.access_token,
+//     },
+//   });
+//   notifSocket.on('connected',() =>
+//   {
+//     console.log("connected notif");
+//   })
+//   notifSocket.on("logout", () =>{
+//     remove('access_token');
+//     router.push("/login");
+//   })
+//   return () =>{
+//     notifSocket.disconnect();
+//   }
+
+// },[notifSocket])
 
   return (
     <AuthContext.Provider
@@ -186,6 +239,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user: user,
         loginError: loginError,
         LogIn,
+        cookie,
         updatingInfos,
         updateUserInfo,
         tfaDisabled,
@@ -195,7 +249,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         userBlockedMe,
         setUserBlockedMe,
         setBlockedUsers,
-        notifSocket,
+        friendsList,
+        setFriendsList,
+        setFriendRequestSent,
+        friendRequestSent,
+        userFriendRequests,
+        setUserFriendRequests,
+        notif,
+        setNotif
       }}
     >
       <div id="snackbar"></div>

@@ -50,11 +50,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
       if (!payload) return client.disconnect(true);
       client.join(payload.id);
-      // const newUser = await this.userService.findUserById(payload.id);
       this.connectedUsers.set(payload.id, client);
       this.server.to(client.id).emit('connected', 'Hello world!');
     } catch (err) {
-      console.log('error while trying to connect');
       return client.disconnect(true);
     }
   }

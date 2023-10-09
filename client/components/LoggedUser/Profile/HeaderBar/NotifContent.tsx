@@ -1,16 +1,26 @@
-import React, { useContext } from 'react'
-import NotifItem from './NotifItem'
-import { AuthContext } from '@/app/context/AuthContext'
+import React, { useContext, useEffect } from "react";
+import NotifItem from "./NotifItem";
+import { AuthContext } from "@/app/context/AuthContext";
+import { baseUrlUsers, getRequest } from "@/app/context/utils/service";
 
 export default function NotifContent() {
-const {notif, userFriendRequests, setUserFriendRequests} = useContext(AuthContext);
-
+  const {
+    notif,
+    userFriendRequests,
+    setUserFriendRequests,
+    fetchFriendRequests
+  } = useContext(AuthContext);
 
   // notif types
   //   1 => friendRequest
   //   2 => recieveMessage
   //   3 => gameRequest
 
+  useEffect(() => {
+    (async () => {
+      await fetchFriendRequests();
+    })();
+  }, []);
   // notif has avatar and username of the sender and the type of notif
   // and we will discuss the notif how to check the stats of the notif
   // friendRequest => accept or reject
@@ -41,16 +51,14 @@ const {notif, userFriendRequests, setUserFriendRequests} = useContext(AuthContex
   // ]
   return (
     <div className="notif-content">
-      <h3 className='text-lg tracking-wider font-semibold absolute top-4'>
+      <h3 className="text-lg tracking-wider font-semibold absolute top-4">
         Notifications
       </h3>
       <div className="notif-list mt-4">
-        {
-          userFriendRequests.map((item: any, index: any) => (
-            <NotifItem key={index} data={item} />
-          ))
-        }
+        {userFriendRequests.map((item: any, index: any) => (
+          <NotifItem key={index} data={item} />
+        ))}
       </div>
     </div>
-  )
+  );
 }

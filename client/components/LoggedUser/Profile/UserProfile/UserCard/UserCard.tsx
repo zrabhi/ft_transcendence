@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaUserClock, FaUserCheck, FaUserPlus } from "react-icons/fa";
 
-// faUserPlust for not friend
+// faUserPlus for not friend
 // faUserCheck for friend
 // faUserClock for friend request sent
 
@@ -15,13 +15,34 @@ export default function UserCard(user: any) {
     blockedUsers,
     setBlockedUsers,
     friendsList,
-    setfriendsList,
+    setFriendsList,
+    fetchFriendList,
     friendRequestSent,
     setFriendRequestSent,
+    userFriendRequests,
+    setUserFriendRequests,
   } = useContext(AuthContext);
   user = user.user;
-  // user.isFriend = true;
-  // user.friendRequestSent = true;
+
+  const [pendingRequests, setPendingRequest] = useState<any>([])
+  const [isInFriendList, setIsFriendList] = useState<any>([])
+  useEffect(() => {
+    let pending: any[] = [];
+    let friendList: any[] = []
+    console.log("++++++",friendsList);
+    friendsList?.map((member: any) => {
+      console.log("----", member.username);
+      friendList.push(member.username);
+    })
+    userFriendRequests?.map((member: any) => {
+      console.log("----", member.username);
+      pending.push(member.username);
+    })
+    console.log(pending);
+    setIsFriendList(friendList)
+    setPendingRequest(pending)
+  }
+  , [userFriendRequests, friendsList])
 
   const handleUnblock = async () => {
     try {
@@ -57,11 +78,14 @@ export default function UserCard(user: any) {
         ""
       );
       const updatedFriendsList = friendsList.filter((friend: any) => {
-        return friend !== user.username;
+        return friend.username !== user.username;
       });
-      setfriendsList(updatedFriendsList);
+      setFriendsList(updatedFriendsList);
+      showSnackbar("friend revomed successfully", true)
     } catch (error) {
-      showSnackbar("error while unfriend process!", false);
+      console.log(error);
+
+      // showSnackbar("error while unfriend process!", false);
     }
   };
 
@@ -74,7 +98,8 @@ export default function UserCard(user: any) {
       const updatedFriendRequest = friendRequestSent.filter((friend: any) => {
         return friend !== user.username;
       });
-      friendRequestSent(updatedFriendRequest);
+      setFriendRequestSent(updatedFriendRequest);
+      showSnackbar("friend request cancled successfully", true);
     } catch (error) {
       showSnackbar("error while unfriend process!", false);
     }
@@ -82,6 +107,7 @@ export default function UserCard(user: any) {
 
   const addFriendHandler = async () => {
     try {
+      console.log(`add friend click`)
       const response = await postRequest(`${baseUrlUsers}/friendRequest/${user.username}`, "");
       setFriendRequestSent([...friendRequestSent, user.username])
       showSnackbar(response.message, true);
@@ -89,6 +115,21 @@ export default function UserCard(user: any) {
     showSnackbar("error while sending request!", false);
     }
   };
+
+  const acceptFriendHandler = async () => {
+    try {
+      const response = await putRequest(`${baseUrlUsers}/acceptFriendRequest/${user.username}`,"");
+      let updateUserFriendRequests = userFriendRequests.filter((member: any) =>{
+        return member.username !== user.username;
+      })
+      setUserFriendRequests(updateUserFriendRequests);
+      await fetchFriendList();
+      setPendingRequest([]);
+    } catch (error) {
+       showSnackbar("error while accepting request!", false);
+    }
+  }
+
   return (
     <div className="user-card w-full relative ">
       <div className="background"></div>
@@ -104,32 +145,30 @@ export default function UserCard(user: any) {
       </div>
       <div className="user-details">
         <h2>{user && user.username}</h2>
-        <div className="friend-state flex gap-4 justify-between items-center cursor-pointer hover:opacity-80">
-          <div className="state-msg">
-            {friendsList.includes(user.username) ? (
-              <p className="" onClick={removeFriendHandler}>
-                Friends
+          <div className="state-msg friend-state flex gap-4 justify-between items-center cursor-pointer hover:opacity-80">
+            {isInFriendList.includes(user.username) ? (
+              <p className="flex justify-between items-center" onClick={removeFriendHandler}>
+                <span>Friends</span>
+                <FaUserCheck />
               </p>
             ) : friendRequestSent.includes(user.username) ? (
-              <p className="" onClick={cancelRequestHandler}>
-                Friend Request Sent
+              <p className="flex justify-between items-center" onClick={cancelRequestHandler} >
+                <span>Friend Request Sent</span>
+                <FaUserClock />
               </p>
-            ) : (
-              <p className="" onClick={addFriendHandler}>
-                Add Friend
+            ) : pendingRequests.includes(user.username) ? (
+              <p className="flex justify-between items-center" onClick={acceptFriendHandler} >
+                <span>Accept</span>
+                <FaUserCheck />
+              </p>
+            ) 
+            : (
+              <p className="flex justify-between items-center" onClick={addFriendHandler}>
+                <span>Add Friend</span>
+                <FaUserPlus />
               </p>
             )}
           </div>
-          <div className="state-icon">
-            { friendsList.includes(user.username) ? (
-              <FaUserCheck />
-            ) : friendRequestSent.includes(user.username) ? (
-              <FaUserClock />
-            ) : (
-              <FaUserPlus />
-            )}
-          </div>
-        </div>
         <div className="block-state">
           <div className="block-btn">
             {blockedUsers.includes(user.username) ? (

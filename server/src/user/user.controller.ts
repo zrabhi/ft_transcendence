@@ -518,7 +518,7 @@ export class UserController {
     @Res() res: Response,
   ) {
     const result = await this.userService.handleFriendRequest(user, username);
-    if (!result.success) return res.status(400).json(result);
+    if (!result.success)return res.status(400).json(result);
     return res.status(200).json(result);
   }
 }

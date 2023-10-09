@@ -251,9 +251,11 @@ const fetchFriendRequests = async () =>{
         setBlockedUsers,
         friendsList,
         setFriendsList,
+        fetchFriendList,
         setFriendRequestSent,
         friendRequestSent,
         userFriendRequests,
+        fetchFriendRequests,
         setUserFriendRequests,
         notif,
         setNotif

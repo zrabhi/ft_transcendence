@@ -410,22 +410,18 @@ export class UserService {
 
   async handleUnFriendUser(user: any, username: string) {
     try {
-      const currentUser = await this.prismaService.user.findUnique({
-        where: {
-          id: user.id,
-        },
-        include: {
-          friend: true,
-        },
+      const currentUser = await this.findUserById(user.id)
+      const Friendships = await this.prismaService.friendship.findMany({
       });
+      const requests = await this.prismaService.friendRequest.findMany({})
       const otherUser = await this.findUserName(username);
-      for (const friend of currentUser.friend) {
+      for (const friend of Friendships) {
         if (
           (friend.user_id == currentUser.id ||
             friend.user_id === otherUser.id) &&
-          (friend.friend_id === currentUser.id ||
-            friend.friend_id === otherUser.id)
-        ) {
+            (friend.friend_id === currentUser.id ||
+              friend.friend_id === otherUser.id)
+              ) {
           await this.prismaService.friendship.delete({
             where: {
               id: friend.id,
@@ -433,10 +429,25 @@ export class UserService {
           });
         }
       }
+      for (const request of requests)
+      {
+        if (
+        (request.requested_id == currentUser.id ||
+          request.requested_id === otherUser.id) &&
+          (request.requester_id === currentUser.id ||
+            request.requester_id === otherUser.id)
+            ) {
+              await this.prismaService.friendRequest.delete({
+                where: {
+                  id: request.id,
+                },
+              });
+            }
+      }
       return { success: true, message: 'succeffully updated' };
     } catch (err) {
-      return { success: false };
       console.log("error occurred while unfriending user");
+      return { success: false };
     }
   }
   async deleteFriendship(user_one: string, user_two: string) {
@@ -674,7 +685,6 @@ export class UserService {
         request.requester_id === currentUser.id &&
         request.requested_id === requestedFriend.id
       ) {
-        console.log(request);
         // thats mean  already request has been send by the current user
         return {
           success: false,
@@ -720,7 +730,7 @@ export class UserService {
         const otherUser = await this.findUserById(request.requester_id);
         requests.push({
           type: 1,
-          usernname:otherUser.username,
+          username:otherUser.username,
           avatar:otherUser.avatar,
       })
     }
@@ -735,16 +745,17 @@ export class UserService {
           id: user.id,
         },
         include: {
-          IncomingRequest: true,
+          OutgoingRequest: true,
         },
       });
       const otherUser = await this.findUserName(username);
-      for (const request of currentUser.IncomingRequest) {
+      for (const request of currentUser.OutgoingRequest) {
         if (
           request.requester_id === currentUser.id &&
           request.state === 'PENDING' &&
           request.requested_id === otherUser.id
         ) {
+
           await this.prismaService.friendRequest.delete({
             where: {
               id: request.id,

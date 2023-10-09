@@ -75,7 +75,7 @@ const BoxChat = ({
   channels,
   users,
 }: any): JSX.Element => {
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // state for dropdown
   const [isPopupOpen, setIsPopupOpen] = useState(false); // state for members popup
@@ -351,37 +351,34 @@ const BoxChat = ({
   }, [selectedChannel]);
 
   useEffect(() => {
-    ref.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-    });
-  }, []);
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   //   // get friends here
 
   const sendMessage = async (e: any) => {
-    e.preventDefault(); // prevent from refreshing the chat box component
-    var time = new Date();
-    const body = {
-      message: message,
-      channelId: selectedChannel.channel.id,
-      token: cookie.access_token,
-      time: time.getHours() + ":" + time.getMinutes(),
-    };
-    socket.emit("message", body);
+    if (message && message.length > 0 && !/^\s*$/.test(message)) {
+      e.preventDefault(); // prevent from refreshing the chat box component
+      var time = new Date();
+      const body = {
+        message: message.trim(),
+        channelId: selectedChannel.channel.id,
+        token: cookie.access_token,
+        time: time.getHours() + ":" + time.getMinutes(),
+      };
+      socket.emit("message", body);
 
-    setMessage("");
+      setMessage("");
+    } else {
+      showSnackbar("type a valid message", false);
+    }
   };
 
   const handleChange = (e: any) => {
     e.preventDefault();
-    if (
-      e.target.value != null &&
-      e.target.value.split(" ").length === 1 &&
-      e.target.value.split(" ")[0].length > 30
-    ) {
-      showSnackbar("You can't write a long word", false);
-    } else setMessage(e.target.value);
+    setMessage(e.target.value.replace(/\s+/g, " "));
   };
 
   const toggleDropdown = () => {
@@ -574,7 +571,7 @@ const BoxChat = ({
               )}
               {/* ADD setting here */}
               {separateOptions?.map((option: any, index: Key) => (
-                <>
+                <div key={"keydiv"+index}>
                   {blockedUsers.includes(chat?.username) &&
                     selectedChannel?.channel?.type === "DM" &&
                     option.text === "Unblock" && (
@@ -591,7 +588,7 @@ const BoxChat = ({
                     selectedChannel?.channel?.type === "DM" &&
                     option.text === "Block" && (
                       <div
-                        key={"separated" + index} //changed previous value "index&"
+                        key={"separated1" + index} //changed previous value "index&"
                         className={`block px-4 py-2 text-sm text-red-600 hover:bg-gray-300 hover:text-red-600 font-semibold cursor-pointer`}
                         role="menuitem"
                         onClick={() => handleOptionClick(option.action)}
@@ -601,7 +598,7 @@ const BoxChat = ({
                     )}
                   {selectedChannel?.channel?.type !== "DM" && (
                     <div
-                      key={"separated" + index} //changed previous value "index&"
+                      key={"separated2" + index} //changed previous value "index&"
                       className={`block px-4 py-2 text-sm text-red-600 hover:bg-gray-300 hover:text-red-600 font-semibold cursor-pointer`}
                       role="menuitem"
                       onClick={() => handleOptionClick(option.action)}
@@ -609,7 +606,7 @@ const BoxChat = ({
                       {option.text}
                     </div>
                   )}
-                </>
+                </div>
               ))}
             </div>
           </div>
@@ -677,97 +674,68 @@ const BoxChat = ({
         </Modal>
       </div>
       <div className="box-chat-messages">
-        <div className="messages-box flex flex-col">
-          <div className="message-list">
-            {messages &&
-              messages?.map((message: MessageProps, index: Key) => (
-                <div
-                  className={`mb-3 ${
-                    message.reciever
-                      ? "self-end bg-[#654795] text-white"
-                      : "self-start bg-gray-200"
-                  } rounded-3xl p-1 flex items-center`}
-                  key={index}
-                >
-                  <span>
-                    <img
-                      alt={message.reciever ? message.sender : message.reciever}
-                      src={message.avatar}
-                      className="avatar-chat"
-                      style={{ width: "40px", height: "40px" }}
-                    />
-                  </span>
-                  <div>
-                    <p>
-                      {!message?.blocked
-                        ? message.content
-                        : "You can't see the message from a blocked user!"}
-                    </p>
-                  </div>
-                </div>
-              ))}
-          </div>
-          <div className="p-4 w-full">
-            <div className="relative w-full">
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
-                <BsFillSendFill color={"white"} onClick={sendMessage} />
+        <div className="messages-box" ref={containerRef}>
+          {messages.map((message: Message, index: number) => (
+            <div
+              key={index}
+              className={`py-2 flex flex-row w-full ${
+                message.reciever ? "justify-end" : "justify-start"
+              }`}
+            >
+              <div className={`${message.reciever ? "order-2" : "order-1"}`}>
+                <img
+                  alt={message.reciever ? message.sender : message.reciever}
+                  src={message.avatar}
+                  className="avatar-chat"
+                  style={{ width: "40px", height: "40px" }}
+                />
               </div>
-              <input
-                type="search"
-                id="default-search"
-                className="block w-full p-4 pl-10 text-sm text-white rounded-3xl bg-[#1F1F1F] focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Write a message"
-                onChange={handleChange}
-                value={message}
-              />
+              <div
+                className={`px-2 w-fit py-3 flex flex-col rounded-3xl  ${
+                  message.reciever ? "order-1 mr-2" : "order-2 ml-2"
+                } ${message.sender ? "text-white bg-[#4050C8]": "bg-[#F0F0F0] text-black"}`}
+                style={{ wordBreak: "break-all" }} // Break words or strings at any character
+              >
+                {/* <span className="text-xs text-gray-200">
+                {message.sentBy}&nbsp;-&nbsp;
+                {new Date(message.sentAt).toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
+              </span> */}
+                <span className="text-md">{!message?.blocked
+                        ? message.content
+                        : "You can't see the message from a blocked user!"}</span>
+              </div>
             </div>
+          ))}
+        </div>
+        <div className="chat-input bg-[#14003D] w-100 overflow-hidden rounded-bl-xl rounded-br-xla">
+          <div className=" space-x-5">
+            <form onSubmit={sendMessage} className="pl-2 pr-2 gap-3 flex flex-row items-center justify-between">
+              <div className="relative w-full">
+                <input
+                  type="search"
+                  id="default-search"
+                  className="w-full block p-3 pl-10 text-sm text-white  rounded-3xl bg-[#1F1E1F] focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="Write a message"
+                  onChange={handleChange}
+                  value={message}
+                />
+              </div>
+
+              <button
+                  type="submit"
+                  className="px-3 py-2 text-xs font-medium text-center text-white bg-[#654695] rounded-3xl hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 disabled:opacity-50"
+                  
+                  disabled={!message || message.length === 0}
+                >
+                  Send
+              </button>
+            </form>
           </div>
         </div>
       </div>
-      {/* <div className="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="px-4 py-2 bg-gray-300">
-          <h2 className="text-xl font-semibold text-gray-800">Chat Room</h2>
-        </div>
-        <div className="px-4 py-4">
-          <div className="flex">
-            <div className="flex-shrink-0 mr-3">
-              <img
-                className="w-8 h-8 rounded-full"
-                src="https://via.placeholder.com/40"
-                alt="User Avatar"
-              />
-            </div>
-            <div className="flex-grow">
-              <div className="bg-gray-200 rounded-lg p-2">
-                <p className="text-sm text-gray-600">
-                  Hello! How can I help you?
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="flex mt-4">
-            <div className="flex-grow">
-              <div className="bg-blue-500 text-white rounded-lg p-2">
-                <p className="text-sm">Hi! I have a question.</p>
-              </div>
-            </div>
-            <div className="flex-shrink-0 ml-3">
-              <img
-                className="w-8 h-8 rounded-full"
-                src="https://via.placeholder.com/40"
-                alt="User Avatar"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="px-4 py-2 bg-gray-300">
-          <input
-            className="w-full px-3 py-2 rounded-full border-2 border-gray-200 focus:outline-none"
-            type="text"
-            placeholder="Type a message..."
-          />
-        </div>
-      </div> */}
       {isPopupOpen && (
         <Modal isOpen={isPopupOpen} style={customStyles} contentLabel="Modal">
           <div className="flex justify-between items-center mb-3 z-10">

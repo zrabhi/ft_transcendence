@@ -350,7 +350,6 @@ export class UserController {
   @Get('user/friends')
   async handleGetFriends(@Req() req, @Res() res, @UserInfo() currUser) {
     try {
-      console.log(currUser.id);
 
       const friends = await this.userService.getFriendsByUserId(currUser.id);
       console.log(friends);
@@ -362,11 +361,9 @@ export class UserController {
           user = await this.userService.findUserById(friend.friend_id);
         if (friend.user_id != currUser.id)
           user = await this.userService.findUserById(friend.user_id);
-        friendsList.push({
-          username: user.username,
-          status: user.status,
-          avatar: user.avatar,
-        });
+        friendsList.push(
+          user
+        );
       }
       res.status(200).json(friendsList);
     } catch (err) {

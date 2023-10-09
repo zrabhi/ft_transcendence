@@ -14,8 +14,16 @@
 }
 
 .users-container {
+  height: 835px;
+  max-height: 835px;
   width: 270px;
   gap: 10;
+}
+
+.channels-chat {
+  overflow: auto;
+  height: 650px;
+  max-width: 650px;
 }
 
 .inbox-header {
@@ -53,6 +61,7 @@
   display: flex;
   flex-direction: column;
   gap: 30px;
+  padding-top: 100px;
   .box-chat-container {
     background-color: #14003d;
     color: #999999;
@@ -70,40 +79,46 @@
       gap: 10px;
     }
   }
-  .box-chat-messages {
-    width: 500px;
-    height: 500px;
-    overflow: hidden;
-  }
+  
 }
+.box-chat-messages {
+  width: 500px;
+  height: 500px;
+  overflow: hidden;
+}
+
 .messages-box {
-  width: 100%;
-  height: 100%;
   overflow-y: auto;
-  padding-right: 10px; /* Adjust for scrollbar width */
+  padding: 10px; /* Adjust for scrollbar width */
   background-color: #14003D;
+  height: calc(100% - 50px); /* Adjust the height based on your layout */
+  /* Other styles as needed */
 }
 
-.messages-box::-webkit-scrollbar {
-  width: 10px;
-  background-color: #f5f5f5;
+.chat-input {
+  height: 350px;
 }
 
-.messages-box::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background: linear-gradient(left, #96a6bf, #63738c);
-  box-shadow: inset 0 0 1px 1px #5c6670;
-}
+// .messages-box::-webkit-scrollbar {
+//   width: 10px;
+//   background-color: #f5f5f5;
+// }
 
-.messages-box::-webkit-scrollbar-track {
-  border-radius: 10px;
-  background: #eee;
-  box-shadow: 0 0 1px 1px #bbb, inset 0 0 7px rgba(0, 0, 0, 0.3);
-}
+// .messages-box::-webkit-scrollbar-thumb {
+//   border-radius: 10px;
+//   background: linear-gradient(left, #96a6bf, #63738c);
+//   box-shadow: inset 0 0 1px 1px #5c6670;
+// }
 
-.messages-box::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(left, #8391a6, #536175);
-}
+// .messages-box::-webkit-scrollbar-track {
+//   border-radius: 10px;
+//   background: #eee;
+//   box-shadow: 0 0 1px 1px #bbb, inset 0 0 7px rgba(0, 0, 0, 0.3);
+// }
+
+// .messages-box::-webkit-scrollbar-thumb:hover {
+//   background: linear-gradient(left, #8391a6, #536175);
+// }
   
 
   .friends-list {
@@ -137,3 +152,8 @@
     width: 450px;
     background-color: #654795;
   }
+
+
+    .headerBar{
+      margin: 30px 35px;
+    }

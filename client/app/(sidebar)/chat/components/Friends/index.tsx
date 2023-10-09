@@ -35,13 +35,13 @@ const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
     <>
       {showSidebar ? (
         <button
-          className="flex text-4xl text-white items-center cursor-pointer fixed right-10 top-6 z-50"
+          className="flex text-4xl text-white items-center cursor-pointer fixed right-10 top-10 z-50"
           onClick={() => setShowSidebar(!showSidebar)}
         >
           x
         </button>
       ) : (
-          <FaUserFriends onClick={() => setShowSidebar(!showSidebar)} className="fixed  z-30 flex items-center cursor-pointer right-10 top-6 text-white icon"/>
+          <FaUserFriends onClick={() => setShowSidebar(!showSidebar)} className="fixed  z-30 flex items-center cursor-pointer right-10 top-17 text-white icon"/>
       )}
 
       <div

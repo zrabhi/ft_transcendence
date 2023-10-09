@@ -23,6 +23,9 @@ import { array } from "yup";
 import { AuthContext } from "@/app/context/AuthContext";
 import Modal from "react-modal";
 import { showSnackbar } from "@/app/context/utils/showSnackBar";
+import ConversationPana from "@/public/images/Conversation-pana.png"
+import GroupChat from "@/public/images/Group Chat-amico.png"
+
 
 const customStyles = {
   content: {
@@ -55,6 +58,7 @@ const Chat: React.FC = () => {
     setUserBlockedMe,
     blockedUsers,
     userBlockedMe,
+    friendsList
   } = useContext(AuthContext);
   const [cookie] = useCookies(["access_token"]);
 
@@ -69,10 +73,10 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const response = await getRequest(`${baseUrlUsers}/users`);
+      const response = await getRequest(`${baseUrlUsers}/user/friends`);
       setUsers(response);
     })();
-  }, []);
+  }, [friendsList]);
 
   useEffect(() => {
     (async () => {
@@ -420,9 +424,13 @@ const Chat: React.FC = () => {
   return (
     <div className="logged-user">
       <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+      <div className="headerBar">
+        <HeaderBar data={user} />
+      </div>
       <div className="home">
-        {/* <HeaderBar /> */}
         <div className="chat-page">
+          
+
           <h2 className="text-2xl text-white mx-auto my-4">
             <strong>Chat</strong>
           </h2>
@@ -446,13 +454,14 @@ const Chat: React.FC = () => {
                 users={users}
               />
             ) : (
-              <div className="text-white text-xl flex justify-center items-center">
-                {" "}
-                You need to select a chat!{" "}
+              <div className="pt-20 text-[#999999] text-xl flex flex-col justify-start items-start">
+                {/* <img src={ConversationPana} alt='ConversationPana'/> */}
+                <span>You need to select a chat to start a conversation</span>
+                <img src={ConversationPana.src} alt="Conversation Pana" width="500px" height="500px" /> 
               </div>
             )}
             {otherChannels && otherChannels.length > 0 ? (
-              <div className="flex flex-col justify-start items-center">
+              <div className="flex flex-col justify-start items-center pt-20">
                 <h2 className="text-2xl mx-auto my-4 text-white font-semibold">
                   <strong>channels</strong>
                 </h2>
@@ -542,10 +551,11 @@ const Chat: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-white text-xl flex flex-col justify-center items-center">
+              <div className="pt-20 text-[#999999] text-xl flex flex-col justify-start items-start">
                 {" "}
                 <h2>There is no channels to join,</h2>
                 <h2>Try to create one!</h2>{" "}
+                <img src={GroupChat.src} alt='GroupChat' width="500px" height="500px" />
               </div>
             )}
             <Friends

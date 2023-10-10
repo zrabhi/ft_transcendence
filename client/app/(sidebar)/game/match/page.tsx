@@ -3,6 +3,7 @@ import HeaderBar from '@/components/LoggedUser/Profile/HeaderBar/HeaderBar';
 import SideBar from '@/components/LoggedUser/SideBar/SideBar'
 import exp from 'constants';
 import React, { useContext } from 'react'
+import GamePopup from './GamePopup'; 
 import './style.scss'
 import Avatar1 from '@/public/images/avatar1.jpeg'
 import { useEffect, useState} from "react";
@@ -13,6 +14,10 @@ import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
 
 export default function match()
 {
+
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState('');
+
     const [cookie] = useCookies(["access_token"]);
     const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
     const {user} = useContext(AuthContext);
@@ -26,6 +31,16 @@ export default function match()
     const [opp_avatar, setOpponentavatar] = useState<string>()
     const [myscore, setmyscore] = useState(0);
     const [oppscore, setoppscore] = useState(0);
+    const handleNewGameClick = () => {
+      // Redirect to the game match page
+      // router.push('/game/match');
+    };
+  
+    const handleBackHomeClick = () => {
+      // Redirect to the profile page
+      // router.push('/profile');
+    };
+  
 
     let raf: number;
     let upkey = false;
@@ -112,18 +127,8 @@ export default function match()
       }
       else{
         setOpponentUser(response);
-        // setOpponentavatar(response?.avatar);
       }
     }
-// useEffect(() => {
-//   if (opp_username === "opponent")
-//     return
-//   (async () => {
-//     await getUser();
-//     console.log(opponentUser);
-    
-//   })()
-// },[])
     const launchGame =  () => {
       const canvas = document.getElementById("canvas") as HTMLCanvasElement;
       const ctx = canvas.getContext("2d");
@@ -145,6 +150,8 @@ export default function match()
         })
         socket.on('opponent quit',()=>{
           game = false;
+          setPopupMessage('Opponent Quit');
+          setShowPopup(true);
           const tableElement = document.getElementById('canvas');
           if (tableElement) {
             tableElement.style.backgroundImage = 'url("https://superposition-lyon.com/wp-content/uploads/2023/01/game-over-blanc.jpeg")'
@@ -156,6 +163,8 @@ export default function match()
       }
       socket.on('right win', () => {
         game = false;
+        setPopupMessage('Right Player Wins');
+        setShowPopup(true);
         const tableElement = document.getElementById('canvas');
           if (tableElement) {
             tableElement.style.backgroundImage = 'url("https://superposition-lyon.com/wp-content/uploads/2023/01/game-over-blanc.jpeg")'
@@ -165,6 +174,8 @@ export default function match()
           }
       })
       socket.on('left win', () => {
+        setPopupMessage('Left Player Wins');
+        setShowPopup(true);
         game = false;
         const tableElement = document.getElementById('canvas');
           if (tableElement) {
@@ -248,10 +259,17 @@ export default function match()
                         </div>
                     </div>
                 </div>
+                <div className="game-popup">
+                  <div className="message">{popupMessage}</div>
+                  <div className="buttons">
+                    <button onClick={handleNewGameClick}>New Game</button>
+                    <button onClick={handleBackHomeClick}>Back Home</button>
+                  </div>
+                </div>    
                 <div className="table" id='table'>
                     <canvas id="canvas" width={1000} height={600}></canvas>
                 </div>
-            </div>         
+            </div>    
         </div>
     </div>
 </div>

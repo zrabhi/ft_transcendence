@@ -91,11 +91,23 @@ export class UserController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('user/username')
-  async getUseByName(@Req() req): Promise<User> {
-    return await this.userService.findUserName(req.user.username);
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Get('user/:username')
+  // async getUseByName(
+  //   @Res() res,
+  //   @Param('username') username: string,
+  // ) {
+  //   try{
+  //     if (!username)
+  //       return res.status(400).json({ msg: 'user not found' })
+  //     console.log("in user get requets")
+  //   const result = await this.userService.findUserName(username);
+  //   return res.status(200).json(result);
+  //   }catch(err)
+  //   {
+  //     res.status(400).json("error occured")
+  //   }
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Post('/users/')
@@ -349,8 +361,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('user/friends')
   async handleGetFriends(@Req() req, @Res() res, @UserInfo() currUser) {
-    try {
-
+    
+    try { 
       const friends = await this.userService.getFriendsByUserId(currUser.id);
       console.log(friends);
 
@@ -365,7 +377,8 @@ export class UserController {
           user
         );
       }
-      res.status(200).json(friendsList);
+      console.log(friendsList);
+      return res.status(200).json(friendsList);
     } catch (err) {
       console.log('error in get friends  ', err);
     }
@@ -439,7 +452,9 @@ export class UserController {
         });
       }
       res.status(200).json(friendsList);
-    } catch (err) {}
+    } catch (err) {
+
+    }
   }
   @Get('getFriendRequests')
   @UseGuards(JwtAuthGuard)

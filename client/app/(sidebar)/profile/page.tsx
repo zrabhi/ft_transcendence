@@ -15,21 +15,22 @@ export default function Profile() {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const fetchFriendList = async () => {
+    console.log("in fetch friends");
     const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
     console.log(friendList);
 
     setFriendList(friendList);
   }
-  useEffect( () => {
-    try {
-      (async () =>{
-      await fetchFriendList();
-      })() 
-    }
-    catch (error) {
-      console.error('Error fetching friend list:', error);
-    }
-  }, []);
+  // useEffect(() => {
+  //   try {
+  //     (async () =>{
+  //     await fetchFriendList();
+  //     })()
+  //   }
+  //   catch (error) {
+  //     console.error('Error fetching friend list:', error);
+  //   }
+  // }, []);
 
   return (
     <div className="profile-page text-white">

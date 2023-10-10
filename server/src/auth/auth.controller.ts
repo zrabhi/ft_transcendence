@@ -10,7 +10,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { Response, response } from 'Express';
+import { Response, response } from 'express';
 import { GoogleGuard } from './Guards/GoogleGuard';
 import passport, { Profile } from 'passport';
 import { AuthService } from './auth.service';

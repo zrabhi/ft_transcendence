@@ -31,20 +31,10 @@ export default function RootLayout({
   /// we will chenge it later we i found out best solution
   // chekc id there is access_toke if so rederect the  user to profile
   const notifSocket = useContext(InvitationSocketContext);
-  const {setNotif} = useContext(AuthContext);
+  const {setNotif, setGameRequest} = useContext(AuthContext);
   const [cookie, setCookie, remove] = useCookies(['access_token']);
   const router = useRouter();
 
-  useEffect(() => {
-    notifSocket.on("logout", () =>{
-      console.log("loging out");
-      remove('access_token');
-      router.push("/login");
-    })
-    return ()=>{
-      notifSocket.disconnect();
-    }
-  },[])
   return (
     <html lang="en">
       <body className={roboto.className} suppressHydrationWarning={true}>

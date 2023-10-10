@@ -17,6 +17,7 @@ import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
 import { blockedUsers } from "@/interfaces/channels";
 import io, { Socket } from "socket.io-client";
+import { showSnackbar } from "./utils/showSnackBar";
 // import socketIO from 'socket.io-client';
 // ADDED BY ZAC
 /// create useState Where you can get blocked users && update it when the users is blocked from chat
@@ -37,8 +38,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [blockedUsers, setBlockedUsers] = useState<[]>([]);
   const [userBlockedMe, setUserBlockedMe] = useState<[]>([]);
   const [friendsList, setFriendsList] = useState<[]>([]);
-  const [friendRequestSent, setFriendRequestSent] = useState<[]>([])
+  const [friendRequestSent, setFriendRequestSent] = useState<[]>([]);
   const [userFriendRequests, setUserFriendRequests] = useState<any>();
+  const [gameRequest, setGameRequest] = useState<[]>([]);
   // here we will aded states to save data cames from sockets
   const Urls = {
     home: "",
@@ -85,26 +87,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log(friendList);
 
     setFriendsList(friendList);
-  }
+  };
 
-const fetchFriendRequestSent = async () => {
-  try {
-    const response = await getRequest(`${baseUrlUsers}/requestFriendSent`);
-    setFriendRequestSent(response);
-  } catch(err) {
-    console.log("error fetching friendSent");
-  }
-}
-const fetchFriendRequests = async () =>{
-  try {
-    const response = await getRequest(`${baseUrlUsers}/getFriendRequests`);
-    setUserFriendRequests(response);
-  }
-  catch(err)
-  {
-    console.log("error fetching friendRequest");
-  }
-}
+  const fetchFriendRequestSent = async () => {
+    try {
+      const response = await getRequest(`${baseUrlUsers}/requestFriendSent`);
+      setFriendRequestSent(response);
+    } catch (err) {
+      console.log("error fetching friendSent");
+    }
+  };
+  const fetchFriendRequests = async () => {
+    try {
+      const response = await getRequest(`${baseUrlUsers}/getFriendRequests`);
+      setUserFriendRequests(response);
+    } catch (err) {
+      console.log("error fetching friendRequest");
+    }
+  };
   useEffect(() => {
     if (!checkPath()) return;
     (async () => {
@@ -128,29 +128,12 @@ const fetchFriendRequests = async () =>{
       const response = await getRequest(`${baseUrlUsers}/UsersBlockedMe`);
       setUserBlockedMe(response);
     })();
-    (async () =>{
+    (async () => {
       await fetchFriendList();
       await fetchFriendRequestSent();
       await fetchFriendRequests();
-      })()
-
+    })();
   }, []);
-
-  // // (async () => {
-  // //   notifSocket = io("http://127.0.0.1:8080/notifications", {
-  // //     auth:{
-  // //       token:cookie.access_token,
-  // //     }
-  // //   });
-  // //   notifSocket.on("connected",()=>{
-  // //     console.log("notification notifSocket connected");
-  // //   });
-  // // })();
-  // // return () => {
-  // //   notifSocket.disconnect();
-  // // };
-  // }, []);
-
   const updatingInfos = useCallback(
     async (username: string, password: string) => {
       const response = await putRequest(
@@ -211,27 +194,37 @@ const fetchFriendRequests = async () =>{
     return true;
   }, []);
 
-  // const socket = socketIO.connect('https://1997-196-65-77-2.ngrok-free.app');
-// useEffect(() =>
-// {
-// notifSocket = io("http://127.0.0.1:8080/notifications",{
-//     auth:{
-//       token:cookie.access_token,
-//     },
-//   });
-//   notifSocket.on('connected',() =>
-//   {
-//     console.log("connected notif");
-//   })
-//   notifSocket.on("logout", () =>{
-//     remove('access_token');
-//     router.push("/login");
-//   })
-//   return () =>{
-//     notifSocket.disconnect();
-//   }
-
-// },[notifSocket])
+  useEffect(() => {
+    notifSocket = io("http://127.0.0.1:8080/notifications", {
+      auth: {
+        token: cookie.access_token,
+      },
+    });
+    notifSocket.on("connected", () => {
+      console.log("connected notif");
+    });
+    notifSocket.on("logout", () => {
+      console.log("loging out");
+      remove("access_token");
+      router.push("/login");
+    });
+    notifSocket.on("accepted", (data: any) => {
+      if (user.username !== data.username)
+        showSnackbar(`${data.username} accepted you game request`, true);
+      router.push("/game");
+    });
+    notifSocket.on("gameRequest", (data: any) => {
+      showSnackbar(
+        `you have a game request from ${data[0].username}, check your notifications to accepte or refuse`,
+        true
+      );
+      console.log("game data", data);
+      setGameRequest(data);
+    });
+    return () => {
+      notifSocket.disconnect();
+    };
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -255,10 +248,12 @@ const fetchFriendRequests = async () =>{
         setFriendRequestSent,
         friendRequestSent,
         userFriendRequests,
+        gameRequest,
+        setGameRequest,
         fetchFriendRequests,
         setUserFriendRequests,
-        notif,
-        setNotif
+        notifSocket,
+        setNotif,
       }}
     >
       <div id="snackbar"></div>

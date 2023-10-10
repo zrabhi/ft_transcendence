@@ -410,18 +410,17 @@ export class UserService {
 
   async handleUnFriendUser(user: any, username: string) {
     try {
-      const currentUser = await this.findUserById(user.id)
-      const Friendships = await this.prismaService.friendship.findMany({
-      });
-      const requests = await this.prismaService.friendRequest.findMany({})
+      const currentUser = await this.findUserById(user.id);
+      const Friendships = await this.prismaService.friendship.findMany({});
+      const requests = await this.prismaService.friendRequest.findMany({});
       const otherUser = await this.findUserName(username);
       for (const friend of Friendships) {
         if (
           (friend.user_id == currentUser.id ||
             friend.user_id === otherUser.id) &&
-            (friend.friend_id === currentUser.id ||
-              friend.friend_id === otherUser.id)
-              ) {
+          (friend.friend_id === currentUser.id ||
+            friend.friend_id === otherUser.id)
+        ) {
           await this.prismaService.friendship.delete({
             where: {
               id: friend.id,
@@ -429,24 +428,23 @@ export class UserService {
           });
         }
       }
-      for (const request of requests)
-      {
+      for (const request of requests) {
         if (
-        (request.requested_id == currentUser.id ||
-          request.requested_id === otherUser.id) &&
+          (request.requested_id == currentUser.id ||
+            request.requested_id === otherUser.id) &&
           (request.requester_id === currentUser.id ||
             request.requester_id === otherUser.id)
-            ) {
-              await this.prismaService.friendRequest.delete({
-                where: {
-                  id: request.id,
-                },
-              });
-            }
+        ) {
+          await this.prismaService.friendRequest.delete({
+            where: {
+              id: request.id,
+            },
+          });
+        }
       }
       return { success: true, message: 'succeffully updated' };
     } catch (err) {
-      console.log("error occurred while unfriending user");
+      console.log('error occurred while unfriending user');
       return { success: false };
     }
   }
@@ -730,11 +728,11 @@ export class UserService {
         const otherUser = await this.findUserById(request.requester_id);
         requests.push({
           type: 1,
-          username:otherUser.username,
-          avatar:otherUser.avatar,
-      })
+          username: otherUser.username,
+          avatar: otherUser.avatar,
+        });
+      }
     }
-  }
     return requests;
   }
 
@@ -755,7 +753,6 @@ export class UserService {
           request.state === 'PENDING' &&
           request.requested_id === otherUser.id
         ) {
-
           await this.prismaService.friendRequest.delete({
             where: {
               id: request.id,
@@ -785,15 +782,105 @@ export class UserService {
           request.state === 'PENDING'
         ) {
           const otherUser = await this.findUserById(request.requested_id);
-          requests.push(
-            otherUser.username,
-          );
+          requests.push(otherUser.username);
         }
       }
-      console.log("here request",requests);
+      console.log('here request', requests);
       return { success: true, requests: requests };
     } catch (err) {
       return { success: false };
+    }
+  }
+  async handleCreateGameInvitation(currentUser: User, otherUser: User) {
+    try {
+      const gameInvitations = await this.prismaService.gameInvite.findMany({});
+
+      for (const invitation of gameInvitations) {
+        if (
+          (invitation.senderId === currentUser.id ||
+            invitation.recieverId === currentUser.id) &&
+          (invitation.senderId === otherUser.id ||
+          invitation.recieverId === otherUser.id) &&
+          invitation.state === 'PENDING'
+        ) {
+          return { success: false, error: 'invitation already sent!' };
+        }
+      }
+      await this.prismaService.gameInvite.create({
+        data: {
+          senderId: currentUser.id,
+          recieverId: otherUser.id,
+          state: 'PENDING',
+        },
+      });
+      return { success: true, message: 'game request sent successfully' };
+    } catch (error) {
+      console.log('error occured heree');
+      return { success: false, error: 'invitation already sent!' };
+    }
+  }
+
+  async handleAccpetRequest(currentUser: User, otherUser: User) {
+    try {
+      const gameInvitations = await this.prismaService.gameInvite.findMany({});
+
+      for (const invitation of gameInvitations) {
+        if (
+          (invitation.senderId === currentUser.id ||
+            invitation.recieverId === currentUser.id) &&
+         (invitation.senderId === otherUser.id ||
+          invitation.recieverId === otherUser.id) &&
+          invitation.state === 'PENDING'
+        ) {
+
+          await this.prismaService.gameInvite.update({
+            where: {
+              id: invitation.id,
+            },
+            data: {
+              state: 'ACCEPTED',
+            },
+          });
+          return { success: true, message: 'game request accepted' };
+        }
+      }
+      return { success: false, message: 'no game request available' };
+    } catch (err) {
+      console.log('error occured');
+      return { success: false, message: 'error occured' };
+    }
+  }
+
+  async handleDeleteGameRequest(currentUser: User, otherUser: User) {
+    try {
+      const gameInvitations = await this.prismaService.gameInvite.findMany({});
+
+      for (const invitation of gameInvitations) {
+        if (
+          (invitation.senderId === currentUser.id ||
+            invitation.recieverId === currentUser.id) &&
+          (invitation.senderId === otherUser.id ||
+          invitation.recieverId === otherUser.id) &&
+          invitation.state === 'PENDING'
+        ) {
+          await this.prismaService.gameInvite.delete({
+            where: {
+              id: invitation.id,
+            },
+          });
+          return {
+            success: true,
+            message: 'game request deleted successfully',
+          };
+        }
+        return {
+          success: false,
+          message: 'no game request available to cancle',
+        };
+      }
+    } catch (err) {
+      console.log('error occured');
+      return { success: false, message: 'error occured' };
     }
   }
   // async getFileUpload(fileTarget, category) {

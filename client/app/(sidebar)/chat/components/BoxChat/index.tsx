@@ -6,7 +6,7 @@ import {
 } from "@/app/context/utils/service";
 import { Key, useContext, useEffect, useRef, useState } from "react";
 
-import { BsFillSendFill, BsThreeDotsVertical } from "react-icons/Bs";
+import { BsFillSendFill, BsThreeDotsVertical } from "react-icons/bs";
 import { FaUserFriends } from "react-icons/fa";
 import { RiAdminFill } from "react-icons/ri";
 import { MdAdminPanelSettings } from "react-icons/md";

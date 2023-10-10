@@ -50,7 +50,6 @@ export class JwtAuthGuard implements CanActivate {
           cookies[name] = val;
           return cookies;
       }, {});
-    // console.log(token);
 
     return token.access_token;
   }

@@ -1,25 +1,33 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import NotifItem from "./NotifItem";
 import { AuthContext } from "@/app/context/AuthContext";
 import { baseUrlUsers, getRequest } from "@/app/context/utils/service";
+import { InvitationSocketContext } from "@/app/context/notifContext";
 
 export default function NotifContent() {
   const {
     notif,
     userFriendRequests,
     setUserFriendRequests,
-    fetchFriendRequests
+    fetchFriendRequests,
+    gameRequest,
+    setGameRequest
   } = useContext(AuthContext);
 
+  const notifSocket = useContext(InvitationSocketContext);
   // notif types
   //   1 => friendRequest
   //   2 => recieveMessage
   //   3 => gameRequest
 
   useEffect(() => {
+
     (async () => {
       await fetchFriendRequests();
     })();
+    return ()=>{
+      notifSocket.disconnect();
+    }
   }, []);
   // notif has avatar and username of the sender and the type of notif
   // and we will discuss the notif how to check the stats of the notif
@@ -55,7 +63,7 @@ export default function NotifContent() {
         Notifications
       </h3>
       <div className="notif-list mt-4">
-        {userFriendRequests.map((item: any, index: any) => (
+        {gameRequest.map((item: any, index: any) => (
           <NotifItem key={index} data={item} />
         ))}
       </div>

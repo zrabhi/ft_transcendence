@@ -73,6 +73,72 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('FriendRequest')
   async handleFriendRequest(@ConnectedSocket() client: Socket) {}
 
+  @SubscribeMessage('gameInvite')
+  async handleGameInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    try {
+      const payload = await this.jwtService.verifyAsync(
+        client.handshake.auth.token,
+        {
+          secret: process.env.JWT_SECRET,
+        },
+      );
+      if (!payload) return client.disconnect(true);
+      const currentUser = await this.userService.findUserById(payload.id);
+      const invitedUser = await this.userService.findUserName(data.username);
+      const result = await this.userService.handleCreateGameInvitation(
+        currentUser,
+        invitedUser,
+      );
+      if (result.success) {
+        const userSockets = this.connectedUsers.filter(
+          (c) => c.id === invitedUser.id,
+        );
+        const userData = [];
+        userData.push({
+          type: 3,
+          avatar: currentUser.avatar,
+          username: currentUser.username,
+        });
+        userSockets.forEach((s) => {
+          this.server.to(s.socket.id).emit('gameRequest', userData);
+        });
+      }
+    } catch (err) {
+      console.log('socket error in game request', err);
+    }
+  }
+  @SubscribeMessage('gameAccepted')
+  async handleGameAccept(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    try {
+      const payload = await this.jwtService.verifyAsync(
+        client.handshake.auth.token,
+        {
+          secret: process.env.JWT_SECRET,
+        },
+      );
+      if (!payload) return client.disconnect(true);
+      const currentUser = await this.userService.findUserById(payload.id);
+      const invitedUser = await this.userService.findUserName(data.username);
+      const result = await this.userService.handleAccpetRequest(currentUser, invitedUser);
+      if (result.success){
+        const userSockets = this.connectedUsers.filter(
+          (c) => {
+            return (c.id === invitedUser.id || c.id === currentUser.id)
+          });
+        userSockets.forEach((s) => {
+          this.server.to(s.socket.id).emit('accepted',{username:currentUser.username});
+        });
+      }
+    }catch (err) {
+
+      }
+  }
   @SubscribeMessage('logout')
   async handleLogout(@ConnectedSocket() client: Socket) {
     const { id } = this.connectedUsers.find((c) => c.socket.id === client.id);
@@ -80,7 +146,7 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
     const userSockets = this.connectedUsers.filter((c) => c.id === id);
     if (userSockets.length === 0) return;
     userSockets.forEach((s) => {
-      this.server.to(s.socket.id).emit("logout");
+      this.server.to(s.socket.id).emit('logout');
       s.socket.disconnect();
     });
   }

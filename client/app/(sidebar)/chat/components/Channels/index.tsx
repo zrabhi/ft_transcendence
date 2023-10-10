@@ -6,7 +6,7 @@ import {
 } from "react-icons/ai";
 
 import UserCard from "../UserCard";
-import { BsSearch } from "react-icons/Bs";
+import { BsSearch } from "react-icons/bs";
 import {
   baseChatUrl,
   getRequest,

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Logo from '@/components/MainPage/Logo/Logo'
 import './Navbar.scss'
 import { useRef, useState } from 'react'
-import { BsList } from 'react-icons/Bs'
+import { BsList } from 'react-icons/bs'
 import { FaTimes } from 'react-icons/fa'
 
 const Navbar = () => {

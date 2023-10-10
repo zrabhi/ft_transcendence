@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userBlockedMe, setUserBlockedMe] = useState<[]>([]);
   const [friendsList, setFriendsList] = useState<[]>([]);
   const [friendRequestSent, setFriendRequestSent] = useState<[]>([]);
-  const [userFriendRequests, setUserFriendRequests] = useState<any>();
+  const [userFriendRequests, setUserFriendRequests] = useState();
   const [gameRequest, setGameRequest] = useState<[]>([]);
   // here we will aded states to save data cames from sockets
   const Urls = {
@@ -105,6 +105,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("error fetching friendRequest");
     }
   };
+  const fetchGameRequest = async () =>{
+    try{
+    const response = await getRequest(`${baseUrlUsers}/gameRequests`)
+    setGameRequest(response);
+    } catch(err)
+    {
+      console.log("error fetching gameRequest");
+    }
+  }
   useEffect(() => {
     if (!checkPath()) return;
     (async () => {
@@ -132,6 +141,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await fetchFriendList();
       await fetchFriendRequestSent();
       await fetchFriendRequests();
+      await fetchGameRequest();
     })();
   }, []);
   const updatingInfos = useCallback(
@@ -211,6 +221,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     notifSocket.on("accepted", (data: any) => {
       if (user.username !== data.username)
         showSnackbar(`${data.username} accepted you game request`, true);
+      else{
+        let updated: any;
+        updated = gameRequest.filter((game: any)=>{
+          return game.username != user.username
+        })
+        setGameRequest(updated);
+      }
       router.push("/game");
     });
     notifSocket.on("gameRequest", (data: any) => {
@@ -251,6 +268,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         gameRequest,
         setGameRequest,
         fetchFriendRequests,
+        fetchGameRequest,
         setUserFriendRequests,
         notifSocket,
         setNotif,

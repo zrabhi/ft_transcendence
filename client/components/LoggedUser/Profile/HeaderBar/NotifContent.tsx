@@ -11,10 +11,9 @@ export default function NotifContent() {
     setUserFriendRequests,
     fetchFriendRequests,
     gameRequest,
-    setGameRequest
+    fetchGameRequest,
   } = useContext(AuthContext);
-
-  const notifSocket = useContext(InvitationSocketContext);
+const [requests, setRequests] = useState<any>([])
   // notif types
   //   1 => friendRequest
   //   2 => recieveMessage
@@ -24,10 +23,9 @@ export default function NotifContent() {
 
     (async () => {
       await fetchFriendRequests();
+      await fetchGameRequest();
     })();
-    return ()=>{
-      notifSocket.disconnect();
-    }
+    setRequests([...userFriendRequests, ...gameRequest]);
   }, []);
   // notif has avatar and username of the sender and the type of notif
   // and we will discuss the notif how to check the stats of the notif
@@ -63,7 +61,7 @@ export default function NotifContent() {
         Notifications
       </h3>
       <div className="notif-list mt-4">
-        {gameRequest.map((item: any, index: any) => (
+        {requests.map((item: any, index: any) => (
           <NotifItem key={index} data={item} />
         ))}
       </div>

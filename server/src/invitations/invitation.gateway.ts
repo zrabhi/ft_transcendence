@@ -135,7 +135,8 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
           this.server.to(s.socket.id).emit('accepted',{username:currentUser.username});
         });
       }
-    }catch (err) {
+    }catch (err)
+    {
 
       }
   }

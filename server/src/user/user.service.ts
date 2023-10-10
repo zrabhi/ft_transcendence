@@ -800,7 +800,7 @@ export class UserService {
           (invitation.senderId === currentUser.id ||
             invitation.recieverId === currentUser.id) &&
           (invitation.senderId === otherUser.id ||
-          invitation.recieverId === otherUser.id) &&
+            invitation.recieverId === otherUser.id) &&
           invitation.state === 'PENDING'
         ) {
           return { success: false, error: 'invitation already sent!' };
@@ -828,11 +828,10 @@ export class UserService {
         if (
           (invitation.senderId === currentUser.id ||
             invitation.recieverId === currentUser.id) &&
-         (invitation.senderId === otherUser.id ||
-          invitation.recieverId === otherUser.id) &&
+          (invitation.senderId === otherUser.id ||
+            invitation.recieverId === otherUser.id) &&
           invitation.state === 'PENDING'
         ) {
-
           await this.prismaService.gameInvite.update({
             where: {
               id: invitation.id,
@@ -860,7 +859,7 @@ export class UserService {
           (invitation.senderId === currentUser.id ||
             invitation.recieverId === currentUser.id) &&
           (invitation.senderId === otherUser.id ||
-          invitation.recieverId === otherUser.id) &&
+            invitation.recieverId === otherUser.id) &&
           invitation.state === 'PENDING'
         ) {
           await this.prismaService.gameInvite.delete({
@@ -881,6 +880,30 @@ export class UserService {
     } catch (err) {
       console.log('error occured');
       return { success: false, message: 'error occured' };
+    }
+  }
+  async handleGetGamesReques(user: any) {
+    try {
+      const currentUser = await this.findUserById(user.id);
+      const invitations = await this.prismaService.gameInvite.findMany({});
+
+      const games = [];
+      for (const invite of invitations) {
+        if (
+          invite.recieverId === currentUser.id &&
+          invite.state === 'PENDING'
+        ) {
+          const otherUser = await this.findUserById(invite.senderId);
+          games.push({
+            type: 3,
+            username: otherUser.username,
+            avatar: otherUser.avatar,
+          });
+        }
+      }
+      return {success: true, games: games}
+    } catch (err) {
+      return {success: false, error: "error occured"}
     }
   }
   // async getFileUpload(fileTarget, category) {

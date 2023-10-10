@@ -485,6 +485,14 @@ export class UserController {
       res.status(400).json('error occured');
     }
   }
+  @Get('gameRequests')
+  @UseGuards(JwtAuthGuard)
+  async handleGetGameRequests(@UserInfo() user: any, @Res() res: Response)
+  {
+      const result = await this.userService.handleGetGamesReques(user);
+      if (result.success) return res.status(200).json(result.games)
+      return res.status(400).json(result);
+  }
   @Get('requestFriendSent')
   @UseGuards(JwtAuthGuard)
   async handleRequestFriendSent(@UserInfo() user: any, @Res() res: Response) {

@@ -11,6 +11,7 @@ import { Socket } from "socket.io";
 import { AuthContext } from '@/app/context/AuthContext';
 import { useCookies } from "react-cookie";
 import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
+import {PopUpModal} from '@/components/LoggedUser/Profile/PopUpModal/PopUpModal'
 
 export default function match()
 {
@@ -259,11 +260,14 @@ export default function match()
                         </div>
                     </div>
                 </div>
-                <div className="game-popup">
-                  <div className="message">{popupMessage}</div>
-                  <div className="buttons">
-                    <button onClick={handleNewGameClick}>New Game</button>
-                    <button onClick={handleBackHomeClick}>Back Home</button>
+                <div className={`${showPopup ? 'bg-blue-400' : 'bg-slate-400 bg-opacity-70 backdrop-blur-sm' } w-screen h-screen fixed inset-0 flex justify-center items-center `} >|
+                  <div className='w-[40rem] xs:w-[18rem] sm:w-[24rem] md:w-[30rem]
+        bg-green-900 rounded-xl  relative p-4 pt-12 pb-8'>
+                    <div className="message">hna radi ykon pop up message{popupMessage}</div>
+                    <div className="buttons">
+                      <button onClick={handleNewGameClick}>New Game</button>
+                      <button onClick={handleBackHomeClick}>Back Home</button>
+                    </div>
                   </div>
                 </div>    
                 <div className="table" id='table'>
@@ -272,6 +276,7 @@ export default function match()
             </div>    
         </div>
     </div>
+    
 </div>
 )
 }

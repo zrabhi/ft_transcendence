@@ -305,7 +305,7 @@ const BoxChat = ({
           userBlockedMe.includes(message?.sender) ||
           blockedUsers.includes(message?.sender)
         )
-          (message.blocked = true), console.log("is blocked yes");
+          (message.blocked = true)
         return message;
       });
       setMessages(() => []);

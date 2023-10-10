@@ -42,7 +42,6 @@ const customStyles = {
   },
 };
 
-// when adding notification we must add the  message sended by  the user in last messages
 let socket: Socket;
 const Chat: React.FC = () => {
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
@@ -107,7 +106,7 @@ const Chat: React.FC = () => {
             channel?.channel &&
             channel?.channel?.id === messageInfo?.channel?.id
           ) {
-            checker = true;
+            checker = true; /// check if user in blocked user
             channel.channel.message = messageInfo?.channel?.message;
             return channel;
           }

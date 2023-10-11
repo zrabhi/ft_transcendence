@@ -25,7 +25,7 @@ enum Status {
   INGAME
 }
 
-enum Role{
+enum Role {
   OWNER
   ADMIN
   MEMBER
@@ -85,7 +85,8 @@ model User {
   memberof                        ChannelMembers[] @relation(name:"userToChannel")
 
   ChannelBan                      ChannelBan[]    @relation(name:"userBaned")
-
+  ChannelAdmin                    ChannelAdmin[]   @relation(name:"userAdmin")
+  ChannelMuted                    ChannelMuted[]   @relation(name:"userMuted")
   created_date                    DateTime        @default(now())
 }
 
@@ -175,7 +176,9 @@ model Message {
 
 model Channel {
   id                String    @unique @default(uuid())
-  name              String
+  name              String    @unique
+  users String[]
+  owner String?
   type              Type
   password          String?
   member_limit Int  @default(0)
@@ -185,10 +188,10 @@ model Channel {
   members           ChannelMembers[]  @relation(name: "channelMembers")
 
   banedUsers        ChannelBan[]      @relation(name: "channelBan")
+  admins            ChannelAdmin[]    @relation(name: "channelAdmin")
+  Muted             ChannelMuted[]    @relation(name: "channelMute")
 
-  //TODO: OWNER
-  // TODO: ADMINS
- //TODO muted Users
+  avatar String?   @default("http://127.0.0.1:8080/api/avatar/pictures/default.jpeg")
   created_at        DateTime @default(now())
 }
 model ChannelMembers{
@@ -201,6 +204,9 @@ model ChannelMembers{
   channel   Channel @relation(fields: [channelId], references:[id], name: "channelMembers", onDelete: Cascade)
 
   role Role
+  isBanned Boolean @default(false)
+  mutedTime String?
+  isMuted Boolean @default(false)
 }
 
 model ChannelMessage {
@@ -213,7 +219,7 @@ model ChannelMessage {
   user    User    @relation(fields: [user_id], references: [id], name: "MsgSender", onDelete: Cascade)
 
   content    String
-
+  time String?
   created_at DateTime @default(now())
 }
 
@@ -227,6 +233,28 @@ model ChannelBan{
   channel     Channel @relation(fields: [channelId], references:[id], name: "channelBan", onDelete: Cascade)
 
   created_at  DateTime @default(now())
+}
+model ChannelMuted{
+  id     String @unique @default(uuid())
+
+  userId String
+  user User @relation(fields: [userId], references: [id], name: "userMuted", onDelete: Cascade)
+
+  channelId  String
+  channel     Channel @relation(fields: [channelId], references:[id], name: "channelMute", onDelete: Cascade)
+
+  created_at  DateTime @default(now())
+}
+model ChannelAdmin{
+  id     String @unique @default(uuid())
+
+  userId String
+  user User @relation(fields: [userId], references: [id], name: "userAdmin", onDelete: Cascade)
+
+  channelId String
+  channel     Channel @relation(fields: [channelId], references:[id], name: "channelAdmin", onDelete: Cascade)
+
+  created_at DateTime @default(now())
 }
 
 
@@ -243,12 +271,15 @@ model ChannelInvite{
 }
 
 model GameInvite {
+  id     String @unique @default(uuid())
   senderId     String
   sender       User   @relation(fields: [senderId], references:[id], name: "gameInviteRequest", onDelete: Cascade)
 
   recieverId   String
   reciever      User   @relation(fields: [recieverId], references:[id], name: "gameInviteRecieved", onDelete: Cascade)
 
+  state          State
+  /// add state variable to check if the invitation is accepted or refused or still pendding
   created_at   DateTime      @default(now())
 
   @@id([senderId, recieverId])

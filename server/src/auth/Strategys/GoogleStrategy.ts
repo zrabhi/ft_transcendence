@@ -49,8 +49,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         const newUser = await this.authService.signup(user);
         userCheck = await this.userService.findUserById(newUser.id);
       }
-      console.log("im heree");
-
       done(null, userCheck);
     }
   }

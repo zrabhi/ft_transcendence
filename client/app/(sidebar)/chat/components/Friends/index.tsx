@@ -1,5 +1,5 @@
 import { baseChatUrl, postRequest } from "@/app/context/utils/service";
-import { Key, useState } from "react";
+import { Key, useContext, useState } from "react";
 import {
   List,
   ListItem,
@@ -13,35 +13,45 @@ import {
 import { AiOutlineMessage } from "react-icons/ai";
 import {GiPingPongBat} from "react-icons/gi"
 import { FaUserFriends } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { InvitationSocketContext } from "@/app/context/notifContext";
+import { AuthContext } from "@/app/context/AuthContext";
 
 const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
   const [showSidebar, setShowSidebar] = useState(false);
-
+  const router = useRouter();
+  const { notifSocket }= useContext(AuthContext);
   const CreateChat = async (user: any) => {
     const response = await postRequest(
       `${baseChatUrl}/create/dm`,
       JSON.stringify({ username: user.username, memberLimit: 2 })
     );
-    
+
     console.log("res is => ",response);
-    
+
     setSelectedChannel(response); // to set selected channel after clicking a friend
     setSelectedChat(user); // to set the selected friend
     console.log("selected user is ", user);
   };
 
-
+  const handleGameInvite = (user: any) =>
+  {
+    console.log("user.username", user.username);
+    notifSocket.emit("gameInvite",{
+      username: user.username
+    })
+  }
   return (
     <>
       {showSidebar ? (
         <button
-          className="flex text-4xl text-white items-center cursor-pointer fixed right-10 top-6 z-50"
+          className="flex text-4xl text-white items-center cursor-pointer fixed right-10 top-10 z-50"
           onClick={() => setShowSidebar(!showSidebar)}
         >
           x
         </button>
       ) : (
-          <FaUserFriends onClick={() => setShowSidebar(!showSidebar)} className="fixed  z-30 flex items-center cursor-pointer right-10 top-6 text-white icon"/>
+          <FaUserFriends onClick={() => setShowSidebar(!showSidebar)} className="fixed  z-30 flex items-center cursor-pointer right-10 top-17 text-white icon"/>
       )}
 
       <div
@@ -73,7 +83,7 @@ const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
                     </div>
                     <div className="flex flex-row gap-3.5 items-center">
                       <AiOutlineMessage className='icon cursor-pointer' onClick={() => CreateChat(user)} />
-                      <GiPingPongBat className='icon cursor-pointer' /> {/* TODO: Add onClick to invite to a game */}
+                      <GiPingPongBat className='icon cursor-pointer' onClick={() => handleGameInvite(user)}/> {/* TODO: Add onClick to invite to a game */}
                     </div>
                   </ListItem>
                 ))}

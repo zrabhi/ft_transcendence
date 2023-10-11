@@ -8,7 +8,7 @@
 }
 
 body {
-  width: 100vw;
+  // width: 100vw; // if we added this line it will add a padding/margin that will show a cursor-X
   background-size: cover;
 }
 
@@ -203,7 +203,7 @@ body {
             display: flex;
             justify-content: center;
             gap: 1rem;
-            margin-top: 1rem;
+            margin-top: .5rem;
             div {
               width: 3rem;
               height: 3rem;

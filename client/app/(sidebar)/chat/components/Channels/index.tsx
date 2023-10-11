@@ -6,7 +6,7 @@ import {
 } from "react-icons/ai";
 
 import UserCard from "../UserCard";
-import { BsSearch } from "react-icons/Bs";
+import { BsSearch } from "react-icons/bs";
 import {
   baseChatUrl,
   getRequest,
@@ -45,34 +45,11 @@ const Channels = ({channels, setSelectedChat, setSelectedChannel, setMessages, s
   }, [isChecked, channels]);
 
   return (
-    <div className="users-container">
-      <div className="inbox-header">
-        <span className="text-white">inbox</span>
-        <AiOutlineSetting />
-      </div>
-      <div className="mb-4">
-        <form>
-          <label className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">
-            Search
-          </label>
-          <div className="relative">
-            <input
-              type="search"
-              id="default-search"
-              className="block w-full p-4 pl-10 text-sm text-white rounded-3xl bg-[#1F1F1F] focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 "
-              placeholder="Search..."
-            />
-            <div className="absolute text-white inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <BsSearch />
-            </div>
-          </div>
-        </form>
-      </div>
+    <div className="users-container pt-20">
+      
 
       <ChannelsSwitcher isChecked={isChecked} setIsChecked={setIsChecked} />
-
-      <div>
-        {isChecked && (
+      {isChecked && (
           <AddNewChannel
             setChannels={setChannels}
             setSelectedChannel={setSelectedChannel}
@@ -80,6 +57,8 @@ const Channels = ({channels, setSelectedChat, setSelectedChannel, setMessages, s
             setMessages={setMessages}
           />
         )}
+      <div className='channels-chat'>
+        
 
         {selectedChannels?.length > 0 ?
           (selectedChannels?.map((channel: any, index: Number) => {

@@ -1,16 +1,16 @@
 @import '@/app/globals.scss';
 
-.profile-card {
+.user-card {
   background-color: $blue-bg-color;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
-  background-image: url('./../../../../public/images/cover.jpeg');
+  background-image: url('./../../../../../public/images/cover.jpeg');
   background-size: cover;
   background-position: center;
   background-blend-mode: color-burn;
-  box-shadow: inset 0 0 10rem 5rem  $blue-bg-color;
+  box-shadow: inset 0 0 10rem 11rem  $blue-bg-color;
 
   .avatar {
     width: 150px;
@@ -28,17 +28,26 @@
 
   h2 {
     font-size: 24px;
-    margin-bottom: 10px;
+  }
+
+  .friend-state {
+    background-color: $main-bg-color;
+    border-radius: .2rem;
+    padding: .5rem 1rem;
   }
 
   .user-details {
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
   }
 
   .stats {
     display: flex;
     justify-content: space-between;
-
+    width: 100%;
     .stat-item {
       flex: 1;
       margin: 0 10px;

@@ -1,7 +1,7 @@
-'use client';
+'use client'
+import React from 'react'
 import HeaderBar from '@/components/LoggedUser/Profile/HeaderBar/HeaderBar';
 import SideBar from '@/components/LoggedUser/SideBar/SideBar'
-import React from 'react'
 import { useRouter } from 'next/navigation';
 import './style.scss'
 

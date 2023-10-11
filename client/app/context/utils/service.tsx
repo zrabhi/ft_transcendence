@@ -1,6 +1,8 @@
 export const baseUrlAuth = "http://127.0.0.1:8080/api/auth";
 export const baseUrlUsers = "http://127.0.0.1:8080/api";
+export const baseChatUrl = "http://127.0.0.1:8080/chat";
 import axios from "axios";
+
 
 export const postRequest = async (url: string, body: any) => {
   const response = await fetch(url, {
@@ -11,7 +13,6 @@ export const postRequest = async (url: string, body: any) => {
     credentials: 'include',
     body,
   });
-  // console.log(response);
 
   const data = await response.json();
   if (!response.ok) {
@@ -80,7 +81,6 @@ export const putRequest = async (url: string, body: any) => {
 
 export const getRequest = async (url: string) => {
   console.log("url", url);
-  
   const response = await fetch(url, {
     method: "GET",
     headers: {
@@ -88,8 +88,28 @@ export const getRequest = async (url: string) => {
     },
     credentials: "include",
   });
-  
-  
+
+  const data = await response.json();
+  if (!response.ok) {
+    let message;
+    if (data?.message) message = data.message;
+    else message = data;
+    return { error: true, message };
+  }
+  return data;
+};
+
+export const getRequestBody = async (url: string, body: any) => {
+  console.log("url", url);
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body,
+    credentials: "include",
+  });
+
   const data = await response.json();
   if (!response.ok) {
     let message;

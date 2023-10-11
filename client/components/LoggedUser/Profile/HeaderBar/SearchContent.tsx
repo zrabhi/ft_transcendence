@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
 import Image from 'next/image';
-export default function SearchContent() {
+import Link from 'next/link'
+
+export default function SearchContent({data}: any) {
   const [searchValue, setSearchValue] = useState('');
   const [users, setUsers] = useState([]);
 
@@ -10,8 +12,9 @@ export default function SearchContent() {
     const fetchUsers = async () => {
       try {
         const allUsers = await getRequest(`${baseUrlUsers}/users`);
-        const filteredUsers = allUsers.filter((user: any) =>
-          user.username.includes(searchValue)
+        const filteredUsers = allUsers.filter((user: any) => {
+          return user.username.toLowerCase().includes(searchValue.toLowerCase()) && user.username !== data.username;
+          }
         );
         setUsers(filteredUsers);
       } catch (error) {
@@ -43,27 +46,31 @@ export default function SearchContent() {
           onChange={(e) => setSearchValue(e.target.value)}
         />
       </div>
-      <div className={`${users.length === 0 ? 'hidden': ''} user-list 
-        mt-4 bg-gray-800 bg-opacity-50 rounded-[.5rem] p-2
-      `}
+      <div
+        className={`${users.length === 0 ? 'hidden' : ''} user-list 
+          mt-4 bg-gray-800 bg-opacity-50 rounded-[.5rem] p-2
+        `}
       >
         <ul className='flex flex-col'>
           {users.map((user: any) => (
             <div key={user.id} className="user">
-              <li key={user.id}
-              className='flex items-center space-x-2 cursor-pointer hover:bg-slate-400 
-              hover:bg-opacity-50 rounded-[.5rem] p-2'
-              >
-                <div className="w-8 h-8 relative overflow-hidden rounded-full">
-                  <Image
-                    src={user.avatar}
-                    alt="avatar"
-                    layout="fill"
-                    objectFit="cover"
-                  />
-                </div>
-                <span className="text-md font-medium">{user.username}</span>
-              </li>
+              <Link href={`/profile/${user.username}`}>
+                <li
+                  key={user.username}
+                  className='flex items-center space-x-2 cursor-pointer hover:bg-slate-400 
+                  hover:bg-opacity-50 rounded-[.5rem] p-2'
+                >
+                  <div className="w-8 h-8 relative overflow-hidden rounded-full">
+                    <Image
+                      src={user.avatar}
+                      alt="avatar"
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  </div>
+                  <span className="text-md font-medium">{user.username}</span>
+                </li>
+              </Link>
             </div>
           ))}
         </ul>

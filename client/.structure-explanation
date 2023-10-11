@@ -1,12 +1,27 @@
-app folder has all routes
-each route has page.tsx file and it's related scss file named by style.css
+// app folder has all routes
+// each route has page.tsx file and it's related scss file named by style.css
 
-all needed components will be exist under folder called components
-each component has own folder,
-so component's folder has two files CompName.tsx CompName.scss
+// all needed components will be exist under folder called components
+// each component has own folder,
+// so component's folder has two files CompName.tsx CompName.scss
 
 
 
-// useEffect(() => {
-/ 
-//         }, [cookie]);
+// // useEffect(() => {
+// /
+// //         }, [cookie]);
+
+
+// const user = await this.userService.findUserById(payload.id);
+//     const channel = await this.prismaService.channel.findUnique({
+//       where: {
+//         id: data.channelId,
+//       },
+//       include: {
+//         members: true,
+//       },
+//     });
+//     const result = this.chatService.handleDeleteRoom(data.channelId, user);
+//     for (const member of channel.members) {
+//         this.server.to(member.userId).emit('channelDeleted', data.channelId);
+//     }

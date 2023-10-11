@@ -11,7 +11,6 @@ import { Socket } from "socket.io";
 import { AuthContext } from '@/app/context/AuthContext';
 import { useCookies } from "react-cookie";
 import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
-import {PopUpModal} from '@/components/LoggedUser/Profile/PopUpModal/PopUpModal'
 
 export default function match()
 {

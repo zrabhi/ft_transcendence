@@ -71,26 +71,52 @@ const Chat: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    try{
     (async () => {
       const response = await getRequest(`${baseUrlUsers}/user/friends`);
-      setUsers(response);
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
+        setUsers(response);
     })();
+  }catch(err)
+  {
+
+  }
   }, [friendsList]);
 
   useEffect(() => {
+    try{
     (async () => {
       // TODO: need to be in one request => /channels
       try {
         const responseDm = await getRequest(`${baseChatUrl}/channelsDm`); // fetching USER Dms
+        if (responseDm.error){
+          if (responseDm.message === "Unauthorized")
+            showSnackbar("Unauthorized", false)
+        return ;
+      }
         setChannels(responseDm);
         const responseRooms = await getRequest(`${baseChatUrl}/channelsRooms`); // fetching user rooms
+        if (responseRooms.error){
+          if (responseRooms.message === "Unauthorized")
+            showSnackbar("Unauthorized", false)
+        return ;
+       }
         setChannels((prevchannels: any) => [...prevchannels, ...responseRooms]);
       } catch (error) {}
     })();
     (async () => {
-      const reponse = await getRequest(`${baseChatUrl}/getChannels`);
-      setOtherChannels(reponse);
+      const response = await getRequest(`${baseChatUrl}/getChannels`);
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+      }
+        setOtherChannels(response);
     })();
+  }catch (err) {
+  }
   }, []);
   useEffect(() => {
     socket = io("http://127.0.0.1:8080/chat", {
@@ -428,8 +454,6 @@ const Chat: React.FC = () => {
       </div>
       <div className="home">
         <div className="chat-page">
-          
-
           <h2 className="text-2xl text-white mx-auto my-4">
             <strong>Chat</strong>
           </h2>

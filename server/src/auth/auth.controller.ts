@@ -87,7 +87,12 @@ export class AuthController {
       console.log("errrrr => ",err);
     }
   }
-
+  @Get('jwtVerification')
+  @UseGuards(JwtAuthGuard)
+  async handleCheckJWT(@Res() res: Response)
+  {
+    res.status(200).json("ok");
+  }
   @Get('google/redirect')
   @UseGuards(GoogleGuard)
   async handleRedirectGoogle(@User() user, @Res() response: Response) {

@@ -14,6 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 import { AuthContext } from "@/app/context/AuthContext";
 import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
+import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 export default function Complete() {
   // replacing
@@ -79,22 +80,31 @@ export default function Complete() {
   }
 
   const updatingInfos = async  (username : string, password: string ) => {
+    try{
 
     const response = await putRequest(
         `${baseUrlUsers}/user`,
         JSON.stringify({ username, password })
     );
-    if (response.error)
+    if (response?.error && response?.message === "Unauthorized"){
+      showSnackbar("Unauthorized", false)
+      return ;
+  }
+    if (response?.error)
     {
       setError(true);
-        if (response.message === 'Username you chosed already exist')
-          setUsernameMsg(response.message);
+        if (response?.message === 'Username you chosed already exist')
+          setUsernameMsg(response?.message);
         else
             setPasswordMsg("Password is not strong enough");
         return false;
     }
     await fetchUserData();
     return true;
+  }catch(err)
+    {
+      return false;
+    }
 };
 
   const reset = () =>
@@ -116,7 +126,10 @@ export default function Complete() {
       return ;
     const result = await updatingInfos(username, password);
     if (result)
+    {
+      showSnackbar("your all setup now", true);
       router.push("/profile");
+    }
   };
 
   return (

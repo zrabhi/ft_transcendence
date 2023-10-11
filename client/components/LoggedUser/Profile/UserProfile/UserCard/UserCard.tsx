@@ -29,13 +29,10 @@ export default function UserCard(user: any) {
   useEffect(() => {
     let pending: any[] = [];
     let friendList: any[] = []
-    console.log("++++++",friendsList);
     friendsList?.map((member: any) => {
-      console.log("----", member.username);
       friendList.push(member.username);
     })
     userFriendRequests?.map((member: any) => {
-      console.log("----", member.username);
       pending.push(member.username);
     })
     console.log(pending);
@@ -50,12 +47,15 @@ export default function UserCard(user: any) {
         `${baseUrlUsers}/unblock/${user.username}`,
         ""
       );
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
       const update = blockedUsers?.filter((member: any) => {
         return member !== user.username;
       });
       setBlockedUsers(update);
     } catch (err) {
-      showSnackbar("error while unblocking user (in cathc)", false);
     }
   };
 
@@ -65,9 +65,12 @@ export default function UserCard(user: any) {
         `${baseUrlUsers}/block/${user.username}`,
         ""
       );
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
       setBlockedUsers([...blockedUsers, user.username]);
     } catch (error) {
-      showSnackbar("error while blocking process!", false);
     }
   };
 
@@ -77,15 +80,17 @@ export default function UserCard(user: any) {
         `${baseUrlUsers}/unfriend/${user.username}`,
         ""
       );
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
       const updatedFriendsList = friendsList.filter((friend: any) => {
         return friend.username !== user.username;
       });
       setFriendsList(updatedFriendsList);
       showSnackbar("friend revomed successfully", true)
     } catch (error) {
-      console.log(error);
 
-      // showSnackbar("error while unfriend process!", false);
     }
   };
 
@@ -95,13 +100,16 @@ export default function UserCard(user: any) {
         `${baseUrlUsers}/cancelFriendRequest/${user.username}`,
         ""
       );
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
       const updatedFriendRequest = friendRequestSent.filter((friend: any) => {
         return friend !== user.username;
       });
       setFriendRequestSent(updatedFriendRequest);
       showSnackbar("friend request cancled successfully", true);
     } catch (error) {
-      showSnackbar("error while unfriend process!", false);
     }
   };
 
@@ -109,16 +117,23 @@ export default function UserCard(user: any) {
     try {
       console.log(`add friend click`)
       const response = await postRequest(`${baseUrlUsers}/friendRequest/${user.username}`, "");
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
       setFriendRequestSent([...friendRequestSent, user.username])
-      showSnackbar(response.message, true);
+      showSnackbar(response?.message, true);
   } catch (error) {
-    showSnackbar("error while sending request!", false);
     }
   };
 
   const acceptFriendHandler = async () => {
     try {
       const response = await putRequest(`${baseUrlUsers}/acceptFriendRequest/${user.username}`,"");
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
       let updateUserFriendRequests = userFriendRequests.filter((member: any) =>{
         return member.username !== user.username;
       })
@@ -126,7 +141,6 @@ export default function UserCard(user: any) {
       await fetchFriendList();
       setPendingRequest([]);
     } catch (error) {
-       showSnackbar("error while accepting request!", false);
     }
   }
 
@@ -147,7 +161,7 @@ export default function UserCard(user: any) {
         <h2>{user && user.username}</h2>
           <div className="state-msg friend-state flex gap-4 justify-between items-center cursor-pointer hover:opacity-80">
             {isInFriendList.includes(user.username) ? (
-              <p className="flex justify-between items-center" onClick={removeFriendHandler}>
+              <p className="flex justify-between gap-2 items-center" onClick={removeFriendHandler}>
                 <span>Friends</span>
                 <FaUserCheck />
               </p>
@@ -172,11 +186,11 @@ export default function UserCard(user: any) {
         <div className="block-state">
           <div className="block-btn">
             {blockedUsers.includes(user.username) ? (
-              <button className="unblock-btn" onClick={handleUnblock}>
+              <button className="bg-red-500 text-white rounded px-4 py-2" onClick={handleUnblock}>
                 Unblock
               </button>
             ) : (
-              <button className="block-btn" onClick={handleBlock}>
+              <button type="button" className="bg-red-500 text-white rounded px-4 py-2" onClick={handleBlock}>
                 Block
               </button>
             )}

@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import NotifItem from "./NotifItem";
 import { AuthContext } from "@/app/context/AuthContext";
 import { baseUrlUsers, getRequest } from "@/app/context/utils/service";
-import { InvitationSocketContext } from "@/app/context/notifContext";
 
 export default function NotifContent() {
   const {
@@ -20,12 +19,16 @@ const [requests, setRequests] = useState<any>([])
   //   3 => gameRequest
 
   useEffect(() => {
-
+    try{
     (async () => {
       await fetchFriendRequests();
       await fetchGameRequest();
     })();
     setRequests([...userFriendRequests, ...gameRequest]);
+  }catch(err)
+  {
+    
+  }
   }, []);
   // notif has avatar and username of the sender and the type of notif
   // and we will discuss the notif how to check the stats of the notif

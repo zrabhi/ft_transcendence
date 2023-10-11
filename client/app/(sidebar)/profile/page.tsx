@@ -7,7 +7,7 @@ import { AuthContext } from '@/app/context/AuthContext'
 import HeaderBar from "@/components/LoggedUser/Profile/HeaderBar/HeaderBar";
 import NavMenu from "@/components/LoggedUser/Profile/NavMenu/NavMenu";
 import "./style.scss";
-import { InvitationSocketContext } from "@/app/context/notifContext";
+import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 export default function Profile() {
   const { getUserData, user,setNotif } = useContext(AuthContext);
@@ -15,11 +15,20 @@ export default function Profile() {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const fetchFriendList = async () => {
-    console.log("in fetch friends");
+    try{
     const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
+    if (friendList.error && friendList.message === "Unauthorized"){
+      showSnackbar("Unauthorized", false)
+      return ;
+
+  }
     console.log(friendList);
 
     setFriendList(friendList);
+}catch(err)
+{
+
+}
   }
   // useEffect(() => {
   //   try {

@@ -8,7 +8,6 @@ import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AuthContext, AuthProvider } from "./context/AuthContext";
 import { CookiesProvider } from 'react-cookie';
-import { InvitationSocketContext } from "./context/notifContext";
 
 
 const metadata: Metadata = {
@@ -30,7 +29,6 @@ export default function RootLayout({
 }) {
   /// we will chenge it later we i found out best solution
   // chekc id there is access_toke if so rederect the  user to profile
-  const notifSocket = useContext(InvitationSocketContext);
   const {setNotif, setGameRequest} = useContext(AuthContext);
   const [cookie, setCookie, remove] = useCookies(['access_token']);
   const router = useRouter();

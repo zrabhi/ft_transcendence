@@ -13,6 +13,7 @@ import {
 } from "@/app/context/utils/service";
 import { StaticImageData } from "next/image";
 import { LoginError, LoginErrorInit } from "@/app/context/utils/types";
+import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 export default function Settings() {
   // use context to get user data
@@ -107,7 +108,11 @@ export default function Settings() {
     if (type === "avatar") formData.append("file", avatar);
     if (type === "cover") formData.append("file", cover);
     const response = await postFileRequest(`${baseUrlUsers}/${type}`, formData);
-    if (response.error) {
+    if (response?.error && response?.message === "Unauthorized"){
+      showSnackbar("Unauthorized", false)
+      return ;
+  }
+    if (response?.error) {
       // console.log(response);
       setError(true);
       setFileMsg("File Is not an image");
@@ -138,7 +143,11 @@ export default function Settings() {
       `${baseUrlUsers}/user/checkPassword`,
       JSON.stringify({ password })
     );
-    if (response.error) {
+    if (response?.error && response?.message === "Unauthorized"){
+      showSnackbar("Unauthorized", false)
+      return ;
+  }
+    if (response?.error) {
       setCurrentPasswordErr("Inavalid current password");
       setError(true);
       return false;
@@ -233,6 +242,7 @@ export default function Settings() {
         return ;
       }
     }
+    showSnackbar("Updated successfully", true)
     updateMsgRef.current!.innerHTML = "Updated successfully";
     updateMsgRef.current!.classList.remove("error");
     updateMsgRef.current!.classList.add("success");

@@ -26,22 +26,31 @@ const Channels = ({channels, setSelectedChat, setSelectedChannel, setMessages, s
   const [selectedChannels, setSelectedChannels] = useState([]);
 
   const handleClickUserMessage = async (channel: any) => {
-    console.log("in channels component",channel.id);
+    try{
     const response = await getRequest(
-      `${baseChatUrl}/getChannel/${channel.id}`
+      `${baseChatUrl}/getChannel/${channel?.id}`
     );
-    // NOTICE: THE USERS IN CHANNELS ARE STORED IN response.users
+    if (response?.error)
+    {
+        if(response?.message === "Unauthorized")
+          showSnackbar("Unauthorized", false)
+      return ;
+    }
     setSelectedChat(channel);
     setSelectedChannel(response);
-    console.log("memebers is channel are ", response.members);
+  }catch(err)
+  {
+
+  }
   };
 
   useEffect(() => {
-    setSelectedChannels(
-      channels?.filter((ch: any) =>
-        !isChecked ? ch?.type === "dm" : ch?.type === "room"
-      )
-    );
+    if (channels?.length > 0)
+      setSelectedChannels(
+        channels?.filter((ch: any) =>
+          !isChecked ? ch?.type === "dm" : ch?.type === "room"
+        )
+      );
   }, [isChecked, channels]);
 
   return (
@@ -206,6 +215,7 @@ const ModalContainer = ({
 
   const handleSubmit = async (values: FormValues, { resetForm }: any) => {
     // Handle form submission here
+    try{
     console.log("value of format ", values);
     const roomForm = {
       name: values.name,
@@ -218,8 +228,10 @@ const ModalContainer = ({
       `${baseChatUrl}/create/room`,
       JSON.stringify(roomForm)
       );
-    if (response.error) {
-      showSnackbar(`${response.message}`, false);
+    if (response?.error)
+    {
+      if (response?.message === "Unauthorized")
+          showSnackbar("Unauthorized", false)
       return ;
     }
     setMessages([]);
@@ -229,6 +241,10 @@ const ModalContainer = ({
     setChannels((prev: any) => [...prev, response.lastMessage]);
     resetForm();
     handleOpen();
+  }catch(err)
+  {
+
+  }
   };
 
   return (
@@ -321,47 +337,6 @@ const ModalContainer = ({
                     />
                   </div>
                 )}
-
-                <div>
-                  <div className="mt-2 flex justify-start items-center">
-                    {avatarPreview && (
-                      <img
-                        src={avatarPreview}
-                        alt="Avatar"
-                        className="mr-3 avatar"
-                      />
-                    )}
-                    <input
-                      type="file"
-                      id="avatar"
-                      name="avatar"
-                      accept="image/jpeg, image/png, image/gif"
-                      className="hidden" // Hide the default file input
-                      onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>
-                      ) => {
-                        const file =
-                          event.target.files && event.target.files[0];
-                        if (file) {
-                          setFieldValue("avatar", file); // Set the file value when a file is selected
-                          setAvatarPreview(URL.createObjectURL(file));
-                        }
-                      }}
-                    />
-                    <label
-                      htmlFor="avatar"
-                      className="cursor-pointer bg-[#654795] text-white rounded px-4 py-2 hover:bg-[#654795]"
-                    >
-                      Select Channel Avatar
-                    </label>
-                  </div>
-                  <ErrorMessage
-                    name="avatar"
-                    component="div"
-                    className="text-red-500"
-                  />
-                </div>
-
                 <div className="w-full flex justify-end">
                   <button
                     type="submit"

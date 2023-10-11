@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { baseUrlAuth, getQrCode, postRequest } from '@/app/context/utils/service';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '@/app/context/AuthContext';
+import { showSnackbar } from '@/app/context/utils/showSnackBar';
 
 
 export default function TfaPage() {
@@ -23,6 +24,10 @@ export default function TfaPage() {
     (async () =>
     {
         const  response = await getQrCode(`${baseUrlAuth}/2fa/generate`);
+        if (response?.error && response?.message === "Unauthorized"){
+          showSnackbar("Unauthorized", false)
+          return ;
+      }
         setQrCodeImage(response);
         // console.log(response);
     })()
@@ -33,10 +38,14 @@ export default function TfaPage() {
     {
       setError(false);
       const response = await postRequest(`${baseUrlAuth}/2fa/turn-on`, JSON.stringify({twoFactorAuthenticationCode: code}));
-      if (response.error)
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
+      if (response?.error)
       {
         setError(true);
-        setErrorMsg(response.message);
+        setErrorMsg(response?.message);
         return false;
       }
       return true;

@@ -3,7 +3,6 @@ import HeaderBar from '@/components/LoggedUser/Profile/HeaderBar/HeaderBar';
 import SideBar from '@/components/LoggedUser/SideBar/SideBar'
 import exp from 'constants';
 import React, { useContext } from 'react'
-import GamePopup from './GamePopup'; 
 import './style.scss'
 import Avatar1 from '@/public/images/avatar1.jpeg'
 import { useEffect, useState} from "react";
@@ -11,6 +10,7 @@ import { Socket } from "socket.io";
 import { AuthContext } from '@/app/context/AuthContext';
 import { useCookies } from "react-cookie";
 import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
+import { disconnect } from 'process';
 
 export default function match()
 {
@@ -193,36 +193,44 @@ export default function match()
         }});
       socket.on('connect', () => {
         console.log('Connected to WebSocket');
+        socket.on('matched right',  (data:any) => {
+          console.log("i match this : " , data);
+          setoppuser(data.username);
+          setOpponentavatar(data.avatar);
+          side = 'right';
+          launchGame();
+        })
+        socket.on('matched left', (data:any) => {
+          console.log("i match this : " , data);
+          setoppuser(data.username);
+          setOpponentavatar(data.avatar);
+          side = 'left';
+          launchGame();
+        })
+  
+        socket.on('match frame',(data:any)=>{
+          Ball.x = data.ballx;
+          Ball.y = data.bally;
+          setmyscore(data.myscore);
+          setoppscore(data.oppscore);
+  
+          if (side == 'left')
+          {
+            rightbar.starty = data.oppy;
+          }
+          else{
+            leftbar.starty = data.oppy;
+          }
+        });
+        // socket.on("disconnect", () => {
+        //   socket.off('matched right');
+        //   socket.off('matched left');
+        //   socket.off('match frame');
+        // });
       });
-      socket.on('matched right',  (data:any) => {
-        console.log("i match this : " , data);
-        setoppuser(data.username);
-        setOpponentavatar(data.avatar);
-        side = 'right';
-        launchGame();
-      })
-      socket.on('matched left', (data:any) => {
-        console.log("i match this : " , data);
-        setoppuser(data.username);
-        setOpponentavatar(data.avatar);
-        side = 'left';
-        launchGame();
-      })
-
-      socket.on('match frame',(data:any)=>{
-        Ball.x = data.ballx;
-        Ball.y = data.bally;
-        setmyscore(data.myscore);
-        setoppscore(data.oppscore);
-
-        if (side == 'left')
-        {
-          rightbar.starty = data.oppy;
-        }
-        else{
-          leftbar.starty = data.oppy;
-        }
-      })
+      return () => {
+        socket.disconnect()
+      }
     }, []);
 
     return (
@@ -248,7 +256,7 @@ export default function match()
                         </div>
                     </div>
                 </div>
-                <div className={`${showPopup ? 'bg-blue-400' : 'bg-slate-400 bg-opacity-70 backdrop-blur-sm' } w-screen h-screen fixed inset-0 flex justify-center items-center `} >|
+                {/* <div className={`${showPopup ? 'bg-blue-400' : 'bg-slate-400 bg-opacity-70 backdrop-blur-sm' } w-screen h-screen fixed inset-0 flex justify-center items-center `} >|
                   <div className='w-[40rem] xs:w-[18rem] sm:w-[24rem] md:w-[30rem]
         bg-green-900 rounded-xl  relative p-4 pt-12 pb-8'>
                     <div className="message">hna radi ykon pop up message{popupMessage}</div>
@@ -257,11 +265,11 @@ export default function match()
                       <button onClick={handleBackHomeClick}>Back Home</button>
                     </div>
                   </div>
-                </div>    
+                </div>     */}
                 <div className="table" id='table'>
                     <canvas id="canvas" width={1000} height={600}></canvas>
                 </div>
-            </div>    
+            </div>
         </div>
     </div>
     

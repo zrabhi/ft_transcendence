@@ -119,17 +119,6 @@ export default function match()
       }
     };
 
-    const getUser = async () =>{
-      
-      const response  = await getRequest(`${baseUrlUsers}/user/${opp_username}`);
-      if (response.error)
-      {
-         /// error here
-      }
-      else{
-        setOpponentUser(response);
-      }
-    }
     const launchGame =  () => {
       const canvas = document.getElementById("canvas") as HTMLCanvasElement;
       const ctx = canvas.getContext("2d");

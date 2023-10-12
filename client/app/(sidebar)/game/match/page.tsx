@@ -3,7 +3,7 @@ import HeaderBar from '@/components/LoggedUser/Profile/HeaderBar/HeaderBar';
 import SideBar from '@/components/LoggedUser/SideBar/SideBar'
 import exp from 'constants';
 import React, { useContext } from 'react'
-import GamePopup from './GamePopup'; 
+import { useRouter } from 'next/navigation';
 import './style.scss'
 import Avatar1 from '@/public/images/avatar1.jpeg'
 import { useEffect, useState} from "react";
@@ -14,7 +14,7 @@ import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
 
 export default function match()
 {
-
+    const router = useRouter();
     const [showPopup, setShowPopup] = useState(false);
     const [popupMessage, setPopupMessage] = useState('');
 
@@ -33,12 +33,14 @@ export default function match()
     const [oppscore, setoppscore] = useState(0);
     const handleNewGameClick = () => {
       // Redirect to the game match page
-      // router.push('/game/match');
+      router.push('/game/match');
+      setShowPopup(false);
     };
   
     const handleBackHomeClick = () => {
       // Redirect to the profile page
-      // router.push('/profile');
+      router.push('/profile');
+      setShowPopup(false);
     };
   
 
@@ -248,13 +250,13 @@ export default function match()
                         </div>
                     </div>
                 </div>
-                <div className={`${showPopup ? 'bg-blue-400' : 'bg-slate-400 bg-opacity-70 backdrop-blur-sm' } w-screen h-screen fixed inset-0 flex justify-center items-center `} >|
-                  <div className='w-[40rem] xs:w-[18rem] sm:w-[24rem] md:w-[30rem]
-        bg-green-900 rounded-xl  relative p-4 pt-12 pb-8'>
+                <div className={`popup ${showPopup ?  'bg-black-400 bg-opacity-70 backdrop-blur-sm': 'hidden' } w-screen h-screen fixed inset-0 flex justify-center items-center `} >|
+                  <div className='popupcore w-[50rem] xs:w-[18rem] sm:w-[24rem] md:w-[30rem]
+         rounded-xl  relative p-4 pt-12 pb-8'>
                     <div className="message">hna radi ykon pop up message{popupMessage}</div>
                     <div className="buttons">
-                      <button onClick={handleNewGameClick}>New Game</button>
-                      <button onClick={handleBackHomeClick}>Back Home</button>
+                      <button className={'back'} onClick={handleNewGameClick}>New Game</button>
+                      <button className={'refreche'} onClick={handleBackHomeClick}>Back Home</button>
                     </div>
                   </div>
                 </div>    

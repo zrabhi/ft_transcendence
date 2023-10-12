@@ -11,7 +11,6 @@ import Link from 'next/link'
 import { baseUrlUsers, putRequest } from "@/app/context/utils/service";
 import { BsCaretRightFill, BsCaretLeftFill } from "react-icons/bs";
 import { AuthContext } from "@/app/context/AuthContext";
-import { InvitationSocketContext } from "@/app/context/notifContext";
 
 interface SideBarProps {
   isExpanded: boolean;
@@ -21,12 +20,11 @@ interface SideBarProps {
 export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
   const router = useRouter();
   const [cookie, setCookie, remove] = useCookies(['access_token']);
-  const noitfSocket  = useContext(InvitationSocketContext);
+  const{ noitfSocket}  = useContext(AuthContext);
   // const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const handleSignOut = () => {
-    console.log("in log put");
-    noitfSocket.emit("logout")
+    noitfSocket?.emit("logout")
     remove('access_token');
     router.push("/login");
   };

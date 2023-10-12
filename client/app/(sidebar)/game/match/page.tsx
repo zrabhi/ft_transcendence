@@ -11,6 +11,7 @@ import { Socket } from "socket.io";
 import { AuthContext } from '@/app/context/AuthContext';
 import { useCookies } from "react-cookie";
 import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
+import { disconnect } from 'process';
 
 export default function match()
 {
@@ -195,36 +196,44 @@ export default function match()
         }});
       socket.on('connect', () => {
         console.log('Connected to WebSocket');
+        socket.on('matched right',  (data:any) => {
+          console.log("i match this : " , data);
+          setoppuser(data.username);
+          setOpponentavatar(data.avatar);
+          side = 'right';
+          launchGame();
+        })
+        socket.on('matched left', (data:any) => {
+          console.log("i match this : " , data);
+          setoppuser(data.username);
+          setOpponentavatar(data.avatar);
+          side = 'left';
+          launchGame();
+        })
+  
+        socket.on('match frame',(data:any)=>{
+          Ball.x = data.ballx;
+          Ball.y = data.bally;
+          setmyscore(data.myscore);
+          setoppscore(data.oppscore);
+  
+          if (side == 'left')
+          {
+            rightbar.starty = data.oppy;
+          }
+          else{
+            leftbar.starty = data.oppy;
+          }
+        });
+        // socket.on("disconnect", () => {
+        //   socket.off('matched right');
+        //   socket.off('matched left');
+        //   socket.off('match frame');
+        // });
       });
-      socket.on('matched right',  (data:any) => {
-        console.log("i match this : " , data);
-        setoppuser(data.username);
-        setOpponentavatar(data.avatar);
-        side = 'right';
-        launchGame();
-      })
-      socket.on('matched left', (data:any) => {
-        console.log("i match this : " , data);
-        setoppuser(data.username);
-        setOpponentavatar(data.avatar);
-        side = 'left';
-        launchGame();
-      })
-
-      socket.on('match frame',(data:any)=>{
-        Ball.x = data.ballx;
-        Ball.y = data.bally;
-        setmyscore(data.myscore);
-        setoppscore(data.oppscore);
-
-        if (side == 'left')
-        {
-          rightbar.starty = data.oppy;
-        }
-        else{
-          leftbar.starty = data.oppy;
-        }
-      })
+      return () => {
+        socket.disconnect()
+      }
     }, []);
 
     return (
@@ -263,7 +272,7 @@ export default function match()
                 <div className="table" id='table'>
                     <canvas id="canvas" width={1000} height={600}></canvas>
                 </div>
-            </div>    
+            </div>
         </div>
     </div>
     

@@ -14,24 +14,31 @@ import { AiOutlineMessage } from "react-icons/ai";
 import {GiPingPongBat} from "react-icons/gi"
 import { FaUserFriends } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { InvitationSocketContext } from "@/app/context/notifContext";
 import { AuthContext } from "@/app/context/AuthContext";
+import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
   const [showSidebar, setShowSidebar] = useState(false);
   const router = useRouter();
   const { notifSocket }= useContext(AuthContext);
   const CreateChat = async (user: any) => {
+    try{
     const response = await postRequest(
       `${baseChatUrl}/create/dm`,
       JSON.stringify({ username: user.username, memberLimit: 2 })
     );
-
-    console.log("res is => ",response);
-
+    if (response?.error)
+    {
+        if(response?.message === "Unauthorized")
+          showSnackbar("Unauthorized", false)
+      return ;
+    }
     setSelectedChannel(response); // to set selected channel after clicking a friend
     setSelectedChat(user); // to set the selected friend
-    console.log("selected user is ", user);
+  }catch(err)
+  {
+
+  }
   };
 
   const handleGameInvite = (user: any) =>

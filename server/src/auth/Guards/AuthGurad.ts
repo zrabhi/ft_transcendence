@@ -20,6 +20,7 @@ export class JwtAuthGuard implements CanActivate {
 
     // const response = context.switchToHttp().getResponse();
     const token = this.extractTokenFromHeader(request);
+    console.log("token +++ =>", token);
     if (!token) {
       console.log("token", token);
       throw new UnauthorizedException();
@@ -51,6 +52,8 @@ export class JwtAuthGuard implements CanActivate {
           return cookies;
       }, {});
 
-    return token.access_token;
+    if (!token || !token.access_token)
+        throw new UnauthorizedException();
+    return token?.access_token;
   }
 }

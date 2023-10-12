@@ -51,9 +51,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     tfaLogin: "tfalogin",
   };
   useEffect(() => {
-    if (cookie.access_token === "" || !cookie.access_token)
-      router.replace("/login");
-  }, []);
+   (async () => {
+    try{
+        if (checkPath()) return;
+        if (cookie && cookie.access_token)
+        {
+          const response = await getRequest(`${baseUrlAuth}/jwtVerification`);
+          console.log("response +++", response);
+          if (response?.error)
+            return;
+          else window.location.href ="/profile";
+        }
+    }catch(err)
+    {
+
+    }
+  })()
+}, []);
   const checkPath = () => {
     setPathname("");
     const currentPath = window.location.href.split("/");
@@ -74,67 +88,104 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const fetchUserData = async () => {
+    try{
     const response = await getRequest(`${baseUrlUsers}/user`);
-    if (response.error) {
+    if (response?.error) {
       setLoginError(response);
       return false;
     }
+    if (response?.error && response?.message === "Unauthorized"){
+      showSnackbar("Unauthorized", false)
+      return ;
+  }
     setUser(response);
-  };
+}catch(err)
+{
+
+}
+};
 
   const fetchFriendList = async () => {
+    try{
     const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
-    console.log(friendList);
-
+    if (friendList.error && friendList.message === "Unauthorized"){
+      showSnackbar("Unauthorized", false)
+      return ;
+  }
     setFriendsList(friendList);
+  }catch(err)
+    {
+
+    }
   };
 
   const fetchFriendRequestSent = async () => {
     try {
       const response = await getRequest(`${baseUrlUsers}/requestFriendSent`);
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
       setFriendRequestSent(response);
     } catch (err) {
-      console.log("error fetching friendSent");
+
     }
   };
   const fetchFriendRequests = async () => {
     try {
       const response = await getRequest(`${baseUrlUsers}/getFriendRequests`);
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
       setUserFriendRequests(response);
     } catch (err) {
-      console.log("error fetching friendRequest");
+
     }
   };
   const fetchGameRequest = async () =>{
     try{
     const response = await getRequest(`${baseUrlUsers}/gameRequests`)
+    if (response?.error && response?.message === "Unauthorized"){
+      showSnackbar("Unauthorized", false)
+      return ;
+  }
     setGameRequest(response);
     } catch(err)
     {
-      console.log("error fetching gameRequest");
+
     }
   }
   useEffect(() => {
     if (!checkPath()) return;
+    console.log("+++++++---?????");
+    try{
     (async () => {
       const response = await getRequest(`${baseUrlUsers}/user`);
-      if (response.error) {
-        setLoginError(response);
-        remove("access_token");
-        router.push("/login");
-        return false;
-      }
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
+    if (response?.error)
+      return ;
       response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
-      console.log(response);
       setUser(response);
       return true;
     })();
     (async () => {
       const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
       setBlockedUsers(response);
     })();
     (async () => {
       const response = await getRequest(`${baseUrlUsers}/UsersBlockedMe`);
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
       setUserBlockedMe(response);
     })();
     (async () => {
@@ -143,65 +194,108 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await fetchFriendRequests();
       await fetchGameRequest();
     })();
+  }catch(err)
+  {
+
+  }
   }, []);
   const updatingInfos = useCallback(
     async (username: string, password: string) => {
+      try{
       const response = await putRequest(
         `${baseUrlUsers}/user`,
         JSON.stringify({ username, password })
       );
-      if (response.error) {
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
+      if (response?.error) {
         setLoginError(response);
         return false;
       }
       setUser(response);
       return true;
-    },
+    }catch(err)
+  {
+  }},
     []
   );
 
   const updateUserInfo = useCallback(async (body: any) => {
+    try{
     const response = await putRequest(
       `${baseUrlUsers}/users/update`,
       JSON.stringify(body)
     );
-    if (response.error) {
+    if (response?.error && response?.message === "Unauthorized"){
+      showSnackbar("Unauthorized", false)
+      return ;
+  }
+    if (response?.error) {
       setLoginError(response);
       return false;
     }
     setUser(response);
     return true;
+  }catch(err)
+  {
+  }
   }, []);
 
   const LogIn = useCallback(async (loginInfo: any) => {
+    try{
     const response = await postRequest(
       `${baseUrlAuth}/signin`,
       JSON.stringify(loginInfo)
     );
-
-    if (response.error) {
+    if (response?.error && response?.message === "Unauthorized"){
+      showSnackbar("Unauthorized", false)
+      return ;
+  }
+    if (response?.error) {
       setLoginError(response);
       return false;
     }
     setUser(response);
     return true;
+  }catch(err)
+  {
+    return false;
+  }
   }, []);
 
   const handleDisable2fa = async () => {
+    try{
     const response = await putRequest(`${baseUrlUsers}/user/disable2fa`, "");
+    if (response?.error && response?.message === "Unauthorized"){
+      showSnackbar("Unauthorized", false)
+      return ;
+  }
     setTfaDisabled(true);
+}catch(err)
+{
+}
   };
+
   const HandleClickUpdate = useCallback(async (UpdateInfo: any) => {
-    setLoginError(LoginErrorInit);
+   try{ setLoginError(LoginErrorInit);
     const response = await putRequest(
       `${baseUrlUsers}/users/update`,
       UpdateInfo
     );
-
-    if (response.error) {
+    if (response?.error && response?.message === "Unauthorized"){
+      showSnackbar("Unauthorized", false)
+      return ;
+  }
+    if (response?.error) {
       return false;
     }
-    return true;
+    return true;}
+    catch(err)
+    {
+
+    }
   }, []);
 
   useEffect(() => {

@@ -22,6 +22,7 @@ class Player {
   isquit = false;
   isongame = false;
   socket: Socket;
+  reserved = false;
 
   constructor(socketid: string) {
     this.score = 0;
@@ -118,6 +119,21 @@ class Queue {
       this.items.splice(indexToRemove, 1);
     }
   }
+
+  getByUserId(userId: string): Player | undefined {
+    return this.items.find((player) => player.userid === userId);
+  }
+
+  containsUserId(userId: string): boolean {
+    return this.items.some((player) => player.userid === userId);
+  }
+
+  removeByUserId(userId: string): void {
+    const indexToRemove = this.items.findIndex((player) => player.userid === userId);
+    if (indexToRemove !== -1) {
+      this.items.splice(indexToRemove, 1);
+    }
+  }
 }
 
 function updateballxy(match:Match) : string 
@@ -178,8 +194,11 @@ export class GameGateway{
   server: Server;
   
   private waiting_users: Queue = new Queue;
+  private invited_users: Queue = new Queue;
+
   private matchs: Match[] = [];
   private playing_users: Player[] = []
+
   constructor(
     private prismaService: PrismaService,
     private jwtService: JwtService,
@@ -212,7 +231,7 @@ export class GameGateway{
 
   async handleDisconnect(client: Socket) {
     const socketId = client.id;
-    console.log(this.playing_users[client.id]?.match);
+    // console.log(this.playing_users[client.id]?.match);
     if(this.playing_users[client.id] && this.playing_users[client.id].match?.ingame == true)
     {
       this.playing_users[client.id].match.ingame = false;
@@ -306,12 +325,64 @@ init(@MessageBody() data: any, @ConnectedSocket() client: Socket): void {
   }
 }
 
-private check_matching(tmplayer:Player) 
+private async check_matching(tmplayer:Player)
 {
-    if (this.waiting_users.size() != 0)
+    const result = await this.userService.getInvitionAccpted(tmplayer.userid)
+    if(result.success)
+    {
+      let i: number;
+      let finded = false;
+      for(i = 0; result.opponents[i]; i++)
+      {
+        if(this.invited_users.containsUserId(result.opponents[i].id))
+        {
+          finded = true;
+          break;
+        }
+      }
+      if(finded == true)
+      { 
+        await this.userService.handleRemoveGameInvite(result.invitaionsId[i]);
+        let rightplayer = tmplayer;
+        let leftplayer = this.invited_users.getByUserId(result.opponents[i].id);
+
+        rightplayer.side = 'right';
+        leftplayer.side = 'left';
+
+        this.invited_users.removeByUserId(result.opponents[i].id);
+
+        rightplayer.opponent = leftplayer;
+        leftplayer.opponent = rightplayer;
+        this.playing_users[rightplayer.socketid] = rightplayer;
+        this.playing_users[leftplayer.socketid] = leftplayer;
+        let tmpmatch = new Match(rightplayer, leftplayer,  new canvas(1000,600));
+        this.matchs[rightplayer.socketid] = tmpmatch;
+        this.matchs[leftplayer.socketid] = tmpmatch;
+        tmpmatch.ingame = true;
+        rightplayer.match = tmpmatch;
+        leftplayer.match = tmpmatch;
+        this.server.to(rightplayer.socketid).emit('matched right', 
+        {
+          username : leftplayer.username,
+          avatar:leftplayer.avatar
+        });
+        this.server.to(leftplayer.socketid).emit('matched left', 
+        {
+          username : rightplayer.username,
+          avatar:rightplayer.avatar
+        });
+      }
+      else
+      {
+        tmplayer.reserved = true;
+        this.invited_users.enqueue(tmplayer);
+      }
+    }
+    else if (this.waiting_users.size() != 0)
     {
       let rightplayer = tmplayer;
       let leftplayer = this.waiting_users.peek();
+
 
       rightplayer.side = 'right';
       leftplayer.side = 'left';
@@ -328,12 +399,12 @@ private check_matching(tmplayer:Player)
       tmpmatch.ingame = true;
       rightplayer.match = tmpmatch;
       leftplayer.match = tmpmatch;
-      this.server.to(rightplayer.socketid).emit('matched right', 
+      this.server.to(rightplayer.socketid).emit('matched right',
       {
         username : leftplayer.username,
         avatar:leftplayer.avatar
       });
-      this.server.to(leftplayer.socketid).emit('matched left', 
+      this.server.to(leftplayer.socketid).emit('matched left',
       {
         username : rightplayer.username,
         avatar:rightplayer.avatar
@@ -345,6 +416,7 @@ private check_matching(tmplayer:Player)
 
 async update_achivements(winner: Player, loser: Player, cleansheet:boolean)
 {
+  try{
   await this.prismaService.match.create({
     data:{
       winner_id: winner.userid,
@@ -371,7 +443,11 @@ async update_achivements(winner: Player, loser: Player, cleansheet:boolean)
       firstGameAchie : true,
       firstLoseAchie:true,
     }
-  })
+  })}
+  catch(err)
+  {
+    return {success: false, error:"error in updating achievements"}
+  }
 }
 }
 

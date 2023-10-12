@@ -53,6 +53,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.connectedUsers.set(payload.id, client);
       this.server.to(client.id).emit('connected', 'Hello world!');
     } catch (err) {
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -66,7 +67,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         },
       );
       if (!payload) return client.disconnect(true);
-      // this.server.to(payload.id).emit('disconnected', '');
       this.connectedUsers.delete(payload.id);
     } catch (err) {
       return client.disconnect(true);
@@ -114,6 +114,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           .emit('newAdmin', { channelName: channel.name, user: data.username });
       }
     } catch (err) {
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -145,6 +146,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           });
       }
     } catch (err) {
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -212,6 +214,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
       }
     } catch (err) {
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -258,6 +261,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           .emit('error occored', { errorMessage: result?.error });
       }
     } catch (err) {
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -296,6 +300,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(member.userId).emit('channelDeleted', response);
       }
     } catch (err) {
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -331,8 +336,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
       }
     } catch (err) {
-      console.log(err);
-
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -373,6 +377,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           username: bannedUser.username,
         });
     } catch (err) {
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -414,6 +419,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       return this.server.to(bannedUser.id).emit('yourBanned', Sentdata);
     } catch (err) {
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -454,6 +460,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       return this.server.to(kickedUser.id).emit('yourKicked', Sentdata);
     } catch (err) {
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -476,10 +483,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       const currUser = await this.userService.findUserById(payload.id)
       const otherUser = await this.userService.findUserName(data.username)
-      
       this.server.to(payload.id).emit('userUnBlocked',{username: data.username});
       return this.server.to(otherUser.id).emit('yourUnBlocked',{username: currUser.username});
     } catch (e) {
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -509,6 +516,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(payload.id)
         .emit('userBlocked', { username: data.username });
     } catch (e) {
+      client.emit("Unauthorized");
       return client.disconnect(true);
     }
   }
@@ -518,7 +526,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: any,
   ) {
-    const payload = await this.jwtService.verifyAsync(data.token, {
+    try
+    {
+      const payload = await this.jwtService.verifyAsync(data.token, {
       secret: process.env.JWT_SECRET,
     });
     if (!payload) return client.disconnect(true);
@@ -591,6 +601,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(member.userId).emit('lastMessage', lastMessage);
     }
     this.chatService.saveMessageToChannel(payload, data);
-    return this.server.to(data.channelId).emit('message', messageInfo);
+    return this.server.to(data.channelId).emit('message', messageInfo);}
+    catch(err)
+    {
+      client.emit("Unauthorized");
+      return client.disconnect(true);
+    }
   }
 }

@@ -69,7 +69,12 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('/users')
   async getAllUsers(@UserInfo() user: User): Promise<User[]> {
+    try{
     return await this.userService.findAllUsers(user);
+    }catch(err)
+    {
+
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -110,9 +115,14 @@ export class UserController {
   // }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/users/')
+  @Post('/users')
   async createUser(@Body() createUserDto: CreateUserDto) {
+    try{
     return await this.userService.addUser(createUserDto);
+    }catch(err)
+    {
+      
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -124,9 +134,14 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('/user/achievement')
   async getUserAchievement(@Req() req, @Res() res) {
+    try{
     const achievements = await this.userService.achievementById(req.user.id);
 
     res.status(200).json(achievements);
+    }catch(err)
+    {
+      res.status(400).json("error")
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -160,20 +175,19 @@ export class UserController {
       }
       res.status(200).json(againstMatches);
     } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: `UserNotFound`,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+        res.status(400).json("error")
     }
   }
 
   // @UseGuards(JwtAuthGuard)
   @Post('/users/matches')
   async createMatch(@Body() createMatchDto: CreateMatchDto) {
+    try{
     return await this.userService.createMatch(createMatchDto);
+    }catch(err)
+    {
+      
+    }
   }
 
   @Get('/users/avatar/:user_id')
@@ -218,7 +232,7 @@ export class UserController {
       await this.userService.UpdateUserName(user, req.user.id);
       Res.status(200).json({ msg: 'Updated succefully' });
     } catch (err) {
-      // console.log(err);
+      Res.status(400).json("ERROR");
     }
   }
 
@@ -236,9 +250,14 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Put('users/update')
   async HandleUpdate(@Body() user: PutUserDto, @Res() res, @Req() req) {
+    try{
     const User = await this.userService.UpdateAllInfos(user, req.user.id);
     if (User) return res.status(200).json(user);
     res.status(400).json('Please Chose Another Username');
+    }catch(err)
+    {
+      res.status(400).json("error")
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -282,7 +301,7 @@ export class UserController {
       return response.status(200).json(file);
     } catch (err) {
       // console.log('image rro', err.message);
-      throw new err();
+      response.status(200).json("error");
     }
     return response.status(200).json(file.path);
   }

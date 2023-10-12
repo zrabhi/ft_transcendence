@@ -3,24 +3,26 @@ import { useState, useEffect } from 'react';
 import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
 import Image from 'next/image';
 import UserCard from './UserCard/UserCard';
+import { showSnackbar } from '@/app/context/utils/showSnackBar';
 
 export default function UserProfile({ username }: { username: string }) {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    try{
     const fetchUsers = async () => {
-      try {
         const allUsers = await getRequest(`${baseUrlUsers}/users`);
+        if (allUsers.error && allUsers.message === "Unauthorized"){
+          showSnackbar("Unauthorized", false)
+          return ;
+      }
         const currentUser = allUsers.filter((user: any) => user.username === username );
         if (currentUser.length === 0) return setUser(null)
         else {
           setUser(currentUser[0]);
         }
         setLoading(false);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
     };
 
     (async () =>{
@@ -34,6 +36,8 @@ export default function UserProfile({ username }: { username: string }) {
     return () => {
       clearTimeout(debouncedFetchUsers);
     };
+  }catch (error) {
+  }
   }, [username]);
 
   if (loading) return <div>Loading...</div>;

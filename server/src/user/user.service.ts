@@ -906,6 +906,46 @@ export class UserService {
       return {success: false, error: "error occured"}
     }
   }
+
+  async getInvitionAccpted(userid:string)
+  {
+    const currentUser = await this.findUserById(userid);
+    const invitations = await this.prismaService.gameInvite.findMany({})
+    let opponents = []
+    let invitationIds = []
+    for (const invite of invitations)
+    {
+      let user;
+      if ((invite.senderId === currentUser.id ||
+        invite.recieverId === currentUser.id) &&
+      invite.state === 'ACCEPTED')
+      {
+        if (invite.senderId === currentUser.id)
+             user = await this.findUserById(invite.recieverId);
+        else
+            user = await this.findUserById(invite.senderId);
+        opponents.push(user)
+        invitationIds.push(invite.id);
+      }
+    }
+    if (opponents.length > 0)
+      return {success: true, opponents: opponents, invitaionsId: invitationIds}
+    return {success: false}
+}
+
+  async handleRemoveGameInvite(gameInviteId: string)
+  {
+    try{
+        await this.prismaService.gameInvite.delete({
+          where:{
+            id: gameInviteId
+          }
+        })
+      return {success: true}
+    }catch(err){
+      return {success:true, error:"error ocured while deleting invitation"}
+    }
+  }
   // async getFileUpload(fileTarget, category) {
   //   let userFile: any = undefined;
   //   const assets = await readdir(`./images/${category}`);

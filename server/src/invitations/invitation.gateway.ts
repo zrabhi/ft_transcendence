@@ -54,6 +54,7 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(client: any) {
+    try{
     const index = this.connectedUsers.findIndex(
       (user) => user.socket.id === client.id,
     );
@@ -68,6 +69,9 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
         );
       this.connectedUsers.splice(index, 1);
     }
+  }catch(err)
+  {
+  }
   }
 
   @SubscribeMessage('FriendRequest')
@@ -107,6 +111,7 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
         });
       }
     } catch (err) {
+      client.disconnect(true);
       console.log('socket error in game request', err);
     }
   }
@@ -137,11 +142,13 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }catch (err)
     {
-
-      }
+      client.disconnect(true);
+      return;
+    }
   }
   @SubscribeMessage('logout')
   async handleLogout(@ConnectedSocket() client: Socket) {
+    try{
     const { id } = this.connectedUsers.find((c) => c.socket.id === client.id);
     if (!id) return;
     const userSockets = this.connectedUsers.filter((c) => c.id === id);
@@ -150,5 +157,9 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.to(s.socket.id).emit('logout');
       s.socket.disconnect();
     });
+  }catch(err)
+  {
+
   }
+}
 }

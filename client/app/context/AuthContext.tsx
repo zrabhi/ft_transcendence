@@ -299,42 +299,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    notifSocket = io("http://127.0.0.1:8080/notifications", {
-      auth: {
-        token: cookie.access_token,
-      },
-    });
-    notifSocket.on("connected", () => {
-      console.log("connected notif");
-    });
-    notifSocket.on("logout", () => {
-      console.log("loging out");
-      remove("access_token");
-      router.push("/login");
-    });
-    notifSocket.on("accepted", (data: any) => {
-      if (user.username !== data.username)
-        showSnackbar(`${data.username} accepted you game request`, true);
-      else{
-        let updated: any;
-        updated = gameRequest.filter((game: any)=>{
-          return game.username != user.username
-        })
-        setGameRequest(updated);
-      }
+  notifSocket = io("http://127.0.0.1:8080/notifications", {
+  auth: {
+  token: cookie.access_token,
+  },
+  });
+  notifSocket.on("connected", () => {
+  console.log("connected notif");
+  });
+  notifSocket.on("logout", () => {
+  console.log("loging out");
+  remove("access_token");
+  router.push("/login");
+  });
+  notifSocket.on("accepted", (data: any) => {
+  if (user.username !== data.username)
+  showSnackbar(`${data.username} accepted you game request`, true);
+  else{
+  let updated: any;
+  updated = gameRequest.filter((game: any)=>{
+  return game.username != user.username
+  })
+  setGameRequest(updated);
+  }
       router.push("/game");
-    });
-    notifSocket.on("gameRequest", (data: any) => {
-      showSnackbar(
-        `you have a game request from ${data[0].username}, check your notifications to accepte or refuse`,
-        true
-      );
-      console.log("game data", data);
-      setGameRequest(data);
-    });
-    return () => {
-      notifSocket.disconnect();
-    };
+  });
+  notifSocket.on("gameRequest", (data: any) => {
+  showSnackbar(
+  `you have a game request from ${data[0].username}, check your notifications to accepte or refuse`,
+  true
+  );
+  console.log("game data", data);
+  setGameRequest(data);
+  });
+  return () => {
+  notifSocket.disconnect();
+  };
   }, []);
 
   return (

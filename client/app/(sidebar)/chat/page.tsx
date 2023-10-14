@@ -23,10 +23,9 @@ import { array } from "yup";
 import { AuthContext } from "@/app/context/AuthContext";
 import Modal from "react-modal";
 import { showSnackbar } from "@/app/context/utils/showSnackBar";
-import ConversationPana from "@/public/images/Conversation-pana.png"
-import GroupChat from "@/public/images/Group Chat-amico.png"
+import ConversationPana from "@/public/images/Conversation-pana.png";
+import GroupChat from "@/public/images/Group Chat-amico.png";
 import Snackbar from "./components/MultipleBar";
-
 
 const customStyles = {
   content: {
@@ -58,30 +57,27 @@ const Chat: React.FC = () => {
     setUserBlockedMe,
     blockedUsers,
     userBlockedMe,
-    friendsList
+    friendsList,
   } = useContext(AuthContext);
   const [cookie] = useCookies(["access_token"]);
   const [snackbars, setSnackbars] = useState<any>([]);
   const [password, setPassword] = useState("");
   const [selectedJoinChannel, setSelectedJoinChannel] = useState<any>(null);
 
-  const handleOpenSnackbar = (message: any, type: any) => {
-    setSnackbars((prevSnackbars: any) => [
-      ...prevSnackbars,
-      {
-        key: new Date().getTime(), // Unique key
-        message,
-        open: true,
-        type:type
-      },
-    ]);
+
+  const handleOpenSnackbar = (message: string, type: string) => {
+    const uniqueKey = Date.now(); // Generate a unique key using the current timestamp
+    const newSnackbar = { key: uniqueKey, message, type };
+
+    setSnackbars((prevSnackbars: any) => [...prevSnackbars, newSnackbar]);
+
+    setTimeout(() => {
+      handleCloseSnackbar(uniqueKey);
+    }, 4000);
   };
   const handleCloseSnackbar = (uniqueKey: any) => {
-    setSnackbars((prevSnackbars: any) =>
-      prevSnackbars.map((snackbar: any) =>
-        snackbar.key === uniqueKey ? { ...snackbar, open: false } : snackbar
-      )
-    );
+    const updatedSnackbars = snackbars.filter((snackbar: any) => snackbar.key !== uniqueKey);
+    setSnackbars(updatedSnackbars);
   };
   // just an example of how to use this function
   // it will disapear after 5 sec
@@ -90,52 +86,53 @@ const Chat: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    try{
-    (async () => {
-      const response = await getRequest(`${baseUrlUsers}/user/friends`);
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-    }
+    try {
+      (async () => {
+        const response = await getRequest(`${baseUrlUsers}/user/friends`);
+        if (response?.error && response?.message === "Unauthorized") {
+          showSnackbar("Unauthorized", false);
+          return;
+        }
         setUsers(response);
-    })();
-  }catch(err)
-  {
-
-  }
+      })();
+    } catch (err) {}
   }, [friendsList]);
 
   useEffect(() => {
-    try{
-    (async () => {
-      // TODO: need to be in one request => /channels
-      try {
-        const responseDm = await getRequest(`${baseChatUrl}/channelsDm`); // fetching USER Dms
-        if (responseDm.error){
-          if (responseDm.message === "Unauthorized")
-            showSnackbar("Unauthorized", false)
-        return ;
-      }
-        setChannels(responseDm);
-        const responseRooms = await getRequest(`${baseChatUrl}/channelsRooms`); // fetching user rooms
-        if (responseRooms.error){
-          if (responseRooms.message === "Unauthorized")
-            showSnackbar("Unauthorized", false)
-        return ;
-       }
-        setChannels((prevchannels: any) => [...prevchannels, ...responseRooms]);
-      } catch (error) {}
-    })();
-    (async () => {
-      const response = await getRequest(`${baseChatUrl}/getChannels`);
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-      }
+    try {
+      (async () => {
+        // TODO: need to be in one request => /channels
+        try {
+          const responseDm = await getRequest(`${baseChatUrl}/channelsDm`); // fetching USER Dms
+          if (responseDm.error) {
+            if (responseDm.message === "Unauthorized")
+              showSnackbar("Unauthorized", false);
+            return;
+          }
+          setChannels(responseDm);
+          const responseRooms = await getRequest(
+            `${baseChatUrl}/channelsRooms`
+          ); // fetching user rooms
+          if (responseRooms.error) {
+            if (responseRooms.message === "Unauthorized")
+              showSnackbar("Unauthorized", false);
+            return;
+          }
+          setChannels((prevchannels: any) => [
+            ...prevchannels,
+            ...responseRooms,
+          ]);
+        } catch (error) {}
+      })();
+      (async () => {
+        const response = await getRequest(`${baseChatUrl}/getChannels`);
+        if (response?.error && response?.message === "Unauthorized") {
+          showSnackbar("Unauthorized", false);
+          return;
+        }
         setOtherChannels(response);
-    })();
-  }catch (err) {
-  }
+      })();
+    } catch (err) {}
   }, []);
   const checkBlocked = (username: string) => {
     return (
@@ -159,9 +156,8 @@ const Chat: React.FC = () => {
           ) {
             checker = true; /// check if user in blocked user
             if (!checkBlocked(messageInfo?.channel.sender))
-                channel.channel.message = messageInfo?.channel?.message;
-            else
-                channel.channel.message = "this message is hidden"
+              channel.channel.message = messageInfo?.channel?.message;
+            else channel.channel.message = "this message is hidden";
             return channel;
           }
         });
@@ -205,9 +201,11 @@ const Chat: React.FC = () => {
           selectedChannel?.channel &&
           selectedChannel?.channel.id === data.channelId
         ) {
-          let updatedMembers = selectedChannel?.members?.filter((member: any) => {
-            return member.name != data.name;
-          });
+          let updatedMembers = selectedChannel?.members?.filter(
+            (member: any) => {
+              return member.name != data.name;
+            }
+          );
           setSelectedChannel((prevChannel: any) => ({
             ...prevChannel,
             members: updatedMembers,
@@ -241,9 +239,11 @@ const Chat: React.FC = () => {
           selectedChannel?.channel &&
           selectedChannel?.channel?.id === data.channelId
         ) {
-          let updatedMembers = selectedChannel?.members?.filter((member: any) => {
-            return member.name != data.name;
-          });
+          let updatedMembers = selectedChannel?.members?.filter(
+            (member: any) => {
+              return member.name != data.name;
+            }
+          );
           setSelectedChannel((prevChannel: any) => ({
             ...prevChannel,
             members: updatedMembers,
@@ -339,12 +339,15 @@ const Chat: React.FC = () => {
       });
       socket.on("NewMember", (data: any) => {
         if (data.member === user.username) {
-            setChannels((prevChannels: any) => [
-              data.lastMessage,
-              ...prevChannels,
-            ]);
-          } else {
-            handleOpenSnackbar(`${data.member} is now in ${data?.channelName} room`, "success");
+          setChannels((prevChannels: any) => [
+            data.lastMessage,
+            ...prevChannels,
+          ]);
+        } else {
+          handleOpenSnackbar(
+            `${data.member} is now in ${data?.channelName} room`,
+            "success"
+          );
           let updatedSelectedChannel = selectedChannel;
           updatedSelectedChannel?.members?.push({
             name: data.member,
@@ -364,9 +367,11 @@ const Chat: React.FC = () => {
           selectedChannel?.channel &&
           selectedChannel?.channel?.id === data.id
         ) {
-          let updatedMembers = selectedChannel?.members?.filter((member: any) => {
-            return member.name != data.name;
-          });
+          let updatedMembers = selectedChannel?.members?.filter(
+            (member: any) => {
+              return member.name != data.name;
+            }
+          );
           setSelectedChannel((prevChannel: any) => ({
             ...prevChannel,
             members: updatedMembers,
@@ -505,7 +510,12 @@ const Chat: React.FC = () => {
               <div className="pt-20 text-[#999999] text-xl flex flex-col justify-start items-start">
                 {/* <img src={ConversationPana} alt='ConversationPana'/> */}
                 <span>You need to select a chat to start a conversation</span>
-                <img src={ConversationPana.src} alt="Conversation Pana" width="500px" height="500px" /> 
+                <img
+                  src={ConversationPana.src}
+                  alt="Conversation Pana"
+                  width="500px"
+                  height="500px"
+                />
               </div>
             )}
             {otherChannels && otherChannels.length > 0 ? (
@@ -603,7 +613,12 @@ const Chat: React.FC = () => {
                 {" "}
                 <h2>There is no channels to join,</h2>
                 <h2>Try to create one!</h2>{" "}
-                <img src={GroupChat.src} alt='GroupChat' width="500px" height="500px" />
+                <img
+                  src={GroupChat.src}
+                  alt="GroupChat"
+                  width="500px"
+                  height="500px"
+                />
               </div>
             )}
             <Friends
@@ -614,16 +629,15 @@ const Chat: React.FC = () => {
           </div>
         </div>
       </div>
-      {snackbars.map((snackbar:any) => (
-  <Snackbar
-    key={snackbar.key}
-    uniqueKey={snackbar.key}
-    message={snackbar.message}
-    open={snackbar.open}
-    type={snackbar.type}
-    onClose={handleCloseSnackbar}
-  />
-))}
+      <div className="snackbar-container">
+        {snackbars.map((snackbar: any) => (
+          <Snackbar
+            key={snackbar.key}
+            message={snackbar.message}
+            type={snackbar.type}
+          />
+        ))}
+      </div>
     </div>
   );
 };

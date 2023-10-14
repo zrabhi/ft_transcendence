@@ -25,6 +25,7 @@ import Modal from "react-modal";
 import { showSnackbar } from "@/app/context/utils/showSnackBar";
 import ConversationPana from "@/public/images/Conversation-pana.png"
 import GroupChat from "@/public/images/Group Chat-amico.png"
+import Snackbar from "./components/MultipleBar";
 
 
 const customStyles = {
@@ -60,10 +61,28 @@ const Chat: React.FC = () => {
     friendsList
   } = useContext(AuthContext);
   const [cookie] = useCookies(["access_token"]);
-
+  const [snackbars, setSnackbars] = useState<any>([]);
   const [password, setPassword] = useState("");
   const [selectedJoinChannel, setSelectedJoinChannel] = useState<any>(null);
 
+  const handleOpenSnackbar = (message: any, type: any) => {
+    setSnackbars((prevSnackbars: any) => [
+      ...prevSnackbars,
+      {
+        key: new Date().getTime(), // Unique key
+        message,
+        open: true,
+        type:type
+      },
+    ]);
+  };
+  const handleCloseSnackbar = (uniqueKey: any) => {
+    setSnackbars((prevSnackbars: any) =>
+      prevSnackbars.map((snackbar: any) =>
+        snackbar.key === uniqueKey ? { ...snackbar, open: false } : snackbar
+      )
+    );
+  };
   // just an example of how to use this function
   // it will disapear after 5 sec
   useEffect(() => {
@@ -118,6 +137,12 @@ const Chat: React.FC = () => {
   }catch (err) {
   }
   }, []);
+  const checkBlocked = (username: string) => {
+    return (
+      blockedUsers.some((friend: any) => friend === username) ||
+      userBlockedMe.some((friend: any) => friend === username)
+    );
+  };
   useEffect(() => {
     socket = io("http://127.0.0.1:8080/chat", {
       auth: {
@@ -133,7 +158,10 @@ const Chat: React.FC = () => {
             channel?.channel?.id === messageInfo?.channel?.id
           ) {
             checker = true; /// check if user in blocked user
-            channel.channel.message = messageInfo?.channel?.message;
+            if (!checkBlocked(messageInfo?.channel.sender))
+                channel.channel.message = messageInfo?.channel?.message;
+            else
+                channel.channel.message = "this message is hidden"
             return channel;
           }
         });
@@ -315,11 +343,8 @@ const Chat: React.FC = () => {
               data.lastMessage,
               ...prevChannels,
             ]);
-        } else {
-          showSnackbar(
-            `${data.member} is now in ${data?.channelName} room`,
-            true
-          );
+          } else {
+            handleOpenSnackbar(`${data.member} is now in ${data?.channelName} room`, "success");
           let updatedSelectedChannel = selectedChannel;
           updatedSelectedChannel?.members?.push({
             name: data.member,
@@ -589,6 +614,16 @@ const Chat: React.FC = () => {
           </div>
         </div>
       </div>
+      {snackbars.map((snackbar:any) => (
+  <Snackbar
+    key={snackbar.key}
+    uniqueKey={snackbar.key}
+    message={snackbar.message}
+    open={snackbar.open}
+    type={snackbar.type}
+    onClose={handleCloseSnackbar}
+  />
+))}
     </div>
   );
 };

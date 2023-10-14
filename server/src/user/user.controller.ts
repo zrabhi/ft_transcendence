@@ -380,7 +380,6 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('user/friends')
   async handleGetFriends(@Req() req, @Res() res, @UserInfo() currUser) {
-    
     try { 
       const friends = await this.userService.getFriendsByUserId(currUser.id);
       console.log(friends);

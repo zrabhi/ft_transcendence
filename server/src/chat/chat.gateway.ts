@@ -228,12 +228,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         secret: process.env.JWT_SECRET,
       });
       if (!payload) return client.disconnect(true);
-      const result = await this.chatService.handleAddMember(
-        payload,
-        data.channelId,
-        data.username,
-      );
-      const channel = await this.prismaService.channel.findUnique({
+      for (let i = 0; i < data.Users.length; i++) {
+        const result = await this.chatService.handleAddMember(
+          payload,
+          data.channelId,
+          data.Users[i],
+        );
+        const channel = await this.prismaService.channel.findUnique({
         where: {
           id: data.channelId,
         },
@@ -241,13 +242,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           members: true,
         },
       });
-      const addedUser = await this.userService.findUserName(data.username);
-      // check if there is multiple users to be added
+      const addedUser = await this.userService.findUserName(data.Users[i]);
       if (result.success) {
         for (const member of channel.members) {
           this.server.to(member.userId).emit('NewMember', {
             channelName: channel.name,
-            member: data.username,
+            member: data.Users[i],
             role: 'Member',
             avatar: addedUser.avatar,
             status: addedUser.status,
@@ -259,8 +259,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server
           .to(payload.id)
           .emit('error occored', { errorMessage: result?.error });
-      }
+    }
+  }
     } catch (err) {
+      console.log(err);
       client.emit("Unauthorized");
       return client.disconnect(true);
     }
@@ -565,6 +567,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       channel: {
         id: data.channelId,
         username: name,
+        sender: user.username,
         avatar: avatar,
         message: data.message,
         status: status,

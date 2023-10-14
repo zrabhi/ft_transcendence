@@ -84,7 +84,7 @@ export class AuthController {
       else if (user.tfa) return response.redirect(TFALOGIN);
       return response.redirect(PROFILE);
     } catch (err) {
-      console.log("errrrr => ",err);
+      response.redirect(LOGIN)
     }
   }
   @Get('jwtVerification')

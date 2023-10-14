@@ -529,7 +529,7 @@ const BoxChat = ({
     if (selectedUsers.length === 0) return;
     const data = {
       channelId: selectedChannel.channel.id,
-      username: selectedUsers[0],
+      Users: selectedUsers,
       token: cookie.access_token,
     };
     socket.emit("addMember", data);
@@ -742,7 +742,7 @@ const BoxChat = ({
               </span> */}
                 <span className="text-md">{!message?.blocked
                         ? message.content
-                        : "You can't see the message from a blocked user!"}</span>
+                        : "this message is hidden!"}</span>
               </div>
             </div>
           ))}

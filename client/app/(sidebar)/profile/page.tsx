@@ -12,22 +12,20 @@ import Users from "./users";
 
 export default function Profile() {
   const { getUserData, user,setNotif } = useContext(AuthContext);
-  const [friendList, setFriendList] = useState<any>([]); // firendlsit will contain array of (username, status, avatar)
+  const [friendList, setFriendList] = useState<any>([]);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [users, setUsers] = useState<[]>([]);
   const fetchFriendList = async () => {
     try{
     const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
-    if (friendList.error && friendList.message === "Unauthorized"){
+    if (friendList.error && friendList.message ===      "Unauthorized") {
       showSnackbar("Unauthorized", false)
       return ;
-
-  }
+    }
     setFriendList(friendList);
-}catch(err)
-{
-
-}
+    } catch(err) {
+      console.error('Error fetching friend list:', err);
+    }
   }
 
   useEffect(() => {
@@ -44,18 +42,17 @@ export default function Profile() {
   useEffect(()=>
   {
     (async () =>{
-      try{
-          const response = await getRequest(`${baseUrlUsers}/users`);
-          if (response?.error)
-          {
-            if (response.message ==="Unauthorized")
-              showSnackbar("Unauthorized", false)
-            return ;
-          }
-          setUsers(response)
-      }catch(err)
-      {
-
+      try {
+        const response = await getRequest(`${baseUrlUsers}/users`);
+        if (response?.error)
+        {
+          if (response.message ==="Unauthorized")
+            showSnackbar("Unauthorized", false)
+          return ;
+        }
+        setUsers(response)
+      } catch(err) {
+        console.error('Error fetching users:', err);
       }
     })()
   },[])

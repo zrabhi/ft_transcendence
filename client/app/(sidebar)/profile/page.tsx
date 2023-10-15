@@ -7,30 +7,46 @@ import { AuthContext } from '@/app/context/AuthContext'
 import HeaderBar from "@/components/LoggedUser/Profile/HeaderBar/HeaderBar";
 import NavMenu from "@/components/LoggedUser/Profile/NavMenu/NavMenu";
 import "./style.scss";
-import ProfileData from "@/components/LoggedUser/Profile/ProfileData/ProfileData";
+import LeaderboardData from "@/components/LoggedUser/Profile/ProfileData/LeaderboardData";
+import FriendsData from "@/components/LoggedUser/Profile/ProfileData/FriendsData";
 
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
-  const [friendList, setFriendList] = useState<any>([]); // firendlsit will contain array of (username, status, avatar)
-
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [selectedItem, setSelectedItem] = useState<number>(2);
 
-  const fetchFriendList = async () => {
-    const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
-    console.log(friendList);
-    
-    setFriendList(friendList);
-  }
-  useEffect( () => {
-    try {
-      (async () =>{
-      await fetchFriendList();
-      })() // you should do await in async functions
-      // console.log(friendList);
+  const [users, setUsers] = useState([]);
+  const [friends, setFriends] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const allUsers = await getRequest(`${baseUrlUsers}/users`);
+        setUsers(allUsers);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    const fetchFriends = async () => {
+      try {
+        const friends = await getRequest(`${baseUrlUsers}/user/friends`);
+        setFriends(friends);
+      } catch (error) {
+        console.error('Error fetching friends:', error);
+      }
     }
-    catch (error) {
-      console.error('Error fetching friend list:', error);
-    }
+
+    fetchUsers();
+    fetchFriends();
+
+    const debouncedFetchUsers = setTimeout(() => {
+      fetchUsers();
+    }, 300);
+
+    return () => {
+      clearTimeout(debouncedFetchUsers);
+    };
   }, []);
 
   return (
@@ -42,10 +58,14 @@ export default function Profile() {
           <ProfileCard data={user} />
           <div className="profile-boxes">
             <div className="navbar-boxes">
-              <NavMenu />
+              <NavMenu setSelectedItem={setSelectedItem} />
             </div>
             <div className="data">
-              <ProfileData data={user} />
+              { selectedItem === 0 && <FriendsData friends={friends} /> }
+              { selectedItem === 1 && <div>History</div> }
+              { selectedItem === 2 && <LeaderboardData users={users} /> }
+              { selectedItem === 3 && <div>Statistics</div> }
+              { selectedItem === 4 && <div>Achievements</div> }
             </div>
           </div>
         </div>

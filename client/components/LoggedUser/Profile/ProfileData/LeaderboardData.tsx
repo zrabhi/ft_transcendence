@@ -1,9 +1,18 @@
 import React from 'react'
 
-export default function LeaderboardData(users: any) {
+interface User {
+  username: string;
+  points: number;
+}
+
+interface LeaderboardDataProps {
+  users: User[];
+}
+
+export default function LeaderboardData({ users }: LeaderboardDataProps) {
   return (
     <div className="leaderboard rounded-lg overflow-hidden">
-      <table className='w-full text-left mt-2'>
+      <table className='w-full text-left mt-4'>
         <thead className='text-sm tracking-wide capitalize font-light bg-purple-700 bg-blend-darken bg-opacity-25'>
           <tr className='' >
             <th className='p-4' >rank</th>

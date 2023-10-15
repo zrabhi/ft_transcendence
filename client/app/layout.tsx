@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import Footer from "@/components/MainPage/Footer/Footer";
 import { useCookies } from "react-cookie";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthContext, AuthProvider } from "./context/AuthContext";
 import { CookiesProvider } from 'react-cookie';
 
 
@@ -27,6 +27,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  /// we will chenge it later we i found out best solution
+  // chekc id there is access_toke if so rederect the  user to profile
+  const {setNotif, setGameRequest} = useContext(AuthContext);
+  const [cookie, setCookie, remove] = useCookies(['access_token']);
+  const router = useRouter();
+
   return (
     <html lang="en">
       <body className={roboto.className} suppressHydrationWarning={true}>

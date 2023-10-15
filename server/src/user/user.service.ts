@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import {
+  BadRequestException,
   Body,
   HttpException,
   HttpStatus,
@@ -13,19 +14,25 @@ import {
   Match,
   Prisma,
   State,
+  Status,
   User,
 } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { FileUserDto, PutUserDto } from './dto/put-user-dto';
+import { generate } from 'rxjs';
 
 @Injectable()
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAllUsers(): Promise<User[]> {
-    return await this.prismaService.user.findMany({});
+  async findAllUsers(user: any): Promise<User[]> {
+    const Allusers = await this.prismaService.user.findMany({});
+    const users = Allusers.filter((currUser) => {
+      return currUser.id != user.id;
+    });
+    return users;
   }
 
   async findUserById(user_id: string): Promise<User> {
@@ -35,11 +42,6 @@ export class UserService {
       },
     });
   }
-
-  // async checkUserNames(user: PutUserDto, userId: string)
-  // {
-
-  // }
 
   async addUser(createUserDto: CreateUserDto) {
     const exist = !!(await this.prismaService.user.findFirst({
@@ -385,9 +387,9 @@ export class UserService {
     });
   }
 
-  async createFriendship(user_one_id: string, user_two_id: string) {
+  async createFriendship(user_one_id: string, user_two_name: string) {
     const userOne = await this.findUserById(user_one_id);
-    const userTwo = await this.findUserById(user_two_id);
+    const userTwo = await this.findUserName(user_two_name);
 
     const isFriend = await this.prismaService.friendship.findFirst({
       where: {
@@ -406,6 +408,46 @@ export class UserService {
     });
   }
 
+  async handleUnFriendUser(user: any, username: string) {
+    try {
+      const currentUser = await this.findUserById(user.id);
+      const Friendships = await this.prismaService.friendship.findMany({});
+      const requests = await this.prismaService.friendRequest.findMany({});
+      const otherUser = await this.findUserName(username);
+      for (const friend of Friendships) {
+        if (
+          (friend.user_id == currentUser.id ||
+            friend.user_id === otherUser.id) &&
+          (friend.friend_id === currentUser.id ||
+            friend.friend_id === otherUser.id)
+        ) {
+          await this.prismaService.friendship.delete({
+            where: {
+              id: friend.id,
+            },
+          });
+        }
+      }
+      for (const request of requests) {
+        if (
+          (request.requested_id == currentUser.id ||
+            request.requested_id === otherUser.id) &&
+          (request.requester_id === currentUser.id ||
+            request.requester_id === otherUser.id)
+        ) {
+          await this.prismaService.friendRequest.delete({
+            where: {
+              id: request.id,
+            },
+          });
+        }
+      }
+      return { success: true, message: 'succeffully updated' };
+    } catch (err) {
+      console.log('error occurred while unfriending user');
+      return { success: false };
+    }
+  }
   async deleteFriendship(user_one: string, user_two: string) {
     const userOne = await this.findUserById(user_one);
     const userTwo = await this.findUserById(user_two);
@@ -425,27 +467,29 @@ export class UserService {
     });
   }
 
+  //NOTICE: this fucntion not stablleeee
   async getFriendsByUserId(user_id: string) {
     return await this.prismaService.friendship.findMany({
       where: {
-        user_id: user_id,
+        OR: [{ user_id: user_id }, { friend_id: user_id }],
       },
     });
   }
 
+  //TODO : THIS IS FOR UPDATING FRIEND REQUEST WHETHER THE REQUEST ACCEPTED OR REJECTED
   async updateFriendRequestState(
     user_one_id: string,
-    user_two_id: string,
+    user_two_name: string,
     state: State,
   ) {
     const userOne = await this.findUserById(user_one_id);
-    const userTwo = await this.findUserById(user_two_id);
+    const userTwo = await this.findUserName(user_two_name);
 
     const FriendRequestId =
       await this.prismaService.friendRequest.findFirstOrThrow({
         where: {
-          requester_id: userOne.id,
-          requested_id: userTwo.id,
+          requester_id: userTwo.id,
+          requested_id: userOne.id,
         },
       });
 
@@ -509,6 +553,16 @@ export class UserService {
     });
   }
 
+  async handleUpdateStatus(currentStatus: Status, user_id: string) {
+    return await this.prismaService.user.update({
+      where: {
+        id: user_id,
+      },
+      data: {
+        status: currentStatus,
+      },
+    });
+  }
   async logOut(userId: string) {
     return await this.prismaService.user.update({
       where: { id: userId },
@@ -517,6 +571,380 @@ export class UserService {
         status: 'OFFLINE',
       },
     });
+  }
+  async findUserByIdWithBlocked(user_id: string) {}
+  async handleBlockUser(user: any, username: string) {
+    try {
+      const currUser = await this.prismaService.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          userBlock: true,
+        },
+      });
+
+      const blockedUser = await this.findUserName(username);
+      const checker = currUser.userBlock.filter((blocked: any) => {
+        return blocked.blockedId === blockedUser.id;
+      });
+      if (checker[0]) throw BadRequestException;
+      await this.prismaService.userBlock.create({
+        data: {
+          blockerId: currUser.id,
+          blockedId: blockedUser.id,
+        },
+      });
+      return { success: true, message: 'user blocked' };
+    } catch (error) {
+      return { success: false, error: 'error ocured' };
+    }
+  }
+
+  async handleUnBlockUser(user: any, username: string) {
+    try {
+      const currUser = await this.prismaService.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          userBlock: true,
+        },
+      });
+      const otherUser = await this.findUserName(username);
+      const checker = currUser.userBlock.filter((blocked: any) => {
+        return blocked.blockedId === otherUser.id;
+      });
+      if (!checker[0]) throw BadRequestException;
+      await this.prismaService.userBlock.delete({
+        where: {
+          id: checker[0].id,
+        },
+      });
+      return { success: true, message: 'user unblocked' };
+    } catch (e) {
+      return { success: false, error: 'error ocured' };
+    }
+  }
+
+  async handleGetBlockedUsers(user: any) {
+    const currUser = await this.prismaService.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        userBlock: true,
+      },
+    });
+    const users = [];
+    for (const block of currUser.userBlock) {
+      const searchedUser = await this.prismaService.user.findUnique({
+        where: {
+          id: block.blockedId,
+        },
+      });
+      users.push(searchedUser.username);
+    }
+    return users;
+  }
+  async handleGetUserblockedMe(user: any) {
+    const currUser = await this.prismaService.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        blockedUser: true,
+      },
+    });
+    const users = [];
+    for (const block of currUser.blockedUser) {
+      const searchedUser = await this.prismaService.user.findUnique({
+        where: {
+          id: block.blockedId,
+        },
+      });
+
+      const otherUser = await this.findUserById(block.blockerId);
+      users.push(otherUser.username);
+    }
+    return users;
+  }
+
+  async handleFriendRequest(user: any, username: string) {
+    const requestedFriend = await this.findUserName(username);
+    const currentUser = await this.prismaService.user.findUnique({
+      where: { id: user.id },
+      include: {
+        OutgoingRequest: true,
+      },
+    });
+    for (const request of currentUser.OutgoingRequest) {
+      if (
+        request.requester_id === currentUser.id &&
+        request.requested_id === requestedFriend.id
+      ) {
+        // thats mean  already request has been send by the current user
+        return {
+          success: false,
+          error: `${currentUser.username} you have already sent request to this user`,
+        };
+      }
+    }
+    try {
+      await this.prismaService.friendRequest.create({
+        data: {
+          requester_id: currentUser.id,
+          requested_id: requestedFriend.id,
+          state: 'PENDING',
+          updated_at: new Date(),
+        },
+      });
+    } catch (err) {
+      return {
+        success: false,
+        error: `error while adding your friend request ${err}`,
+      };
+    }
+    return {
+      success: true,
+      message: `friend request successfully sent to ${username}`,
+    };
+  }
+
+  async getFriendRequests(user: any) {
+    const currentUser = await this.prismaService.user.findUnique({
+      where: { id: user.id },
+      include: {
+        IncomingRequest: true,
+      },
+    });
+
+    const requests = [];
+    for (const request of currentUser.IncomingRequest) {
+      if (
+        request.requested_id === currentUser.id &&
+        request.state === 'PENDING'
+      ) {
+        const otherUser = await this.findUserById(request.requester_id);
+        requests.push({
+          type: 1,
+          username: otherUser.username,
+          avatar: otherUser.avatar,
+        });
+      }
+    }
+    return requests;
+  }
+
+  async handleCancleFriendRequest(user: any, username: string) {
+    try {
+      const currentUser = await this.prismaService.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          OutgoingRequest: true,
+        },
+      });
+      const otherUser = await this.findUserName(username);
+      for (const request of currentUser.OutgoingRequest) {
+        if (
+          request.requester_id === currentUser.id &&
+          request.state === 'PENDING' &&
+          request.requested_id === otherUser.id
+        ) {
+          await this.prismaService.friendRequest.delete({
+            where: {
+              id: request.id,
+            },
+          });
+        }
+      }
+      return { success: true, message: 'friend request deleted successfully' };
+    } catch (err) {
+      return { success: false };
+    }
+  }
+  async getFriendRequestSent(user: any) {
+    try {
+      const currentUser = await this.prismaService.user.findUnique({
+        where: {
+          id: user.id,
+        },
+        include: {
+          OutgoingRequest: true,
+        },
+      });
+      const requests = [];
+      for (const request of currentUser.OutgoingRequest) {
+        if (
+          request.requester_id === currentUser.id &&
+          request.state === 'PENDING'
+        ) {
+          const otherUser = await this.findUserById(request.requested_id);
+          requests.push(otherUser.username);
+        }
+      }
+      console.log('here request', requests);
+      return { success: true, requests: requests };
+    } catch (err) {
+      return { success: false };
+    }
+  }
+  async handleCreateGameInvitation(currentUser: User, otherUser: User) {
+    try {
+      const gameInvitations = await this.prismaService.gameInvite.findMany({});
+
+      for (const invitation of gameInvitations) {
+        if (
+          (invitation.senderId === currentUser.id ||
+            invitation.recieverId === currentUser.id) &&
+          (invitation.senderId === otherUser.id ||
+            invitation.recieverId === otherUser.id) &&
+          invitation.state === 'PENDING'
+        ) {
+          return { success: false, error: 'invitation already sent!' };
+        }
+      }
+      await this.prismaService.gameInvite.create({
+        data: {
+          senderId: currentUser.id,
+          recieverId: otherUser.id,
+          state: 'PENDING',
+        },
+      });
+      return { success: true, message: 'game request sent successfully' };
+    } catch (error) {
+      console.log('error occured heree');
+      return { success: false, error: 'invitation already sent!' };
+    }
+  }
+
+  async handleAccpetRequest(currentUser: User, otherUser: User) {
+    try {
+      const gameInvitations = await this.prismaService.gameInvite.findMany({});
+
+      for (const invitation of gameInvitations) {
+        if (
+          (invitation.senderId === currentUser.id ||
+            invitation.recieverId === currentUser.id) &&
+          (invitation.senderId === otherUser.id ||
+            invitation.recieverId === otherUser.id) &&
+          invitation.state === 'PENDING'
+        ) {
+          await this.prismaService.gameInvite.update({
+            where: {
+              id: invitation.id,
+            },
+            data: {
+              state: 'ACCEPTED',
+            },
+          });
+          return { success: true, message: 'game request accepted' };
+        }
+      }
+      return { success: false, message: 'no game request available' };
+    } catch (err) {
+      console.log('error occured');
+      return { success: false, message: 'error occured' };
+    }
+  }
+
+  async handleDeleteGameRequest(currentUser: User, otherUser: User) {
+    try {
+      const gameInvitations = await this.prismaService.gameInvite.findMany({});
+
+      for (const invitation of gameInvitations) {
+        if (
+          (invitation.senderId === currentUser.id ||
+            invitation.recieverId === currentUser.id) &&
+          (invitation.senderId === otherUser.id ||
+            invitation.recieverId === otherUser.id) &&
+          invitation.state === 'PENDING'
+        ) {
+          await this.prismaService.gameInvite.delete({
+            where: {
+              id: invitation.id,
+            },
+          });
+          return {
+            success: true,
+            message: 'game request deleted successfully',
+          };
+        }
+        return {
+          success: false,
+          message: 'no game request available to cancle',
+        };
+      }
+    } catch (err) {
+      console.log('error occured');
+      return { success: false, message: 'error occured' };
+    }
+  }
+  async handleGetGamesReques(user: any) {
+    try {
+      const currentUser = await this.findUserById(user.id);
+      const invitations = await this.prismaService.gameInvite.findMany({});
+
+      const games = [];
+      for (const invite of invitations) {
+        if (
+          invite.recieverId === currentUser.id &&
+          invite.state === 'PENDING'
+        ) {
+          const otherUser = await this.findUserById(invite.senderId);
+          games.push({
+            type: 3,
+            username: otherUser.username,
+            avatar: otherUser.avatar,
+          });
+        }
+      }
+      return {success: true, games: games}
+    } catch (err) {
+      return {success: false, error: "error occured"}
+    }
+  }
+
+  async getInvitionAccpted(userid:string)
+  {
+    const currentUser = await this.findUserById(userid);
+    const invitations = await this.prismaService.gameInvite.findMany({})
+    let opponents = []
+    let invitationIds = []
+    for (const invite of invitations)
+    {
+      let user;
+      if ((invite.senderId === currentUser.id ||
+        invite.recieverId === currentUser.id) &&
+      invite.state === 'ACCEPTED')
+      {
+        if (invite.senderId === currentUser.id)
+             user = await this.findUserById(invite.recieverId);
+        else
+            user = await this.findUserById(invite.senderId);
+        opponents.push(user)
+        invitationIds.push(invite.id);
+      }
+    }
+    if (opponents.length > 0)
+      return {success: true, opponents: opponents, invitaionsId: invitationIds}
+    return {success: false}
+}
+
+  async handleRemoveGameInvite(gameInviteId: string)
+  {
+    try{
+        await this.prismaService.gameInvite.delete({
+          where:{
+            id: gameInviteId
+          }
+        })
+      return {success: true}
+    }catch(err){
+      return {success:true, error:"error ocured while deleting invitation"}
+    }
   }
   // async getFileUpload(fileTarget, category) {
   //   let userFile: any = undefined;

@@ -6,42 +6,55 @@ import ProfileCard from "@/components/LoggedUser/Profile/ProfileCard/ProfileCard
 import { AuthContext } from '@/app/context/AuthContext'
 import HeaderBar from "@/components/LoggedUser/Profile/HeaderBar/HeaderBar";
 import NavMenu from "@/components/LoggedUser/Profile/NavMenu/NavMenu";
-import "./style.scss";
-import LeaderboardData from "@/components/LoggedUser/Profile/ProfileData/LeaderboardData";
 import FriendsData from "@/components/LoggedUser/Profile/ProfileData/FriendsData";
+import LeaderboardData from "@/components/LoggedUser/Profile/ProfileData/LeaderboardData";
+import "./style.scss";
+import { showSnackbar } from "@/app/context/utils/showSnackBar";
+
+import Users from "./users";
 
 export default function Profile() {
-  const { getUserData, user } = useContext(AuthContext);
+  const { getUserData, user,setNotif } = useContext(AuthContext);
+  const [friendList, setFriendList] = useState<any>([]); // firendlsit will contain array of (username, status, avatar)
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [users, setUsers] = useState<[]>([]);
   const [selectedItem, setSelectedItem] = useState<number>(2);
 
-  const [users, setUsers] = useState([]);
-  const [friends, setFriends] = useState([]);
+  const fetchUsers = async () => {
+    try {
+      const allUsers = await getRequest(`${baseUrlUsers}/users`);
+      setUsers(allUsers);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const fetchFriendList = async () => {
+    try {
+      const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
+      if (friendList.error && friendList.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false)
+        return ;
+      }
+      setFriendList(friendList);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const allUsers = await getRequest(`${baseUrlUsers}/users`);
-        setUsers(allUsers);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
-
-    const fetchFriends = async () => {
-      try {
-        const friends = await getRequest(`${baseUrlUsers}/user/friends`);
-        setFriends(friends);
-      } catch (error) {
-        console.error('Error fetching friends:', error);
-      }
+    try {
+      (async () =>{
+      await fetchFriendList();
+      })()
     }
-
-    fetchUsers();
-    fetchFriends();
+    catch (error) {
+      console.error('Error fetching friend list:', error);
+    }
 
     const debouncedFetchUsers = setTimeout(() => {
       fetchUsers();
+      fetchFriendList();
     }, 300);
 
     return () => {
@@ -49,19 +62,38 @@ export default function Profile() {
     };
   }, []);
 
+  useEffect(()=>
+  {
+    (async () =>{
+      try{
+          const response = await getRequest(`${baseUrlUsers}/users`);
+          if (response?.error)
+          {
+            if (response.message ==="Unauthorized")
+              showSnackbar("Unauthorized", false)
+            return ;
+          }
+          setUsers(response)
+      }catch(err)
+      {
+
+      }
+    })()
+  },[])
   return (
     <div className="profile-page text-white">
       <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
       <div className={`profile ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
         <div className="profile-content min-h-screen p-8">
           <HeaderBar data={user} />
+          <Users users={users} userFriends={friendList}/>
           <ProfileCard data={user} />
           <div className="profile-boxes">
             <div className="navbar-boxes">
               <NavMenu setSelectedItem={setSelectedItem} />
             </div>
             <div className="data">
-              { selectedItem === 0 && <FriendsData friends={friends} /> }
+              { selectedItem === 0 && <FriendsData friendList={friendList} /> }
               { selectedItem === 1 && <div>History</div> }
               { selectedItem === 2 && <LeaderboardData users={users} /> }
               { selectedItem === 3 && <div>Statistics</div> }

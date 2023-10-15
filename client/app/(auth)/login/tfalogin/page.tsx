@@ -5,6 +5,7 @@ import Avatar1 from "@/public/images/avatar1.jpeg";
 import Image from 'next/image';
 import { baseUrlAuth, getQrCode, postRequest } from '@/app/context/utils/service';
 import { useRouter } from "next/navigation";
+import { showSnackbar } from '@/app/context/utils/showSnackBar';
 
 
 export default function TfaPage() {
@@ -41,18 +42,27 @@ export default function TfaPage() {
 
     const codeVerifitacion  = async (code: string) =>
     {
+      try{
       setError(false);
       const response = await postRequest(`${baseUrlAuth}/2fa/turn-on`, JSON.stringify({twoFactorAuthenticationCode: code}));
       // console.log(response);
-      if (response.error)
+      if (response?.error && response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+    }
+      if (response?.error)
       {
         setError(true);
-        setErrorMsg(response.message);
+        setErrorMsg(response?.message);
         (error);
         // console.log(errorMsg);
         return false;
       }
       return true;
+    }catch(err)
+    {
+      return false;
+    }
     }
 
     const handleEnbaleClick = async (e: any) =>

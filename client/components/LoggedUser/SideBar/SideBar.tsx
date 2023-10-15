@@ -1,7 +1,7 @@
 "use client";
 import "./SideBar.scss";
 import Logo from "@/components/MainPage/Logo/Logo";
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction, useContext, useEffect } from "react";
 import { CgHomeAlt, CgProfile, CgGames } from "react-icons/cg";
 import { PiTelevisionFill, PiChatsFill } from "react-icons/pi";
 import { IoMdSettings, IoMdExit } from "react-icons/io";
@@ -9,7 +9,8 @@ import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
 import Link from 'next/link'
 import { baseUrlUsers, putRequest } from "@/app/context/utils/service";
-import { BsCaretRightFill, BsCaretLeftFill } from "react-icons/Bs";
+import { BsCaretRightFill, BsCaretLeftFill } from "react-icons/bs";
+import { AuthContext } from "@/app/context/AuthContext";
 
 interface SideBarProps {
   isExpanded: boolean;
@@ -19,18 +20,15 @@ interface SideBarProps {
 export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
   const router = useRouter();
   const [cookie, setCookie, remove] = useCookies(['access_token']);
+  const{ noitfSocket}  = useContext(AuthContext);
   // const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  // Login out (updated by zac)
-  const statusUpdate = async () =>
-  {
-    const response = await putRequest(`${baseUrlUsers}/user/logout`, "");
-  }
-  const handleSignOut = async () => {
-    await statusUpdate();
+  const handleSignOut = () => {
+    noitfSocket?.emit("logout")
     remove('access_token');
     router.push("/login");
   };
+
   return (
     <div className={`sidebar ${isExpanded? '' : '-translate-x-full'} `}>
       <div className="logo h-1/3 w-full ">

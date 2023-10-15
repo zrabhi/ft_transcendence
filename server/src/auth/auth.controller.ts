@@ -10,7 +10,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { Response, response } from 'Express';
+import { Response, response } from 'express';
 import { GoogleGuard } from './Guards/GoogleGuard';
 import passport, { Profile } from 'passport';
 import { AuthService } from './auth.service';
@@ -49,7 +49,7 @@ export class AuthController {
           username: user.username,
           setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
         });
-        response.cookie('acces_token', access_token);
+        response.cookie('access_token', access_token);
         return response.status(200).json(user);
       }
       return response.status(400).json({ msg: 'Invalid Credencial' });
@@ -72,7 +72,7 @@ export class AuthController {
 
   @Get('/42/redirect')
   @UseGuards(FtGurad)
-  async handleRedirectFt(@User() user, @Res() response) {
+  async handleRedirectFt(@User() user, @Res() response: Response) {
     try {
       const access_token = await this.authService.extractJwtToken({
         id: user.id,
@@ -84,10 +84,15 @@ export class AuthController {
       else if (user.tfa) return response.redirect(TFALOGIN);
       return response.redirect(PROFILE);
     } catch (err) {
-      // console.log("errrrr => ",err);
+      response.redirect(LOGIN)
     }
   }
-
+  @Get('jwtVerification')
+  @UseGuards(JwtAuthGuard)
+  async handleCheckJWT(@Res() res: Response)
+  {
+    res.status(200).json("ok");
+  }
   @Get('google/redirect')
   @UseGuards(GoogleGuard)
   async handleRedirectGoogle(@User() user, @Res() response: Response) {
@@ -120,8 +125,7 @@ export class AuthController {
         request.user.id,
       );
 
-    if (!isCodeValid)
-      return res.status(400).json('Wrong authentication code');
+    if (!isCodeValid) return res.status(400).json('Wrong authentication code');
     await this.authService.turnOnTwoFactorAuthentication(request.user.id);
     res.status(200).json('ok');
   }

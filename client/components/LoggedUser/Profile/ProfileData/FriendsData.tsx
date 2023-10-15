@@ -23,15 +23,15 @@ export default function FriendsData({friendList}: FriendsDataProps) {
           {friendList.map((user: any, index: number) => (
             <tr key={index} className=''>
               <td className='p-4' >
-                <div className="flex items-center">
-                  <div className="avatar">
+                <div className="flex items-center gap-4">
+                  <div className="avatar w-16 h-16 rounded-full overflow-hidden">
                     <img src={user.avatar} alt="avatar" />
                   </div>
                   <div className="username">{user.username}</div>
                 </div>
               </td>
               <td className='p-4' >
-                <div className="status">
+                <div className="status text-sm font-semibold tracking-wide">
                   {user.status}
                 </div>
               </td>

@@ -7,6 +7,7 @@ import { AuthContext } from '@/app/context/AuthContext'
 import HeaderBar from "@/components/LoggedUser/Profile/HeaderBar/HeaderBar";
 import NavMenu from "@/components/LoggedUser/Profile/NavMenu/NavMenu";
 import "./style.scss";
+import ProfileData from "@/components/LoggedUser/Profile/ProfileData/ProfileData";
 
 export default function Profile() {
   const { getUserData, user } = useContext(AuthContext);
@@ -43,7 +44,9 @@ export default function Profile() {
             <div className="navbar-boxes">
               <NavMenu />
             </div>
-
+            <div className="data">
+              <ProfileData data={user} />
+            </div>
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { FaUserFriends, FaHistory, FaListOl } from "react-icons/fa";
@@ -6,7 +6,11 @@ import { ImStatsBars } from "react-icons/im";
 import { GiAchievement } from "react-icons/gi";
 import './NavMenu.scss'
 
-export default function NavMenu() {
+interface NavMenuProps {
+  setSelectedItem: Dispatch<SetStateAction<number>>;
+}
+
+export default function NavMenu({ setSelectedItem }: NavMenuProps) {
   const [activeItem, setActiveItem] = useState<number>(2);
 
   const menuItems = [
@@ -28,6 +32,7 @@ export default function NavMenu() {
 
   const handleItemClick = (index: number) => {
     setActiveItem(index);
+    setSelectedItem(index);
   };
 
   return (

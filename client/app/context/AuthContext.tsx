@@ -27,7 +27,7 @@ import { showSnackbar } from "./utils/showSnackBar";
 let notifSocket: Socket;
 export const AuthContext = createContext<any>({});
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User>(userInit);
+  const [user, setUser] = useState<User>();
   const [tfaDisabled, setTfaDisabled] = useState(true);
   const [loginError, setLoginError] = useState<LoginError>();
   const router = useRouter();
@@ -168,9 +168,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     if (response?.error)
       return ;
-      response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
-      setUser(response);
-      return true;
+    response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
+    console.log(response);
+    setUser(response);
+    return true;
     })();
     (async () => {
       const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
@@ -299,7 +300,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-  notifSocket = io("http://127.0.0.1:8080/notifications", {
+  notifSocket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/notifications`, {
   auth: {
   token: cookie.access_token,
   },

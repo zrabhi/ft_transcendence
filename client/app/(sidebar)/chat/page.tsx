@@ -51,6 +51,8 @@ const Chat: React.FC = () => {
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
   const [otherChannels, setOtherChannels] = useState([]);
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
+  const [selectedChannels, setSelectedChannels] = useState([]);
+  const [checkUpdated, setCheckUpdated] = useState<channels[]>([]);
   const {
     user,
     setBlockedUsers,
@@ -64,7 +66,6 @@ const Chat: React.FC = () => {
   const [password, setPassword] = useState("");
   const [selectedJoinChannel, setSelectedJoinChannel] = useState<any>(null);
 
-
   const handleOpenSnackbar = (message: string, type: string) => {
     const uniqueKey = Date.now(); // Generate a unique key using the current timestamp
     const newSnackbar = { key: uniqueKey, message, type };
@@ -76,7 +77,9 @@ const Chat: React.FC = () => {
     }, 4000);
   };
   const handleCloseSnackbar = (uniqueKey: any) => {
-    const updatedSnackbars = snackbars.filter((snackbar: any) => snackbar.key !== uniqueKey);
+    const updatedSnackbars = snackbars.filter(
+      (snackbar: any) => snackbar.key !== uniqueKey
+    );
     setSnackbars(updatedSnackbars);
   };
   // just an example of how to use this function
@@ -97,7 +100,10 @@ const Chat: React.FC = () => {
       })();
     } catch (err) {}
   }, [friendsList]);
-
+useEffect(()=>{
+  setCheckUpdated(channels)
+  console.log("setting channel in join", channels);
+},[channels])
   useEffect(() => {
     try {
       (async () => {
@@ -141,7 +147,7 @@ const Chat: React.FC = () => {
     );
   };
   useEffect(() => {
-    socket = io("http://127.0.0.1:8080/chat", {
+    socket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/chat`, {
       auth: {
         token: cookie.access_token,
       },
@@ -149,7 +155,8 @@ const Chat: React.FC = () => {
     socket.on("connected", () => {
       socket.on("lastMessage", (messageInfo: any) => {
         let checker = false;
-        let updatedChannel: any = channels?.filter((channel: any) => {
+        let updatedChannel: any = channels?.map((channel: any) => {
+          console.log("message info", messageInfo, "channel", channel);
           if (
             channel?.channel &&
             channel?.channel?.id === messageInfo?.channel?.id
@@ -158,17 +165,17 @@ const Chat: React.FC = () => {
             if (!checkBlocked(messageInfo?.channel.sender))
               channel.channel.message = messageInfo?.channel?.message;
             else channel.channel.message = "this message is hidden";
-            return channel;
           }
+          return channel;
         });
-        let previousChannels = channels?.filter((channel: any) => {
-          return (
-            channel?.channel && channel?.channel?.id != messageInfo?.channel?.id
-          );
-        });
-        !checker
-          ? setChannels((prevChannels: any) => [messageInfo, ...prevChannels])
-          : setChannels(() => [...updatedChannel, ...previousChannels]);
+        console.log("updated in last message", updatedChannel);
+          setChannels((prevChannels:any) => {
+            return prevChannels?.map((channel:any) =>{
+              return channel?.channel?.id === messageInfo?.channel?.id ? messageInfo : channel
+            }
+            );
+          })
+
         if (user.username != messageInfo?.channel?.username)
           showSnackbar(
             `You have new message from ${messageInfo?.channel?.username}`,
@@ -177,23 +184,29 @@ const Chat: React.FC = () => {
       });
 
       socket.on("channelDeleted", (data: socketResponse) => {
+        console.log("data received", data);
         if (!data.success) {
           alert(data.error);
           return;
         }
-        let updatedChannel = channels?.map((channel: any) => {
-          if (channel?.channel && channel?.channel?.id === data.channelId)
-            return [];
-          return channel;
-        });
+
+        setChannels(channels?.filter((channel: any) => {
+          if (channel?.channel && channel?.channel?.id !== data.channelId)
+              return channel
+        }));
         if (user.username != data.username)
           showSnackbar(
-            `the owner  ${data.username}  deleted  ${data.name} Room`,
+            `the owner ${data.username}  deleted  ${data.name} Room`,
             true
           );
-        else showSnackbar(`Room has been deleted`, true);
-        setSelectedChannel(null); // the  the channel here for other usersss
-        setChannels(updatedChannel);
+          else showSnackbar(`Room has been deleted`, true);
+          setSelectedChannels(
+            selectedChannels.filter(
+              (channel: any) => channel?.channel?.id != data.channelId
+              )
+              );
+        console.log(selectedChannel , data.channelId);
+        setSelectedChannel(null);
       });
       socket.on("userKicked", (data: any) => {
         if (
@@ -281,7 +294,7 @@ const Chat: React.FC = () => {
         showSnackbar(`Message can be sent because you have been muted`, false);
       });
       socket.on("memberJoinned", (data: any) => {
-        console.log("data from socket", data);
+        console.log(data.name, user);
         if (user.username != data.name) {
           showSnackbar(`${data?.name} joinned ${data?.channelName} Room`, true);
           if (
@@ -300,6 +313,7 @@ const Chat: React.FC = () => {
           return;
         }
         setChannels((prev: any) => [data?.lastMessage, ...prev]);
+
         let desiredChannel: any = otherChannels?.filter((channel: any) => {
           return channel?.channel?.id === data?.channelId;
         });
@@ -435,22 +449,22 @@ const Chat: React.FC = () => {
           );
       });
       socket.on("disconnect", () => {
-        socket.off("YourUnbanned");
+        // socket.off("YourUnbanned");
         socket.off("lastMessage");
-        socket.off("YourBlocked");
-        socket.off("userBlocked");
-        socket.off("blockedUser");
-        socket.off("leftRoom");
-        socket.off("NewMember");
-        socket.off("newAdmin");
-        socket.off("memberJoinned");
-        socket.off("userMuted");
-        socket.off("Yourmuted");
-        socket.off("yourBanned");
-        socket.off("userBanned");
-        socket.off("yourKicked");
-        socket.off("userKicked");
-        socket.off("channelDeleted");
+        // socket.off("YourBlocked");
+        // socket.off("userBlocked");
+        // socket.off("blockedUser");
+        // socket.off("leftRoom");
+        // socket.off("NewMember");
+        // socket.off("newAdmin");
+        // socket.off("memberJoinned");
+        // socket.off("userMuted");
+        // socket.off("Yourmuted");
+        // socket.off("yourBanned");
+        // socket.off("userBanned");
+        // socket.off("yourKicked");
+        // socket.off("userKicked");
+        // socket.off("channelDeleted");
       });
     });
     return () => {
@@ -490,6 +504,8 @@ const Chat: React.FC = () => {
           <div className="container">
             <Channels
               setMessages={setMessages}
+              selectedChannels={selectedChannels}
+              setSelectedChannels={setSelectedChannels}
               channels={channels}
               setChannels={setChannels}
               setSelectedChannel={setSelectedChannel}
@@ -497,6 +513,8 @@ const Chat: React.FC = () => {
             />
             {selectedChannel ? (
               <BoxChat
+                selectedChannels={selectedChannels}
+                setSelectedChannels={setSelectedChannels}
                 setSelectedChannel={setSelectedChannel}
                 setMessages={setMessages}
                 messages={messages}

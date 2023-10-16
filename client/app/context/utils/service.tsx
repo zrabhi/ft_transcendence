@@ -1,6 +1,6 @@
-export const baseUrlAuth = "http://127.0.0.1:8080/api/auth";
-export const baseUrlUsers = "http://127.0.0.1:8080/api";
-export const baseChatUrl = "http://127.0.0.1:8080/chat";
+export const baseUrlAuth = process.env.NEXT_PUBLIC_BACKEND_HOST +  "/api/auth";
+export const baseUrlUsers = process.env.NEXT_PUBLIC_BACKEND_HOST + "/api";
+export const baseChatUrl = process.env.NEXT_PUBLIC_BACKEND_HOST +  "/chat";
 import { showSnackbar } from "./showSnackBar";
 
 

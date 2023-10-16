@@ -21,9 +21,8 @@ import * as Yup from "yup";
 import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 
-const Channels = ({channels, setSelectedChat, setSelectedChannel, setMessages, setChannels, }: any) => {
+const Channels = ({selectedChannels,setSelectedChannels,channels, setSelectedChat, setSelectedChannel, setMessages, setChannels, }: any) => {
   const [isChecked, setIsChecked] = useState(false);
-  const [selectedChannels, setSelectedChannels] = useState([]);
 
   const handleClickUserMessage = async (channel: any) => {
     try{
@@ -45,6 +44,7 @@ const Channels = ({channels, setSelectedChat, setSelectedChannel, setMessages, s
   };
 
   useEffect(() => {
+
     if (channels?.length > 0)
       setSelectedChannels(
         channels?.filter((ch: any) =>
@@ -52,7 +52,9 @@ const Channels = ({channels, setSelectedChat, setSelectedChannel, setMessages, s
         )
       );
   }, [isChecked, channels]);
-
+useEffect(()=>{
+  console.log("joined", channels);
+},[channels])
   return (
     <div className="users-container pt-20">
       
@@ -228,6 +230,7 @@ const ModalContainer = ({
       `${baseChatUrl}/create/room`,
       JSON.stringify(roomForm)
       );
+     console.log("channel craeted", response);
     if (response?.error)
     {
       if (response?.message === "Unauthorized")
@@ -235,10 +238,9 @@ const ModalContainer = ({
       return ;
     }
     setMessages([]);
-    console.log("channel craeted", response);
     setSelectedChannel(response);
     setSelectedChat(response.channel);
-    setChannels((prev: any) => [...prev, response.lastMessage]);
+    setChannels((prev: any) => [response.lastMessage, ...prev]);
     resetForm();
     handleOpen();
   }catch(err)

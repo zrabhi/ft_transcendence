@@ -72,6 +72,8 @@ const BoxChat = ({
   setSelectedChannel,
   setChannels,
   channels,
+  selectedChannels,
+  setSelectedChannels,
   users,
 }: any): JSX.Element => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -220,34 +222,37 @@ const BoxChat = ({
   }
 
   async function handleLeaveRoom() {
-    try{
-    const response = await putRequest(
-      `${baseChatUrl}/leaveChannel/${selectedChannel.channel.id}`,
-      ""
-    );
-    if (response?.error && response?.message === "Unauthorized"){
-      showSnackbar("Unauthorized", false)
-      return ;
-    }
-    if (!response.success) {
-      showSnackbar(`${response?.message.message}`, false);
-      return;
-    }
-    socket.emit("LeaveChannel", {
-      channelId: selectedChannel.channel.id,
-      token: cookie.access_token,
-      name: user.username,
-    });
-    let updatedChannels = channels.filter((channel: any) => {
-      return channel?.channel?.id != selectedChannel.channel.id;
-    });
-    setSelectedChannel(null);
-    setChannels(updatedChannels);
-    showSnackbar("You left the channel successfully", true);
-  }catch(err)
-  {
-
-  }
+    try {
+      const response = await putRequest(
+        `${baseChatUrl}/leaveChannel/${selectedChannel.channel.id}`,
+        ""
+      );
+      if (response?.error && response?.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false);
+        return;
+      }
+      if (!response.success) {
+        showSnackbar(`${response?.message.message}`, false);
+        return;
+      }
+      socket.emit("LeaveChannel", {
+        channelId: selectedChannel.channel.id,
+        token: cookie.access_token,
+        name: user.username,
+      });
+      let updatedChannels = channels.filter((channel: any) => {
+        return channel?.channel?.id !== selectedChannel?.channel?.id;
+      });
+      console.log("updated channels", updatedChannels);
+      setSelectedChannels(
+        selectedChannels.filter(
+          (channel: any) => channel.channel.id != selectedChannel?.channel?.id
+        )
+      );
+      setSelectedChannel(null);
+      setChannels(updatedChannels);
+      showSnackbar("You left the channel successfully", true);
+    } catch (err) {}
   }
 
   function handleKickMember(user: any) {
@@ -304,33 +309,30 @@ const BoxChat = ({
     setSelectedUsers([]);
 
     (async () => {
-      try{
-      const response = await getRequest(
-        `${baseChatUrl}/getMessages/${selectedChannel?.channel?.id}`
-      );
-      if (response?.error){
-          if(response?.message === "Unauthorized")
-            showSnackbar("Unauthorized", false)
-        return ;
-    }
-      let checkBlocked = response?.allMessages?.filter((message: any) => {
-        if (
-          userBlockedMe.includes(message?.sender) ||
-          blockedUsers.includes(message?.sender)
-        )
-          (message.blocked = true)
-        return message;
-      });
-      setMessages(() => []);
-      setMessages((prevMessages: any) => [...prevMessages, ...checkBlocked]);
-    }catch(err)
-    {
-
-    }
+      try {
+        const response = await getRequest(
+          `${baseChatUrl}/getMessages/${selectedChannel?.channel?.id}`
+        );
+        if (response?.error) {
+          if (response?.message === "Unauthorized")
+            showSnackbar("Unauthorized", false);
+          return;
+        }
+        let checkBlocked = response?.allMessages?.filter((message: any) => {
+          if (
+            userBlockedMe.includes(message?.sender) ||
+            blockedUsers.includes(message?.sender)
+          )
+            message.blocked = true;
+          return message;
+        });
+        setMessages(() => []);
+        setMessages((prevMessages: any) => [...prevMessages, ...checkBlocked]);
+      } catch (err) {}
     })();
 
     setChat(selectedChat);
-    socket = io("http://127.0.0.1:8080/chat", {
+    socket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/chat`, {
       auth: {
         token: cookie.access_token,
       },
@@ -358,12 +360,11 @@ const BoxChat = ({
         setMessages((prevMessages: any) => [...prevMessages, sendedMessage]);
         return;
       });
-      socket.on("Unauthorized", () =>
-      {
+      socket.on("Unauthorized", () => {
         showSnackbar("Unauthorized", false);
         router.push("login");
-      })
-      socket.on("error occored", () =>{
+      });
+      socket.on("error occored", () => {
         showSnackbar("Unauthorized", false);
       });
       socket.on("disconnect", () => {
@@ -403,10 +404,8 @@ const BoxChat = ({
 
   const handleChange = (e: any) => {
     e.preventDefault();
-    if (e.target.value === " ")
-        setMessage("");
-    else
-      setMessage(e.target.value.replace(/\s+/g, " "));
+    if (e.target.value === " ") setMessage("");
+    else setMessage(e.target.value.replace(/\s+/g, " "));
   };
 
   const toggleDropdown = () => {
@@ -496,16 +495,18 @@ const BoxChat = ({
 
   // this state is to remove the users if theyr already in channel members
   const [usersList, setUsersList] = useState<any>(
-   users.length > 0 ? users.filter((user: any) => {
-      // Check if the user's id is in the members array
-      return (
-        !selectedChannel?.members?.some(
-          (member: any) => member.name === user.username
-        ) &&
-        !blockedUsers.includes(user.username) &&
-        !userBlockedMe.includes(user.username)
-      );
-    }): []
+    users.length > 0
+      ? users.filter((user: any) => {
+          // Check if the user's id is in the members array
+          return (
+            !selectedChannel?.members?.some(
+              (member: any) => member.name === user.username
+            ) &&
+            !blockedUsers.includes(user.username) &&
+            !userBlockedMe.includes(user.username)
+          );
+        })
+      : []
   );
 
   // this state is for the search bar to filter easily
@@ -554,23 +555,20 @@ const BoxChat = ({
   };
 
   const handleClickChangeType = async () => {
-    try{
-    console.log(changeType);
-    const response = await putRequest(
-      `${baseChatUrl}/channelSettings`,
-      JSON.stringify(changeType)
-    );
-    if (response?.error && response?.message === "Unauthorized"){
-      showSnackbar("Unauthorized", false)
-      return ;
-    }
-    if (response?.error) {
-      showSnackbar(response?.message.error, false);
-    } else showSnackbar(response?.message, true);
-  }catch(err)
-  {
-
-  }
+    try {
+      console.log(changeType);
+      const response = await putRequest(
+        `${baseChatUrl}/channelSettings`,
+        JSON.stringify(changeType)
+      );
+      if (response?.error && response?.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false);
+        return;
+      }
+      if (response?.error) {
+        showSnackbar(response?.message.error, false);
+      } else showSnackbar(response?.message, true);
+    } catch (err) {}
   };
 
   return (
@@ -608,7 +606,7 @@ const BoxChat = ({
               )}
               {/* ADD setting here */}
               {separateOptions?.map((option: any, index: Key) => (
-                <div key={"keydiv"+index}>
+                <div key={"keydiv" + index}>
                   {blockedUsers.includes(chat?.username) &&
                     selectedChannel?.channel?.type === "DM" &&
                     option.text === "Unblock" && (
@@ -730,7 +728,11 @@ const BoxChat = ({
               <div
                 className={`px-2 w-fit py-3 flex flex-col rounded-3xl  ${
                   message.reciever ? "order-1 mr-2" : "order-2 ml-2"
-                } ${message.sender ? "text-white bg-[#4050C8]": "bg-[#F0F0F0] text-black"}`}
+                } ${
+                  message.sender
+                    ? "text-white bg-[#4050C8]"
+                    : "bg-[#F0F0F0] text-black"
+                }`}
                 style={{ wordBreak: "break-all" }} // Break words or strings at any character
               >
                 {/* <span className="text-xs text-gray-200">
@@ -740,16 +742,21 @@ const BoxChat = ({
                   minute: "2-digit"
                 })}
               </span> */}
-                <span className="text-md">{!message?.blocked
-                        ? message.content
-                        : "this message is hidden!"}</span>
+                <span className="text-md">
+                  {!message?.blocked
+                    ? message.content
+                    : "this message is hidden!"}
+                </span>
               </div>
             </div>
           ))}
         </div>
         <div className="chat-input bg-[#14003D] w-100 overflow-hidden rounded-bl-xl rounded-br-xla">
           <div className=" space-x-5">
-            <form onSubmit={sendMessage} className="pl-2 pr-2 gap-3 flex flex-row items-center justify-between">
+            <form
+              onSubmit={sendMessage}
+              className="pl-2 pr-2 gap-3 flex flex-row items-center justify-between"
+            >
               <div className="relative w-full">
                 <input
                   type="search"
@@ -762,12 +769,11 @@ const BoxChat = ({
               </div>
 
               <button
-                  type="submit"
-                  className="px-3 py-2 text-xs font-medium text-center text-white bg-[#654695] rounded-3xl hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 disabled:opacity-50"
-                  
-                  disabled={!message || message.length === 0}
-                >
-                  Send
+                type="submit"
+                className="px-3 py-2 text-xs font-medium text-center text-white bg-[#654695] rounded-3xl hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 disabled:opacity-50"
+                disabled={!message || message.length === 0}
+              >
+                Send
               </button>
             </form>
           </div>

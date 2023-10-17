@@ -34,7 +34,7 @@ export default function match()
     const [oppscore, setoppscore] = useState(0);
     const handleNewGameClick = () => {
       // Redirect to the game match page
-      router.push('/game/match');
+      router.push('/game');
       setShowPopup(false);
     };
   
@@ -196,6 +196,9 @@ export default function match()
         }});
       socket.on('connect', () => {
         console.log('Connected to WebSocket');
+        socket.on('disconnect',()=>{
+          router.push('/game')
+        })
         socket.on('matched right',  (data:any) => {
           console.log("i match this : " , data);
           setoppuser(data.username);

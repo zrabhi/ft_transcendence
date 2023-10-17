@@ -25,7 +25,7 @@ export default function LeaderboardData({ users }: LeaderboardDataProps) {
             <tr key={index} className='hover:bg-purple-700 rounded-md hover:bg-opacity-20'>
               <td className='p-4' >{index + 1}</td>
               <td className='p-4' >{user.username}</td>
-              <td className='p-4' >{user.points}</td>
+              <td className='p-4' >{user.win * 50}</td>
             </tr>
           ))}
         </tbody>

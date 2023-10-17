@@ -21,7 +21,7 @@ export default function Page({params}: {params: {username: string} }) {
 
   const fetchUsers = async () => {
     try {
-      const allUsers = await getRequest(`${baseUrlUsers}/users`);
+      const allUsers = await getRequest(`${baseUrlUsers}/allUsers`);
       console.log(`length of all users: ${allUsers.length}`);
       setUsers(allUsers);
     } catch (error) {

@@ -22,7 +22,7 @@ export default function Profile() {
 
   const fetchUsers = async () => {
     try {
-      const allUsers = await getRequest(`${baseUrlUsers}/users`);
+      const allUsers = await getRequest(`${baseUrlUsers}/allUsers`);
       setUsers(allUsers);
     } catch (error) {
       console.error('Error fetching users:', error);

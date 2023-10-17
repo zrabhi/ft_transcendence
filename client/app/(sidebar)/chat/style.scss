@@ -1,21 +1,21 @@
 .snackbar-container {
-  display: flex;
-  flex-direction: column;
-  width: 350px;
-  height: auto !important;
-  position: fixed;
-  top: 100px;
-  left: 50%;
-  transform: translateX(-50%);
+    position: fixed;
+    bottom: 20px; /* Adjust this value to control the vertical distance from the bottom */
+    left: 20px;  /* Adjust this value to control the horizontal distance from the right */
+    display: flex;
+    flex-direction: column-reverse; /* Stack snackbars from bottom to top */
+    align-items: flex-end; /* Align snackbars to the right */
   .snackbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     height: 40px !important;
     width: 100%;
     padding: 5px;
     margin: 2px 0px 0px 10px;
     border-radius: 10px;
+    width: 350px;
+    height: 50px;
   }
 }
 

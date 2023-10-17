@@ -187,7 +187,7 @@ export default function match()
   
     useEffect(() => {
       selectedcolor = localStorage.getItem("selectedMapColor") as string;
-      socket = io('http://127.0.0.1:8080/matching',{
+      socket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/matching`,{
         auth: {
           token: cookie.access_token,
         }});

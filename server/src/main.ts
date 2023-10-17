@@ -22,7 +22,7 @@ import SocketAdapter from './Socket.Adapter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: process.env.HOSTNAME,
+    origin: process.env.HOSTNAME_MACHINE,
     methods: process.env.METHODS,
     credentials: true,
   });

@@ -25,12 +25,11 @@ import { SeassionGuard } from './Guards/SeassionGuard';
 import { UserService } from 'src/user/user.service';
 import { turnOnGuard } from './Guards/turnOnGurad';
 
-const HOSTNAME: string = process.env.HOSTNAME;
-const LOGIN: string = process.env.HOSTNAME + process.env.LOGIN;
-const COMPLETE: string = process.env.HOSTNAME + process.env.COMPLETE;
-const PROFILE: string = process.env.HOSTNAME + process.env.PROFILE;
-const TFALOGIN: string = process.env.HOSTNAME + process.env.TFALOGIN;
-
+const HOSTNAME: string = process.env.HOSTNAME_MACHINE;
+const LOGIN: string = process.env.HOSTNAME_MACHINE + process.env.LOGIN;
+const COMPLETE: string = process.env.HOSTNAME_MACHINE + process.env.COMPLETE;
+const PROFILE: string = process.env.HOSTNAME_MACHINE + process.env.PROFILE;
+const TFALOGIN: string = process.env.HOSTNAME_MACHINE + process.env.TFALOGIN;
 @Controller('/api/auth')
 export class AuthController {
   constructor(

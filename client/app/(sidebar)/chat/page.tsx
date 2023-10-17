@@ -44,6 +44,7 @@ const customStyles = {
 
 let socket: Socket;
 const Chat: React.FC = () => {
+  const [filteredUserList, setFilteredUserList] = useState<any>();
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState<any>(null); // to set the channel selected
   const [selectedChat, setSelectedChat] = useState<chat>(); // to set the user selected
@@ -161,20 +162,28 @@ useEffect(()=>{
             channel?.channel &&
             channel?.channel?.id === messageInfo?.channel?.id
           ) {
-            checker = true; /// check if user in blocked user
+            checker = true;
             if (!checkBlocked(messageInfo?.channel.sender))
               channel.channel.message = messageInfo?.channel?.message;
             else channel.channel.message = "this message is hidden";
           }
           return channel;
         });
-        console.log("updated in last message", updatedChannel);
-          setChannels((prevChannels:any) => {
-            return prevChannels?.map((channel:any) =>{
-              return channel?.channel?.id === messageInfo?.channel?.id ? messageInfo : channel
-            }
-            );
-          })
+        console.log(channels, messageInfo?.channel?.id)
+          if (channels.some((channel: any) =>  channel?.channel?.id === messageInfo?.channel?.id))
+            setChannels((prevChannels:any) => {
+              return prevChannels?.map((channel:any) =>{
+                if(channel?.channel?.id === messageInfo?.channel?.id)
+                      channel.channel.message = messageInfo?.channel.message
+                return channel;
+              }
+              );
+            })
+          else {
+            console.log("im hereeeeoo++++");
+            
+            setChannels((prev: any) => [messageInfo , ...prev]);
+          }
 
         if (user.username != messageInfo?.channel?.username)
           showSnackbar(
@@ -312,6 +321,7 @@ useEffect(()=>{
           }
           return;
         }
+        
         setChannels((prev: any) => [data?.lastMessage, ...prev]);
 
         let desiredChannel: any = otherChannels?.filter((channel: any) => {
@@ -353,6 +363,7 @@ useEffect(()=>{
       });
       socket.on("NewMember", (data: any) => {
         if (data.member === user.username) {
+          
           setChannels((prevChannels: any) => [
             data.lastMessage,
             ...prevChannels,
@@ -370,6 +381,8 @@ useEffect(()=>{
             avatar: data.avatar,
             id: data.id,
           });
+          setFilteredUserList(filteredUserList?.filter((user: any) => user?.username !== data.member))
+          
           setSelectedChannel(updatedSelectedChannel);
         }
       });
@@ -449,22 +462,22 @@ useEffect(()=>{
           );
       });
       socket.on("disconnect", () => {
-        // socket.off("YourUnbanned");
+        socket.off("YourUnbanned");
         socket.off("lastMessage");
-        // socket.off("YourBlocked");
-        // socket.off("userBlocked");
-        // socket.off("blockedUser");
-        // socket.off("leftRoom");
-        // socket.off("NewMember");
-        // socket.off("newAdmin");
-        // socket.off("memberJoinned");
-        // socket.off("userMuted");
-        // socket.off("Yourmuted");
-        // socket.off("yourBanned");
-        // socket.off("userBanned");
-        // socket.off("yourKicked");
-        // socket.off("userKicked");
-        // socket.off("channelDeleted");
+        socket.off("YourBlocked");
+        socket.off("userBlocked");
+        socket.off("blockedUser");
+        socket.off("leftRoom");
+        socket.off("NewMember");
+        socket.off("newAdmin");
+        socket.off("memberJoinned");
+        socket.off("userMuted");
+        socket.off("Yourmuted");
+        socket.off("yourBanned");
+        socket.off("userBanned");
+        socket.off("yourKicked");
+        socket.off("userKicked");
+        socket.off("channelDeleted");
       });
     });
     return () => {
@@ -523,6 +536,8 @@ useEffect(()=>{
                 selectedChat={selectedChat}
                 setChannels={setChannels}
                 users={users}
+                filteredUserList = {filteredUserList}
+                setFilteredUserList= {setFilteredUserList}
               />
             ) : (
               <div className="pt-20 text-[#999999] text-xl flex flex-col justify-start items-start">
@@ -640,6 +655,8 @@ useEffect(()=>{
               </div>
             )}
             <Friends
+              channels={channels}
+              setChannels={setChannels}
               setSelectedChannel={setSelectedChannel}
               setSelectedChat={setSelectedChat}
               users={users}

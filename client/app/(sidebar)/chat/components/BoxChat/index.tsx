@@ -75,6 +75,8 @@ const BoxChat = ({
   selectedChannels,
   setSelectedChannels,
   users,
+  filteredUserList,
+  setFilteredUserList
 }: any): JSX.Element => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState<string>("");
@@ -509,8 +511,11 @@ const BoxChat = ({
       : []
   );
 
+  useEffect(()=> {
+    setFilteredUserList(usersList);
+  }, [usersList])
+
   // this state is for the search bar to filter easily
-  const [filteredUserList, setFilteredUserList] = useState(usersList);
 
   // function to fo filter onChange
   const handleSearchInputChange = (e: any) => {
@@ -519,7 +524,7 @@ const BoxChat = ({
 
     // Filter users based on the search query
     const filtered = usersList?.filter((user: any) =>
-      user.username.toLowerCase().includes(query)
+      user.username.toLowerCase().includes(query) && !selectedChannel?.members.some((member: any) => { member.username === user.username })
     );
 
     setFilteredUserList(filtered);
@@ -534,6 +539,7 @@ const BoxChat = ({
       token: cookie.access_token,
     };
     socket.emit("addMember", data);
+    setSelectedUsers([]);
   };
 
   const [activeTab, setActiveTab] = useState("members");

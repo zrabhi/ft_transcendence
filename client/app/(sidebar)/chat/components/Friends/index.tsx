@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import { AuthContext } from "@/app/context/AuthContext";
 import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
-const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
+const Friends = ({ channels,setChannels,setSelectedChannel, setSelectedChat, users }: any) => {
   const [showSidebar, setShowSidebar] = useState(false);
   const router = useRouter();
   const { notifSocket }= useContext(AuthContext);
@@ -35,6 +35,8 @@ const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
     }
     setSelectedChannel(response); // to set selected channel after clicking a friend
     setSelectedChat(user); // to set the selected friend
+    if (!channels.some((channel: any) => channel?.channel?.id === response?.lastMessage?.channel?.id))
+      setChannels((prev: any) => [response.lastMessage, ...prev]);
   }catch(err)
   {
 

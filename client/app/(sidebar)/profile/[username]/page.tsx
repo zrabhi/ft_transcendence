@@ -27,7 +27,7 @@ export default function Page({params}: {params: {username: string} }) {
         console.log(`sorting ${user1.username} and ${user2.username}`);
         return user2.win - user1.win;
       })
-      setUsers(leaderBoardList.slice(0, 3));
+      setUsers(leaderBoardList.slice(0, 15));
     } catch (error) {
       console.error('Error fetching users:', error);
     }

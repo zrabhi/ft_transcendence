@@ -230,6 +230,7 @@ export class GameGateway{
   }
 
   async handleDisconnect(client: Socket) {
+    //TODO: UPDATE USER STATUS TO ONLINE
     const socketId = client.id;
     // console.log(this.playing_users[client.id]?.match);
     if(this.playing_users[client.id] && this.playing_users[client.id].match?.ingame == true)

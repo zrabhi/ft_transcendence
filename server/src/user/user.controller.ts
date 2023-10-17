@@ -170,16 +170,6 @@ export class UserController {
       );
       const againstMatches = [];
       for (const match of allUserMatches) {
-        if (match.loser_id == searchedUser.id) {
-          const loser = await this.userService.findUserById(searchedUser.id);
-          const winner = await this.userService.findUserById(match.loser_id);
-          againstMatches.push({
-            winnerScore: match.winner_score,
-            loserScore: match.loser_score,
-            loser: loser,
-            winner: winner,
-          });
-        } else {
           const loser = await this.userService.findUserById(match.loser_id);
           const winner = await this.userService.findUserById(match.winner_id);
           againstMatches.push({
@@ -188,7 +178,6 @@ export class UserController {
             loser: loser,
             winner: winner,
           });
-        }
       }
       res.status(200).json(againstMatches);
     } catch (err) {
@@ -204,16 +193,6 @@ export class UserController {
       );
       const againstMatches = [];
       for (const match of allUserMatches) {
-        if (match.loser_id == req.user.id) {
-          const loser = await this.userService.findUserById(req.user.id);
-          const winner = await this.userService.findUserById(match.loser_id);
-          againstMatches.push({
-            winnerScore: match.winner_score,
-            loserScore: match.loser_score,
-            loser: loser,
-            winner: winner,
-          });
-        } else {
           const loser = await this.userService.findUserById(match.loser_id);
           const winner = await this.userService.findUserById(match.winner_id);
           againstMatches.push({
@@ -221,8 +200,8 @@ export class UserController {
             loserScore: match.loser_score,
             loser: loser,
             winner: winner,
+            playedAt:match.played_at
           });
-        }
       }
       res.status(200).json(againstMatches);
     } catch (error) {

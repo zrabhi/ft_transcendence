@@ -12,13 +12,15 @@ import "./style.scss";
 import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 import Users from "./users";
+import GameHistoryList from "@/components/LoggedUser/Profile/ProfileData/GameHistoryList";
 
 export default function Profile() {
   const { getUserData, user,setNotif } = useContext(AuthContext);
-  const [friendList, setFriendList] = useState<any>([]);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const [users, setUsers] = useState<[]>([]);
   const [selectedItem, setSelectedItem] = useState<number>(2);
+  const [users, setUsers] = useState<[]>([]);
+  const [friendList, setFriendList] = useState<any>([]);
+  const [gameList, setGameList] = useState<any>([]);
 
   const fetchUsers = async () => {
     try {
@@ -28,7 +30,7 @@ export default function Profile() {
         console.log(`sorting ${user1.username} and ${user2.username}`);
         return user2.win - user1.win;
       })
-      setUsers(leaderBoardList.slice(0, 3));
+      setUsers(leaderBoardList.slice(0, 15));
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -45,6 +47,19 @@ export default function Profile() {
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const fetchGameHistory = async () => {
+    try {
+      const gameList = await getRequest(`${baseUrlUsers}/user/matches`);
+      if (gameList.error && gameList.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false)
+        return ;
+      }
+      setGameList(gameList);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   useEffect(() => {
@@ -57,13 +72,14 @@ export default function Profile() {
       console.error('Error fetching friend list:', error);
     }
 
-    const debouncedFetchUsers = setTimeout(() => {
-      fetchUsers();
-      fetchFriendList();
+    const debouncedFetchData = setTimeout(async () => {
+      await fetchUsers();
+      await fetchFriendList();
+      await fetchGameHistory();
     }, 300);
 
     return () => {
-      clearTimeout(debouncedFetchUsers);
+      clearTimeout(debouncedFetchData);
     };
   }, []);
 
@@ -98,7 +114,7 @@ export default function Profile() {
             </div>
             <div className="data">
               { selectedItem === 0 && <FriendsData friendList={friendList} /> }
-              { selectedItem === 1 && <div>History</div> }
+              { selectedItem === 1 && <GameHistoryList gameList={gameList} /> }
               { selectedItem === 2 && <LeaderboardData users={users} /> }
               { selectedItem === 3 && <div>Statistics</div> }
               { selectedItem === 4 && <div>Achievements</div> }

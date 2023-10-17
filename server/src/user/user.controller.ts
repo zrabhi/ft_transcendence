@@ -73,6 +73,16 @@ export class UserController {
       return await this.userService.findAllUsers(user);
     } catch (err) {}
   }
+  @Get('allUsers')
+  @UseGuards(JwtAuthGuard)
+  async getLeaderBoards(@UserInfo() user: User, @Res() res: Response) {
+    try {
+      const users = await this.userService.getAllUsers();
+      res.status(200).json(users);
+    } catch (err) {
+      res.status(400).json("error");
+    }
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('userNameCheck')

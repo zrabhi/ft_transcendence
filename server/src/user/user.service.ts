@@ -34,6 +34,9 @@ export class UserService {
     });
     return users;
   }
+  async getAllUsers(): Promise<User[]> {
+    return await this.prismaService.user.findMany({});
+  }
 
   async findUserById(user_id: string): Promise<User> {
     return await this.prismaService.user.findUniqueOrThrow({

@@ -15,7 +15,7 @@ import Users from "./users";
 
 export default function Profile() {
   const { getUserData, user,setNotif } = useContext(AuthContext);
-  const [friendList, setFriendList] = useState<any>([]); // firendlsit will contain array of (username, status, avatar)
+  const [friendList, setFriendList] = useState<any>([]);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [users, setUsers] = useState<[]>([]);
   const [selectedItem, setSelectedItem] = useState<number>(2);
@@ -65,18 +65,17 @@ export default function Profile() {
   useEffect(()=>
   {
     (async () =>{
-      try{
-          const response = await getRequest(`${baseUrlUsers}/users`);
-          if (response?.error)
-          {
-            if (response.message ==="Unauthorized")
-              showSnackbar("Unauthorized", false)
-            return ;
-          }
-          setUsers(response)
-      }catch(err)
-      {
-
+      try {
+        const response = await getRequest(`${baseUrlUsers}/users`);
+        if (response?.error)
+        {
+          if (response.message ==="Unauthorized")
+            showSnackbar("Unauthorized", false)
+          return ;
+        }
+        setUsers(response)
+      } catch(err) {
+        console.error('Error fetching users:', err);
       }
     })()
   },[])

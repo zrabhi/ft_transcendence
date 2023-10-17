@@ -27,7 +27,7 @@ import { showSnackbar } from "./utils/showSnackBar";
 let notifSocket: Socket;
 export const AuthContext = createContext<any>({});
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User>(userInit);
   const [tfaDisabled, setTfaDisabled] = useState(true);
   const [loginError, setLoginError] = useState<LoginError>();
   const router = useRouter();

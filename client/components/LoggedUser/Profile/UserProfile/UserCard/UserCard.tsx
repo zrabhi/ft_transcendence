@@ -203,11 +203,11 @@ export default function UserCard(user: any) {
           </div>
           <div className="stat-item">
             <h4>Wins</h4>
-            <p>{user && user.wins}</p>
+            <p>{user && user.win}</p>
           </div>
           <div className="stat-item">
             <h4>Losses</h4>
-            <p>{user && user.losses}</p>
+            <p>{user && user.loss}</p>
           </div>
         </div>
       </div>

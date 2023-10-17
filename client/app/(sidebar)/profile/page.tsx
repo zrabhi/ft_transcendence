@@ -22,8 +22,13 @@ export default function Profile() {
 
   const fetchUsers = async () => {
     try {
+      console.log("fetching users");
       const allUsers = await getRequest(`${baseUrlUsers}/allUsers`);
-      setUsers(allUsers);
+      let leaderBoardList = allUsers.sort((user1: any, user2: any) => {
+        console.log(`sorting ${user1.username} and ${user2.username}`);
+        return user2.win - user1.win;
+      })
+      setUsers(leaderBoardList.slice(0, 3));
     } catch (error) {
       console.error('Error fetching users:', error);
     }

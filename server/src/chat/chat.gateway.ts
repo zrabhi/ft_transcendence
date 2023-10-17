@@ -18,6 +18,8 @@ import { UserService } from 'src/user/user.service';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { channel, subscribe } from 'diagnostics_channel';
+import { response } from 'express';
+import { json } from 'stream/consumers';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -181,7 +183,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
       let message :any;
       if (channel.messages.length === 0)
-          message= {
+          message = {
             type:"room",
             channel: {
                 id: channel.id,
@@ -197,7 +199,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
               id: channel.id,
               name: channel.name,
               avatar: channel.avatar,
-              message:channel.messages[channel.messages.length -1].content,
+              message:channel.messages[channel.messages.length - 1].content,
               status: ''
           }};
       }
@@ -291,7 +293,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         user,
       )) as any;
       const response = {
-        channelId: data.channelId,
+        channelId: channel.id,
         name: channel.name,
         username: user.username,
         success: result.success,

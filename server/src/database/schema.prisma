@@ -125,7 +125,7 @@ model Achievement{
   accountCreationAchie Boolean
   firstFriendAchie     Boolean  @default(false)
   firstGameAchie       Boolean  @default(false)
-  firstLoseAchie      Boolean @default(false)
+  firstLoseAchie       Boolean @default(false)
   firstWinAchie        Boolean  @default(false)
   cleanSheetGameAchie  Boolean  @default(false)
 

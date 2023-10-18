@@ -13,9 +13,10 @@ import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 import Users from "./users";
 import GameHistoryList from "@/components/LoggedUser/Profile/ProfileData/GameHistoryList";
+import StatsData from "@/components/LoggedUser/Profile/ProfileData/StatsData";
 
 export default function Profile() {
-  const { getUserData, user,setNotif } = useContext(AuthContext);
+  const { getUserData, user ,setNotif } = useContext(AuthContext);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<number>(2);
   const [users, setUsers] = useState<[]>([]);
@@ -116,7 +117,7 @@ export default function Profile() {
               { selectedItem === 0 && <FriendsData friendList={friendList} /> }
               { selectedItem === 1 && <GameHistoryList gameList={gameList} /> }
               { selectedItem === 2 && <LeaderboardData users={users} /> }
-              { selectedItem === 3 && <div>Statistics</div> }
+              { selectedItem === 3 && <StatsData user={user} /> }
               { selectedItem === 4 && <div>Achievements</div> }
             </div>
           </div>

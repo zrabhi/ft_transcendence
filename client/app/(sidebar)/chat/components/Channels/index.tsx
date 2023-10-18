@@ -52,9 +52,7 @@ const Channels = ({selectedChannels,setSelectedChannels,channels, setSelectedCha
         )
       );
   }, [isChecked, channels]);
-useEffect(()=>{
-  console.log("joined", channels);
-},[channels])
+
   return (
     <div className="users-container pt-20">
       
@@ -235,6 +233,8 @@ const ModalContainer = ({
     {
       if (response?.message === "Unauthorized")
           showSnackbar("Unauthorized", false)
+     else
+        showSnackbar(response?.message, false);
       return ;
     }
     setMessages([]);

@@ -25,7 +25,7 @@ export default function SignIn() {
   const passMessage = useRef<HTMLParagraphElement>(null);
   const checkOne = useRef<HTMLParagraphElement>(null); // for checkbox number 1
   const checkTwo = useRef<HTMLParagraphElement>(null); // for checkbox number 2
-
+  let intraRedirect: string = process.env.NEXT_PUBLIC_BACKEND_HOST + "/api/auth/42/login"
   // useStates
   const [loginInfo, setLoginInfo] = useState({
     email: "",
@@ -150,7 +150,7 @@ export default function SignIn() {
                         />
                       </div>{" "}
                     </Link>
-                    <Link href="http://127.0.0.1:8080/api/auth/42/login">
+                    <Link href={intraRedirect}>
                       <div className="school">
                         <Image
                           src={schoolLogo}

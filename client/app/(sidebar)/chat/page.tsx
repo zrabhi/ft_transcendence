@@ -66,7 +66,8 @@ const Chat: React.FC = () => {
   const [snackbars, setSnackbars] = useState<any>([]);
   const [password, setPassword] = useState("");
   const [selectedJoinChannel, setSelectedJoinChannel] = useState<any>(null);
-
+  const [isMessage, setIsMessage] = useState<any>(null);
+  const [deletedId, setDeletedId] = useState<string>("");
   const handleOpenSnackbar = (message: string, type: string) => {
     const uniqueKey = Date.now(); // Generate a unique key using the current timestamp
     const newSnackbar = { key: uniqueKey, message, type };
@@ -101,10 +102,37 @@ const Chat: React.FC = () => {
       })();
     } catch (err) {}
   }, [friendsList]);
-useEffect(()=>{
-  setCheckUpdated(channels)
-  console.log("setting channel in join", channels);
-},[channels])
+  useEffect(() => {
+    console.log("??+", channels);
+    if (isMessage)
+    {
+      if (
+      channels.some(
+        (channel: any) => {
+          console.log("the test in filter", channel?.channel?.id , isMessage?.channel?.id)
+          console.log('types of', typeof channel?.channel?.id , typeof isMessage?.channel?.id)
+          return channel?.channel?.id === isMessage?.channel?.id
+        }
+        )
+    )
+      {console.log("in condition");
+      setChannels((prevChannels: any) => {
+        return prevChannels?.map((channel: any) => {
+          if (channel?.channel?.id === isMessage?.channel?.id)
+            if (!checkBlocked(isMessage?.channel.sender)) {
+              channel.channel.message = isMessage?.channel.message;
+            } else {
+              channel.channel.message = "this message is hidden";
+            }
+          return channel;
+        });
+      });}
+      else {
+        setChannels((prev: any) => [isMessage, ...prev]);
+      }
+    setIsMessage(null);
+  }
+  }, [isMessage]);
   useEffect(() => {
     try {
       (async () => {
@@ -141,12 +169,25 @@ useEffect(()=>{
       })();
     } catch (err) {}
   }, []);
+
   const checkBlocked = (username: string) => {
     return (
       blockedUsers.some((friend: any) => friend === username) ||
       userBlockedMe.some((friend: any) => friend === username)
     );
   };
+useEffect(()=>{
+  if (deletedId !== "")
+  {
+    setChannels(
+      channels?.filter((channel: any) => {
+        if (channel?.channel && channel?.channel?.id !== deletedId)
+          return channel;
+      })
+    );
+    setDeletedId("");
+  }
+},[deletedId])
   useEffect(() => {
     socket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/chat`, {
       auth: {
@@ -156,65 +197,27 @@ useEffect(()=>{
     socket.on("connected", () => {
       socket.on("lastMessage", (messageInfo: any) => {
         let checker = false;
-        let updatedChannel: any = channels?.map((channel: any) => {
-          console.log("message info", messageInfo, "channel", channel);
-          if (
-            channel?.channel &&
-            channel?.channel?.id === messageInfo?.channel?.id
-          ) {
-            checker = true;
-            if (!checkBlocked(messageInfo?.channel.sender))
-              channel.channel.message = messageInfo?.channel?.message;
-            else channel.channel.message = "this message is hidden";
-          }
-          return channel;
-        });
-        console.log(channels, messageInfo?.channel?.id)
-          if (channels.some((channel: any) =>  channel?.channel?.id === messageInfo?.channel?.id))
-            setChannels((prevChannels:any) => {
-              return prevChannels?.map((channel:any) =>{
-                if(channel?.channel?.id === messageInfo?.channel?.id)
-                      channel.channel.message = messageInfo?.channel.message
-                return channel;
-              }
-              );
-            })
-          else {
-            console.log("im hereeeeoo++++");
-            
-            setChannels((prev: any) => [messageInfo , ...prev]);
-          }
-
-        if (user.username != messageInfo?.channel?.username)
+        setIsMessage(messageInfo);
+          if (user.username != messageInfo?.channel?.username)
           showSnackbar(
             `You have new message from ${messageInfo?.channel?.username}`,
             true
-          );
-      });
-
+            );
+        });
       socket.on("channelDeleted", (data: socketResponse) => {
         console.log("data received", data);
+        setDeletedId(data.channelId);
         if (!data.success) {
           alert(data.error);
           return;
         }
-
-        setChannels(channels?.filter((channel: any) => {
-          if (channel?.channel && channel?.channel?.id !== data.channelId)
-              return channel
-        }));
         if (user.username != data.username)
           showSnackbar(
             `the owner ${data.username}  deleted  ${data.name} Room`,
             true
           );
-          else showSnackbar(`Room has been deleted`, true);
-          setSelectedChannels(
-            selectedChannels.filter(
-              (channel: any) => channel?.channel?.id != data.channelId
-              )
-              );
-        console.log(selectedChannel , data.channelId);
+        else showSnackbar(`Room has been deleted`, true);
+        console.log(selectedChannel, data.channelId);
         setSelectedChannel(null);
       });
       socket.on("userKicked", (data: any) => {
@@ -321,7 +324,6 @@ useEffect(()=>{
           }
           return;
         }
-        
         setChannels((prev: any) => [data?.lastMessage, ...prev]);
 
         let desiredChannel: any = otherChannels?.filter((channel: any) => {
@@ -363,7 +365,6 @@ useEffect(()=>{
       });
       socket.on("NewMember", (data: any) => {
         if (data.member === user.username) {
-          
           setChannels((prevChannels: any) => [
             data.lastMessage,
             ...prevChannels,
@@ -381,8 +382,12 @@ useEffect(()=>{
             avatar: data.avatar,
             id: data.id,
           });
-          setFilteredUserList(filteredUserList?.filter((user: any) => user?.username !== data.member))
-          
+          setFilteredUserList(
+            filteredUserList?.filter(
+              (user: any) => user?.username !== data.member
+            )
+          );
+
           setSelectedChannel(updatedSelectedChannel);
         }
       });
@@ -536,8 +541,8 @@ useEffect(()=>{
                 selectedChat={selectedChat}
                 setChannels={setChannels}
                 users={users}
-                filteredUserList = {filteredUserList}
-                setFilteredUserList= {setFilteredUserList}
+                filteredUserList={filteredUserList}
+                setFilteredUserList={setFilteredUserList}
               />
             ) : (
               <div className="pt-20 text-[#999999] text-xl flex flex-col justify-start items-start">

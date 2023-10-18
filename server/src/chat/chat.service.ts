@@ -323,7 +323,7 @@ export class ChatService {
           type:"dm",
           channel: {
             id: result[0].id,
-            name: otherUser.username,
+            username: otherUser.username,
             avatar:otherUser.avatar,
             message: '',
             status: otherUser.status,
@@ -344,7 +344,7 @@ export class ChatService {
       type: 'dm',
       channel: {
         id: channel.id,
-        name: otherUser.username,
+        username: otherUser.username,
         avatar:otherUser.avatar,
         message: '',
         status: otherUser.status,

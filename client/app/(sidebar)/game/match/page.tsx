@@ -247,22 +247,6 @@ export default function match()
         <div className="game-content min-h-screen p-8">
             <HeaderBar />
             <div className={`core flex w-full`} >
-                {/* <div className="score flex">
-                    <div className="player player1 flex gap-4">
-                        <div className='avatar '>
-                            <img src={user?.avatar}  alt="avatar" />
-                        </div>
-                        <div className='player-name none lg:block text-sm bg-green-300 overflow-hidden text-ellipsis' >{user.username}</div>
-                        <div className="score1">{myscore}</div>
-                    </div>
-                    <div className="player player2">
-                        <div className="score2">{oppscore}</div>
-                        <div className='player-name none lg:block text-sm bg-green-300 overflow-hidden text-ellipsis' >{opp_username}</div>
-                        <div className='avatar '>
-                            <img src={opp_avatar} alt="avatar" />
-                        </div>
-                    </div>
-                </div> */}
                 <div className="score flex p-2 justify-between items-center gap-4">
                   <div className="player1 flex items-center gap-3 w-1/2 justify-between ">
                     <div className="avatar w-12 h-12 rounded-full overflow-hidden border border-slate-50">

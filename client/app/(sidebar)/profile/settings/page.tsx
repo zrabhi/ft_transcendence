@@ -175,6 +175,10 @@ export default function Settings() {
         setError(true);
         setUsernameMsg("Username must be at most 20 characters");
         return false;
+      } else if (username.indexOf(" ") >= 0) {
+        setError(true);
+        setUsernameMsg("Username must not contain spaces");
+        return false;
       }
     }
     return true;

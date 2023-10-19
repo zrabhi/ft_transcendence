@@ -23,9 +23,9 @@ import { array } from "yup";
 import { AuthContext } from "@/app/context/AuthContext";
 import Modal from "react-modal";
 import { showSnackbar } from "@/app/context/utils/showSnackBar";
-import ConversationPana from "@/public/images/Conversation-pana.png"
-import GroupChat from "@/public/images/Group Chat-amico.png"
-
+import ConversationPana from "@/public/images/Conversation-pana.png";
+import GroupChat from "@/public/images/Group Chat-amico.png";
+import Snackbar from "./components/MultipleBar";
 
 const customStyles = {
   content: {
@@ -51,19 +51,37 @@ const Chat: React.FC = () => {
   const [channels, setChannels] = useState<channels[]>([]); // to set channels already exists
   const [otherChannels, setOtherChannels] = useState([]);
   const [users, setUsers] = useState([]); // to set users (TODO : changing it to user friends)
+  const [selectedChannels, setSelectedChannels] = useState([]);
+  const [checkUpdated, setCheckUpdated] = useState<channels[]>([]);
   const {
     user,
     setBlockedUsers,
     setUserBlockedMe,
     blockedUsers,
     userBlockedMe,
-    friendsList
+    friendsList,
   } = useContext(AuthContext);
   const [cookie] = useCookies(["access_token"]);
-
+  const [snackbars, setSnackbars] = useState<any>([]);
   const [password, setPassword] = useState("");
   const [selectedJoinChannel, setSelectedJoinChannel] = useState<any>(null);
 
+  const handleOpenSnackbar = (message: string, type: string) => {
+    const uniqueKey = Date.now(); // Generate a unique key using the current timestamp
+    const newSnackbar = { key: uniqueKey, message, type };
+
+    setSnackbars((prevSnackbars: any) => [...prevSnackbars, newSnackbar]);
+
+    setTimeout(() => {
+      handleCloseSnackbar(uniqueKey);
+    }, 4000);
+  };
+  const handleCloseSnackbar = (uniqueKey: any) => {
+    const updatedSnackbars = snackbars.filter(
+      (snackbar: any) => snackbar.key !== uniqueKey
+    );
+    setSnackbars(updatedSnackbars);
+  };
   // just an example of how to use this function
   // it will disapear after 5 sec
   useEffect(() => {
@@ -71,55 +89,65 @@ const Chat: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    try{
-    (async () => {
-      const response = await getRequest(`${baseUrlUsers}/user/friends`);
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-    }
+    try {
+      (async () => {
+        const response = await getRequest(`${baseUrlUsers}/user/friends`);
+        if (response?.error && response?.message === "Unauthorized") {
+          showSnackbar("Unauthorized", false);
+          return;
+        }
         setUsers(response);
-    })();
-  }catch(err)
-  {
-
-  }
+      })();
+    } catch (err) {}
   }, [friendsList]);
-
+useEffect(()=>{
+  setCheckUpdated(channels)
+  console.log("setting channel in join", channels);
+},[channels])
   useEffect(() => {
-    try{
-    (async () => {
-      // TODO: need to be in one request => /channels
-      try {
-        const responseDm = await getRequest(`${baseChatUrl}/channelsDm`); // fetching USER Dms
-        if (responseDm.error){
-          if (responseDm.message === "Unauthorized")
-            showSnackbar("Unauthorized", false)
-        return ;
-      }
-        setChannels(responseDm);
-        const responseRooms = await getRequest(`${baseChatUrl}/channelsRooms`); // fetching user rooms
-        if (responseRooms.error){
-          if (responseRooms.message === "Unauthorized")
-            showSnackbar("Unauthorized", false)
-        return ;
-       }
-        setChannels((prevchannels: any) => [...prevchannels, ...responseRooms]);
-      } catch (error) {}
-    })();
-    (async () => {
-      const response = await getRequest(`${baseChatUrl}/getChannels`);
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-      }
+    try {
+      (async () => {
+        // TODO: need to be in one request => /channels
+        try {
+          const responseDm = await getRequest(`${baseChatUrl}/channelsDm`); // fetching USER Dms
+          if (responseDm.error) {
+            if (responseDm.message === "Unauthorized")
+              showSnackbar("Unauthorized", false);
+            return;
+          }
+          setChannels(responseDm);
+          const responseRooms = await getRequest(
+            `${baseChatUrl}/channelsRooms`
+          ); // fetching user rooms
+          if (responseRooms.error) {
+            if (responseRooms.message === "Unauthorized")
+              showSnackbar("Unauthorized", false);
+            return;
+          }
+          setChannels((prevchannels: any) => [
+            ...prevchannels,
+            ...responseRooms,
+          ]);
+        } catch (error) {}
+      })();
+      (async () => {
+        const response = await getRequest(`${baseChatUrl}/getChannels`);
+        if (response?.error && response?.message === "Unauthorized") {
+          showSnackbar("Unauthorized", false);
+          return;
+        }
         setOtherChannels(response);
-    })();
-  }catch (err) {
-  }
+      })();
+    } catch (err) {}
   }, []);
+  const checkBlocked = (username: string) => {
+    return (
+      blockedUsers.some((friend: any) => friend === username) ||
+      userBlockedMe.some((friend: any) => friend === username)
+    );
+  };
   useEffect(() => {
-    socket = io("http://127.0.0.1:8080/chat", {
+    socket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/chat`, {
       auth: {
         token: cookie.access_token,
       },
@@ -127,24 +155,27 @@ const Chat: React.FC = () => {
     socket.on("connected", () => {
       socket.on("lastMessage", (messageInfo: any) => {
         let checker = false;
-        let updatedChannel: any = channels?.filter((channel: any) => {
+        let updatedChannel: any = channels?.map((channel: any) => {
+          console.log("message info", messageInfo, "channel", channel);
           if (
             channel?.channel &&
             channel?.channel?.id === messageInfo?.channel?.id
           ) {
             checker = true; /// check if user in blocked user
-            channel.channel.message = messageInfo?.channel?.message;
-            return channel;
+            if (!checkBlocked(messageInfo?.channel.sender))
+              channel.channel.message = messageInfo?.channel?.message;
+            else channel.channel.message = "this message is hidden";
           }
+          return channel;
         });
-        let previousChannels = channels?.filter((channel: any) => {
-          return (
-            channel?.channel && channel?.channel?.id != messageInfo?.channel?.id
-          );
-        });
-        !checker
-          ? setChannels((prevChannels: any) => [messageInfo, ...prevChannels])
-          : setChannels(() => [...updatedChannel, ...previousChannels]);
+        console.log("updated in last message", updatedChannel);
+          setChannels((prevChannels:any) => {
+            return prevChannels?.map((channel:any) =>{
+              return channel?.channel?.id === messageInfo?.channel?.id ? messageInfo : channel
+            }
+            );
+          })
+
         if (user.username != messageInfo?.channel?.username)
           showSnackbar(
             `You have new message from ${messageInfo?.channel?.username}`,
@@ -153,23 +184,29 @@ const Chat: React.FC = () => {
       });
 
       socket.on("channelDeleted", (data: socketResponse) => {
+        console.log("data received", data);
         if (!data.success) {
           alert(data.error);
           return;
         }
-        let updatedChannel = channels?.map((channel: any) => {
-          if (channel?.channel && channel?.channel?.id === data.channelId)
-            return [];
-          return channel;
-        });
+
+        setChannels(channels?.filter((channel: any) => {
+          if (channel?.channel && channel?.channel?.id !== data.channelId)
+              return channel
+        }));
         if (user.username != data.username)
           showSnackbar(
-            `the owner  ${data.username}  deleted  ${data.name} Room`,
+            `the owner ${data.username}  deleted  ${data.name} Room`,
             true
           );
-        else showSnackbar(`Room has been deleted`, true);
-        setSelectedChannel(null); // the  the channel here for other usersss
-        setChannels(updatedChannel);
+          else showSnackbar(`Room has been deleted`, true);
+          setSelectedChannels(
+            selectedChannels.filter(
+              (channel: any) => channel?.channel?.id != data.channelId
+              )
+              );
+        console.log(selectedChannel , data.channelId);
+        setSelectedChannel(null);
       });
       socket.on("userKicked", (data: any) => {
         if (
@@ -177,9 +214,11 @@ const Chat: React.FC = () => {
           selectedChannel?.channel &&
           selectedChannel?.channel.id === data.channelId
         ) {
-          let updatedMembers = selectedChannel?.members?.filter((member: any) => {
-            return member.name != data.name;
-          });
+          let updatedMembers = selectedChannel?.members?.filter(
+            (member: any) => {
+              return member.name != data.name;
+            }
+          );
           setSelectedChannel((prevChannel: any) => ({
             ...prevChannel,
             members: updatedMembers,
@@ -213,9 +252,11 @@ const Chat: React.FC = () => {
           selectedChannel?.channel &&
           selectedChannel?.channel?.id === data.channelId
         ) {
-          let updatedMembers = selectedChannel?.members?.filter((member: any) => {
-            return member.name != data.name;
-          });
+          let updatedMembers = selectedChannel?.members?.filter(
+            (member: any) => {
+              return member.name != data.name;
+            }
+          );
           setSelectedChannel((prevChannel: any) => ({
             ...prevChannel,
             members: updatedMembers,
@@ -253,7 +294,7 @@ const Chat: React.FC = () => {
         showSnackbar(`Message can be sent because you have been muted`, false);
       });
       socket.on("memberJoinned", (data: any) => {
-        console.log("data from socket", data);
+        console.log(data.name, user);
         if (user.username != data.name) {
           showSnackbar(`${data?.name} joinned ${data?.channelName} Room`, true);
           if (
@@ -272,6 +313,7 @@ const Chat: React.FC = () => {
           return;
         }
         setChannels((prev: any) => [data?.lastMessage, ...prev]);
+
         let desiredChannel: any = otherChannels?.filter((channel: any) => {
           return channel?.channel?.id === data?.channelId;
         });
@@ -311,14 +353,14 @@ const Chat: React.FC = () => {
       });
       socket.on("NewMember", (data: any) => {
         if (data.member === user.username) {
-            setChannels((prevChannels: any) => [
-              data.lastMessage,
-              ...prevChannels,
-            ]);
+          setChannels((prevChannels: any) => [
+            data.lastMessage,
+            ...prevChannels,
+          ]);
         } else {
-          showSnackbar(
+          handleOpenSnackbar(
             `${data.member} is now in ${data?.channelName} room`,
-            true
+            "success"
           );
           let updatedSelectedChannel = selectedChannel;
           updatedSelectedChannel?.members?.push({
@@ -339,9 +381,11 @@ const Chat: React.FC = () => {
           selectedChannel?.channel &&
           selectedChannel?.channel?.id === data.id
         ) {
-          let updatedMembers = selectedChannel?.members?.filter((member: any) => {
-            return member.name != data.name;
-          });
+          let updatedMembers = selectedChannel?.members?.filter(
+            (member: any) => {
+              return member.name != data.name;
+            }
+          );
           setSelectedChannel((prevChannel: any) => ({
             ...prevChannel,
             members: updatedMembers,
@@ -405,22 +449,22 @@ const Chat: React.FC = () => {
           );
       });
       socket.on("disconnect", () => {
-        socket.off("YourUnbanned");
+        // socket.off("YourUnbanned");
         socket.off("lastMessage");
-        socket.off("YourBlocked");
-        socket.off("userBlocked");
-        socket.off("blockedUser");
-        socket.off("leftRoom");
-        socket.off("NewMember");
-        socket.off("newAdmin");
-        socket.off("memberJoinned");
-        socket.off("userMuted");
-        socket.off("Yourmuted");
-        socket.off("yourBanned");
-        socket.off("userBanned");
-        socket.off("yourKicked");
-        socket.off("userKicked");
-        socket.off("channelDeleted");
+        // socket.off("YourBlocked");
+        // socket.off("userBlocked");
+        // socket.off("blockedUser");
+        // socket.off("leftRoom");
+        // socket.off("NewMember");
+        // socket.off("newAdmin");
+        // socket.off("memberJoinned");
+        // socket.off("userMuted");
+        // socket.off("Yourmuted");
+        // socket.off("yourBanned");
+        // socket.off("userBanned");
+        // socket.off("yourKicked");
+        // socket.off("userKicked");
+        // socket.off("channelDeleted");
       });
     });
     return () => {
@@ -460,6 +504,8 @@ const Chat: React.FC = () => {
           <div className="container">
             <Channels
               setMessages={setMessages}
+              selectedChannels={selectedChannels}
+              setSelectedChannels={setSelectedChannels}
               channels={channels}
               setChannels={setChannels}
               setSelectedChannel={setSelectedChannel}
@@ -467,6 +513,8 @@ const Chat: React.FC = () => {
             />
             {selectedChannel ? (
               <BoxChat
+                selectedChannels={selectedChannels}
+                setSelectedChannels={setSelectedChannels}
                 setSelectedChannel={setSelectedChannel}
                 setMessages={setMessages}
                 messages={messages}
@@ -480,7 +528,12 @@ const Chat: React.FC = () => {
               <div className="pt-20 text-[#999999] text-xl flex flex-col justify-start items-start">
                 {/* <img src={ConversationPana} alt='ConversationPana'/> */}
                 <span>You need to select a chat to start a conversation</span>
-                <img src={ConversationPana.src} alt="Conversation Pana" width="500px" height="500px" /> 
+                <img
+                  src={ConversationPana.src}
+                  alt="Conversation Pana"
+                  width="500px"
+                  height="500px"
+                />
               </div>
             )}
             {otherChannels && otherChannels.length > 0 ? (
@@ -578,7 +631,12 @@ const Chat: React.FC = () => {
                 {" "}
                 <h2>There is no channels to join,</h2>
                 <h2>Try to create one!</h2>{" "}
-                <img src={GroupChat.src} alt='GroupChat' width="500px" height="500px" />
+                <img
+                  src={GroupChat.src}
+                  alt="GroupChat"
+                  width="500px"
+                  height="500px"
+                />
               </div>
             )}
             <Friends
@@ -588,6 +646,15 @@ const Chat: React.FC = () => {
             />
           </div>
         </div>
+      </div>
+      <div className="snackbar-container">
+        {snackbars.map((snackbar: any) => (
+          <Snackbar
+            key={snackbar.key}
+            message={snackbar.message}
+            type={snackbar.type}
+          />
+        ))}
       </div>
     </div>
   );

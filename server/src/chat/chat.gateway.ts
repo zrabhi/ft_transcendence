@@ -18,6 +18,8 @@ import { UserService } from 'src/user/user.service';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { channel, subscribe } from 'diagnostics_channel';
+import { response } from 'express';
+import { json } from 'stream/consumers';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -181,7 +183,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
       let message :any;
       if (channel.messages.length === 0)
-          message= {
+          message = {
             type:"room",
             channel: {
                 id: channel.id,
@@ -197,7 +199,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
               id: channel.id,
               name: channel.name,
               avatar: channel.avatar,
-              message:channel.messages[channel.messages.length -1].content,
+              message:channel.messages[channel.messages.length - 1].content,
               status: ''
           }};
       }
@@ -228,12 +230,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         secret: process.env.JWT_SECRET,
       });
       if (!payload) return client.disconnect(true);
-      const result = await this.chatService.handleAddMember(
-        payload,
-        data.channelId,
-        data.username,
-      );
-      const channel = await this.prismaService.channel.findUnique({
+      for (let i = 0; i < data.Users.length; i++) {
+        const result = await this.chatService.handleAddMember(
+          payload,
+          data.channelId,
+          data.Users[i],
+        );
+        const channel = await this.prismaService.channel.findUnique({
         where: {
           id: data.channelId,
         },
@@ -241,13 +244,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           members: true,
         },
       });
-      const addedUser = await this.userService.findUserName(data.username);
-      // check if there is multiple users to be added
+      const addedUser = await this.userService.findUserName(data.Users[i]);
       if (result.success) {
         for (const member of channel.members) {
           this.server.to(member.userId).emit('NewMember', {
             channelName: channel.name,
-            member: data.username,
+            member: data.Users[i],
             role: 'Member',
             avatar: addedUser.avatar,
             status: addedUser.status,
@@ -259,8 +261,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server
           .to(payload.id)
           .emit('error occored', { errorMessage: result?.error });
-      }
+    }
+  }
     } catch (err) {
+      console.log(err);
       client.emit("Unauthorized");
       return client.disconnect(true);
     }
@@ -289,7 +293,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         user,
       )) as any;
       const response = {
-        channelId: data.channelId,
+        channelId: channel.id,
         name: channel.name,
         username: user.username,
         success: result.success,
@@ -565,6 +569,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       channel: {
         id: data.channelId,
         username: name,
+        sender: user.username,
         avatar: avatar,
         message: data.message,
         status: status,

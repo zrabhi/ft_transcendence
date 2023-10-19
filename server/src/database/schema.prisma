@@ -3,7 +3,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -126,7 +125,7 @@ model Achievement{
   accountCreationAchie Boolean
   firstFriendAchie     Boolean  @default(false)
   firstGameAchie       Boolean  @default(false)
-  firstLoseAchie      Boolean @default(false)
+  firstLoseAchie       Boolean @default(false)
   firstWinAchie        Boolean  @default(false)
   cleanSheetGameAchie  Boolean  @default(false)
 

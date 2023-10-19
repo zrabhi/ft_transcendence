@@ -9,10 +9,31 @@ services:
       - ./server/.env
     ports:
       - '5432:5432'
-    volumes:
-      - docker-nest-postgres:/var/lib/postgresql/data
     networks:
       - network
+
+  # backend:
+  #   container_name: server
+  #   build: ./server
+  #   ports:
+  #     - 8080:8080
+  #   env_file:
+  #     - ./server/.env
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - network
+
+  # frontend:
+  #   container_name: client
+  #   build: ./client
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - network
+
 volumes:
   docker-nest-postgres:
 networks:

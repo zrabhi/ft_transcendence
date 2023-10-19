@@ -62,7 +62,7 @@ const Friends = ({ setSelectedChannel, setSelectedChat, users }: any) => {
       )}
 
       <div
-        className={`friends-bar top-0 right-0  bg-blue-600  p-10 pl-20 text-white fixed h-full z-40 ease-in-out duration-300 ${showSidebar ? "translate-x-0 " : "translate-x-full"
+        className={`friends-bar top-0 right-0 p-10 pl-20 text-white fixed h-full z-40 ease-in-out duration-300 ${showSidebar ? "translate-x-0 " : "translate-x-full"
           }`}
       >
         <h3 className="mt-15 text-2xl font-semibold text-white">Friends</h3>

@@ -69,11 +69,18 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('/users')
   async getAllUsers(@UserInfo() user: User): Promise<User[]> {
-    try{
-    return await this.userService.findAllUsers(user);
-    }catch(err)
-    {
-
+    try {
+      return await this.userService.findAllUsers(user);
+    } catch (err) {}
+  }
+  @Get('allUsers')
+  @UseGuards(JwtAuthGuard)
+  async getLeaderBoards(@UserInfo() user: User, @Res() res: Response) {
+    try {
+      const users = await this.userService.getAllUsers();
+      res.status(200).json(users);
+    } catch (err) {
+      res.status(400).json("error");
     }
   }
 
@@ -115,17 +122,6 @@ export class UserController {
   // }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/users')
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    try{
-    return await this.userService.addUser(createUserDto);
-    }catch(err)
-    {
-      
-    }
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Delete('/user')
   async deleteUser(@Req() req) {
     return await this.userService.deleteUserByUsername(req.user.id);
@@ -134,16 +130,60 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('/user/achievement')
   async getUserAchievement(@Req() req, @Res() res) {
-    try{
-    const achievements = await this.userService.achievementById(req.user.id);
+    try {
+      const achievements = await this.userService.achievementById(req.user.id);
 
-    res.status(200).json(achievements);
-    }catch(err)
-    {
-      res.status(400).json("error")
+      res.status(200).json(achievements);
+    } catch (err) {
+      res.status(400).json('error');
+    }
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('/user/achievement/:username')
+  async getUserAchievementByUsername(
+    @UserInfo() user: User,
+    @Param('username') username: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const searchedUser = await this.userService.findUserName(username);
+      const achievements = await this.userService.achievementById(
+        searchedUser.id,
+      );
+      res.status(200).json(achievements);
+    } catch (err) {
+      res.status(400).json('error');
     }
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/user/matches/:username')
+  async handleGetUserMatches(
+    @UserInfo() user: User,
+    @Param('username') username: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const searchedUser = await this.userService.findUserName(username);
+      const allUserMatches = await this.userService.getMatchesByUserId(
+        searchedUser.id,
+      );
+      const againstMatches = [];
+      for (const match of allUserMatches) {
+          const loser = await this.userService.findUserById(match.loser_id);
+          const winner = await this.userService.findUserById(match.winner_id);
+          againstMatches.push({
+            winnerScore: match.winner_score,
+            loserScore: match.loser_score,
+            loser: loser,
+            winner: winner,
+          });
+      }
+      res.status(200).json(againstMatches);
+    } catch (err) {
+      res.status(400).json('error');
+    }
+  }
   @UseGuards(JwtAuthGuard)
   @Get('/user/matches')
   async getMatches(@Req() req, @Res() res) {
@@ -153,16 +193,6 @@ export class UserController {
       );
       const againstMatches = [];
       for (const match of allUserMatches) {
-        if (match.loser_id == req.user.id) {
-          const loser = await this.userService.findUserById(req.user.id);
-          const winner = await this.userService.findUserById(match.loser_id);
-          againstMatches.push({
-            winnerScore: match.winner_score,
-            loserScore: match.loser_score,
-            loser: loser,
-            winner: winner,
-          });
-        } else {
           const loser = await this.userService.findUserById(match.loser_id);
           const winner = await this.userService.findUserById(match.winner_id);
           againstMatches.push({
@@ -170,25 +200,25 @@ export class UserController {
             loserScore: match.loser_score,
             loser: loser,
             winner: winner,
+            playedAt:match.played_at
           });
-        }
       }
       res.status(200).json(againstMatches);
     } catch (error) {
-        res.status(400).json("error")
+      res.status(400).json('error');
     }
   }
 
   // @UseGuards(JwtAuthGuard)
-  @Post('/users/matches')
-  async createMatch(@Body() createMatchDto: CreateMatchDto) {
-    try{
-    return await this.userService.createMatch(createMatchDto);
-    }catch(err)
-    {
-      
-    }
-  }
+  // @Post('/users/matches')
+  // async createMatch(@Body() createMatchDto: CreateMatchDto) {
+  //   try{
+  //   return await this.userService.createMatch(createMatchDto);
+  //   }catch(err)
+  //   {
+
+  //   }
+  // }
 
   @Get('/users/avatar/:user_id')
   async getUserAvatar(@Param('user_id') user_id: string, @Res() res: Response) {
@@ -232,7 +262,7 @@ export class UserController {
       await this.userService.UpdateUserName(user, req.user.id);
       Res.status(200).json({ msg: 'Updated succefully' });
     } catch (err) {
-      Res.status(400).json("ERROR");
+      Res.status(400).json('ERROR');
     }
   }
 
@@ -250,13 +280,12 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Put('users/update')
   async HandleUpdate(@Body() user: PutUserDto, @Res() res, @Req() req) {
-    try{
-    const User = await this.userService.UpdateAllInfos(user, req.user.id);
-    if (User) return res.status(200).json(user);
-    res.status(400).json('Please Chose Another Username');
-    }catch(err)
-    {
-      res.status(400).json("error")
+    try {
+      const User = await this.userService.UpdateAllInfos(user, req.user.id);
+      if (User) return res.status(200).json(user);
+      res.status(400).json('Please Chose Another Username');
+    } catch (err) {
+      res.status(400).json('error');
     }
   }
 
@@ -301,7 +330,7 @@ export class UserController {
       return response.status(200).json(file);
     } catch (err) {
       // console.log('image rro', err.message);
-      response.status(200).json("error");
+      response.status(200).json('error');
     }
     return response.status(200).json(file.path);
   }
@@ -380,8 +409,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('user/friends')
   async handleGetFriends(@Req() req, @Res() res, @UserInfo() currUser) {
-    
-    try { 
+    try {
       const friends = await this.userService.getFriendsByUserId(currUser.id);
       console.log(friends);
 
@@ -392,9 +420,7 @@ export class UserController {
           user = await this.userService.findUserById(friend.friend_id);
         if (friend.user_id != currUser.id)
           user = await this.userService.findUserById(friend.user_id);
-        friendsList.push(
-          user
-        );
+        friendsList.push(user);
       }
       console.log(friendsList);
       return res.status(200).json(friendsList);
@@ -471,9 +497,7 @@ export class UserController {
         });
       }
       res.status(200).json(friendsList);
-    } catch (err) {
-
-    }
+    } catch (err) {}
   }
   @Get('getFriendRequests')
   @UseGuards(JwtAuthGuard)
@@ -506,11 +530,10 @@ export class UserController {
   }
   @Get('gameRequests')
   @UseGuards(JwtAuthGuard)
-  async handleGetGameRequests(@UserInfo() user: any, @Res() res: Response)
-  {
-      const result = await this.userService.handleGetGamesReques(user);
-      if (result.success) return res.status(200).json(result.games)
-      return res.status(400).json(result);
+  async handleGetGameRequests(@UserInfo() user: any, @Res() res: Response) {
+    const result = await this.userService.handleGetGamesReques(user);
+    if (result.success) return res.status(200).json(result.games);
+    return res.status(400).json(result);
   }
   @Get('requestFriendSent')
   @UseGuards(JwtAuthGuard)
@@ -539,12 +562,8 @@ export class UserController {
     @Param('username') username: string,
     @UserInfo() user: any,
     @Res() res: Response,
-  )
-  {
-    const result = await this.userService.handleUnFriendUser(
-      user,
-      username,
-    );
+  ) {
+    const result = await this.userService.handleUnFriendUser(user, username);
     if (result.success) return res.status(200).json(result);
     return res.status(400).json(result);
   }
@@ -557,7 +576,7 @@ export class UserController {
     @Res() res: Response,
   ) {
     const result = await this.userService.handleFriendRequest(user, username);
-    if (!result.success)return res.status(400).json(result);
+    if (!result.success) return res.status(400).json(result);
     return res.status(200).json(result);
   }
 }

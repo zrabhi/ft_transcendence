@@ -34,6 +34,9 @@ export class UserService {
     });
     return users;
   }
+  async getAllUsers(): Promise<User[]> {
+    return await this.prismaService.user.findMany({});
+  }
 
   async findUserById(user_id: string): Promise<User> {
     return await this.prismaService.user.findUniqueOrThrow({
@@ -140,7 +143,6 @@ export class UserService {
       // );
     }
   }
-
   async achievementById(userId: string): Promise<Achievement> {
     try {
       return await this.prismaService.achievement.findUnique({
@@ -406,8 +408,28 @@ export class UserService {
         friend_id: userTwo.id,
       },
     });
+    await this.creatFriendshipAchievements(userOne, userTwo);
   }
 
+  async creatFriendshipAchievements(userOne:User, userTwo:User)
+  {
+    await this.prismaService.achievement.update({
+      where:{
+        userId:userOne.id
+      },
+      data:{
+        firstFriendAchie: true,
+      }
+    })
+    await this.prismaService.achievement.update({
+      where:{
+        userId:userTwo.id
+      },
+      data:{
+        firstFriendAchie: true,
+      }
+    })
+  }
   async handleUnFriendUser(user: any, username: string) {
     try {
       const currentUser = await this.findUserById(user.id);

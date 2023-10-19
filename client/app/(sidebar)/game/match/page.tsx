@@ -29,7 +29,7 @@ export default function match()
 
     const [opp_username, setoppuser] = useState('opponent');
     const [opponentUser, setOpponentUser] = useState<any>();
-    const [opp_avatar, setOpponentavatar] = useState<string>()
+    const [opp_avatar, setOpponentavatar] = useState<string>("https://cdn.dribbble.com/users/886358/screenshots/2980235/loading.gif")
     const [myscore, setmyscore] = useState(0);
     const [oppscore, setoppscore] = useState(0);
     const handleNewGameClick = () => {
@@ -190,7 +190,7 @@ export default function match()
   
     useEffect(() => {
       selectedcolor = localStorage.getItem("selectedMapColor") as string;
-      socket = io('http://127.0.0.1:8080/matching',{
+      socket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/matching`,{
         auth: {
           token: cookie.access_token,
         }});
@@ -265,7 +265,7 @@ export default function match()
                 <div className={`popup ${showPopup ?  'bg-black-400 bg-opacity-70 backdrop-blur-sm': 'hidden' } w-screen h-screen fixed inset-0 flex justify-center items-center `} >|
                   <div className='popupcore w-[50rem] xs:w-[18rem] sm:w-[24rem] md:w-[30rem]
          rounded-xl  relative p-4 pt-12 pb-8'>
-                    <div className="message">hna radi ykon pop up message{popupMessage}</div>
+                    <div className="message">{popupMessage}</div>
                     <div className="buttons">
                       <button className={'back'} onClick={handleNewGameClick}>New Game</button>
                       <button className={'refreche'} onClick={handleBackHomeClick}>Back Home</button>

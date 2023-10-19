@@ -273,11 +273,7 @@ export class GameGateway {
                   myscore: this.playing_users[client.id].score,
                   oppscore: this.playing_users[client.id].opponent.score
               });
-              let ret : string;
-              if(currentPlayer.side == "right")
-                ret = updateballxy(this.matchs[client.id]);
-              else
-                ret = 'ok';
+              let ret = updateballxy(this.matchs[client.id]);
 
               if (ret != 'ok') {
                   this.server.to(client.id).emit(ret);
@@ -471,124 +467,12 @@ async update_achivements(winner: Player, loser: Player, cleansheet:boolean)
     },
     data:{
       firstGameAchie : true,
-      firstLoseAchie:true,
+      firstLoseAchie :true,
     }
   })}
   catch(err)
   {
     return {success: false, error:"error in updating achievements"}
   }
-
-//   private async check_matching(tmplayer: Player) {
-//       const result = await this.userService.getInvitionAccpted(tmplayer.userid)
-//       if (result.success) {
-//           let i: number;
-//           let finded = false;
-//           for (i = 0; result.opponents[i]; i++) {
-//               if (this.invited_users.containsUserId(result.opponents[i].id)) {
-//                   finded = true;
-//                   break;
-//               }
-//           }
-//           if (finded == true) {
-//               await this.userService.handleRemoveGameInvite(result.invitaionsId[i]);
-//               let rightplayer = tmplayer;
-//               let leftplayer = this.invited_users.getByUserId(result.opponents[i].id);
-
-//               rightplayer.side = 'right';
-//               leftplayer.side = 'left';
-
-//               this.invited_users.removeByUserId(result.opponents[i].id);
-
-//               rightplayer.opponent = leftplayer;
-//               leftplayer.opponent = rightplayer;
-//               this.playing_users[rightplayer.socketid] = rightplayer;
-//               this.playing_users[leftplayer.socketid] = leftplayer;
-//               let tmpmatch = new Match(rightplayer, leftplayer, new canvas(1000, 600));
-//               this.matchs[rightplayer.socketid] = tmpmatch;
-//               this.matchs[leftplayer.socketid] = tmpmatch;
-//               tmpmatch.ingame = true;
-//               rightplayer.match = tmpmatch;
-//               leftplayer.match = tmpmatch;
-//               this.server.to(rightplayer.socketid).emit('matched right', {
-//                   username: leftplayer.username,
-//                   avatar: leftplayer.avatar
-//               });
-//               this.server.to(leftplayer.socketid).emit('matched left', {
-//                   username: rightplayer.username,
-//                   avatar: rightplayer.avatar
-//               });
-//           } else {
-//               tmplayer.reserved = true;
-//               this.invited_users.enqueue(tmplayer);
-//           }
-//       } else if (this.waiting_users.size() != 0) {
-//           let rightplayer = tmplayer;
-//           let leftplayer = this.waiting_users.peek();
-
-
-//           rightplayer.side = 'right';
-//           leftplayer.side = 'left';
-
-//           this.waiting_users.dequeue();
-
-//           rightplayer.opponent = leftplayer;
-//           leftplayer.opponent = rightplayer;
-//           this.playing_users[rightplayer.socketid] = rightplayer;
-//           this.playing_users[leftplayer.socketid] = leftplayer;
-//           let tmpmatch = new Match(rightplayer, leftplayer, new canvas(1000, 600));
-//           this.matchs[rightplayer.socketid] = tmpmatch;
-//           this.matchs[leftplayer.socketid] = tmpmatch;
-//           tmpmatch.ingame = true;
-//           rightplayer.match = tmpmatch;
-//           leftplayer.match = tmpmatch;
-//           this.server.to(rightplayer.socketid).emit('matched right', {
-//               username: leftplayer.username,
-//               avatar: leftplayer.avatar
-//           });
-//           this.server.to(leftplayer.socketid).emit('matched left', {
-//               username: rightplayer.username,
-//               avatar: rightplayer.avatar
-//           });
-//       } else {
-//           this.waiting_users.enqueue(tmplayer);
-//       }
-//   }
-
-//   async update_achivements(winner: Player, loser: Player, cleansheet: boolean) {
-//       try {
-//           await this.prismaService.match.create({
-//               data: {
-//                   winner_id: winner.userid,
-//                   loser_id: loser.userid,
-//                   winner_score: winner.score,
-//                   loser_score: loser.score
-//               }
-//           })
-//           await this.prismaService.achievement.update({
-//               where: {
-//                   userId: winner.userid,
-//               },
-//               data: {
-//                   firstGameAchie: true,
-//                   firstWinAchie: true,
-//                   cleanSheetGameAchie: cleansheet
-//               }
-//           })
-//           await this.prismaService.achievement.update({
-//               where: {
-//                   userId: loser.userid,
-//               },
-//               data: {
-//                   firstGameAchie: true,
-//                   firstLoseAchie: true,
-//               }
-//           })
-//       } catch (err) {
-//           return {
-//               success: false,
-//               error: "error in updating achievements"
-//           }
-//       }
   }
 }

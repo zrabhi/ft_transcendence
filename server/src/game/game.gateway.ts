@@ -248,6 +248,8 @@ export class GameGateway {
       let loser = this.playing_users[client.id];
       winner.score = 3; loser.score = 0;
       await this.update_achivements(winner, loser, true);
+      await this.userService.handleUpdateStatus('ONLINE', this.playing_users[client.id].userid);
+      await this.userService.handleUpdateStatus('ONLINE', this.playing_users[client.id].opponent.userid);
       this.playing_users[this.playing_users[client.id]?.opponent?.socketid] = null;
       this.playing_users[client.id]  = null;
     }
@@ -307,7 +309,7 @@ export class GameGateway {
 
 
 @SubscribeMessage('init')
-init(@MessageBody() data: any, @ConnectedSocket() client: Socket): void {
+async init(@MessageBody() data: any, @ConnectedSocket() client: Socket){
   const match = this.matchs[client.id];
   match.canvas.width = data.canvasw;
   match.canvas.height = data.canvash;
@@ -326,8 +328,11 @@ init(@MessageBody() data: any, @ConnectedSocket() client: Socket): void {
   this.playing_users[client.id].isready = true;
   if(this.playing_users[client.id].isready && this.playing_users[client.id].isready)
   {
+
     this.server.to(client.id).emit('start');
     this.server.to(this.playing_users[client.id].opponent.socketid).emit('start');
+    await this.userService.handleUpdateStatus('INGAME', this.playing_users[client.id].opponent.userid);
+    await this.userService.handleUpdateStatus('INGAME', this.playing_users[client.id].userid);
   }
 }
 

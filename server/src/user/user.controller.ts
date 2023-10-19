@@ -560,7 +560,17 @@ export class UserController {
     if (result.success) return res.status(200).json(result);
     return res.status(400).json(result);
   }
-
+  @Get('userStatus')
+  @UseGuards(JwtAuthGuard)
+  async handleGetUserStatus(@Res() res: Response, @UserInfo() user: User)
+  {
+    try{
+      const status = await this.userService.handleGetUserStatus(user);
+      res.status(200).json(status);
+    }catch(err){
+        res.status(400).json("error")
+    }
+  }
   @Post('friendRequest/:username')
   @UseGuards(JwtAuthGuard)
   async handleFriendRequest(

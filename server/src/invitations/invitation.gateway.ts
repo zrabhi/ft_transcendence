@@ -44,7 +44,9 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
       );
 
       if (!payload) return client.disconnect(true);
-      await this.userService.handleUpdateStatus('ONLINE', payload.id);
+      const current = await this.userService.findUserById(payload.id);
+      if (current.status !== "INGAME")
+          await this.userService.handleUpdateStatus('ONLINE', payload.id);
       client.join(payload.id);
       this.connectedUsers.push({ socket: client, id: payload.id });
     } catch (err) {

@@ -13,6 +13,7 @@ import { useCookies } from "react-cookie";
 import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
 import { disconnect } from 'process';
 import Image from 'next/image';
+import { showSnackbar } from '@/app/context/utils/showSnackBar';
 
 export default function match()
 {
@@ -27,21 +28,23 @@ export default function match()
     let selectedcolor = 'black';
     let socket: Socket;
     let count = 0;
-
+    const [checker, setChecker] = useState(false);
     const [opp_username, setoppuser] = useState('opponent');
     const [opponentUser, setOpponentUser] = useState<any>();
     const [opp_avatar, setOpponentavatar] = useState<string>("https://cdn.dribbble.com/users/886358/screenshots/2980235/loading.gif")
     const [myscore, setmyscore] = useState(0);
     const [oppscore, setoppscore] = useState(0);
-    const handleNewGameClick = () => {
-      // Redirect to the game match page
-      router.push('/game');
+    const [status, setstatus] = useState("default status")
+    const handleNewGameClick = (e: any) => {
+      e.preventDefault();
+      window.location.href ="/game/match";
       setShowPopup(false);
     };
-  
-    const handleBackHomeClick = () => {
-      // Redirect to the profile page
-      router.push('/profile');
+    
+    const handleBackHomeClick = (e: any) => {
+      e.preventDefault();
+
+      window.location.href ="/profile";
       setShowPopup(false);
     };
   
@@ -189,17 +192,51 @@ export default function match()
       });
     };
   
+    useEffect(() =>{
+      (async () =>{
+        const response = await getRequest(`${baseUrlUsers}/userStatus`)
+        console.log("hello", response)
+        if (response?.error)
+        {
+          if (response?.message === "Unauthorized")
+          {
+            showSnackbar("Unauthorized", false)
+          }
+          else
+            showSnackbar("Something went wrong", false);
+          return;
+        } 
+        setstatus(response);
+        setChecker(true);
+      })()
+    },[])
+
     useEffect(() => {
       selectedcolor = localStorage.getItem("selectedMapColor") as string;
+      if(checker)
+      {
+        console.log(status)
+      if (status === "INGAME")
+      {
+        setTimeout(() => {
+            showSnackbar("already in game", false);
+          }, 50000);
+          window.location.href ="/game";
+          return;
+      }
+      console.log("here we connect to the server")
       socket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/matching`,{
         auth: {
           token: cookie.access_token,
         }});
-      socket.on('connect', () => {
-        console.log('Connected to WebSocket');
-        socket.on('disconnect',()=>{
-          router.push('/game')
-        })
+
+     
+        socket.on('connect', () => {
+          console.log('Connected to WebSocket');
+          socket.on('disconnect',()=>{
+            router.push('/game')
+          })
+
         socket.on('matched right',  (data:any) => {
           console.log("i match this : " , data);
           setoppuser(data.username);
@@ -235,10 +272,12 @@ export default function match()
         //   socket.off('match frame');
         // });
       });
+ 
       return () => {
         socket.disconnect()
       }
-    }, []);
+    }
+    }, [checker]);
 
     return (
     <div className="logged-user">
@@ -247,22 +286,7 @@ export default function match()
         <div className="game-content min-h-screen p-8">
             <HeaderBar />
             <div className={`core flex w-full`} >
-                {/* <div className="score flex">
-                    <div className="player player1 flex gap-4">
-                        <div className='avatar '>
-                            <img src={user?.avatar}  alt="avatar" />
-                        </div>
-                        <div className='player-name none lg:block text-sm bg-green-300 overflow-hidden text-ellipsis' >{user.username}</div>
-                        <div className="score1">{myscore}</div>
-                    </div>
-                    <div className="player player2">
-                        <div className="score2">{oppscore}</div>
-                        <div className='player-name none lg:block text-sm bg-green-300 overflow-hidden text-ellipsis' >{opp_username}</div>
-                        <div className='avatar '>
-                            <img src={opp_avatar} alt="avatar" />
-                        </div>
-                    </div>
-                </div> */}
+
                 <div className="score flex p-2 justify-between items-center gap-4">
                   <div className="player1 flex items-center gap-3 w-1/2 justify-between ">
                     <div className="avatar w-12 h-12 rounded-full overflow-hidden border border-slate-50">
@@ -304,8 +328,8 @@ export default function match()
                     rounded-xl  relative p-4 pt-12 pb-8'>
                     <div className="message">{popupMessage}</div>
                     <div className="buttons">
-                      <button className={'back'} onClick={handleNewGameClick}>New Game</button>
-                      <button className={'refreche'} onClick={handleBackHomeClick}>Back Home</button>
+                      <button className={'back'} onClick={(e)=>handleNewGameClick(e)}>New Game</button>
+                      <button className={'refreche'} onClick={(e)=>handleBackHomeClick(e)}>Profile</button>
                     </div>
                   </div>
                 </div>    

@@ -15,7 +15,6 @@ enum State {
   PENDING
   ACCEPTED
   REJECTED
-
 }
 
 enum Status {

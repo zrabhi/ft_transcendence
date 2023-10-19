@@ -954,7 +954,11 @@ export class UserService {
       return {success: true, opponents: opponents, invitaionsId: invitationIds}
     return {success: false}
 }
-
+  async handleGetUserStatus(user: any)
+  {
+    const currentUser = await this.findUserById(user.id);
+    return currentUser.status; 
+  }
   async handleRemoveGameInvite(gameInviteId: string)
   {
     try{

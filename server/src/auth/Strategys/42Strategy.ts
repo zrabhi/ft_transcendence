@@ -34,6 +34,7 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
     profile: Profile,
     done: VerifyCallback,
   ): Promise<any> {
+    try{
     const user = this.extract42UserData(profile);
     let userCheck = await this.userService.findUserEmail(user.email);
     if (!userCheck)
@@ -42,5 +43,9 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
       userCheck  = await this.userService.findUserById(newUser.id);
     }
      done(null, userCheck);
+  }catch(err)
+  {
+
+  }
   }
 }

@@ -149,7 +149,7 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('logout')
   async handleLogout(@ConnectedSocket() client: Socket) {
     try{
-      //TODO: HANDLE LOGOUT (NOT FUNCTIONAL 100%)
+      // TODO: HANDLE LOGOUT (NOT FUNCTIONAL 100%)
     const { id } = this.connectedUsers.find((c) => c.socket.id === client.id);
     if (!id) return;
     console.log("user id", id);

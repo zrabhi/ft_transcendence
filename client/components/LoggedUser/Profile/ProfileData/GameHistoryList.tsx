@@ -17,12 +17,13 @@ export default function GameHistoryList({ gameList }: any) {
           >
             <div className="winner-side column w-2/5">
               <div className="user-data flex flex-col gap-2 items-center">
-                <div className="avatar rounded-full overflow-hidden border-2 border-green-500">
+                <div className="avatar rounded-full overflow-hidden border-2 border-green-500 w-16 h-16">
                   <Image
                     src={game.winner.avatar}
                     alt="Winner avatar"
-                    width={80}
-                    height={80}
+                    width={100}
+                    height={100}
+                    className='w-full h-full object-cover'
                   />
                 </div>
                 <div className="username">{game.winner.username}</div>

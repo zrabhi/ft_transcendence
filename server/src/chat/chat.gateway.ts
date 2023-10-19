@@ -564,6 +564,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         (name = '#' + channel.name),
         (status = ''),
         (avatar = channel.avatar);
+    console.log("data channel id", data.channelId);
+    
     const lastMessage = {
       type: type,
       channel: {

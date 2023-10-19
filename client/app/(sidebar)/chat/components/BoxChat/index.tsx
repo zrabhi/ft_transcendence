@@ -75,6 +75,8 @@ const BoxChat = ({
   selectedChannels,
   setSelectedChannels,
   users,
+  filteredUserList,
+  setFilteredUserList
 }: any): JSX.Element => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState<string>("");
@@ -441,7 +443,6 @@ const BoxChat = ({
   };
 
   const renderActions = (role: "Owner" | "Admin" | "Member", user: any) => {
-    // console.log("role user", user);
     if (role in actionOptions) {
       return (
         <div className="mt-2">
@@ -509,8 +510,11 @@ const BoxChat = ({
       : []
   );
 
+  useEffect(()=> {
+    setFilteredUserList(usersList);
+  }, [usersList])
+
   // this state is for the search bar to filter easily
-  const [filteredUserList, setFilteredUserList] = useState(usersList);
 
   // function to fo filter onChange
   const handleSearchInputChange = (e: any) => {
@@ -519,7 +523,7 @@ const BoxChat = ({
 
     // Filter users based on the search query
     const filtered = usersList?.filter((user: any) =>
-      user.username.toLowerCase().includes(query)
+      user.username.toLowerCase().includes(query) && !selectedChannel?.members.some((member: any) => { member.username === user.username })
     );
 
     setFilteredUserList(filtered);
@@ -534,6 +538,7 @@ const BoxChat = ({
       token: cookie.access_token,
     };
     socket.emit("addMember", data);
+    setSelectedUsers([]);
   };
 
   const [activeTab, setActiveTab] = useState("members");
@@ -918,13 +923,6 @@ const BoxChat = ({
                       >
                         <div className="flex flex-row items-center">
                           <div className="relative">
-                            <div
-                              className={`w-4 h-4 absolute top-2 right-3 rounded-full ${
-                                user.status === "ONLINE"
-                                  ? "bg-green-500"
-                                  : "bg-gray-500"
-                              }`}
-                            />
                             <img
                               src={user.avatar}
                               alt={`${user.name}'s avatar`}
@@ -935,7 +933,6 @@ const BoxChat = ({
                             <h3 className="text-xl text-white font-semibold">
                               {user.name}
                             </h3>
-                            {/* Render the role icon */}
                             <div className="flex items-center">
                               {roleIcons[user.role]}
                               <span
@@ -1024,7 +1021,7 @@ const BoxChat = ({
                       <div className="relative">
                         <div
                           className={`w-4 h-4 absolute top-2 right-3 rounded-full ${
-                            user.status === "Online"
+                            user.status === "ONLINE"
                               ? "bg-green-500"
                               : "bg-gray-500"
                           }`}

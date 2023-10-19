@@ -102,13 +102,6 @@ export class UserController {
       return res.status(400).json({ msg: 'user not found' });
     }
   }
-
-  // @UseGuards(JwtAuthGuard)
-  // @Get('user/:username')
-  // async getUseByName(
-  //   @Res() res,
-  //   @Param('username') username: string,
-  // ) {
   //   try{
   //     if (!username)
   //       return res.status(400).json({ msg: 'user not found' })

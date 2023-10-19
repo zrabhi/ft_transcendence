@@ -376,32 +376,6 @@ export default function Settings() {
                   </Link>
                 )}
               </div>
-              <div className="social-form">
-                <form action="">
-                  <div className="input">
-                    <label htmlFor="discord">discord</label>
-                    <input
-                      type="text"
-                      name="discord"
-                      id="discord"
-                      autoComplete="off"
-                      placeholder="enter your discord link"
-                      onChange={handleDiscordChange}
-                    />
-                  </div>
-                  <div className="input">
-                    <label htmlFor="twitter">twitter</label>
-                    <input
-                      type="text"
-                      name="twitter"
-                      id="twitter"
-                      autoComplete="off"
-                      placeholder="Enter your twitter link"
-                      onChange={handleTwitterChange}
-                    />
-                  </div>
-                </form>
-              </div>
               <button className="submit" onClick={handleSubmitClick}>
                 submit
               </button>

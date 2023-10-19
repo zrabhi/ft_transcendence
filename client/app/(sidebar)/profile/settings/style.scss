@@ -155,6 +155,8 @@
           display: flex;
           flex-direction: column;
           gap: .6rem;
+          margin-top: 2rem;
+          margin-bottom: 2rem;
           h4 {
             font-weight: 600;
             text-align: center;
@@ -169,45 +171,6 @@
             padding: .3rem;
             border-radius: .2rem;
             background-color: #9492de;
-          }
-        }
-        .social-form {
-          margin-top: 3rem;
-          form {
-            .input {
-              position: relative;
-              margin-bottom: 2rem;
-              input {
-                display: block;
-                outline: none;
-                border: none;
-                padding: .3rem .5rem;
-                border-radius: .3rem;
-                background-color: $box-bg-color;
-                width: 100%;
-                font-size: .9rem;
-                border: 1px solid $blue-bg-color;
-                transition: all .2s ease-in-out;
-                &::placeholder {
-                  text-transform: capitalize;
-                }
-                &:focus {
-                  border-color: $soft-gold-color;
-                  border-width: 1px;
-                }
-              }
-              label {
-                font-size: .8rem;
-                font-weight: 600;
-                text-transform: capitalize;
-                display: block;
-                letter-spacing: .05rem;
-                opacity: .8;
-                position: absolute;
-                top: -1.2rem;
-                left: 0;
-              }
-            }
           }
         }
         .submit {

@@ -53,6 +53,7 @@ export class ChatController {
     const data = {
       channel: result.channel,
       members: members,
+      lastMessage: result.lastMessage
     };
     res.status(200).json(data);
   }
@@ -209,20 +210,27 @@ export class ChatController {
     @UserInfo() user: User,
     @Res() res: Response,
   ) {
+    try{
     const result = await this.chatService.getChannelDmMessages(
       channelId,
       user.id,
     );
-    // console.log('all messages here =>', result.allMessages);
-    // console.log('members are here =>', result.users);
     res.status(200).json(result);
+    }catch(err)
+    {
+      res.status(400).json("error");
+    }
   }
   @UseGuards(JwtAuthGuard)
   @Get('getChannels')
   async handleGetChannels(@UserInfo() user: User, @Res() res: Response) {
+    try{
     const result = await this.chatService.getAllChannels(user);
     res.status(200).json(result);
-    /// handle get channels expect private one's
+    }catch(err)
+    {
+      res.status(400).json("error");
+    }
   }
   @UseGuards(JwtAuthGuard)
   @Get('channelsDm')

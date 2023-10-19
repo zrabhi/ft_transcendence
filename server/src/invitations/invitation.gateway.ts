@@ -1,4 +1,4 @@
-import { JwtService } from '@nestjs/jwt';
+ import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
@@ -149,11 +149,17 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('logout')
   async handleLogout(@ConnectedSocket() client: Socket) {
     try{
+      //TODO: HANDLE LOGOUT (NOT FUNCTIONAL 100%)
     const { id } = this.connectedUsers.find((c) => c.socket.id === client.id);
     if (!id) return;
+    console.log("user id", id);
+    await this.userService.handleUpdateStatus(
+      'OFFLINE',
+      id
+    );
     const userSockets = this.connectedUsers.filter((c) => c.id === id);
     if (userSockets.length === 0) return;
-    userSockets.forEach((s) => {
+    userSockets.forEach(async (s) => {
       this.server.to(s.socket.id).emit('logout');
       s.socket.disconnect();
     });

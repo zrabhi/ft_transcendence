@@ -12,8 +12,8 @@ interface FriendsDataProps {
 
 export default function FriendsData({friendList}: FriendsDataProps) {
   return (
-    <div className="friends-list">
-      <table className='w-full text-left mt-4'>
+    <div className="friends-list bg-purple-400 bg-opacity-20 rounded-[.5rem] overflow-hidden mt-4 ">
+      <table className='w-full text-left'>
         <tbody>
           {friendList.length === 0 && (
             <tr className=''>
@@ -21,7 +21,7 @@ export default function FriendsData({friendList}: FriendsDataProps) {
             </tr>
           )}
           {friendList.map((user: any, index: number) => (
-            <tr key={index} className=''>
+            <tr key={index} className='hover:bg-purple-400 hover:bg-opacity-20'>
               <td className='p-4' >
                 <div className="flex items-center gap-4">
                   <div className="avatar w-16 h-16 rounded-full overflow-hidden">

@@ -190,7 +190,7 @@ model Channel {
   admins            ChannelAdmin[]    @relation(name: "channelAdmin")
   Muted             ChannelMuted[]    @relation(name: "channelMute")
 
-  avatar String?   @default("http://127.0.0.1:8080/api/avatar/pictures/default.jpeg")
+  avatar String?   @default("http://192.168.1.55:8080/api/avatar/pictures/default.jpeg")
   created_at        DateTime @default(now())
 }
 model ChannelMembers{

@@ -97,6 +97,7 @@ export class ChatService {
         name: true, // You can select other fields you need from the channel
         users: true,
         type: true,
+        messages:true
       },
     });
     return search;
@@ -314,9 +315,20 @@ export class ChatService {
 
     const result = await this.checkChannelDmExistence(user.username, username);
     if (result.length > 0) {
+      
       const data = {
         channel: result[0],
         user: user,
+        lastMessage:{
+          type:"dm",
+          channel: {
+            id: result[0].id,
+            username: otherUser.username,
+            avatar:otherUser.avatar,
+            message: '',
+            status: otherUser.status,
+          }
+        }
       };
       return data;
     }
@@ -328,6 +340,16 @@ export class ChatService {
         users: [username, user.username],
       },
     });
+    const lastMessage = {
+      type: 'dm',
+      channel: {
+        id: channel.id,
+        username: otherUser.username,
+        avatar:otherUser.avatar,
+        message: '',
+        status: otherUser.status,
+      }
+    }
     await this._prisma.channelMembers.create({
       data: {
         userId: user.id,
@@ -335,7 +357,6 @@ export class ChatService {
         role: 'MEMBER',
       },
     });
-
     await this._prisma.channelMembers.create({
       data: {
         userId: otherUser.id,
@@ -343,7 +364,8 @@ export class ChatService {
         role: 'MEMBER',
       },
     });
-    return { channel: channel, user: otherUser };
+
+    return { channel: channel, user: otherUser, lastMessage: lastMessage };
   }
   //Todo: saveMessageToChannel:
 
@@ -489,14 +511,25 @@ export class ChatService {
           role: 'MEMBER',
         },
       });
-      const lastMessage = channel.messages[channel.messages.length - 1];
+      let lastConvo;
+      let checker = false;
+      let lastMessage = channel.messages[channel.messages.length - 1];
       if (!lastMessage)
-        return {
-          success: true,
-          error: 'member added successfully',
-          channel: channel,
-        };
-      const lastConvo = {
+        {
+          lastConvo = {
+            type: 'room',
+            channel: {
+              id: channel.id,
+              name: channel.name, /// it ay be deleteedd
+              avatar: channel.avatar,
+              message: "",
+              time: new Date(),
+              status: '',
+            },
+          }
+        }
+    else
+       lastConvo = {
         type: 'room',
         channel: {
           id: channel.id,

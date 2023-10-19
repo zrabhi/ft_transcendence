@@ -14,11 +14,6 @@ module.exports = {
       md: "768px",
       lg: "1024px",
     },
-    borderRadius: {
-      lg: "1rem",
-      md: "0.75rem",
-      sm: "0.5rem",
-    },
     container: {
       center: true,
       padding: "2rem",

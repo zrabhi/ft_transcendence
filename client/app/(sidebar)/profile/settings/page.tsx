@@ -276,7 +276,7 @@ export default function Settings() {
                       type="text"
                       name="username"
                       id="username"
-                      placeholder={user.username ? user.username : "Please enter New Username"}
+                      placeholder={"Please enter New Username"}
                       autoComplete="off"
                       value={username}
                       onChange={handleUsernameChange}

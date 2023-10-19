@@ -12,6 +12,7 @@ import { AuthContext } from '@/app/context/AuthContext';
 import { useCookies } from "react-cookie";
 import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
 import { disconnect } from 'process';
+import Image from 'next/image';
 
 export default function match()
 {
@@ -246,25 +247,59 @@ export default function match()
         <div className="game-content min-h-screen p-8">
             <HeaderBar />
             <div className={`core flex w-full`} >
-                <div className="score flex">
-                    <div className="player player1">
-                        <div className='avatar'>
+                {/* <div className="score flex">
+                    <div className="player player1 flex gap-4">
+                        <div className='avatar '>
                             <img src={user?.avatar}  alt="avatar" />
                         </div>
-                        <div className='player-name invisible lg:visible ' >{user.username}</div>
+                        <div className='player-name none lg:block text-sm bg-green-300 overflow-hidden text-ellipsis' >{user.username}</div>
                         <div className="score1">{myscore}</div>
                     </div>
                     <div className="player player2">
                         <div className="score2">{oppscore}</div>
-                        <div className='player-name invisible lg:visible ' >{opp_username}</div>
-                        <div className='avatar'>
+                        <div className='player-name none lg:block text-sm bg-green-300 overflow-hidden text-ellipsis' >{opp_username}</div>
+                        <div className='avatar '>
                             <img src={opp_avatar} alt="avatar" />
                         </div>
                     </div>
+                </div> */}
+                <div className="score flex p-1 justify-between items-center">
+                  <div className="player1 flex items-center gap-3 w-1/2 ">
+                    <div className="avatar w-12 h-12 rounded-full overflow-hidden">
+                      <Image 
+                        src={user?.avatar}
+                        alt="avatar"
+                        width={100}
+                        height={100}
+                      />
+                    </div>
+                    <div className="username text-sm font-bold tracking-wide hidden lg:block">
+                      {user.username}
+                    </div>
+                    <div className="player-score grow flex justify-center text-xl">
+                      {myscore}
+                    </div>
+                  </div>
+                  <div className="player2 flex flex-row-reverse  items-center gap-3 w-1/2">
+                    <div className="avatar w-12 h-12 rounded-full overflow-hidden">
+                      <Image 
+                        src={opp_avatar}
+                        alt="avatar"
+                        width={100}
+                        height={100}
+                      />
+                    </div>
+                    <div className="username text-sm font-bold tracking-wide hidden lg:block">
+                      {opp_username}
+                    </div>
+                    <div className="player-score grow flex justify-center text-xl">
+                      {oppscore}
+                    </div>
+                  </div>
                 </div>
                 <div className={`popup ${showPopup ?  'bg-black-400 bg-opacity-70 backdrop-blur-sm': 'hidden' } w-screen h-screen fixed inset-0 flex justify-center items-center `} >|
                   <div className='popupcore w-[50rem] xs:w-[18rem] sm:w-[24rem] md:w-[30rem]
-         rounded-xl  relative p-4 pt-12 pb-8'>
+                    rounded-xl  relative p-4 pt-12 pb-8'>
                     <div className="message">{popupMessage}</div>
                     <div className="buttons">
                       <button className={'back'} onClick={handleNewGameClick}>New Game</button>

@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 import './ProfileCard.scss';
 
@@ -7,13 +8,15 @@ export default function ProfileCard(user: any) {
     <div className="profile-card w-full relative ">
       <div className="background"></div>
       <div className="avatar">
-        <img
+        <Image
           src={
             user.data && user.data.avatar && !user.data.avatar.includes('googleusercontent')
               ? user.data.avatar
               : '/images/DefaultAvatar.jpg'
           }
           alt="User Avatar"
+          width={200}
+          height={200}
         />
       </div>
       <div className="user-details">

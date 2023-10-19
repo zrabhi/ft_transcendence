@@ -4,7 +4,7 @@ import Image from 'next/image';
 export default function GameHistoryList({ gameList }: any) {
   return (
     <div className="game-history">
-      <div className="game-history-header mt-4 flex justify-evenly items-center text-center bg-purple-800 bg-opacity-50 py-3 font-bold text-xl tracking-wider rounded">
+      <div className="game-history-header mt-4 flex justify-evenly items-center text-center bg-purple-400 bg-opacity-40 py-3 font-bold text-xl tracking-wider rounded-t-[.5rem] ">
         <div className="column w-2/5 ">Winner</div>
         <div className="column w-1/5 ">Score</div>
         <div className="column w-2/5 ">Loser</div>
@@ -13,16 +13,17 @@ export default function GameHistoryList({ gameList }: any) {
         {gameList.map((game: any, index: number) => (
           <div
             key={index}
-            className="game-history-item flex justify-center items-center my-4 hover:bg-purple-700 hover:bg-opacity-20"
+            className="game-history-item flex justify-center items-center hover:bg-purple-400 hover:bg-opacity-30 py-4"
           >
             <div className="winner-side column w-2/5">
               <div className="user-data flex flex-col gap-2 items-center">
-                <div className="avatar rounded-full overflow-hidden border border-green-500">
+                <div className="avatar rounded-full overflow-hidden border-2 border-green-500 w-16 h-16">
                   <Image
                     src={game.winner.avatar}
                     alt="Winner avatar"
-                    width={80}
-                    height={80}
+                    width={100}
+                    height={100}
+                    className='w-full h-full object-cover'
                   />
                 </div>
                 <div className="username">{game.winner.username}</div>
@@ -35,7 +36,7 @@ export default function GameHistoryList({ gameList }: any) {
             </div>
             <div className="column w-2/5">
               <div className="user-data flex flex-col gap-2 items-center">
-                <div className="avatar rounded-full overflow-hidden border border-red-500">
+                <div className="avatar rounded-full overflow-hidden border-2 border-red-500">
                   <Image
                     src={game.loser.avatar}
                     alt="Winner avatar"

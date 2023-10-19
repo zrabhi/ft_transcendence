@@ -8,7 +8,7 @@ export default function StatsData({user}: any) {
     // win rate bar
     // number of goals
     // number of received goals
-    <div className="mx-auto p-4 mt-4 bg-purple-400 bg-opacity-60 rounded-lg shadow-md">
+    <div className="mx-auto p-4 mt-4 bg-purple-400 bg-opacity-40 rounded-[.5rem] shadow-md">
       <h1 className="text-2xl font-bold mb-4">User Stats</h1>
 
       <div className="stat mb-6">

@@ -4,7 +4,7 @@ import Image from 'next/image';
 export default function GameHistoryList({ gameList }: any) {
   return (
     <div className="game-history">
-      <div className="game-history-header mt-4 flex justify-evenly items-center text-center bg-purple-800 bg-opacity-50 py-3 font-bold text-xl tracking-wider rounded">
+      <div className="game-history-header mt-4 flex justify-evenly items-center text-center bg-purple-400 bg-opacity-40 py-3 font-bold text-xl tracking-wider rounded-t-[.5rem] ">
         <div className="column w-2/5 ">Winner</div>
         <div className="column w-1/5 ">Score</div>
         <div className="column w-2/5 ">Loser</div>
@@ -13,7 +13,7 @@ export default function GameHistoryList({ gameList }: any) {
         {gameList.map((game: any, index: number) => (
           <div
             key={index}
-            className="game-history-item flex justify-center items-center my-4 hover:bg-purple-700 hover:bg-opacity-20"
+            className="game-history-item flex justify-center items-center hover:bg-purple-400 hover:bg-opacity-30 py-4"
           >
             <div className="winner-side column w-2/5">
               <div className="user-data flex flex-col gap-2 items-center">

@@ -17,7 +17,7 @@ export default function GameHistoryList({ gameList }: any) {
           >
             <div className="winner-side column w-2/5">
               <div className="user-data flex flex-col gap-2 items-center">
-                <div className="avatar rounded-full overflow-hidden border border-green-500">
+                <div className="avatar rounded-full overflow-hidden border-2 border-green-500">
                   <Image
                     src={game.winner.avatar}
                     alt="Winner avatar"
@@ -35,7 +35,7 @@ export default function GameHistoryList({ gameList }: any) {
             </div>
             <div className="column w-2/5">
               <div className="user-data flex flex-col gap-2 items-center">
-                <div className="avatar rounded-full overflow-hidden border border-red-500">
+                <div className="avatar rounded-full overflow-hidden border-2 border-red-500">
                   <Image
                     src={game.loser.avatar}
                     alt="Winner avatar"

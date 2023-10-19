@@ -20,11 +20,25 @@
     justify-content: center;
     margin-top: 2%;
     width: 50%;
+    position: relative;
+    width: 90%;
+    max-width: 40rem;
     -webkit-border-radius: 2rem;
     -moz-border-radius: 2rem;
     -ms-border-radius: 2rem;
     -o-border-radius: 2rem;
+    &::after {
+        content: '';
+        width: 1px;
+        height: 100%;
+        background-color: #fff;
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+    }
 }
+
 
 .player-score {
     font-size: .9rem;

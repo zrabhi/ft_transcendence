@@ -263,36 +263,38 @@ export default function match()
                         </div>
                     </div>
                 </div> */}
-                <div className="score flex p-1 justify-between items-center">
-                  <div className="player1 flex items-center gap-3 w-1/2 ">
-                    <div className="avatar w-12 h-12 rounded-full overflow-hidden">
+                <div className="score flex p-2 justify-between items-center gap-4">
+                  <div className="player1 flex items-center gap-3 w-1/2 justify-between ">
+                    <div className="avatar w-12 h-12 rounded-full overflow-hidden border border-slate-50">
                       <Image 
                         src={user?.avatar}
                         alt="avatar"
                         width={100}
                         height={100}
+                        className='w-full h-full object-cover'
                       />
                     </div>
-                    <div className="username text-sm font-bold tracking-wide hidden lg:block">
+                    <div className="username text-sm font-bold tracking-wide hidden md:block uppercase">
                       {user.username}
                     </div>
-                    <div className="player-score grow flex justify-center text-xl">
+                    <div className="player-score text-xl">
                       {myscore}
                     </div>
                   </div>
-                  <div className="player2 flex flex-row-reverse  items-center gap-3 w-1/2">
-                    <div className="avatar w-12 h-12 rounded-full overflow-hidden">
+                  <div className="player2 flex flex-row-reverse  items-center justify-between gap-3 w-1/2">
+                    <div className="avatar w-12 h-12 rounded-full overflow-hidden border border-slate-50">
                       <Image 
                         src={opp_avatar}
                         alt="avatar"
                         width={100}
                         height={100}
+                        className='w-full h-full object-cover'
                       />
                     </div>
-                    <div className="username text-sm font-bold tracking-wide hidden lg:block">
+                    <div className="username text-sm font-bold tracking-wide hidden md:block uppercase">
                       {opp_username}
                     </div>
-                    <div className="player-score grow flex justify-center text-xl">
+                    <div className="player-score text-xl">
                       {oppscore}
                     </div>
                   </div>

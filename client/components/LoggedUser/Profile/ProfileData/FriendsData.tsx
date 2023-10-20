@@ -11,15 +11,17 @@ interface FriendsDataProps {
 }
 
 export default function FriendsData({friendList}: FriendsDataProps) {
+  if (friendList.length === 0) {
+    return (
+      <div className="no-friends">
+        <div className="text-2xl font-bold mt-4 text-center ">No friends yet</div>
+      </div>
+    );
+  }
   return (
     <div className="friends-list bg-purple-400 bg-opacity-20 rounded-[.5rem] overflow-hidden mt-4 ">
       <table className='w-full text-left'>
         <tbody>
-          {friendList.length === 0 && (
-            <tr className=''>
-              <td className='text-center text-2xl' >No friends yet! </td>
-            </tr>
-          )}
           {friendList.map((user: any, index: number) => (
             <tr key={index} className='hover:bg-purple-400 hover:bg-opacity-20'>
               <td className='p-4' >

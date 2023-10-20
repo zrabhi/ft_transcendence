@@ -159,7 +159,8 @@ export default function UserCard(user: any) {
       </div>
       <div className="user-details">
         <h2>{user && user.username}</h2>
-          <div className="state-msg friend-state flex gap-4 justify-between items-center cursor-pointer hover:opacity-80">
+        <div className="user-states flex bg-slate-200 w-full justify-center gap-4">
+          <div className="state-msg w-[10rem] friend-state                                                                                                                                                                                            rounded-[.4rem] flex gap-4 justify-between items-center cursor-pointer hover:opacity-80">
             {isInFriendList.includes(user.username) ? (
               <p className="flex justify-between gap-2 items-center" onClick={removeFriendHandler}>
                 <span>Friends</span>
@@ -183,17 +184,18 @@ export default function UserCard(user: any) {
               </p>
             )}
           </div>
-        <div className="block-state">
-          <div className="block-btn">
-            {blockedUsers.includes(user.username) ? (
-              <button className="bg-red-500 text-white rounded px-4 py-2" onClick={handleUnblock}>
-                Unblock
-              </button>
-            ) : (
-              <button type="button" className="bg-red-500 text-white rounded px-4 py-2" onClick={handleBlock}>
-                Block
-              </button>
-            )}
+          <div className="block-state w-[10rem] bg-red-500 text-white px-4 py-2 rounded-[.4rem] overflow-hidden">
+            <div className="block-btn">
+              {blockedUsers.includes(user.username) ? (
+                <button className="" onClick={handleUnblock}>
+                  Unblock
+                </button>
+              ) : (
+                <button type="button" className="bg-red-500 text-white rounded px-4 py-2" onClick={handleBlock}>
+                  Block
+                </button>
+              )}
+            </div>
           </div>
         </div>
         <div className="stats">

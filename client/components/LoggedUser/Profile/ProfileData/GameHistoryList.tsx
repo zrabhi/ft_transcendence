@@ -2,6 +2,13 @@ import React from 'react';
 import Image from 'next/image';
 
 export default function GameHistoryList({ gameList }: any) {
+  if (gameList.length === 0) {
+    return (
+      <div className="no-games">
+        <div className="text-2xl font-bold mt-4 text-center ">No games played yet</div>
+      </div>
+    );
+  }
   return (
     <div className="game-history">
       <div className="game-history-header mt-4 flex justify-evenly items-center text-center bg-purple-400 bg-opacity-40 py-3 font-bold text-xl tracking-wider rounded-t-[.5rem] ">

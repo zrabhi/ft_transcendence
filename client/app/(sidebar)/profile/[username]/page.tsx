@@ -10,6 +10,11 @@ import FriendsData from "@/components/LoggedUser/Profile/ProfileData/FriendsData
 import LeaderboardData from "@/components/LoggedUser/Profile/ProfileData/LeaderboardData";
 import { baseUrlUsers, getRequest } from "@/app/context/utils/service";
 import { showSnackbar } from "@/app/context/utils/showSnackBar";
+import Game from "../../game/page";
+import GameHistory from "@/components/MainPage/GameHistory/GameHistory";
+import GameHistoryList from "@/components/LoggedUser/Profile/ProfileData/GameHistoryList";
+import StatsData from "@/components/LoggedUser/Profile/ProfileData/StatsData";
+import AchievementsData from "@/components/LoggedUser/Profile/ProfileData/AchievementsData";
 
 export default function Page({params}: {params: {username: string} }) {
   const { username } = params;
@@ -17,7 +22,9 @@ export default function Page({params}: {params: {username: string} }) {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [users, setUsers] = useState<[]>([]);
   const [selectedItem, setSelectedItem] = useState<number>(2);
-  const [friendList, setFriendList] = useState<any>([]); // firendlsit will contain array of (username, status, avatar)
+  const [friendList, setFriendList] = useState<any>([]);
+  const [gameList, setGameList] = useState<any>([]);
+  const [achievements, setAchievements] = useState<any>({});
 
   const fetchUsers = async () => {
     try {
@@ -46,6 +53,33 @@ export default function Page({params}: {params: {username: string} }) {
     }
   }
 
+  const fetchGameList = async () => {
+    try {
+      const gameList = await getRequest(`${baseUrlUsers}/user/matches/${username}`);
+      if (gameList.error && gameList.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false)
+        return ;
+      }
+      setGameList(gameList);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const fetchAchievements = async () => {
+    try {
+      const achievements = await getRequest(`${baseUrlUsers}/user/achievement/${username}`);
+      if (achievements.error && achievements.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false)
+        return ;
+      }
+      console.log(achievements);
+      setAchievements(achievements);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   useEffect(() => {
     try {
       (async () =>{
@@ -56,9 +90,11 @@ export default function Page({params}: {params: {username: string} }) {
       console.error('Error fetching friend list:', error);
     }
 
-    const debouncedFetchUsers = setTimeout(() => {
-      fetchUsers();
-      fetchFriendList();
+    const debouncedFetchUsers = setTimeout(async () => {
+      await fetchUsers();
+      await fetchFriendList();
+      await fetchGameList();
+      await fetchAchievements();
     }, 300);
 
     return () => {
@@ -95,10 +131,10 @@ export default function Page({params}: {params: {username: string} }) {
           <NavMenu setSelectedItem={setSelectedItem} />
           <div className="user-data">
             { selectedItem === 0 && <FriendsData friendList={friendList} /> }
-              { selectedItem === 1 && <div>History</div> }
+              { selectedItem === 1 && <GameHistoryList gameList={gameList} /> }
               { selectedItem === 2 && <LeaderboardData users={users} /> }
-              { selectedItem === 3 && <div>Statistics</div> }
-              { selectedItem === 4 && <div>Achievements</div> }
+              { selectedItem === 3 && <StatsData user={user} /> }
+              { selectedItem === 4 && <AchievementsData achievements={achievements} /> }
           </div>
         </div>
       </div>

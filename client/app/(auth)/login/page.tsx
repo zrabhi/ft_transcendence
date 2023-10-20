@@ -17,6 +17,7 @@ import schoolLogo from "@/public/images/42.png";
 import GithubLogo from "@/public/images/github.png";
 import { useRouter } from "next/navigation";
 import { AuthContext } from "@/app/context/AuthContext";
+import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 export default function SignIn() {
   //All refs
@@ -25,7 +26,8 @@ export default function SignIn() {
   const passMessage = useRef<HTMLParagraphElement>(null);
   const checkOne = useRef<HTMLParagraphElement>(null); // for checkbox number 1
   const checkTwo = useRef<HTMLParagraphElement>(null); // for checkbox number 2
-  let intraRedirect: string = process.env.NEXT_PUBLIC_BACKEND_HOST + "/api/auth/42/login"
+  let intraRedirect: string =
+    process.env.NEXT_PUBLIC_BACKEND_HOST + "/api/auth/42/login";
   // useStates
   const [loginInfo, setLoginInfo] = useState({
     email: "",
@@ -74,11 +76,15 @@ export default function SignIn() {
     const result = await LogIn(loginInfo);
     if (result) {
       // console.log(user.tfa);
-      if (user.tfa){
-        return router.push("/login/tfalogin");}
+      if (user.tfa) {
+        return router.push("/login/tfalogin");
+      }
       router.push("/profile");
-    } else return (ErrorRef.current!.innerHTML = "Invalid Credentials");
-
+    } else
+      return (
+        (ErrorRef.current!.innerHTML = "Invalid Credentials"),
+        showSnackbar("Invalid Credentials", false)
+      );
   };
 
   return (
@@ -102,8 +108,8 @@ export default function SignIn() {
                     placeholder="email"
                     autoFocus
                     required
-                    autoComplete='off'
-                    defaultValue=''
+                    autoComplete="off"
+                    defaultValue=""
                     onInvalid={handleInvalidEmail}
                     onChange={handleEmailChange}
                   />
@@ -120,8 +126,8 @@ export default function SignIn() {
                     type="password"
                     placeholder="password"
                     required
-                    autoComplete='off'
-                    defaultValue=''
+                    autoComplete="off"
+                    defaultValue=""
                     onInvalid={handleInvalidPassword}
                     onChange={handlePasswordChange}
                   />
@@ -130,13 +136,16 @@ export default function SignIn() {
                   </div>
                 </div>
 
-
-
                 <div ref={ErrorRef} className="errorRef email-error"></div>
-                <button onClick={handleClickButton} className=""> sign in</button>
+                <button onClick={handleClickButton} className="">
+                  {" "}
+                  sign in
+                </button>
                 <div className="auto-auth">
-                  <span className="
-                  text-gray-400 text-sm ">
+                  <span
+                    className="
+                  text-gray-400 text-sm "
+                  >
                     You can sign in with
                   </span>
                   <div className="logos">

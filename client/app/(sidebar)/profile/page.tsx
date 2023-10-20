@@ -23,6 +23,21 @@ export default function Profile() {
   const [users, setUsers] = useState<[]>([]);
   const [friendList, setFriendList] = useState<any>([]);
   const [gameList, setGameList] = useState<any>([]);
+  const [achievements, setAchievements] = useState<any>({});
+
+  const fetchAchievements = async () => {
+    try {
+      const achievements = await getRequest(`${baseUrlUsers}/user/achievement`);
+      if (achievements.error && achievements.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false)
+        return ;
+      }
+      console.log(achievements);
+      setAchievements(achievements);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const fetchUsers = async () => {
     try {
@@ -78,6 +93,7 @@ export default function Profile() {
       await fetchUsers();
       await fetchFriendList();
       await fetchGameHistory();
+      await fetchAchievements();
     }, 300);
 
     return () => {
@@ -119,7 +135,7 @@ export default function Profile() {
               { selectedItem === 1 && <GameHistoryList gameList={gameList} /> }
               { selectedItem === 2 && <LeaderboardData users={users} /> }
               { selectedItem === 3 && <StatsData user={user} /> }
-              { selectedItem === 4 && <AchievementsData /> }
+              { selectedItem === 4 && <AchievementsData achievements={achievements} /> }
             </div>
           </div>
         </div>

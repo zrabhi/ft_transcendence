@@ -10,45 +10,7 @@ import Achive4Avatar from "@/public/achievements/first-lose.png"
 import Achive5Avatar from "@/public/achievements/first-win.png"
 import Achive6Avatar from "@/public/achievements/clean-sheet.png"
 
-export default function AchievementsData() {
-  const [achievements, setAchievements] = useState<any>({});
-
-  const fetchAchievements = async () => {
-    try {
-      const achievements = await getRequest(`${baseUrlUsers}/user/achievement`);
-      if (achievements.error && achievements.message === "Unauthorized") {
-        showSnackbar("Unauthorized", false)
-        return ;
-      }
-      console.log(achievements);
-      setAchievements(achievements);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  // those are the keys
-//   accountCreationAchie
-// : 
-// true
-// cleanSheetGameAchie
-// : 
-// false
-// created_at
-// : 
-// "2023-10-20T20:00:28.822Z"
-// firstFriendAchie
-// : 
-// false
-// firstGameAchie
-// : 
-// false
-// firstLoseAchie
-// : 
-// false
-// firstWinAchie
-// : 
-// false
+export default function AchievementsData({achievements}: any) {
 
   let achievsDataArr = [
     {
@@ -88,13 +50,6 @@ export default function AchievementsData() {
       avatarName : Achive6Avatar,
     }
   ]
-
-
-  useEffect(() => {
-    (async() => {
-      await fetchAchievements();
-    })()
-  }, [])
 
   return (
     <div className="achievs mt-4 flex flex-col gap-1">

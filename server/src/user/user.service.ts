@@ -411,24 +411,23 @@ export class UserService {
     await this.creatFriendshipAchievements(userOne, userTwo);
   }
 
-  async creatFriendshipAchievements(userOne:User, userTwo:User)
-  {
+  async creatFriendshipAchievements(userOne: User, userTwo: User) {
     await this.prismaService.achievement.update({
-      where:{
-        userId:userOne.id
+      where: {
+        userId: userOne.id,
       },
-      data:{
+      data: {
         firstFriendAchie: true,
-      }
-    })
+      },
+    });
     await this.prismaService.achievement.update({
-      where:{
-        userId:userTwo.id
+      where: {
+        userId: userTwo.id,
       },
-      data:{
+      data: {
         firstFriendAchie: true,
-      }
-    })
+      },
+    });
   }
   async handleUnFriendUser(user: any, username: string) {
     try {
@@ -765,15 +764,17 @@ export class UserService {
           id: user.id,
         },
         include: {
-          OutgoingRequest: true,
+          IncomingRequest: true,
         },
       });
       const otherUser = await this.findUserName(username);
-      for (const request of currentUser.OutgoingRequest) {
+      for (const request of currentUser.IncomingRequest) {
         if (
-          request.requester_id === currentUser.id &&
-          request.state === 'PENDING' &&
-          request.requested_id === otherUser.id
+          (request.requester_id === currentUser.id ||
+            request.requested_id === currentUser.id) &&
+          (request.requested_id === otherUser.id ||
+            request.requester_id === otherUser.id) &&
+          request.state === 'PENDING'
         ) {
           await this.prismaService.friendRequest.delete({
             where: {
@@ -923,53 +924,50 @@ export class UserService {
           });
         }
       }
-      return {success: true, games: games}
+      return { success: true, games: games };
     } catch (err) {
-      return {success: false, error: "error occured"}
+      return { success: false, error: 'error occured' };
     }
   }
 
-  async getInvitionAccpted(userid:string)
-  {
+  async getInvitionAccpted(userid: string) {
     const currentUser = await this.findUserById(userid);
-    const invitations = await this.prismaService.gameInvite.findMany({})
-    let opponents = []
-    let invitationIds = []
-    for (const invite of invitations)
-    {
+    const invitations = await this.prismaService.gameInvite.findMany({});
+    let opponents = [];
+    let invitationIds = [];
+    for (const invite of invitations) {
       let user;
-      if ((invite.senderId === currentUser.id ||
-        invite.recieverId === currentUser.id) &&
-      invite.state === 'ACCEPTED')
-      {
+      if (
+        (invite.senderId === currentUser.id ||
+          invite.recieverId === currentUser.id) &&
+        invite.state === 'ACCEPTED'
+      ) {
         if (invite.senderId === currentUser.id)
-             user = await this.findUserById(invite.recieverId);
-        else
-            user = await this.findUserById(invite.senderId);
-        opponents.push(user)
+          user = await this.findUserById(invite.recieverId);
+        else user = await this.findUserById(invite.senderId);
+        opponents.push(user);
         invitationIds.push(invite.id);
       }
     }
     if (opponents.length > 0)
-      return {success: true, opponents: opponents, invitaionsId: invitationIds}
-    return {success: false}
-}
-  async handleGetUserStatus(user: any)
-  {
-    const currentUser = await this.findUserById(user.id);
-    return currentUser.status; 
+      return {
+        success: true,
+        opponents: opponents,
+        invitaionsId: invitationIds,
+      };
+    return { success: false };
   }
-  async handleRemoveGameInvite(gameInviteId: string)
-  {
-    try{
-        await this.prismaService.gameInvite.delete({
-          where:{
-            id: gameInviteId
-          }
-        })
-      return {success: true}
-    }catch(err){
-      return {success:true, error:"error ocured while deleting invitation"}
+
+  async handleRemoveGameInvite(gameInviteId: string) {
+    try {
+      await this.prismaService.gameInvite.delete({
+        where: {
+          id: gameInviteId,
+        },
+      });
+      return { success: true };
+    } catch (err) {
+      return { success: true, error: 'error ocured while deleting invitation' };
     }
   }
   // async getFileUpload(fileTarget, category) {

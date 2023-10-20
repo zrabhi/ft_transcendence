@@ -20,11 +20,11 @@ interface SideBarProps {
 export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
   const router = useRouter();
   const [cookie, setCookie, remove] = useCookies(['access_token']);
-  const{ noitfSocket}  = useContext(AuthContext);
+  const{ notifSocket}  = useContext(AuthContext);
   // const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const handleSignOut = () => {
-    noitfSocket?.emit("logout")
+    notifSocket.emit("logout")
     remove('access_token');
     router.push("/login");
   };

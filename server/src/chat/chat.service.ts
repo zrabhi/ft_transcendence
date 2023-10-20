@@ -85,11 +85,13 @@ export class ChatService {
     user: string,
     otherUser: string,
   ): Promise<Channel | any> {
+    const currentUser = await this._user.findUserName(user);
+    const other = await this._user.findUserName(otherUser)
     const search = await this._prisma.channel.findMany({
       where: {
         AND: [
-          { users: { has: user } }, // Check if userId1 is in the 'users' array
-          { users: { has: otherUser } }, // Check if userId2 is in the 'users' array
+          { users: { has: currentUser.id } }, // Check if userId1 is in the 'users' array
+          { users: { has: other.id } }, // Check if userId2 is in the 'users' array
         ],
       },
       select: {
@@ -337,7 +339,7 @@ export class ChatService {
         name: uuidv4(),
         member_limit: memberLimit,
         type: 'DM',
-        users: [username, user.username],
+        users: [otherUser.id, user.id],
       },
     });
     const lastMessage = {
@@ -383,7 +385,7 @@ export class ChatService {
   async getAllUserChannelsDm(currUser: any): Promise<Channel[]> {
     const channelsDm = await this._prisma.channel.findMany({
       where: {
-        AND: [{ users: { has: currUser.username } }],
+        AND: [{ users: { has: currUser.id } }],
       },
       include: {
         messages: true,

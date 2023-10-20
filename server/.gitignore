@@ -4,7 +4,7 @@ node_modules/*
 .env
 *.sql
 dist
-# images/avatars/*.jpg
-# images/avatars/*.png
-# images/avatars/*.jpeg
-# !images/avatars/default.jpeg
+images/avatars/*.jpg
+images/avatars/*.png
+images/avatars/*.jpeg
+!images/avatars/default.jpeg

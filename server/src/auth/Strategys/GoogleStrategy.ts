@@ -41,7 +41,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     done: VerifyCallback,
   ): Promise<any> {
     {
-
+      try{
       const user = this.extractGoogleUserData(profile);
       let userCheck = await this.userService.findUserEmail(user.email);
       if (!userCheck) {
@@ -50,6 +50,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         userCheck = await this.userService.findUserById(newUser.id);
       }
       done(null, userCheck);
+    }catch(err)
+    {
+
+    }
     }
   }
 }

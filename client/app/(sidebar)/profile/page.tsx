@@ -14,6 +14,7 @@ import { showSnackbar } from "@/app/context/utils/showSnackBar";
 import Users from "./users";
 import GameHistoryList from "@/components/LoggedUser/Profile/ProfileData/GameHistoryList";
 import StatsData from "@/components/LoggedUser/Profile/ProfileData/StatsData";
+import AchievementsData from "@/components/LoggedUser/Profile/ProfileData/AchievementsData";
 
 export default function Profile() {
   const { getUserData, user ,setNotif } = useContext(AuthContext);
@@ -118,7 +119,7 @@ export default function Profile() {
               { selectedItem === 1 && <GameHistoryList gameList={gameList} /> }
               { selectedItem === 2 && <LeaderboardData users={users} /> }
               { selectedItem === 3 && <StatsData user={user} /> }
-              { selectedItem === 4 && <div>Achievements</div> }
+              { selectedItem === 4 && <AchievementsData /> }
             </div>
           </div>
         </div>

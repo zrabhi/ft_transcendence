@@ -88,254 +88,248 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const fetchUserData = async () => {
-    try{
-    const response = await getRequest(`${baseUrlUsers}/user`);
-    if (response?.error) {
-      setLoginError(response);
-      return false;
-    }
-    if (response?.error && response?.message === "Unauthorized"){
-      showSnackbar("Unauthorized", false)
-      return ;
-  }
-    setUser(response);
-}catch(err)
-{
-
-}
-};
+    try {
+      const response = await getRequest(`${baseUrlUsers}/user`);
+      if (response?.error) {
+        setLoginError(response);
+        return false;
+      }
+      if (response?.error && response?.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false);
+        return;
+      }
+      setUser(response);
+    } catch (err) {}
+  };
 
   const fetchFriendList = async () => {
-    try{
-    const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
-    if (friendList.error && friendList.message === "Unauthorized"){
-      showSnackbar("Unauthorized", false)
-      return ;
-  }
-    setFriendsList(friendList);
-  }catch(err)
-    {
-
-    }
+    try {
+      const friendList = await getRequest(`${baseUrlUsers}/user/friends`);
+      if (friendList.error && friendList.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false);
+        return;
+      }
+      setFriendsList(friendList);
+    } catch (err) {}
   };
 
   const fetchFriendRequestSent = async () => {
     try {
       const response = await getRequest(`${baseUrlUsers}/requestFriendSent`);
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-    }
+      if (response?.error && response?.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false);
+        return;
+      }
       setFriendRequestSent(response);
-    } catch (err) {
-
-    }
+    } catch (err) {}
   };
   const fetchFriendRequests = async () => {
     try {
       const response = await getRequest(`${baseUrlUsers}/getFriendRequests`);
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-    }
+      if (response?.error && response?.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false);
+        return;
+      }
       setUserFriendRequests(response);
-    } catch (err) {
-
-    }
+    } catch (err) {}
   };
-  const fetchGameRequest = async () =>{
-    try{
-    const response = await getRequest(`${baseUrlUsers}/gameRequests`)
-    if (response?.error && response?.message === "Unauthorized"){
-      showSnackbar("Unauthorized", false)
-      return ;
-  }
-    setGameRequest(response);
-    } catch(err)
-    {
-
-    }
-  }
+  const fetchGameRequest = async () => {
+    try {
+      const response = await getRequest(`${baseUrlUsers}/gameRequests`);
+      if (response?.error && response?.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false);
+        return;
+      }
+      setGameRequest(response);
+    } catch (err) {}
+  };
   useEffect(() => {
     if (!checkPath()) return;
     console.log("+++++++---?????");
-    try{
-    (async () => {
-      const response = await getRequest(`${baseUrlUsers}/user`);
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-    }
-    if (response?.error)
-      return ;
-    response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
-    console.log(response);
-    setUser(response);
-    return true;
-    })();
-    (async () => {
-      const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-    }
-      setBlockedUsers(response);
-    })();
-    (async () => {
-      const response = await getRequest(`${baseUrlUsers}/UsersBlockedMe`);
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-    }
-      setUserBlockedMe(response);
-    })();
-    (async () => {
-      await fetchFriendList();
-      await fetchFriendRequestSent();
-      await fetchFriendRequests();
-      await fetchGameRequest();
-    })();
-  }catch(err)
-  {
-
-  }
+    try {
+      (async () => {
+        const response = await getRequest(`${baseUrlUsers}/user`);
+        if (response?.error && response?.message === "Unauthorized") {
+          showSnackbar("Unauthorized", false);
+          return;
+        }
+        if (response?.error) return;
+        response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
+        console.log(response);
+        setUser(response);
+        return true;
+      })();
+      (async () => {
+        const response = await getRequest(`${baseUrlUsers}/blockedUsers`);
+        if (response?.error && response?.message === "Unauthorized") {
+          showSnackbar("Unauthorized", false);
+          return;
+        }
+        setBlockedUsers(response);
+      })();
+      (async () => {
+        const response = await getRequest(`${baseUrlUsers}/UsersBlockedMe`);
+        if (response?.error && response?.message === "Unauthorized") {
+          showSnackbar("Unauthorized", false);
+          return;
+        }
+        setUserBlockedMe(response);
+      })();
+      (async () => {
+        await fetchFriendList();
+        await fetchFriendRequestSent();
+        await fetchFriendRequests();
+        await fetchGameRequest();
+      })();
+    } catch (err) {}
   }, []);
   const updatingInfos = useCallback(
     async (username: string, password: string) => {
-      try{
+      try {
+        const response = await putRequest(
+          `${baseUrlUsers}/user`,
+          JSON.stringify({ username, password })
+        );
+        if (response?.error && response?.message === "Unauthorized") {
+          showSnackbar("Unauthorized", false);
+          return;
+        }
+        if (response?.error) {
+          setLoginError(response);
+          return false;
+        }
+        setUser(response);
+        return true;
+      } catch (err) {}
+    },
+    []
+  );
+
+  const updateUserInfo = useCallback(async (body: any) => {
+    try {
       const response = await putRequest(
-        `${baseUrlUsers}/user`,
-        JSON.stringify({ username, password })
+        `${baseUrlUsers}/users/update`,
+        JSON.stringify(body)
       );
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-    }
+      if (response?.error && response?.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false);
+        return;
+      }
       if (response?.error) {
         setLoginError(response);
         return false;
       }
       setUser(response);
       return true;
-    }catch(err)
-  {
-  }},
-    []
-  );
-
-  const updateUserInfo = useCallback(async (body: any) => {
-    try{
-    const response = await putRequest(
-      `${baseUrlUsers}/users/update`,
-      JSON.stringify(body)
-    );
-    if (response?.error && response?.message === "Unauthorized"){
-      showSnackbar("Unauthorized", false)
-      return ;
-  }
-    if (response?.error) {
-      setLoginError(response);
-      return false;
-    }
-    setUser(response);
-    return true;
-  }catch(err)
-  {
-  }
+    } catch (err) {}
   }, []);
 
   const LogIn = useCallback(async (loginInfo: any) => {
-    try{
-    const response = await postRequest(
-      `${baseUrlAuth}/signin`,
-      JSON.stringify(loginInfo)
-    );
-    if (response?.error && response?.message === "Unauthorized"){
-      showSnackbar("Unauthorized", false)
-      return ;
-  }
-    if (response?.error) {
-      setLoginError(response);
+    try {
+      const response = await postRequest(
+        `${baseUrlAuth}/signin`,
+        JSON.stringify(loginInfo)
+      );
+      if (response?.error && response?.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false);
+        return;
+      }
+      if (response?.error) {
+        setLoginError(response);
+        return false;
+      }
+      setUser(response);
+      return true;
+    } catch (err) {
       return false;
     }
-    setUser(response);
-    return true;
-  }catch(err)
-  {
-    return false;
-  }
   }, []);
 
   const handleDisable2fa = async () => {
-    try{
-    const response = await putRequest(`${baseUrlUsers}/user/disable2fa`, "");
-    if (response?.error && response?.message === "Unauthorized"){
-      showSnackbar("Unauthorized", false)
-      return ;
-  }
-    setTfaDisabled(true);
-}catch(err)
-{
-}
+    try {
+      const response = await putRequest(`${baseUrlUsers}/user/disable2fa`, "");
+      if (response?.error && response?.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false);
+        return;
+      }
+      setTfaDisabled(true);
+    } catch (err) {}
   };
 
   const HandleClickUpdate = useCallback(async (UpdateInfo: any) => {
-   try{ setLoginError(LoginErrorInit);
-    const response = await putRequest(
-      `${baseUrlUsers}/users/update`,
-      UpdateInfo
-    );
-    if (response?.error && response?.message === "Unauthorized"){
-      showSnackbar("Unauthorized", false)
-      return ;
-  }
-    if (response?.error) {
-      return false;
-    }
-    return true;}
-    catch(err)
-    {
-
-    }
+    try {
+      setLoginError(LoginErrorInit);
+      const response = await putRequest(
+        `${baseUrlUsers}/users/update`,
+        UpdateInfo
+      );
+      if (response?.error && response?.message === "Unauthorized") {
+        showSnackbar("Unauthorized", false);
+        return;
+      }
+      if (response?.error) {
+        return false;
+      }
+      return true;
+    } catch (err) {}
   }, []);
 
   useEffect(() => {
-  notifSocket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/notifications`, {
-  auth: {
-  token: cookie.access_token,
-  },
-  });
-  notifSocket.on("connected", () => {
-  console.log("connected notif");
-  });
-  notifSocket.on("logout", () => {
-  console.log("loging out");
-  remove("access_token");
-  router.push("/login");
-  });
-  notifSocket.on("accepted", (data: any) => {
-  if (user.username !== data.username)
-  showSnackbar(`${data.username} accepted you game request`, true);
-  else{
-  let updated: any;
-  updated = gameRequest.filter((game: any)=>{
-  return game.username != user.username
-  })
-  setGameRequest(updated);
-  }
+    notifSocket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/notifications`, {
+      auth: {
+        token: cookie.access_token,
+      },
+    });
+    notifSocket.on("connected", () => {
+      console.log("connected notif");
+    });
+    notifSocket.on("logout", () => {
+      console.log("loging out");
+      remove("access_token");
+      router.push("/login");
+    }); 
+    notifSocket.on("Yourefused", (data: any) =>
+    {
+      showSnackbar("Request refused succesfully", true);
+      const updated : any = gameRequest.filter((game: any) => {
+        return game.username !== data.username;
+        
+      });
+      setGameRequest(updated);
+    })
+    notifSocket.on("userRefused", (data : any) =>
+    {
+      showSnackbar(`${data.username} Refused your game request`, false)
+    })
+    notifSocket.on("userAccepted", (data: any) =>{
+      showSnackbar(`${data.username} accepted you game request`, true);
       router.push("/game");
-  });
-  notifSocket.on("gameRequest", (data: any) => {
-  showSnackbar(
-  `you have a game request from ${data[0].username}, check your notifications to accepte or refuse`,
-  true
-  );
-  console.log("game data", data);
-  setGameRequest(data);
-  });
-  return () => {
-  notifSocket.disconnect();
-  };
+    })
+    notifSocket.on("Youaccepted", (data: any) =>
+    {
+      showSnackbar("Game request accepted succesfully", true);
+      let updated: any;
+      updated = gameRequest.filter((game: any) => {
+        return game.username != data.username;
+      });
+      setGameRequest(updated);
+      router.push("/game");
+    })
+    notifSocket.on("gameRequestSent", () =>
+    {
+      showSnackbar("Game request succesfully sent", true);
+    })
+    notifSocket.on("gameRequest", (data: any) => {
+      console.log("game data", data);
+      showSnackbar(
+        `You have a game request from ${data[0]?.username}, check your notifications to accepte or refuse`,
+        true
+      );
+      setGameRequest(data);
+    });
+    return () => {
+      notifSocket.disconnect();
+    };
   }, []);
 
   return (

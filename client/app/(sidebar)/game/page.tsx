@@ -47,7 +47,7 @@ export default function Game() {
 				</div>
 					<div className="subcore flex-1 flex">
 					<div className={`arena flex flex-1 flex-col`} style={{ backgroundColor: selectedMapColor }}>
-							<div className="presstext flex-1  flex ">PRESS START</div>
+							<div className="presstext flex-1  flex " style={{ backgroundColor: selectedMapColor }} >PRESS START</div>
 							<div className="button cursor-pointer" onClick={startfunc}>START</div>
 						</div>
 					</div>

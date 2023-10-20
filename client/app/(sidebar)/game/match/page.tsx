@@ -193,25 +193,32 @@ export default function match()
     };
   
     useEffect(() =>{
-      (async () =>{
-        const response = await getRequest(`${baseUrlUsers}/userStatus`)
-        console.log("hello", response)
-        if (response?.error)
-        {
-          if (response?.message === "Unauthorized")
+      try{
+        (async () =>{
+          const response = await getRequest(`${baseUrlUsers}/userStatus`)
+          console.log("hello", response)
+          if (response?.error)
           {
-            showSnackbar("Unauthorized", false)
-          }
-          else
-            showSnackbar("Something went wrong", false);
-          return;
-        } 
-        setstatus(response);
-        setChecker(true);
-      })()
+            if (response?.message === "Unauthorized")
+            {
+              showSnackbar("Unauthorized", false)
+            }
+            else
+              showSnackbar("Something went wrong", false);
+            return;
+          } 
+          setstatus(response);
+          setChecker(true);
+        })()
+      }catch(e)
+      {
+        showSnackbar("somthing went wrong", false);
+        window.location.href ="/game";
+      }
     },[])
 
     useEffect(() => {
+      try{
       selectedcolor = localStorage.getItem("selectedMapColor") as string;
       if(checker)
       {
@@ -276,6 +283,10 @@ export default function match()
       return () => {
         socket.disconnect()
       }
+    }
+    }catch(e){
+      showSnackbar("somthing went wrong", false);
+      window.location.href ="/game";
     }
     }, [checker]);
 

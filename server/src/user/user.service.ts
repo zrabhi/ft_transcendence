@@ -163,7 +163,11 @@ export class UserService {
       },
     });
   }
-
+  async handleGetUserStatus(user: any)
+  {
+    const currentUser = await this.findUserById(user.id);
+    return currentUser.status; 
+  }
   async getUserFriends(user_id: string): Promise<Friendship[]> {
     return await this.prismaService.friendship.findMany({
       where: { user_id: user_id },

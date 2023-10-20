@@ -151,6 +151,7 @@ class Queue {
 }
 
 function updateballxy(match: Match): string {
+  try{
   if (match.ingame == false)
       return 'ok';
   if (match.ball.x + match.ball.addx > match.canvas.width) {
@@ -192,6 +193,11 @@ function updateballxy(match: Match): string {
   match.ball.x = match.ball.x + match.ball.addx;
   match.ball.y = match.ball.y + match.ball.addy;
   return 'ok'
+}
+catch(e){
+  console.log("something went wrong")
+  return "error"
+}
 }
 
 @WebSocketGateway({
@@ -236,29 +242,35 @@ export class GameGateway {
   }
 
   async handleDisconnect(client: Socket) {
-    //TODO: UPDATE USER STATUS TO ONLINE
-    const socketId = client.id;
-    // console.log(this.playing_users[client.id]?.match);
-    if(this.playing_users[client.id] && this.playing_users[client.id].match?.ingame == true)
-    {
-      this.playing_users[client.id].match.ingame = false;
-      console.log('yes he is in the playing users ')
-      this.server.to(this.playing_users[client.id].opponent.socketid).emit('opponent quit');
-      let winner = this.playing_users[client.id].opponent;
-      let loser = this.playing_users[client.id];
-      winner.score = 3; loser.score = 0;
-      await this.update_achivements(winner, loser, true);
-      await this.userService.handleUpdateStatus('ONLINE', this.playing_users[client.id].userid);
-      await this.userService.handleUpdateStatus('ONLINE', this.playing_users[client.id].opponent.userid);
-      this.playing_users[this.playing_users[client.id]?.opponent?.socketid] = null;
-      this.playing_users[client.id]  = null;
+    try{
+      //TODO: UPDATE USER STATUS TO ONLINE
+      const socketId = client.id;
+      // console.log(this.playing_users[client.id]?.match);
+      console.log("++++++++++++++++++++++++++++++++++++++++++++",this.playing_users[client.id] ,this.playing_users[client.id].match?.ingame)
+      if(this.playing_users[client.id] && this.playing_users[client.id].match?.ingame == true)
+      {
+        this.playing_users[client.id].match.ingame = false;
+        console.log('yes he is in the playing users ')
+        this.server.to(this.playing_users[client.id].opponent.socketid).emit('opponent quit');
+        let winner = this.playing_users[client.id].opponent;
+        let loser = this.playing_users[client.id];
+        winner.score = 3; loser.score = 0;
+        await this.update_achivements(winner, loser, true);
+        console.log("here we set the status t online")
+        await this.userService.handleUpdateStatus('ONLINE', this.playing_users[client.id].userid);
+        await this.userService.handleUpdateStatus('ONLINE', this.playing_users[client.id].opponent.userid);
+        this.playing_users[this.playing_users[client.id]?.opponent?.socketid] = null;
+        this.playing_users[client.id]  = null;
+      }
+      else
+      {
+        console.log('no its not in playing users')
+        this.waiting_users.removeBySocketId(client.id);
+      }
+      console.log(`User disconnected with ID: ${socketId}`);
+    }catch(err){
+      console.log("something went wrong")
     }
-    else
-    {
-      console.log('no its not in playing users')
-      this.waiting_users.removeBySocketId(client.id);
-    }
-    console.log(`User disconnected with ID: ${socketId}`);
   }
 
   @SubscribeMessage('bar')
@@ -295,6 +307,8 @@ export class GameGateway {
                   if (loser.score == 0)
                       cleansheet = true;
                   this.update_achivements(winner, loser, cleansheet);
+                  await this.userService.handleUpdateStatus('ONLINE', this.playing_users[client.id].userid);
+                  await this.userService.handleUpdateStatus('ONLINE', this.playing_users[client.id].opponent.userid);
               }
           } else {
               console.error('Player or opponent is undefined.');
@@ -310,57 +324,100 @@ export class GameGateway {
 
 @SubscribeMessage('init')
 async init(@MessageBody() data: any, @ConnectedSocket() client: Socket){
-  const match = this.matchs[client.id];
-  match.canvas.width = data.canvasw;
-  match.canvas.height = data.canvash;
-  match.ball.x = match.canvas.width / 2;
-  match.ball.y = match.canvas.height / 2;
-  if(this.playing_users[client.id].bar)
-  {
-    console.log('server get init')
-    if(this.playing_users[client.id].side == 'right')
-      this.playing_users[client.id].bar.x = match.canvas.width - 115;
-    else
-      this.playing_users[client.id].bar.x = 100;
-    this.playing_users[client.id].bar.length = 100;
-    this.playing_users[client.id].bar.width = 15;
-  }
-  this.playing_users[client.id].isready = true;
-  if(this.playing_users[client.id].isready && this.playing_users[client.id].isready)
-  {
+  try{
+    const match = this.matchs[client.id];
+    match.canvas.width = data.canvasw;
+    match.canvas.height = data.canvash;
+    match.ball.x = match.canvas.width / 2;
+    match.ball.y = match.canvas.height / 2;
+    if(this.playing_users[client.id].bar)
+    {
+      console.log('server get init')
+      if(this.playing_users[client.id].side == 'right')
+        this.playing_users[client.id].bar.x = match.canvas.width - 115;
+      else
+        this.playing_users[client.id].bar.x = 100;
+      this.playing_users[client.id].bar.length = 100;
+      this.playing_users[client.id].bar.width = 15;
+    }
+    this.playing_users[client.id].isready = true;
+    if(this.playing_users[client.id].isready && this.playing_users[client.id].isready)
+    {
 
-    this.server.to(client.id).emit('start');
-    this.server.to(this.playing_users[client.id].opponent.socketid).emit('start');
-    await this.userService.handleUpdateStatus('INGAME', this.playing_users[client.id].opponent.userid);
-    await this.userService.handleUpdateStatus('INGAME', this.playing_users[client.id].userid);
+      this.server.to(client.id).emit('start');
+      this.server.to(this.playing_users[client.id].opponent.socketid).emit('start');
+      await this.userService.handleUpdateStatus('INGAME', this.playing_users[client.id].opponent.userid);
+      await this.userService.handleUpdateStatus('INGAME', this.playing_users[client.id].userid);
+    }
+  }catch(err){
+    console.log("something went wrong");
   }
 }
 
 private async check_matching(tmplayer:Player)
 {
-  const result = await this.userService.getInvitionAccpted(tmplayer.userid)
-  if(result.success)
-  {
-    let i: number;
-    let finded = false;
-    for(i = 0; result.opponents[i]; i++)
+  try{
+    const result = await this.userService.getInvitionAccpted(tmplayer.userid)
+    if(result.success)
     {
-      if(this.invited_users.containsUserId(result.opponents[i].id))
+      let i: number;
+      let finded = false;
+      for(i = 0; result.opponents[i]; i++)
       {
-        finded = true;
-        break;
+        if(this.invited_users.containsUserId(result.opponents[i].id))
+        {
+          finded = true;
+          break;
+        }
+      }
+      if(finded == true)
+      { 
+        await this.userService.handleRemoveGameInvite(result.invitaionsId[i]);
+        let rightplayer = tmplayer;
+        let leftplayer = this.invited_users.getByUserId(result.opponents[i].id);
+
+        rightplayer.side = 'right';
+        leftplayer.side = 'left';
+
+        this.invited_users.removeByUserId(result.opponents[i].id);
+
+        rightplayer.opponent = leftplayer;
+        leftplayer.opponent = rightplayer;
+        this.playing_users[rightplayer.socketid] = rightplayer;
+        this.playing_users[leftplayer.socketid] = leftplayer;
+        let tmpmatch = new Match(rightplayer, leftplayer,  new canvas(1000,600));
+        this.matchs[rightplayer.socketid] = tmpmatch;
+        this.matchs[leftplayer.socketid] = tmpmatch;
+        tmpmatch.ingame = true;
+        rightplayer.match = tmpmatch;
+        leftplayer.match = tmpmatch;
+        this.server.to(rightplayer.socketid).emit('matched right', 
+        {
+          username : leftplayer.username,
+          avatar:leftplayer.avatar
+        });
+        this.server.to(leftplayer.socketid).emit('matched left', 
+        {
+          username : rightplayer.username,
+          avatar:rightplayer.avatar
+        });
+      }
+      else
+      {
+        tmplayer.reserved = true;
+        this.invited_users.enqueue(tmplayer);
       }
     }
-    if(finded == true)
-    { 
-      await this.userService.handleRemoveGameInvite(result.invitaionsId[i]);
+    else if (this.waiting_users.size() != 0)
+    {
       let rightplayer = tmplayer;
-      let leftplayer = this.invited_users.getByUserId(result.opponents[i].id);
+      let leftplayer = this.waiting_users.peek();
+
 
       rightplayer.side = 'right';
       leftplayer.side = 'left';
 
-      this.invited_users.removeByUserId(result.opponents[i].id);
+      this.waiting_users.dequeue();
 
       rightplayer.opponent = leftplayer;
       leftplayer.opponent = rightplayer;
@@ -372,112 +429,81 @@ private async check_matching(tmplayer:Player)
       tmpmatch.ingame = true;
       rightplayer.match = tmpmatch;
       leftplayer.match = tmpmatch;
-      this.server.to(rightplayer.socketid).emit('matched right', 
+      this.server.to(rightplayer.socketid).emit('matched right',
       {
         username : leftplayer.username,
         avatar:leftplayer.avatar
       });
-      this.server.to(leftplayer.socketid).emit('matched left', 
+      this.server.to(leftplayer.socketid).emit('matched left',
       {
         username : rightplayer.username,
         avatar:rightplayer.avatar
       });
+    }else{
+      this.waiting_users.enqueue(tmplayer);
     }
-    else
-    {
-      tmplayer.reserved = true;
-      this.invited_users.enqueue(tmplayer);
-    }
-  }
-  else if (this.waiting_users.size() != 0)
+  }catch(e)
   {
-    let rightplayer = tmplayer;
-    let leftplayer = this.waiting_users.peek();
-
-
-    rightplayer.side = 'right';
-    leftplayer.side = 'left';
-
-    this.waiting_users.dequeue();
-
-    rightplayer.opponent = leftplayer;
-    leftplayer.opponent = rightplayer;
-    this.playing_users[rightplayer.socketid] = rightplayer;
-    this.playing_users[leftplayer.socketid] = leftplayer;
-    let tmpmatch = new Match(rightplayer, leftplayer,  new canvas(1000,600));
-    this.matchs[rightplayer.socketid] = tmpmatch;
-    this.matchs[leftplayer.socketid] = tmpmatch;
-    tmpmatch.ingame = true;
-    rightplayer.match = tmpmatch;
-    leftplayer.match = tmpmatch;
-    this.server.to(rightplayer.socketid).emit('matched right',
-    {
-      username : leftplayer.username,
-      avatar:leftplayer.avatar
-    });
-    this.server.to(leftplayer.socketid).emit('matched left',
-    {
-      username : rightplayer.username,
-      avatar:rightplayer.avatar
-    });
-  }else{
-    this.waiting_users.enqueue(tmplayer);
+    console.log("something went wrong");
   }
 }
 
 async update_achivements(winner: Player, loser: Player, cleansheet:boolean)
 {
-  try {
-  await this.prismaService.match.create({
-    data:{
-      winner_id: winner.userid,
-      loser_id: loser.userid,
-      winner_score: winner.score,
-      loser_score: loser.score
+
+    try {
+    await this.prismaService.match.create({
+      data:{
+        winner_id: winner.userid,
+        loser_id: loser.userid,
+        winner_score: winner.score,
+        loser_score: loser.score
+      }
+    })
+    /// udpating winner user object
+    const winnerUser = await this.userService.findUserById(winner.userid);
+    await this.prismaService.user.update({
+      where:{
+        id: winner.userid,
+      },
+      data:{
+        totalGames: winnerUser.totalGames +  1,
+        win:winnerUser.win + 1
+      }
+    })
+    /// udpating loser user object
+    const loserUser = await this.userService.findUserById(loser.userid);
+    await this.prismaService.user.update({
+      where:{
+        id: loser.userid,
+      },
+      data:{
+        totalGames:loserUser.totalGames + 1,
+        loss:loserUser.loss+1,
+      }
+    });
+    await this.prismaService.achievement.update({
+      where:{
+        userId: winner.userid,
+      },
+      data:{
+        firstGameAchie : true,
+        firstWinAchie: true,
+        cleanSheetGameAchie: cleansheet
+      }
+    })
+    await this.prismaService.achievement.update({
+      where:{
+        userId: loser.userid,
+      },
+      data:{
+        firstGameAchie : true,
+        firstLoseAchie :true,
+      }
+    })}
+    catch(err)
+    {
+      return {success: false, error:"error in updating achievements"}
     }
-  })
-  /// udpating winner user object
-  await this.prismaService.user.update({
-    where:{
-      id: winner.userid,
-    },
-    data:{
-      totalGames:+ 1,
-      win:+1
     }
-  })
-   /// udpating loser user object
-  await this.prismaService.user.update({
-    where:{
-      id: loser.userid,
-    },
-    data:{
-      totalGames:+ 1,
-      loss:+1,
-    }
-  });
-  await this.prismaService.achievement.update({
-    where:{
-      userId: winner.userid,
-    },
-    data:{
-      firstGameAchie : true,
-      firstWinAchie: true,
-      cleanSheetGameAchie: cleansheet
-    }
-  })
-  await this.prismaService.achievement.update({
-    where:{
-      userId: loser.userid,
-    },
-    data:{
-      firstGameAchie : true,
-      firstLoseAchie :true,
-    }
-  })}
-  catch(err)
-  {
-    return {success: false, error:"error in updating achievements"}
-  }
-  }
 }

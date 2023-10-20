@@ -50,19 +50,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     login: "login",
     tfaLogin: "tfalogin",
   };
-  useEffect(() => {
-    (async () => {
-      try {
-        if (checkPath()) return;
-        if (cookie && cookie.access_token) {
-          const response = await getRequest(`${baseUrlAuth}/jwtVerification`);
-          console.log("response +++", response);
-          if (response?.error) return;
-          else window.location.href = "/profile";
-        }
-      } catch (err) {}
-    })();
-  }, []);
+//   useEffect(() => {
+//    (async () => {
+//     try{
+//         if (checkPath()) return;
+//         if (cookie && cookie.access_token)
+//         {
+//           const response = await getRequest(`${baseUrlAuth}/jwtVerification`);
+//           console.log("response +++", response);
+//           if (response?.error)
+//             return;
+//           else window.location.href ="/profile";
+//         }
+//     }catch(err)
+//     {
+
+//     }
+//   })()
+// }, []);
   const checkPath = () => {
     setPathname("");
     const currentPath = window.location.href.split("/");

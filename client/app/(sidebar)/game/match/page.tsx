@@ -286,7 +286,6 @@ export default function match()
         <div className="game-content min-h-screen p-8">
             <HeaderBar />
             <div className={`core flex w-full`} >
-
                 <div className="score flex p-2 justify-between items-center gap-4">
                   <div className="player1 flex items-center gap-3 w-1/2 justify-between ">
                     <div className="avatar w-12 h-12 rounded-full overflow-hidden border border-slate-50">

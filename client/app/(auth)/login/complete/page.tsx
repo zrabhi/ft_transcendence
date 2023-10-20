@@ -117,6 +117,12 @@ export default function Complete() {
   const handleSubmitClick = async (e: any) => {
     e.preventDefault();
     reset();
+    console.log("username", username);
+    if (username.indexOf(" ") >= 0) {
+      setError(true);
+      setUsernameMsg("Username must not contain spaces");
+      return;
+    }
     if (username.length < 6) {
       setError(true);
       setUsernameMsg("Username must be at least 6 characters");

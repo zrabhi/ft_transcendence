@@ -113,9 +113,9 @@ export default function Settings() {
       return ;
   }
     if (response?.error) {
-      // console.log(response);
       setError(true);
-      setFileMsg("File Is not an image");
+      setFileMsg("File is not an image");
+      showSnackbar("File is not an image", false);
       return false;
     }
     return true;
@@ -149,6 +149,7 @@ export default function Settings() {
   }
     if (response?.error) {
       setCurrentPasswordErr("Inavalid current password");
+      showSnackbar("Invalid current password", false);
       setError(true);
       return false;
     }
@@ -159,6 +160,7 @@ export default function Settings() {
     if (password.length < 8) {
       setError(true);
       setPasswordMsg("password it's not strong enough");
+      showSnackbar("password it's not strong enough", false);
       return false;
     }
     return true;
@@ -170,10 +172,12 @@ export default function Settings() {
       if (username.length < 4) {
         setError(true);
         setUsernameMsg("Username must be at least 4 characters");
+        showSnackbar("Username must be at least 4 characters", false);
         return false;
       } else if (username.length > 20) {
         setError(true);
         setUsernameMsg("Username must be at most 20 characters");
+        showSnackbar("Username must be at most 20 characters", false);
         return false;
       }
     }
@@ -212,6 +216,7 @@ export default function Settings() {
     setError(false);
     if (isNothingToUpdate()) {
       updateMsgRef.current!.innerHTML = "Nothing to update";
+      showSnackbar("Nothing to update", false);
       return;
     }
     const access = await checkCurrentPassword(currentPassword);
@@ -239,6 +244,7 @@ export default function Settings() {
       {
         setError(true);
         setUsernameMsg("Please Chose Another Username");
+        showSnackbar("Please Chose Another Username", false);
         return ;
       }
     }

@@ -283,38 +283,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       remove("access_token");
       router.push("/login");
     }); 
-    notifSocket.on("refused", (data : any) =>{
-      if (user.username !== data.username)
-          showSnackbar(`${data.username} Refused you game request`, false);
-      else
-      {
-        let updated: any;
-        updated = gameRequest.filter((game: any) => {
-          return game.username != user.username;
-        });
-        setGameRequest(updated);
-        showSnackbar("Request refused succesfully", true);
-      }
+    notifSocket.on("Yourefused", (data: any) =>
+    {
+      showSnackbar("Request refused succesfully", true);
+      const updated : any = gameRequest.filter((game: any) => {
+        return game.username !== data.username;
+        
+      });
+      setGameRequest(updated);
     })
-    notifSocket.on("accepted", (data: any) => {
-      showSnackbar(`Redirecting you to game match`, true);
-      if (user.username !== data.username)
-        showSnackbar(`${data.username} accepted you game request`, true);
-      else {
-        let updated: any;
-        updated = gameRequest.filter((game: any) => {
-          return game.username != user.username;
-        });
-        setGameRequest(updated);
-      }
+    notifSocket.on("userRefused", (data : any) =>
+    {
+      showSnackbar(`${data.username} Refused your game request`, false)
+    })
+    notifSocket.on("userAccepted", (data: any) =>{
+      showSnackbar(`${data.username} accepted you game request`, true);
       router.push("/game");
-    });
+    })
+    notifSocket.on("Youaccepted", (data: any) =>
+    {
+      showSnackbar("Game request accepted succesfully", true);
+      let updated: any;
+      updated = gameRequest.filter((game: any) => {
+        return game.username != data.username;
+      });
+      setGameRequest(updated);
+      router.push("/game");
+    })
+    notifSocket.on("gameRequestSent", () =>
+    {
+      showSnackbar("Game request succesfully sent", true);
+    })
     notifSocket.on("gameRequest", (data: any) => {
+      console.log("game data", data);
       showSnackbar(
-        `you have a game request from ${data[0].username}, check your notifications to accepte or refuse`,
+        `You have a game request from ${data[0]?.username}, check your notifications to accepte or refuse`,
         true
       );
-      console.log("game data", data);
       setGameRequest(data);
     });
     return () => {

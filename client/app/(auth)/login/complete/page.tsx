@@ -55,6 +55,14 @@ export default function Complete() {
         `${baseUrlUsers}/avatar`,
         formData
       );
+      if (response?.error) 
+      {
+        if (response?.message === "Unauthorized"){
+        showSnackbar("Unauthorized", false)
+        return ;
+        }
+        showSnackbar("File format in not valide", false);
+      }
     }
   }
   reader.readAsDataURL(e.target.files[0]);
@@ -69,11 +77,13 @@ export default function Complete() {
     if (password.length < 8) {
       setError(true);
       setPasswordMsg("Password must be at least 8 characters");
+      showSnackbar("Password must be at least 8 characters", false);
       return false
     }
     if (password !== confirmPassword) {
       setError(true)
       setPasswordMsg("Password and confirm password do not match");
+      showSnackbar("Password and confirm password do not match", false);
       return false
     }
     return true;
@@ -94,10 +104,16 @@ export default function Complete() {
     {
       setError(true);
         if (response?.message === 'Username you chosed already exist')
+        {
           setUsernameMsg(response?.message);
-        else
+          showSnackbar(response?.message, false);
+        }
+         else
+         {
             setPasswordMsg("Password is not strong enough");
-        return false;
+            showSnackbar("Password is not strong enough", false);
+        }
+          return false;
     }
     await fetchUserData();
     return true;
@@ -120,6 +136,7 @@ export default function Complete() {
     if (username.length < 6) {
       setError(true);
       setUsernameMsg("Username must be at least 6 characters");
+      showSnackbar("Username must be at least 6 characters", false);
       return;
     }
     if (!passwordCheck())
@@ -127,7 +144,7 @@ export default function Complete() {
     const result = await updatingInfos(username, password);
     if (result)
     {
-      showSnackbar("your all setup now", true);
+      showSnackbar("Your all setup now, Enjoy!", true);
       router.push("/profile");
     }
   };

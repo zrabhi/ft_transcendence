@@ -109,10 +109,53 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
         userSockets.forEach((s) => {
           this.server.to(s.socket.id).emit('gameRequest', userData);
         });
+        const SocketCurrentUser = this.connectedUsers.filter(
+          (c) => c.id === currentUser.id,
+        );
+        SocketCurrentUser.forEach((s) => {
+          this.server.to(s.socket.id).emit('gameRequestSent', userData);
+        });
       }
     } catch (err) {
       client.disconnect(true);
       console.log('socket error in game request', err);
+    }
+  }
+  @SubscribeMessage('gameRefused')
+  async handleRefuseGame(
+  @ConnectedSocket() client: Socket,
+  @MessageBody() data: any)
+  {
+    try {
+      const payload = await this.jwtService.verifyAsync(
+        client.handshake.auth.token,
+        {
+          secret: process.env.JWT_SECRET,
+        },
+      );
+      if (!payload) return client.disconnect(true);
+      const currentUser = await this.userService.findUserById(payload.id);
+      const invitedUser = await this.userService.findUserName(data.username);
+      const result = await this.userService.handleDeleteGameRequest(currentUser, invitedUser);
+      if (result.success){
+        const userSockets = this.connectedUsers.filter(
+          (c) => {
+            return (c.id === invitedUser.id)
+          });
+        userSockets.forEach((s) => {
+          this.server.to(s.socket.id).emit('userRefused', {username:currentUser.username});
+        });
+        const SocketCurrentUser = this.connectedUsers.filter(
+          (c) => c.id === currentUser.id,
+        );
+        SocketCurrentUser.forEach((s) => {
+          this.server.to(s.socket.id).emit('Yourefused', {username: invitedUser.username});
+        });
+      }
+    }catch (err)
+    {
+      client.disconnect(true);
+      return;
     }
   }
   @SubscribeMessage('gameAccepted')
@@ -131,13 +174,20 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
       const currentUser = await this.userService.findUserById(payload.id);
       const invitedUser = await this.userService.findUserName(data.username);
       const result = await this.userService.handleAccpetRequest(currentUser, invitedUser);
-      if (result.success){
+      if (result.success)
+      {
         const userSockets = this.connectedUsers.filter(
           (c) => {
-            return (c.id === invitedUser.id || c.id === currentUser.id)
+            return (c.id === invitedUser.id)
           });
         userSockets.forEach((s) => {
-          this.server.to(s.socket.id).emit('accepted',{username:currentUser.username});
+          this.server.to(s.socket.id).emit('userAccepted', {username:currentUser.username});
+        });
+        const SocketCurrentUser = this.connectedUsers.filter(
+          (c) => c.id === currentUser.id,
+        );
+        SocketCurrentUser.forEach((s) => {
+          this.server.to(s.socket.id).emit('Youaccepted', {username: invitedUser.username});
         });
       }
     }catch (err)

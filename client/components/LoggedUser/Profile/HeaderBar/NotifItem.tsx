@@ -4,7 +4,7 @@ import NotifFriendRequest from './NotifFriendRequest'
 import NotifMessage from './NotifMessage'
 import NotifGameRequest from './NotifGameRequest'
 
-export default function NotifItem({ data }: any) {
+export default function NotifItem({ data, setRequests,requests }: any) {
   return (
     <div className='notif-item p-2 mb-1 rounded bg-purple-50 bg-opacity-30 hover:bg-opacity-50
       flex justify-between items-center gap-4 cursor-pointer transition-all duration-200 ease-in-out
@@ -21,11 +21,11 @@ export default function NotifItem({ data }: any) {
         {
           // instead of pass the data to the component we can pass only username and content
           data.type === 1 ? (
-            <NotifFriendRequest data={data} />
+            <NotifFriendRequest data={data} setRequests={setRequests} requests={requests} />
           ) : data.type === 2 ? (
             <NotifMessage data={data} />
           ) : (
-            <NotifGameRequest data={data} />
+            <NotifGameRequest data={data} setRequests={setRequests} requests={requests}/>
           )
         }
       </div>

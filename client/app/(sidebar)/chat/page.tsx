@@ -103,7 +103,6 @@ const Chat: React.FC = () => {
     } catch (err) {}
   }, [friendsList]);
   useEffect(() => {
-    console.log("??+", channels);
     if (isMessage)
     {
       if (

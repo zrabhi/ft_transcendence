@@ -50,6 +50,8 @@ model User {
   ladder_level                    Int      @default(0)
   xp                              Int      @default(50)
   totalGames                      Int      @default(0)
+  totalGoalsScored                Int      @default(0)
+  totalGoalsRecieved              Int      @default(0)
   discordHandler                  String?
   twitterHandler                  String?
   tfa                             Boolean?  @default(false)

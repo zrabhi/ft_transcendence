@@ -40,6 +40,7 @@ class Player {
   isongame = false;
   socket: Socket;
   reserved = false;
+  invited = false;
 
   constructor(socketid: string) {
       this.score = 0;
@@ -235,6 +236,12 @@ export class GameGateway {
           tmplayer.userid = currentUser.id;
           tmplayer.socket = client;
           console.log(`User connected to game gateway with ID: ${socketId}`)
+          // console.log(this.waiting_users.getByUserId(tmplayer.userid));
+          if(this.waiting_users.getByUserId(tmplayer.userid) != undefined)
+          {
+            client.disconnect(true);
+            return;
+          }
           await this.check_matching(tmplayer);
       } catch (err) {
           return client.disconnect(true);
@@ -246,8 +253,7 @@ export class GameGateway {
       //TODO: UPDATE USER STATUS TO ONLINE
       const socketId = client.id;
       // console.log(this.playing_users[client.id]?.match);
-      console.log("++++++++++++++++++++++++++++++++++++++++++++",this.playing_users[client.id] ,this.playing_users[client.id].match?.ingame)
-      if(this.playing_users[client.id] && this.playing_users[client.id].match?.ingame == true)
+      if(this.playing_users[client.id] && this.playing_users[client.id].match?.ingame === true)
       {
         this.playing_users[client.id].match.ingame = false;
         console.log('yes he is in the playing users ')
@@ -264,7 +270,7 @@ export class GameGateway {
       }
       else
       {
-        console.log('no its not in playing users')
+        this.invited_users.removeBySocketId(client.id);
         this.waiting_users.removeBySocketId(client.id);
       }
       console.log(`User disconnected with ID: ${socketId}`);
@@ -362,6 +368,7 @@ private async check_matching(tmplayer:Player)
     {
       let i: number;
       let finded = false;
+
       for(i = 0; result.opponents[i]; i++)
       {
         if(this.invited_users.containsUserId(result.opponents[i].id))
@@ -371,16 +378,13 @@ private async check_matching(tmplayer:Player)
         }
       }
       if(finded == true)
-      { 
+      {
         await this.userService.handleRemoveGameInvite(result.invitaionsId[i]);
         let rightplayer = tmplayer;
         let leftplayer = this.invited_users.getByUserId(result.opponents[i].id);
-
         rightplayer.side = 'right';
         leftplayer.side = 'left';
-
         this.invited_users.removeByUserId(result.opponents[i].id);
-
         rightplayer.opponent = leftplayer;
         leftplayer.opponent = rightplayer;
         this.playing_users[rightplayer.socketid] = rightplayer;
@@ -405,6 +409,7 @@ private async check_matching(tmplayer:Player)
       else
       {
         tmplayer.reserved = true;
+        tmplayer.invited = true;
         this.invited_users.enqueue(tmplayer);
       }
     }
@@ -413,12 +418,10 @@ private async check_matching(tmplayer:Player)
       let rightplayer = tmplayer;
       let leftplayer = this.waiting_users.peek();
 
-
       rightplayer.side = 'right';
       leftplayer.side = 'left';
 
       this.waiting_users.dequeue();
-
       rightplayer.opponent = leftplayer;
       leftplayer.opponent = rightplayer;
       this.playing_users[rightplayer.socketid] = rightplayer;
@@ -450,7 +453,6 @@ private async check_matching(tmplayer:Player)
 
 async update_achivements(winner: Player, loser: Player, cleansheet:boolean)
 {
-
     try {
     await this.prismaService.match.create({
       data:{
@@ -468,7 +470,9 @@ async update_achivements(winner: Player, loser: Player, cleansheet:boolean)
       },
       data:{
         totalGames: winnerUser.totalGames +  1,
-        win:winnerUser.win + 1
+        win:winnerUser.win + 1,
+        totalGoalsScored:winnerUser.totalGoalsScored +  winner.score,
+        totalGoalsRecieved:winnerUser.totalGoalsRecieved + loser.score
       }
     })
     /// udpating loser user object
@@ -480,6 +484,8 @@ async update_achivements(winner: Player, loser: Player, cleansheet:boolean)
       data:{
         totalGames:loserUser.totalGames + 1,
         loss:loserUser.loss+1,
+        totalGoalsScored:loserUser.totalGoalsScored + loser.score,
+        totalGoalsRecieved:loserUser.totalGoalsRecieved + winner.score
       }
     });
     await this.prismaService.achievement.update({

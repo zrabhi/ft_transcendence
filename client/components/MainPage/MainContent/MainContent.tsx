@@ -6,9 +6,9 @@ const MainContent = () => {
   return (
     <div className="main-content">
       <div className="container">
-        <h1>Play Pong: The Classic Table Tennis Game</h1>
-        <h2>Here you can discover the best pong gamers network</h2>
-        <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Delectus facere nostrum quibusdam, iure dignissimos nisi necessitatibus quidem ipsam tempore minus adipisci tempora fugiat doloremque natus totam obcaecati alias mollitia praesentium.</p>
+      <h1>Welcome to Pong Pro: The Ultimate Table Tennis Experience</h1>
+      <h2>Join our vibrant community of top-notch pong players</h2>
+      <p>Experience the thrill of intense matches, where skill and strategy converge to create unforgettable moments. Join us now to be a part of the action!</p>
         <div className="img">
           <Image
             src={HomeImage}

@@ -246,8 +246,7 @@ export class GameGateway {
       //TODO: UPDATE USER STATUS TO ONLINE
       const socketId = client.id;
       // console.log(this.playing_users[client.id]?.match);
-      console.log("++++++++++++++++++++++++++++++++++++++++++++",this.playing_users[client.id] ,this.playing_users[client.id].match?.ingame)
-      if(this.playing_users[client.id] && this.playing_users[client.id].match?.ingame == true)
+      if(this.playing_users[client.id] && this.playing_users[client.id].match?.ingame === true)
       {
         this.playing_users[client.id].match.ingame = false;
         console.log('yes he is in the playing users ')
@@ -264,7 +263,7 @@ export class GameGateway {
       }
       else
       {
-        console.log('no its not in playing users')
+        console.log('++++++++++++++++++++++++++++++++no its not in playing users')
         this.waiting_users.removeBySocketId(client.id);
       }
       console.log(`User disconnected with ID: ${socketId}`);

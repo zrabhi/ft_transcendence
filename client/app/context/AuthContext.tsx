@@ -93,6 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         showSnackbar("Unauthorized", false);
         return;
       }
+      response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
       setUser(response);
     } catch (err) {}
   };
@@ -140,7 +141,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
   useEffect(() => {
     if (!checkPath()) return;
-    console.log("+++++++---?????");
     try {
       (async () => {
         const response = await getRequest(`${baseUrlUsers}/user`);

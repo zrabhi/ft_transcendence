@@ -17,7 +17,7 @@ import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 export default function Settings() {
   // use context to get user data
-  const { user, updateUserInfo, tfaDisabled, handleDisable2fa, loginError} =
+  const { fetchUserData , user, updateUserInfo, tfaDisabled, handleDisable2fa, loginError} =
     useContext(AuthContext);
 
   // to check if 2fa is enabled or not
@@ -252,6 +252,7 @@ export default function Settings() {
         return ;
       }
     }
+    await fetchUserData();
     showSnackbar("Updated successfully", true)
     updateMsgRef.current!.innerHTML = "Updated successfully";
     updateMsgRef.current!.classList.remove("error");

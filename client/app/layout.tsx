@@ -39,7 +39,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
-        {/* <Footer /> */}
+        <Footer />
       </body>
     </html>
   );

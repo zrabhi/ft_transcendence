@@ -40,7 +40,7 @@ export default function StatsData({user}: any) {
       </div>
 
       <div className="stat mb-6">
-        <p className="text-slate-100 font-semibold">Goals Scored: 10 </p>
+        <p className="text-slate-100 font-semibold">Goals Scored:  </p>
         <div className="w-full bg-gray-300 h-4 rounded-full">
           <div className="w-3/5 bg-green-500 bg-opacity-80 h-4 rounded-full"></div>
         </div>

@@ -225,9 +225,7 @@ export default function match()
         console.log(status)
       if (status === "INGAME")
       {
-        setTimeout(() => {
-            showSnackbar("already in game", false);
-          }, 50000);
+          showSnackbar("already in game", false);
           window.location.href ="/game";
           return;
       }
@@ -292,7 +290,7 @@ export default function match()
 
     return (
     <div className="logged-user">
-    <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+    {/* <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} /> */}
     <div className={`game ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
         <div className="game-content min-h-screen p-8">
             <HeaderBar />
@@ -333,6 +331,7 @@ export default function match()
                     </div>
                   </div>
                 </div>
+                
                 <div className={`popup ${showPopup ?  'bg-black-400 bg-opacity-70 backdrop-blur-sm': 'hidden' } w-screen h-screen fixed inset-0 flex justify-center items-center `} >|
                   <div className='popupcore w-[50rem] xs:w-[18rem] sm:w-[24rem] md:w-[30rem]
                     rounded-xl  relative p-4 pt-12 pb-8'>
@@ -345,6 +344,9 @@ export default function match()
                 </div>    
                 <div className="table" id='table'>
                     <canvas id="canvas" width={1000} height={600}></canvas>
+                </div>
+                <div className="back">
+                  <button onClick={()=>router.push("/game")}>BACK</button>
                 </div>
             </div>
         </div>

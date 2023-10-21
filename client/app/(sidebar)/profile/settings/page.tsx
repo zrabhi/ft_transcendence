@@ -174,10 +174,10 @@ export default function Settings() {
         setUsernameMsg("Username must be at least 4 characters");
         showSnackbar("Username must be at least 4 characters", false);
         return false;
-      } else if (username.length > 20) {
+      } else if (username.length > 15) {
         setError(true);
-        setUsernameMsg("Username must be at most 20 characters");
-        showSnackbar("Username must be at most 20 characters", false);
+        setUsernameMsg("Username must be at most 15 characters");
+        showSnackbar("Username must be at most 15 characters", false);
         return false;
       } else if (username.indexOf(" ") >= 0) {
         setError(true);

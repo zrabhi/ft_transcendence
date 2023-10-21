@@ -108,10 +108,10 @@ export default function Complete() {
           setUsernameMsg(response?.message);
           showSnackbar(response?.message, false);
         }
-         else
-         {
-            setPasswordMsg("Password is not strong enough");
-            showSnackbar("Password is not strong enough", false);
+        else
+        {
+          setPasswordMsg("Password is not strong enough");
+          showSnackbar("Password is not strong enough", false);
         }
           return false;
     }
@@ -143,6 +143,12 @@ export default function Complete() {
       setError(true);
       setUsernameMsg("Username must be at least 6 characters");
       showSnackbar("Username must be at least 6 characters", false);
+      return;
+    }
+    if (username.length > 15) {
+      setError(true);
+      setUsernameMsg("Username must be less than 15 characters");
+      showSnackbar("Username must be less than 15 characters", false);
       return;
     }
     if (!passwordCheck())

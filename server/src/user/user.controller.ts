@@ -66,12 +66,15 @@ export const strorageAvatar = {
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get('/users')
-  async getAllUsers(@UserInfo() user: User): Promise<User[]> {
+  @UseGuards(JwtAuthGuard)
+  async getUsers(@UserInfo() user: User, @Res() res: Response) {
     try {
-      return await this.userService.findAllUsers(user);
-    } catch (err) {}
+      const users = await this.userService.findAllUsers(user);
+      res.status(200).json(users);
+    } catch (err) {
+      res.status(400).json("ko");
+    }
   }
   @Get('allUsers')
   @UseGuards(JwtAuthGuard)

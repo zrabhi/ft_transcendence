@@ -21,6 +21,7 @@ export default function UserCard(user: any) {
     setFriendRequestSent,
     userFriendRequests,
     setUserFriendRequests,
+    notifSocket
   } = useContext(AuthContext);
   user = user.user;
 
@@ -114,32 +115,35 @@ export default function UserCard(user: any) {
   };
 
   const addFriendHandler = async () => {
+
     try {
-      console.log(`add friend click`)
-      const response = await postRequest(`${baseUrlUsers}/friendRequest/${user.username}`, "");
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-    }
-      setFriendRequestSent([...friendRequestSent, user.username])
-      showSnackbar(response?.message, true);
+      notifSocket.emit("FriendRequest", {username:user.username});
+    //   console.log(`add friend click`)
+    //   const response = await postRequest(`${baseUrlUsers}/friendRequest/${user.username}`, "");
+    //   if (response?.error && response?.message === "Unauthorized"){
+    //     showSnackbar("Unauthorized", false)
+    //     return ;
+    // }
+    //   setFriendRequestSent([...friendRequestSent, user.username])
+    //   showSnackbar(response?.message, true);
   } catch (error) {
     }
   };
 
   const acceptFriendHandler = async () => {
     try {
-      const response = await putRequest(`${baseUrlUsers}/acceptFriendRequest/${user.username}`,"");
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-    }
-      let updateUserFriendRequests = userFriendRequests.filter((member: any) =>{
-        return member.username !== user.username;
-      })
-      setUserFriendRequests(updateUserFriendRequests);
-      await fetchFriendList();
-      setPendingRequest([]);
+      notifSocket.emit("AccepetFriendRequest", {username: user.username});
+    //   const response = await putRequest(`${baseUrlUsers}/acceptFriendRequest/${user.username}`,"");
+    //   if (response?.error && response?.message === "Unauthorized"){
+    //     showSnackbar("Unauthorized", false)
+    //     return ;
+    // }
+    //   let updateUserFriendRequests = userFriendRequests.filter((member: any) =>{
+    //     return member.username !== user.username;
+    //   })
+    //   setUserFriendRequests(updateUserFriendRequests);
+    //   await fetchFriendList();
+    //   setPendingRequest([]);
     } catch (error) {
     }
   }

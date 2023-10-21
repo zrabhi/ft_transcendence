@@ -17,6 +17,7 @@ export default function NotifFriendRequest({data, setRequests, requests}: any) {
     setFriendRequestSent,
     userFriendRequests,
     setUserFriendRequests,
+    notifSocket,
   } = useContext(AuthContext);
   const handleRedirectProfile = () =>
   {
@@ -48,18 +49,19 @@ export default function NotifFriendRequest({data, setRequests, requests}: any) {
 
   const acceptFriendHandler = async () => {
     try {
-      const response = await putRequest(`${baseUrlUsers}/acceptFriendRequest/${data.username}`,"");
-      if (response?.error && response?.message === "Unauthorized"){
-        showSnackbar("Unauthorized", false)
-        return ;
-    }
-      let updateUserFriendRequests = userFriendRequests.filter((member: any) =>{
-        return member.username !== data.username;
-      })
-      setUserFriendRequests(updateUserFriendRequests);
+      notifSocket.emit("AccepetFriendRequest", {username: data.username});
+    //   const response = await putRequest(`${baseUrlUsers}/acceptFriendRequest/${data.username}`,"");
+    //   if (response?.error && response?.message === "Unauthorized"){
+    //     showSnackbar("Unauthorized", false)
+    //     return ;
+    // }
+      // let updateUserFriendRequests = userFriendRequests.filter((member: any) =>{
+      //   return member.username !== data.username;
+      // })
+      // setUserFriendRequests(updateUserFriendRequests);
       setRequests(requests?.filter((request: any)=> request.username != data.username));
       await fetchFriendList();
-      showSnackbar(`${data.username} Is your friend now`, true);
+      // showSnackbar(`${data.username} Is your friend now`, true);
     } catch (error) {
     }
   }

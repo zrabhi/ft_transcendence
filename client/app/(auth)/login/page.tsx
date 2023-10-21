@@ -74,9 +74,9 @@ export default function SignIn() {
   const handleClickButton = async (e: any) => {
     e.preventDefault();
     const result = await LogIn(loginInfo);
-    if (result) {
+    if (result?.success) {
       // console.log(user.tfa);
-      if (user.tfa) {
+      if (result?.data?.tfa) {
         return router.push("/login/tfalogin");
       }
       router.push("/profile");

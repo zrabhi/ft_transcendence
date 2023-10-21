@@ -30,7 +30,7 @@ export class UserService {
   async findAllUsers(user: any): Promise<User[]> {
     const Allusers = await this.prismaService.user.findMany({});
     const users = Allusers.filter((currUser) => {
-      return currUser.id != user.id;
+      return currUser.id !== user.id;
     });
     return users;
   }
@@ -585,6 +585,17 @@ export class UserService {
       },
       data: {
         status: currentStatus,
+      },
+    });
+  }
+  async updateIsVerified(user_id: string )
+  {
+    return await this.prismaService.user.update({
+      where: {
+        id: user_id,
+      },
+      data: {
+        isTfaVerified:false
       },
     });
   }

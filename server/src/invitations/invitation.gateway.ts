@@ -1,4 +1,4 @@
- import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
@@ -45,8 +45,8 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
 
       if (!payload) return client.disconnect(true);
       const current = await this.userService.findUserById(payload.id);
-      if (current.status !== "INGAME")
-          await this.userService.handleUpdateStatus('ONLINE', payload.id);
+      if (current.status !== 'INGAME')
+        await this.userService.handleUpdateStatus('ONLINE', payload.id);
       client.join(payload.id);
       this.connectedUsers.push({ socket: client, id: payload.id });
     } catch (err) {
@@ -56,28 +56,111 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(client: any) {
-    try{
-    const index = this.connectedUsers.findIndex(
-      (user) => user.socket.id === client.id,
-    );
-    if (index > -1) {
-      const sockets = this.connectedUsers.filter(
-        (user) => user.id === this.connectedUsers[index].id,
+    try {
+      const index = this.connectedUsers.findIndex(
+        (user) => user.socket.id === client.id,
       );
-      if (sockets.length < 2)
-        await this.userService.handleUpdateStatus(
-          'OFFLINE',
-          this.connectedUsers[index].id,
+      if (index > -1) {
+        const sockets = this.connectedUsers.filter(
+          (user) => user.id === this.connectedUsers[index].id,
         );
-      this.connectedUsers.splice(index, 1);
-    }
-  }catch(err)
-  {
-  }
+        if (sockets.length < 2)
+          await this.userService.handleUpdateStatus(
+            'OFFLINE',
+            this.connectedUsers[index].id,
+          );
+        this.connectedUsers.splice(index, 1);
+      }
+    } catch (err) {}
   }
 
   @SubscribeMessage('FriendRequest')
-  async handleFriendRequest(@ConnectedSocket() client: Socket) {}
+  async handleFriendRequest(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    try {
+      const payload = await this.jwtService.verifyAsync(
+        client.handshake.auth.token,
+        {
+          secret: process.env.JWT_SECRET,
+        },
+      );
+      if (!payload) return client.disconnect(true);
+      const currentUser = await this.userService.findUserById(payload.id);
+      const invitedUser = await this.userService.findUserName(data.username);
+      const result = await this.userService.handleFriendRequest(
+        payload,
+        data.username,
+      );
+      if (result.success) {
+        const userSockets = this.connectedUsers.filter(
+          (c) => c.id === invitedUser.id,
+        );
+        const dataSent = [];
+        dataSent.push({
+          type: 1,
+          username: currentUser.username,
+          avatar: currentUser.avatar,
+        });
+        userSockets.forEach((s) => {
+          this.server.to(s.socket.id).emit('YouhaveFriendRequest', dataSent);
+        });
+        const SocketCurrentUser = this.connectedUsers.filter(
+          (c) => c.id === currentUser.id,
+        );
+        SocketCurrentUser.forEach((s) => {
+          this.server
+            .to(s.socket.id)
+            .emit('FriendRequestSent', { username: data.username });
+        });
+      }
+    } catch (err) {}
+  }
+  @SubscribeMessage('AccepetFriendRequest')
+  async handleAcceptFriendRequest(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
+    try {
+      const payload = await this.jwtService.verifyAsync(
+        client.handshake.auth.token,
+        {
+          secret: process.env.JWT_SECRET,
+        },
+      );
+      if (!payload) return client.disconnect(true);
+      const currentUser = await this.userService.findUserById(payload.id);
+      const invitedUser = await this.userService.findUserName(data.username);
+        await this.userService.updateFriendRequestState(
+          payload.id,
+          data.username,
+          'ACCEPTED',
+        );
+        await this.userService.createFriendship(payload.id, data.username);
+        const userSockets = this.connectedUsers.filter(
+          (c) => c.id === invitedUser.id,
+        );
+        const dataSent = [];
+        dataSent.push({
+          type: 1,
+          username: currentUser.username,
+          avatar: currentUser.avatar,
+        });
+        userSockets.forEach((s) => {
+          this.server.to(s.socket.id).emit('FriendRequestAccpeted', {username:data.username});
+        });
+        const SocketCurrentUser = this.connectedUsers.filter(
+          (c) => c.id === currentUser.id,
+        );
+        SocketCurrentUser.forEach((s) => {
+          this.server
+            .to(s.socket.id)
+            .emit('IsNowYourFriend', { username: currentUser.username });
+        });
+    } catch (err) {}
+    
+  }
 
   @SubscribeMessage('gameInvite')
   async handleGameInvite(
@@ -125,9 +208,9 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
   }
   @SubscribeMessage('gameRefused')
   async handleRefuseGame(
-  @ConnectedSocket() client: Socket,
-  @MessageBody() data: any)
-  {
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
+  ) {
     try {
       const payload = await this.jwtService.verifyAsync(
         client.handshake.auth.token,
@@ -138,24 +221,29 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
       if (!payload) return client.disconnect(true);
       const currentUser = await this.userService.findUserById(payload.id);
       const invitedUser = await this.userService.findUserName(data.username);
-      const result = await this.userService.handleDeleteGameRequest(currentUser, invitedUser);
-      if (result.success){
-        const userSockets = this.connectedUsers.filter(
-          (c) => {
-            return (c.id === invitedUser.id)
-          });
+      const result = await this.userService.handleDeleteGameRequest(
+        currentUser,
+        invitedUser,
+      );
+      if (result.success) {
+        const userSockets = this.connectedUsers.filter((c) => {
+          return c.id === invitedUser.id;
+        });
         userSockets.forEach((s) => {
-          this.server.to(s.socket.id).emit('userRefused', {username:currentUser.username});
+          this.server
+            .to(s.socket.id)
+            .emit('userRefused', { username: currentUser.username });
         });
         const SocketCurrentUser = this.connectedUsers.filter(
           (c) => c.id === currentUser.id,
         );
         SocketCurrentUser.forEach((s) => {
-          this.server.to(s.socket.id).emit('Yourefused', {username: invitedUser.username});
+          this.server
+            .to(s.socket.id)
+            .emit('Yourefused', { username: invitedUser.username });
         });
       }
-    }catch (err)
-    {
+    } catch (err) {
       client.disconnect(true);
       return;
     }
@@ -175,49 +263,48 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
       if (!payload) return client.disconnect(true);
       const currentUser = await this.userService.findUserById(payload.id);
       const invitedUser = await this.userService.findUserName(data.username);
-      const result = await this.userService.handleAccpetRequest(currentUser, invitedUser);
-      if (result.success)
-      {
-        const userSockets = this.connectedUsers.filter(
-          (c) => {
-            return (c.id === invitedUser.id)
-          });
+      const result = await this.userService.handleAccpetRequest(
+        currentUser,
+        invitedUser,
+      );
+      if (result.success) {
+        const userSockets = this.connectedUsers.filter((c) => {
+          return c.id === invitedUser.id;
+        });
         userSockets.forEach((s) => {
-          this.server.to(s.socket.id).emit('userAccepted', {username:currentUser.username});
+          this.server
+            .to(s.socket.id)
+            .emit('userAccepted', { username: currentUser.username });
         });
         const SocketCurrentUser = this.connectedUsers.filter(
           (c) => c.id === currentUser.id,
         );
         SocketCurrentUser.forEach((s) => {
-          this.server.to(s.socket.id).emit('Youaccepted', {username: invitedUser.username});
+          this.server
+            .to(s.socket.id)
+            .emit('Youaccepted', { username: invitedUser.username });
         });
       }
-    }catch (err)
-    {
+    } catch (err) {
       client.disconnect(true);
       return;
     }
   }
   @SubscribeMessage('logout')
   async handleLogout(@ConnectedSocket() client: Socket) {
-    try{
+    try {
       // TODO: HANDLE LOGOUT (NOT FUNCTIONAL 100%)
-    const { id } = this.connectedUsers.find((c) => c.socket.id === client.id);
-    if (!id) return;
-    console.log("user id", id);
-    await this.userService.handleUpdateStatus(
-      'OFFLINE',
-      id
-    );
-    const userSockets = this.connectedUsers.filter((c) => c.id === id);
-    if (userSockets.length === 0) return;
-    userSockets.forEach(async (s) => {
-      this.server.to(s.socket.id).emit('logout');
-      s.socket.disconnect();
-    });
-  }catch(err)
-  {
-
+      const { id } = this.connectedUsers.find((c) => c.socket.id === client.id);
+      if (!id) return;
+      console.log('user id', id);
+      await this.userService.handleUpdateStatus('OFFLINE', id);
+      await this.userService.updateIsVerified(id);
+      const userSockets = this.connectedUsers.filter((c) => c.id === id);
+      if (userSockets.length === 0) return;
+      userSockets.forEach(async (s) => {
+        this.server.to(s.socket.id).emit('logout');
+        s.socket.disconnect();
+      });
+    } catch (err) {}
   }
-}
 }

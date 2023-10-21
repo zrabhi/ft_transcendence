@@ -38,8 +38,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [blockedUsers, setBlockedUsers] = useState<[]>([]);
   const [userBlockedMe, setUserBlockedMe] = useState<[]>([]);
   const [friendsList, setFriendsList] = useState<[]>([]);
-  const [friendRequestSent, setFriendRequestSent] = useState<[]>([]);
-  const [userFriendRequests, setUserFriendRequests] = useState();
+  const [friendRequestSent, setFriendRequestSent] = useState<any>([]);
+  const [userFriendRequests, setUserFriendRequests] = useState<any>();
   const [gameRequest, setGameRequest] = useState<[]>([]);
   // here we will aded states to save data cames from sockets
   const Urls = {
@@ -50,19 +50,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     login: "login",
     tfaLogin: "tfalogin",
   };
-  useEffect(() => {
-    (async () => {
-      try {
-        if (checkPath()) return;
-        if (cookie && cookie.access_token) {
-          const response = await getRequest(`${baseUrlAuth}/jwtVerification`);
-          console.log("response +++", response);
-          if (response?.error) return;
-          else window.location.href = "/profile";
-        }
-      } catch (err) {}
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       if (checkPath()) return;
+  //       if (cookie && cookie.access_token) {
+  //         const response = await getRequest(`${baseUrlAuth}/jwtVerification`);
+  //         console.log("response +++", response);
+  //         if (response?.error) return;
+  //         else window.location.href = "/profile";
+  //       }
+  //     } catch (err) {}
+  //   })();
+  // }, []);
   const checkPath = () => {
     setPathname("");
     const currentPath = window.location.href.split("/");
@@ -234,7 +234,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return false;
       }
       setUser(response);
-      return true;
+      return {success: true, data: response};
     } catch (err) {
       return false;
     }
@@ -282,26 +282,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("loging out");
       remove("access_token");
       router.push("/login");
-    }); 
-    notifSocket.on("Yourefused", (data: any) =>
-    {
+    });
+    notifSocket.on("Yourefused", (data: any) => {
       showSnackbar("Request refused succesfully", true);
-      const updated : any = gameRequest.filter((game: any) => {
+      const updated: any = gameRequest.filter((game: any) => {
         return game.username !== data.username;
-        
       });
       setGameRequest(updated);
-    })
-    notifSocket.on("userRefused", (data : any) =>
-    {
-      showSnackbar(`${data.username} Refused your game request`, false)
-    })
-    notifSocket.on("userAccepted", (data: any) =>{
+    });
+    notifSocket.on("userRefused", (data: any) => {
+      showSnackbar(`${data.username} Refused your game request`, false);
+    });
+    notifSocket.on("userAccepted", (data: any) => {
       showSnackbar(`${data.username} accepted you game request`, true);
       router.push("/game");
-    })
-    notifSocket.on("Youaccepted", (data: any) =>
-    {
+    });
+    notifSocket.on("Youaccepted", (data: any) => {
       showSnackbar("Game request accepted succesfully", true);
       let updated: any;
       updated = gameRequest.filter((game: any) => {
@@ -309,11 +305,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       setGameRequest(updated);
       router.push("/game");
-    })
-    notifSocket.on("gameRequestSent", () =>
-    {
+    });
+    notifSocket.on("gameRequestSent", () => {
       showSnackbar("Game request succesfully sent", true);
-    })
+    });
     notifSocket.on("gameRequest", (data: any) => {
       console.log("game data", data);
       showSnackbar(
@@ -322,6 +317,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       );
       setGameRequest(data);
     });
+    ////Friends requests
+    notifSocket.on("YouhaveFriendRequest", (data: any) => {
+      showSnackbar(
+        `You have a riend request from ${data[0].username}, check your notification`
+      , true);
+      setUserFriendRequests([...userFriendRequests, data]);
+    });
+    notifSocket.on("FriendRequestSent", (data : any)=>{
+      showSnackbar(`Friend request succesfully sent to ${data.username}`, true);
+      setFriendRequestSent([...friendRequestSent, data.username]);
+    })
+
+    notifSocket.on("IsNowYourFriend", async (data: any)=>{
+      showSnackbar(`${data.username} is now your friend`, true);
+         let updateUserFriendRequests = userFriendRequests.filter((member: any) =>{
+        return member.username !== data.username;
+      })
+      setUserFriendRequests(updateUserFriendRequests);
+      await fetchFriendList();
+    })
+    
+    notifSocket.on("FriendRequestAccpeted", async (data: any) =>{
+      showSnackbar(`${data.username} accepted your friend request`, true);
+      await fetchFriendList();
+    })  
     return () => {
       notifSocket.disconnect();
     };
@@ -354,6 +374,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         fetchFriendRequests,
         fetchGameRequest,
         setUserFriendRequests,
+        setTfaDisabled,
         notifSocket,
         setNotif,
       }}

@@ -114,7 +114,7 @@ export default function Profile() {
         }
         setUsers(response)
       } catch(err) {
-        console.error('Error fetching users:', err);
+        
       }
     })()
   },[])

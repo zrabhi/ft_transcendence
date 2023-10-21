@@ -78,9 +78,11 @@ export class AuthController {
         username: user.username,
         setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
       });
+      const currentUser = await this.userService.findUserById(user.id)
       response.cookie('access_token', access_token);
-      if (!user.password) return response.redirect(COMPLETE);
-      else if (user.tfa) return response.redirect(TFALOGIN);
+      if (currentUser.tfa) 
+          return response.redirect(TFALOGIN);
+      else if (!currentUser.password) return response.redirect(COMPLETE);
       return response.redirect(PROFILE);
     } catch (err) {
       response.redirect(LOGIN)
@@ -102,8 +104,9 @@ export class AuthController {
         setTwoFactorAuthenticationSecret: user.twoFactorAuthenticationSecret,
       });
       response.cookie('access_token', access_token);
-      if (!user.password) return response.redirect(COMPLETE);
-      if (user.tfa) return response.redirect(TFALOGIN);
+      const currentUser = await this.userService.findUserById(user.id)
+      if (!currentUser.password) return response.redirect(COMPLETE);
+      else if (currentUser.tfa) return response.redirect(TFALOGIN);
       return response.redirect(PROFILE);
     } catch (err) {
       response.redirect(LOGIN);

@@ -513,13 +513,16 @@ export class UserController {
     @Res() res: Response,
   ) {
     try {
-      await this.userService.updateFriendRequestState(
+      const result = await this.userService.updateFriendRequestState(
         user.id,
         username,
         'ACCEPTED',
       );
-      await this.userService.createFriendship(user.id, username);
-      res.status(200).json({ success: true, message: 'ACCEPTED' });
+      if (result){
+        await this.userService.createFriendship(user.id, username);
+      res.status(200).json({ success: true, message: 'ACCEPTED' });}
+      else
+        res.status(200).json("firend request canceld");
     } catch (err) {
       res.status(400).json('error occured');
     }

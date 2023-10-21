@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:20-bullseye
 
 WORKDIR /usr/src/app/client
 COPY package.json ./

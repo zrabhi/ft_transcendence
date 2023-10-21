@@ -1,8 +1,5 @@
-import React, { useEffect } from 'react'
-import { useState } from 'react'
+import React from 'react'
 import Image from 'next/image'
-import { getRequest, baseUrlUsers } from '@/app/context/utils/service'
-import { showSnackbar } from '@/app/context/utils/showSnackBar'
 import Achive1Avatar from "@/public/achievements/account-creation.jpeg"
 import Achive2Avatar from "@/public/achievements/first-friend.png"
 import Achive3Avatar from "@/public/achievements/first-game.png"

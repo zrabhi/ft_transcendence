@@ -55,8 +55,9 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  async handleDisconnect(client: any) {
+  async handleDisconnect(client: Socket) {
     try {
+    console.log("im diconnect status offline");
       const index = this.connectedUsers.findIndex(
         (user) => user.socket.id === client.id,
       );
@@ -132,32 +133,35 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
       if (!payload) return client.disconnect(true);
       const currentUser = await this.userService.findUserById(payload.id);
       const invitedUser = await this.userService.findUserName(data.username);
-        await this.userService.updateFriendRequestState(
+      const result =  await this.userService.updateFriendRequestState(
           payload.id,
           data.username,
           'ACCEPTED',
         );
-        await this.userService.createFriendship(payload.id, data.username);
-        const userSockets = this.connectedUsers.filter(
-          (c) => c.id === invitedUser.id,
-        );
-        const dataSent = [];
-        dataSent.push({
-          type: 1,
-          username: currentUser.username,
-          avatar: currentUser.avatar,
+        if (result)
+        {
+          await this.userService.createFriendship(payload.id, data.username);
+           const userSockets = this.connectedUsers.filter(
+             (c) => c.id === invitedUser.id,
+            );
+          const dataSent = [];
+          dataSent.push({
+            type: 1,
+            username: currentUser.username,
+            avatar: currentUser.avatar,
+          });
+          userSockets.forEach((s) => {
+            this.server.to(s.socket.id).emit('FriendRequestAccpeted', {username:data.username});
+          });
+          const SocketCurrentUser = this.connectedUsers.filter(
+            (c) => c.id === currentUser.id,
+          );
+          SocketCurrentUser.forEach((s) => {
+            this.server
+             .to(s.socket.id)
+              .emit('IsNowYourFriend', { username: currentUser.username });
         });
-        userSockets.forEach((s) => {
-          this.server.to(s.socket.id).emit('FriendRequestAccpeted', {username:data.username});
-        });
-        const SocketCurrentUser = this.connectedUsers.filter(
-          (c) => c.id === currentUser.id,
-        );
-        SocketCurrentUser.forEach((s) => {
-          this.server
-            .to(s.socket.id)
-            .emit('IsNowYourFriend', { username: currentUser.username });
-        });
+      }
     } catch (err) {}
     
   }
@@ -292,8 +296,8 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
   }
   @SubscribeMessage('logout')
   async handleLogout(@ConnectedSocket() client: Socket) {
-    try {
-      // TODO: HANDLE LOGOUT (NOT FUNCTIONAL 100%)
+    try 
+    {
       const { id } = this.connectedUsers.find((c) => c.socket.id === client.id);
       if (!id) return;
       console.log('user id', id);

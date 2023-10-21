@@ -470,7 +470,9 @@ async update_achivements(winner: Player, loser: Player, cleansheet:boolean)
       },
       data:{
         totalGames: winnerUser.totalGames +  1,
-        win:winnerUser.win + 1
+        win:winnerUser.win + 1,
+        totalGoalsScored:winnerUser.totalGoalsScored +  winner.score,
+        totalGoalsRecieved:winnerUser.totalGoalsRecieved + loser.score
       }
     })
     /// udpating loser user object
@@ -482,6 +484,8 @@ async update_achivements(winner: Player, loser: Player, cleansheet:boolean)
       data:{
         totalGames:loserUser.totalGames + 1,
         loss:loserUser.loss+1,
+        totalGoalsScored:loserUser.totalGoalsScored + loser.score,
+        totalGoalsRecieved:loserUser.totalGoalsRecieved + winner.score
       }
     });
     await this.prismaService.achievement.update({

@@ -16,7 +16,7 @@ import passport, { Profile } from 'passport';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './Strategys/GoogleStrategy';
 import { AuthDto } from './dto/auth.dto';
-import { User } from './decorator/user-decorator';
+import { User, UserInfo } from './decorator/user-decorator';
 import { FtGurad } from './Guards/42Gurad';
 import { GithubGuard } from './Guards/GithubGuard';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -90,9 +90,14 @@ export class AuthController {
   }
   @Get('jwtVerification')
   @UseGuards(JwtAuthGuard)
-  async handleCheckJWT(@Res() res: Response)
-  {
-    res.status(200).json("ok");
+  async handleCheckJWT(@Res() res: Response, @UserInfo() user: any)
+  { 
+    try{
+      const currentUser = await this.userService.findUserById(user.id);
+      res.status(200).json(currentUser);
+    }catch(err){
+      res.status(400).json("ko");
+    }
   }
   @Get('google/redirect')
   @UseGuards(GoogleGuard)

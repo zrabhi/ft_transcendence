@@ -41,8 +41,8 @@ model User {
   email                           String   @unique
   username                        String   @unique
   password                        String?
-  avatar                          String   @default("http://127.0.0.1:8080/api/avatar/pictures/default.jpeg")
-  cover                           String   @default("http://127.0.0.1:8080/api/cover/pictures/default.png")
+  avatar                          String   @default("http://10.11.5.8:8080/api/avatar/pictures/default.jpeg")
+  cover                           String   @default("http://10.11.5.8:8080/api/cover/pictures/default.png")
   status                          Status   @default(ONLINE)
   country                         String?
   win                             Int      @default(0)
@@ -50,6 +50,8 @@ model User {
   ladder_level                    Int      @default(0)
   xp                              Int      @default(50)
   totalGames                      Int      @default(0)
+  totalGoalsScored                Int      @default(0)
+  totalGoalsRecieved              Int      @default(0)
   discordHandler                  String?
   twitterHandler                  String?
   tfa                             Boolean?  @default(false)
@@ -189,7 +191,7 @@ model Channel {
   admins            ChannelAdmin[]    @relation(name: "channelAdmin")
   Muted             ChannelMuted[]    @relation(name: "channelMute")
 
-  avatar String?   @default("http://127.0.0.1:8080/api/avatar/pictures/hashtag.jpg")
+  avatar String?   @default("http://10.11.5.8:8080/api/avatar/pictures/hashtag.jpg")
   created_at        DateTime @default(now())
 }
 model ChannelMembers{

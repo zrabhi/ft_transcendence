@@ -12,9 +12,9 @@ const MainContent = () => {
         <div className="img">
           <Image
             src={HomeImage}
-            width={500}
-            height={500}
-            alt='a women descripe a pong game to a child'
+            width={900}
+            height={900}
+            alt='a child descripe a pong game to a child'
           />
         </div>
       </div>

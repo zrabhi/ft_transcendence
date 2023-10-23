@@ -120,7 +120,6 @@ export default function match()
         raf = window.requestAnimationFrame(() => draw(canvas, ctx));
       else
       {
-        console.log('here we stop drawing');
         ctx?.clearRect(0,0,canvas.width, canvas.height);
       }
     };
@@ -132,9 +131,7 @@ export default function match()
       rightbar.x = canvas.width - 100 - rightbar.width;
       if(game == false) {
         Ball.addx = Ball.addx;
-        console.log(game);
         game = true;
-        console.log("here we init")
         socket.emit('init',
         {
           canvasw:canvas.width,
@@ -196,7 +193,6 @@ export default function match()
       try{
         (async () =>{
           const response = await getRequest(`${baseUrlUsers}/userStatus`)
-          console.log("hello", response)
           if (response?.error)
           {
             if (response?.message === "Unauthorized")
@@ -222,16 +218,12 @@ export default function match()
       selectedcolor = localStorage.getItem("selectedMapColor") as string;
       if(checker)
       {
-        console.log(status)
       if (status === "INGAME")
       {
-        setTimeout(() => {
-            showSnackbar("already in game", false);
-          }, 50000);
+          showSnackbar("already in game", false);
           window.location.href ="/game";
           return;
       }
-      console.log("here we connect to the server")
       socket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/matching`,{
         auth: {
           token: cookie.access_token,
@@ -239,20 +231,17 @@ export default function match()
 
      
         socket.on('connect', () => {
-          console.log('Connected to WebSocket');
           socket.on('disconnect',()=>{
             router.push('/game')
           })
 
         socket.on('matched right',  (data:any) => {
-          console.log("i match this : " , data);
           setoppuser(data.username);
           setOpponentavatar(data.avatar);
           side = 'right';
           launchGame();
         })
         socket.on('matched left', (data:any) => {
-          console.log("i match this : " , data);
           setoppuser(data.username);
           setOpponentavatar(data.avatar);
           side = 'left';
@@ -292,9 +281,9 @@ export default function match()
 
     return (
     <div className="logged-user">
-    <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+    {/* <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} /> */}
     <div className={`game ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
-        <div className="game-content min-h-screen p-8">
+        <div className="game-content p-8">
             <HeaderBar />
             <div className={`core flex w-full`} >
                 <div className="score flex p-2 justify-between items-center gap-4">
@@ -333,6 +322,7 @@ export default function match()
                     </div>
                   </div>
                 </div>
+                
                 <div className={`popup ${showPopup ?  'bg-black-400 bg-opacity-70 backdrop-blur-sm': 'hidden' } w-screen h-screen fixed inset-0 flex justify-center items-center `} >|
                   <div className='popupcore w-[50rem] xs:w-[18rem] sm:w-[24rem] md:w-[30rem]
                     rounded-xl  relative p-4 pt-12 pb-8'>
@@ -345,6 +335,9 @@ export default function match()
                 </div>    
                 <div className="table" id='table'>
                     <canvas id="canvas" width={1000} height={600}></canvas>
+                </div>
+                <div className="back">
+                  <button onClick={()=>router.push("/game")}>BACK</button>
                 </div>
             </div>
         </div>

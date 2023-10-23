@@ -166,7 +166,6 @@ export class AuthService {
 async isTwoFactorAuthenticationCodeValid( twoFactorAuthenticationCode: string, useriD: string)
     {
       const   user = await this._user.findUserById(useriD);
-      console.log(user);
     try {
       return  authenticator.verify({
         token: twoFactorAuthenticationCode,

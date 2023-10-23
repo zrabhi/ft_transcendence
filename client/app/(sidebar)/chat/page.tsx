@@ -108,13 +108,12 @@ const Chat: React.FC = () => {
       if (
       channels.some(
         (channel: any) => {
-          console.log("the test in filter", channel?.channel?.id , isMessage?.channel?.id)
-          console.log('types of', typeof channel?.channel?.id , typeof isMessage?.channel?.id)
+        
           return channel?.channel?.id === isMessage?.channel?.id
         }
         )
     )
-      {console.log("in condition");
+      {
       setChannels((prevChannels: any) => {
         return prevChannels?.map((channel: any) => {
           if (channel?.channel?.id === isMessage?.channel?.id)
@@ -184,6 +183,11 @@ useEffect(()=>{
           return channel;
       })
     );
+    setSelectedChannels(
+      selectedChannels.filter((channel: any) => {
+        if (channel?.channel && channel?.channel?.id !== deletedId)
+          return channel;
+      }));
     setDeletedId("");
   }
 },[deletedId])
@@ -204,19 +208,17 @@ useEffect(()=>{
             );
         });
       socket.on("channelDeleted", (data: socketResponse) => {
-        console.log("data received", data);
         setDeletedId(data.channelId);
         if (!data.success) {
-          alert(data.error);
           return;
         }
-        if (user.username != data.username)
+        if (user.username !== data.username)
           showSnackbar(
             `the owner ${data.username}  deleted  ${data.name} Room`,
             true
           );
         else showSnackbar(`Room has been deleted`, true);
-        console.log(selectedChannel, data.channelId);
+      
         setSelectedChannel(null);
       });
       socket.on("userKicked", (data: any) => {
@@ -305,7 +307,7 @@ useEffect(()=>{
         showSnackbar(`Message can be sent because you have been muted`, false);
       });
       socket.on("memberJoinned", (data: any) => {
-        console.log(data.name, user);
+      
         if (user.username != data.name) {
           showSnackbar(`${data?.name} joinned ${data?.channelName} Room`, true);
           if (
@@ -346,7 +348,7 @@ useEffect(()=>{
         );
       });
       socket.on("newAdmin", (data: any) => {
-        console.log("data from socket", data);
+        
         if (user.username === data?.user)
           showSnackbar(`Your now admin of ${data?.channelName} Room `, true);
         if (

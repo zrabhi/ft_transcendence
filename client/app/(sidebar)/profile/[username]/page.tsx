@@ -28,15 +28,13 @@ export default function Page({params}: {params: {username: string} }) {
 
   const fetchUsers = async () => {
     try {
-      console.log("fetching users");
       const allUsers = await getRequest(`${baseUrlUsers}/allUsers`);
       let leaderBoardList = allUsers.sort((user1: any, user2: any) => {
-        console.log(`sorting ${user1.username} and ${user2.username}`);
+        // console.log(`sorting ${user1.username} and ${user2.username}`);
         return user2.win - user1.win;
       })
       setUsers(leaderBoardList.slice(0, 15));
     } catch (error) {
-      console.error('Error fetching users:', error);
     }
   };
 
@@ -49,7 +47,7 @@ export default function Page({params}: {params: {username: string} }) {
       }
       setFriendList(friendList);
     } catch (err) {
-      console.log(err);
+      // console.log("");
     }
   }
 
@@ -62,7 +60,7 @@ export default function Page({params}: {params: {username: string} }) {
       }
       setGameList(gameList);
     } catch (err) {
-      console.log(err);
+      // console.log("");
     }
   }
 
@@ -73,10 +71,9 @@ export default function Page({params}: {params: {username: string} }) {
         showSnackbar("Unauthorized", false)
         return ;
       }
-      console.log(achievements);
       setAchievements(achievements);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
 

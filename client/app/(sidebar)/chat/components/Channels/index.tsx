@@ -216,7 +216,6 @@ const ModalContainer = ({
   const handleSubmit = async (values: FormValues, { resetForm }: any) => {
     // Handle form submission here
     try{
-    console.log("value of format ", values);
     const roomForm = {
       name: values.name,
       type: values.type,
@@ -228,7 +227,6 @@ const ModalContainer = ({
       `${baseChatUrl}/create/room`,
       JSON.stringify(roomForm)
       );
-     console.log("channel craeted", response);
     if (response?.error)
     {
       if (response?.message === "Unauthorized")

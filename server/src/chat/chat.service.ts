@@ -59,7 +59,7 @@ export class ChatService {
         });
       }
     }
-    console.log('channels listed are ', rooms);
+    // console.log('channels listed are ', rooms);
     return rooms;
   }
   async getCHannelRoom(channelName: string) {
@@ -85,11 +85,13 @@ export class ChatService {
     user: string,
     otherUser: string,
   ): Promise<Channel | any> {
+    const currentUser = await this._user.findUserName(user);
+    const other = await this._user.findUserName(otherUser)
     const search = await this._prisma.channel.findMany({
       where: {
         AND: [
-          { users: { has: user } }, // Check if userId1 is in the 'users' array
-          { users: { has: otherUser } }, // Check if userId2 is in the 'users' array
+          { users: { has: currentUser.id } }, // Check if userId1 is in the 'users' array
+          { users: { has: other.id } }, // Check if userId2 is in the 'users' array
         ],
       },
       select: {
@@ -121,7 +123,7 @@ export class ChatService {
     const result = await this.checkChannelRoomExistence(name);
     if (result) return { error: 'Room already exists', channel: undefined };
     let channel: any;
-    console.log('type', type);
+    // console.log('type', type);
 
     if (type === 'PUBLIC') {
       channel = await this._prisma.channel.create({
@@ -132,7 +134,7 @@ export class ChatService {
           member_limit: memberLimit,
         },
       });
-      console.log(channel);
+      // console.log(channel);
     }
     if (type === 'PROTECTED') {
       if (!password)
@@ -161,7 +163,7 @@ export class ChatService {
           member_limit: memberLimit,
         },
       });
-      console.log(channel);
+      // console.log(channel);
     }
     await this._prisma.channelMembers.create({
       data: {
@@ -198,7 +200,7 @@ export class ChatService {
     });
     const user = await this._user.findUserById(user_id);
     const allMessages = [];
-    console.log('channel', channel_id);
+    // console.log('channel', channel_id);
 
     if (channel && channel.messages && channel.messages.length > 0) {
       for (const message of channel.messages) {
@@ -269,7 +271,7 @@ export class ChatService {
 
   //TODO: check if the user is blocked from the channel
   async handleJoinChannelRoom(name: string, user: any, password: string) {
-    console.log(user.username, user.id);
+    // console.log(user.username, user.id);
     const channel = await this._prisma.channel.findUnique({
       where: {
         name: name,
@@ -337,7 +339,7 @@ export class ChatService {
         name: uuidv4(),
         member_limit: memberLimit,
         type: 'DM',
-        users: [username, user.username],
+        users: [otherUser.id, user.id],
       },
     });
     const lastMessage = {
@@ -383,7 +385,7 @@ export class ChatService {
   async getAllUserChannelsDm(currUser: any): Promise<Channel[]> {
     const channelsDm = await this._prisma.channel.findMany({
       where: {
-        AND: [{ users: { has: currUser.username } }],
+        AND: [{ users: { has: currUser.id } }],
       },
       include: {
         messages: true,
@@ -581,7 +583,7 @@ export class ChatService {
     const searchedUser = channel.members.filter((member: any) => {
       return newAdmin.id === member.userId;
     });
-    console.log('user is found ', searchedUser);
+    // console.log('user is found ', searchedUser);
     for (const member of channel.members) {
       if (searchedUser[0].id === member.id) continue;
       if (member.userId === currUser.id) {
@@ -635,8 +637,8 @@ export class ChatService {
   async handleUserMute(user: any, channel_id: string, userToBeMuted: string) {
     if (!channel_id || !userToBeMuted)
       return { success: false, error: 'fields are empty' };
-    let time = Date.now() + 300000;
-    console.log('logo', time);
+    let time = Date.now() + 120000;
+    // console.log('logo', time);
     const currUser = await this._user.findUserById(user.id);
     const mutedUser = await this._user.findUserName(userToBeMuted);
     const channel = await this._prisma.channel.findUnique({
@@ -656,11 +658,11 @@ export class ChatService {
     let searchedUser: any = channel.members.filter((member) => {
       return member.userId === mutedUser.id;
     });
-    console.log(searchedUser);
+    // console.log(searchedUser);
 
     for (const member of channel.members) {
       if (searchedUser[0].id === member.id) continue;
-      console.log('searched user ', member.userId);
+      // console.log('searched user ', member.userId);
       // if (member.userId === mutedUser.id && member.role === 'ADMIN')
       if (
         member.userId === currUser.id &&
@@ -784,10 +786,10 @@ export class ChatService {
         error: `${userToBeKicked} is not on this channel`,
         success: false,
       };
-    console.log(searchedUser);
+    // console.log(searchedUser);
     for (const member of channel.members) {
       if (searchedUser[0].id === member.id) continue;
-      console.log('searched user ', member.userId);
+      // console.log('searched user ', member.userId);
       if (
         member.userId === currentUser.id &&
         (member.role === 'ADMIN' || member.role === 'OWNER')

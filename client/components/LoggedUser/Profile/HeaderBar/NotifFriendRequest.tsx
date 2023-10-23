@@ -17,6 +17,7 @@ export default function NotifFriendRequest({data, setRequests, requests}: any) {
     setFriendRequestSent,
     userFriendRequests,
     setUserFriendRequests,
+    notifSocket,
   } = useContext(AuthContext);
   const handleRedirectProfile = () =>
   {
@@ -29,8 +30,6 @@ export default function NotifFriendRequest({data, setRequests, requests}: any) {
         `${baseUrlUsers}/cancelFriendRequest/${data.username}`,
         ""
       );
-      console.log("cancle ++", response);
-      
       if (response?.error && response?.message === "Unauthorized"){
         showSnackbar("Unauthorized", false)
         return ;
@@ -40,7 +39,7 @@ export default function NotifFriendRequest({data, setRequests, requests}: any) {
       });
       setFriendRequestSent(updatedFriendRequest);
       setRequests(requests?.filter((request: any)=> request.username != data.username));  
-      showSnackbar("friend request cancled successfully", true);
+      showSnackbar("Friend request cancled successfully", true);
     } catch (error) {
     }
   };
@@ -48,6 +47,7 @@ export default function NotifFriendRequest({data, setRequests, requests}: any) {
 
   const acceptFriendHandler = async () => {
     try {
+      // notifSocket.emit("AccepetFriendRequest", {username: data.username});
       const response = await putRequest(`${baseUrlUsers}/acceptFriendRequest/${data.username}`,"");
       if (response?.error && response?.message === "Unauthorized"){
         showSnackbar("Unauthorized", false)
@@ -66,11 +66,9 @@ export default function NotifFriendRequest({data, setRequests, requests}: any) {
   
   const handleAccept = async () => {
     await acceptFriendHandler();
-    alert('accept')
   }
   const handleRefuse = async () => {
     await cancelRequestHandler();
-    alert('accept')
   }
   return (
     <div className='flex flex-row justify-between'>

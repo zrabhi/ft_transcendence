@@ -153,7 +153,7 @@ export class ChatController {
     @Param('channleId') channleId: string,
     @Res() res: Response,
   ) {
-    console.log('im here');
+    // console.log('im here');
 
     const channel = await this.chatService.getChannelById(channleId);
     const members = [];
@@ -240,12 +240,13 @@ export class ChatController {
 
     const data = [];
     for (const channel of result) {
-      const searchedUserName = channel.users.filter((username) => {
-        if (username != currUser.username) return username;
+      const searchedUserName = channel.users.filter((id) => {
+        if (id != currUser.id) return id;
       });
+
       const lastMessage = channel.messages[channel.messages.length - 1];
       if (!lastMessage) continue;
-      const searchedUser = await this.userService.findUserName(
+      const searchedUser = await this.userService.findUserById(
         searchedUserName[0],
       );
       data.push({

@@ -21,6 +21,7 @@ export default function UserCard(user: any) {
     setFriendRequestSent,
     userFriendRequests,
     setUserFriendRequests,
+    notifSocket
   } = useContext(AuthContext);
   user = user.user;
 
@@ -35,7 +36,6 @@ export default function UserCard(user: any) {
     userFriendRequests?.map((member: any) => {
       pending.push(member.username);
     })
-    console.log(pending);
     setIsFriendList(friendList)
     setPendingRequest(pending)
   }
@@ -115,8 +115,10 @@ export default function UserCard(user: any) {
   };
 
   const addFriendHandler = async () => {
+
     try {
-      console.log(`add friend click`)
+      // notifSocket.emit("FriendRequest", {username:user.username});
+      // // console.log(`add friend click`)
       const response = await postRequest(`${baseUrlUsers}/friendRequest/${user.username}`, "");
       if (response?.error && response?.message === "Unauthorized"){
         showSnackbar("Unauthorized", false)
@@ -130,6 +132,7 @@ export default function UserCard(user: any) {
 
   const acceptFriendHandler = async () => {
     try {
+      // notifSocket.emit("AccepetFriendRequest", {username: user.username});
       const response = await putRequest(`${baseUrlUsers}/acceptFriendRequest/${user.username}`,"");
       if (response?.error && response?.message === "Unauthorized"){
         showSnackbar("Unauthorized", false)

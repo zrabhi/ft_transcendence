@@ -1,6 +1,12 @@
-Dockerfile
-.dockerignore
 node_modules
-package-lock.json
 npm-debug.log
-dist
+Dockerfile*
+docker-compose*
+.dockerignore
+.git
+.gitignore
+README.md
+LICENSE
+.vscode
+.next
+/dist

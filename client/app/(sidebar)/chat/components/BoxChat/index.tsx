@@ -76,7 +76,7 @@ const BoxChat = ({
   setSelectedChannels,
   users,
   filteredUserList,
-  setFilteredUserList
+  setFilteredUserList,
 }: any): JSX.Element => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState<string>("");
@@ -138,7 +138,6 @@ const BoxChat = ({
     : {};
 
   async function handleBlock() {
-    console.log("-----", selectedChat);
     // username is the selected user to be blocked
     socket.emit("block", {
       username: selectedChat.username,
@@ -245,7 +244,6 @@ const BoxChat = ({
       let updatedChannels = channels.filter((channel: any) => {
         return channel?.channel?.id !== selectedChannel?.channel?.id;
       });
-      console.log("updated channels", updatedChannels);
       setSelectedChannels(
         selectedChannels.filter(
           (channel: any) => channel.channel.id != selectedChannel?.channel?.id
@@ -309,7 +307,20 @@ const BoxChat = ({
   useEffect(() => {
     getCurrentUserRole();
     setSelectedUsers([]);
-
+    setUsersList(
+      users.length > 0
+        ? users.filter((user: any) => {
+            // Check if the user's id is in the members array
+            return (
+              !selectedChannel?.members?.some(
+                (member: any) => member.name === user.username
+              ) &&
+              !blockedUsers.includes(user.username) &&
+              !userBlockedMe.includes(user.username)
+            );
+          })
+        : []
+    );
     (async () => {
       try {
         const response = await getRequest(
@@ -510,9 +521,9 @@ const BoxChat = ({
       : []
   );
 
-  useEffect(()=> {
+  useEffect(() => {
     setFilteredUserList(usersList);
-  }, [usersList])
+  }, [usersList]);
 
   // this state is for the search bar to filter easily
 
@@ -522,8 +533,12 @@ const BoxChat = ({
     setSearchQuery(query);
 
     // Filter users based on the search query
-    const filtered = usersList?.filter((user: any) =>
-      user.username.toLowerCase().includes(query) && !selectedChannel?.members.some((member: any) => { member.username === user.username })
+    const filtered = usersList?.filter(
+      (user: any) =>
+        user.username.toLowerCase().includes(query) &&
+        !selectedChannel?.members.some((member: any) => {
+          member.username === user.username;
+        })
     );
 
     setFilteredUserList(filtered);
@@ -561,7 +576,6 @@ const BoxChat = ({
 
   const handleClickChangeType = async () => {
     try {
-      console.log(changeType);
       const response = await putRequest(
         `${baseChatUrl}/channelSettings`,
         JSON.stringify(changeType)

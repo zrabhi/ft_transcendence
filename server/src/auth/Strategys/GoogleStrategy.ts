@@ -27,7 +27,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const userData: CreateUserDto = {
       email: emails[0].value,
       username: name.givenName,
-      avatar: "http://127.0.0.1:8080/api/avatar/pictures/default.jpeg",
+      avatar: process.env.HOSTNAME_MACHINE + `/api/avatar/pictures/default.jpeg`,
       cover: '',
       password: '',
     };

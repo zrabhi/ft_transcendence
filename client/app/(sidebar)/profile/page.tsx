@@ -23,6 +23,7 @@ export default function Profile() {
   const [users, setUsers] = useState<[]>([]);
   const [friendList, setFriendList] = useState<any>([]);
   const [gameList, setGameList] = useState<any>([]);
+  const [NewUsers, setNewUsers] = useState<[]>([]);
   const [achievements, setAchievements] = useState<any>({});
 
   const fetchAchievements = async () => {
@@ -32,19 +33,15 @@ export default function Profile() {
         showSnackbar("Unauthorized", false)
         return ;
       }
-      console.log(achievements);
       setAchievements(achievements);
     } catch (err) {
-      console.log(err);
     }
   }
 
   const fetchUsers = async () => {
     try {
-      console.log("fetching users");
       const allUsers = await getRequest(`${baseUrlUsers}/allUsers`);
       let leaderBoardList = allUsers.sort((user1: any, user2: any) => {
-        console.log(`sorting ${user1.username} and ${user2.username}`);
         return user2.win - user1.win;
       })
       setUsers(leaderBoardList.slice(0, 15));
@@ -62,7 +59,6 @@ export default function Profile() {
       }
       setFriendList(friendList);
     } catch (err) {
-      console.log(err);
     }
   };
 
@@ -75,7 +71,6 @@ export default function Profile() {
       }
       setGameList(gameList);
     } catch (err) {
-      console.log(err);
     }
   }
 
@@ -112,7 +107,7 @@ export default function Profile() {
             showSnackbar("Unauthorized", false)
           return ;
         }
-        setUsers(response)
+        setNewUsers(response)
       } catch(err) {
         
       }
@@ -124,7 +119,7 @@ export default function Profile() {
       <div className={`profile ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
         <div className="profile-content min-h-screen p-8">
           <HeaderBar data={user} />
-          <Users users={users} userFriends={friendList}/>
+          <Users users={NewUsers} userFriends={friendList}/>
           <ProfileCard data={user} />
           <div className="profile-boxes">
             <div className="navbar-boxes">

@@ -1,6 +1,9 @@
 @import '@/app/globals.scss';
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+.game-content {
+    height: calc(100vh - 3rem);
+}
 
 .core {
     background-color: $blue-bg-color;

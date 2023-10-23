@@ -29,7 +29,6 @@ export default function TfaPage() {
           return ;
       }
         setQrCodeImage(response);
-        // console.log(response);
     })()
   },[])
 

@@ -57,7 +57,7 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleDisconnect(client: Socket) {
     try {
-    console.log("im diconnect status offline");
+    // console.log("im diconnect status offline");
       const index = this.connectedUsers.findIndex(
         (user) => user.socket.id === client.id,
       );
@@ -207,7 +207,7 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
       }
     } catch (err) {
       client.disconnect(true);
-      console.log('socket error in game request', err);
+      // console.log('socket error in game request', err);
     }
   }
   @SubscribeMessage('gameRefused')
@@ -300,7 +300,7 @@ export class Invitations implements OnGatewayConnection, OnGatewayDisconnect {
     {
       const { id } = this.connectedUsers.find((c) => c.socket.id === client.id);
       if (!id) return;
-      console.log('user id', id);
+      // console.log('user id', id);
       await this.userService.handleUpdateStatus('OFFLINE', id);
       await this.userService.updateIsVerified(id);
       const userSockets = this.connectedUsers.filter((c) => c.id === id);

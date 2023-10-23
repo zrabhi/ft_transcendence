@@ -45,7 +45,6 @@ const Friends = ({ channels,setChannels,setSelectedChannel, setSelectedChat, use
 
   const handleGameInvite = (user: any) =>
   {
-    console.log("user.username", user.username);
     notifSocket.emit("gameInvite",{
       username: user.username
     })

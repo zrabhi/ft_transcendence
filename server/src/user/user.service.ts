@@ -229,11 +229,11 @@ export class UserService {
         return await this.prismaService.user.update({
           where: { id: userId },
           data: {
-            avatar: `http://127.0.0.1:8080/api/avatar/pictures/${infos.avatar}`,
+            avatar:  process.env.HOSTNAME + `8080/api/avatar/pictures/${infos.avatar}`,
           },
         });
       } catch (err) {
-        // console.log(err);
+        // // console.log(err);
       }
       {
         throw new HttpException(
@@ -249,7 +249,7 @@ export class UserService {
         return await this.prismaService.user.update({
           where: { id: userId },
           data: {
-            cover: `http://127.0.0.1:8080/api/cover/pictures/${infos.cover}`,
+            cover: process.env.HOSTNAME +  `8080/api/cover/pictures/${infos.cover}`,
           },
         });
       } catch (err) {
@@ -273,7 +273,7 @@ export class UserService {
         },
       });
     } catch (err) {
-      // console.log(err);
+      
     }
   }
 
@@ -313,7 +313,7 @@ export class UserService {
         });
       }
     } catch (err) {
-      // console.log(err);
+      // // console.log(err);
     }
   }
   async passWordCheck(@Body() Body, userId: string) {
@@ -469,7 +469,7 @@ export class UserService {
       }
       return { success: true, message: 'succeffully updated' };
     } catch (err) {
-      console.log('error occurred while unfriending user');
+      // console.log('error occurred while unfriending user');
       return { success: false };
     }
   }
@@ -823,7 +823,7 @@ export class UserService {
           requests.push(otherUser.username);
         }
       }
-      console.log('here request', requests);
+      // console.log('here request', requests);
       return { success: true, requests: requests };
     } catch (err) {
       return { success: false };
@@ -853,7 +853,7 @@ export class UserService {
       });
       return { success: true, message: 'game request sent successfully' };
     } catch (error) {
-      console.log('error occured heree');
+      // console.log('error occured heree');
       return { success: false, error: 'invitation already sent!' };
     }
   }
@@ -883,7 +883,7 @@ export class UserService {
       }
       return { success: false, message: 'no game request available' };
     } catch (err) {
-      console.log('error occured');
+      // console.log('error occured');
       return { success: false, message: 'error occured' };
     }
   }
@@ -916,7 +916,7 @@ export class UserService {
         };
       }
     } catch (err) {
-      console.log('error occured');
+      // console.log('error occured');
       return { success: false, message: 'error occured' };
     }
   }
@@ -997,12 +997,12 @@ export class UserService {
   //     }
   //   }
   //   if (userFile) {
-  //     console.log("file found");
+  //     // console.log("file found");
   //     return true
   //   }
   //   else
   //   {
-  //     console.log("file not found");
+  //     // console.log("file not found");
   //     return false
   //   }
   // }

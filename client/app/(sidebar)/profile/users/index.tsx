@@ -32,9 +32,7 @@ let test: any = [];
       userBlockedMe.some((friend: any) => friend === user.username)
     );
   };
-  useEffect(() => {
-    console.log("blocked user ++++", blockedUsers);
-  }, [blockedUsers]);
+ 
   return (
     <>
       {showSidebar ? (

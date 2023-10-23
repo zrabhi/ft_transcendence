@@ -153,7 +153,7 @@ export class ChatController {
     @Param('channleId') channleId: string,
     @Res() res: Response,
   ) {
-    console.log('im here');
+    // console.log('im here');
 
     const channel = await this.chatService.getChannelById(channleId);
     const members = [];

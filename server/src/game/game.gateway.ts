@@ -97,11 +97,11 @@ class bar {
   length: number;
 
   constructor() {
-      this.x = 0;
-      this.y = 0;
-      this.starty = 0;
-      this.width = 0;
-      this.length = 0;
+    this.x = 0;
+    this.y = 0;
+    this.starty = 0;
+    this.width = 0;
+    this.length = 0;
   }
 }
 
@@ -193,10 +193,10 @@ function updateballxy(match: Match): string {
   }
   match.ball.x = match.ball.x + match.ball.addx;
   match.ball.y = match.ball.y + match.ball.addy;
+
   return 'ok'
 }
 catch(e){
-  console.log("something went wrong")
   return "error"
 }
 }
@@ -235,8 +235,8 @@ export class GameGateway {
           tmplayer.avatar = currentUser.avatar;
           tmplayer.userid = currentUser.id;
           tmplayer.socket = client;
-          console.log(`User connected to game gateway with ID: ${socketId}`)
-          // console.log(this.waiting_users.getByUserId(tmplayer.userid));
+          // console.log(`User connected to game33 gateway with ID: ${socketId}`)
+          // // console.log(this.waiting_users.getByUserId(tmplayer.userid));
           if(this.waiting_users.getByUserId(tmplayer.userid) != undefined)
           {
             client.disconnect(true);
@@ -252,17 +252,17 @@ export class GameGateway {
     try{
       //TODO: UPDATE USER STATUS TO ONLINE
       const socketId = client.id;
-      // console.log(this.playing_users[client.id]?.match);
+      // // console.log(this.playing_users[client.id]?.match);
       if(this.playing_users[client.id] && this.playing_users[client.id].match?.ingame === true)
       {
         this.playing_users[client.id].match.ingame = false;
-        console.log('yes he is in the playing users ')
+        // console.log('yes he is in the playing users ')
         this.server.to(this.playing_users[client.id].opponent.socketid).emit('opponent quit');
         let winner = this.playing_users[client.id].opponent;
         let loser = this.playing_users[client.id];
         winner.score = 3; loser.score = 0;
         await this.update_achivements(winner, loser, true);
-        console.log("here we set the status t online")
+        // console.log("here we set the status t online")
         await this.userService.handleUpdateStatus('ONLINE', this.playing_users[client.id].userid);
         await this.userService.handleUpdateStatus('ONLINE', this.playing_users[client.id].opponent.userid);
         this.playing_users[this.playing_users[client.id]?.opponent?.socketid] = null;
@@ -273,9 +273,9 @@ export class GameGateway {
         this.invited_users.removeBySocketId(client.id);
         this.waiting_users.removeBySocketId(client.id);
       }
-      console.log(`User disconnected with ID: ${socketId}`);
+      // console.log(`User disconnected with ID: ${socketId}`);
     }catch(err){
-      console.log("something went wrong")
+      // console.log("something went wrong")
     }
   }
 
@@ -321,7 +321,7 @@ export class GameGateway {
           }
         }catch(err)
         {
-          console.log("error in bar message handling");
+          // console.log("error in bar message handling");
           client.disconnect();
         }
   }
@@ -338,7 +338,7 @@ async init(@MessageBody() data: any, @ConnectedSocket() client: Socket){
     match.ball.y = match.canvas.height / 2;
     if(this.playing_users[client.id].bar)
     {
-      console.log('server get init')
+      // console.log('server get init')
       if(this.playing_users[client.id].side == 'right')
         this.playing_users[client.id].bar.x = match.canvas.width - 115;
       else
@@ -356,7 +356,7 @@ async init(@MessageBody() data: any, @ConnectedSocket() client: Socket){
       await this.userService.handleUpdateStatus('INGAME', this.playing_users[client.id].userid);
     }
   }catch(err){
-    console.log("something went wrong");
+    // console.log("something went wrong");
   }
 }
 
@@ -447,7 +447,7 @@ private async check_matching(tmplayer:Player)
     }
   }catch(e)
   {
-    console.log("something went wrong");
+    // console.log("something went wrong");
   }
 }
 

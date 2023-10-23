@@ -32,28 +32,7 @@ const [requests, setRequests] = useState<any>([])
   // recieveMessage => onClick => redirect to chat
   // gameRequest => accept or reject
 
-  const notifTest = [
-    {
-      type: 1,
-      avatar: 'https://i.pravatar.cc/300',
-      username: 'user1',
-    },
-    // {
-    //   type: 2,
-    //   avatar: 'https://i.pravatar.cc/300',
-    //   username: 'user2',
-    // },
-    // {
-    //   type: 3,
-    //   avatar: 'https://i.pravatar.cc/300',
-    //   username: 'user3',
-    // },
-    // {
-    //   type: 1,
-    //   avatar: 'https://i.pravatar.cc/300',
-    //   username: 'user4',
-    // }
-  ]
+  
   return (
     <div className="notif-content">
       <h3 className="text-lg tracking-wider font-semibold absolute top-4">

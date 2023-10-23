@@ -36,7 +36,6 @@ export default function UserCard(user: any) {
     userFriendRequests?.map((member: any) => {
       pending.push(member.username);
     })
-    console.log(pending);
     setIsFriendList(friendList)
     setPendingRequest(pending)
   }
@@ -119,7 +118,7 @@ export default function UserCard(user: any) {
 
     try {
       // notifSocket.emit("FriendRequest", {username:user.username});
-      // console.log(`add friend click`)
+      // // console.log(`add friend click`)
       const response = await postRequest(`${baseUrlUsers}/friendRequest/${user.username}`, "");
       if (response?.error && response?.message === "Unauthorized"){
         showSnackbar("Unauthorized", false)

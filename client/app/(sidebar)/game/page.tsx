@@ -20,7 +20,7 @@ export default function Game() {
 	<div className="logged-user">
 		<SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
 		<div className={`game ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
-			<div className="game-content h-screen p-8">
+			<div className="game-content p-8">
 				<HeaderBar />
 				<div className="core flex  flex-col">
 					<div className="maps flex justify-between ">

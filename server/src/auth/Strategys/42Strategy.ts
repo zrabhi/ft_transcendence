@@ -46,7 +46,7 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
      done(null, userCheck);
   }catch(err)
   {
-    console.log(err);
+    // console.log(err);
     
   }
   }

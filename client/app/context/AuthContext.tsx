@@ -152,7 +152,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
         if (response?.error) return;
         response.tfa === false ? setTfaDisabled(true) : setTfaDisabled(false);
-        console.log(response);
         setUser(response);
         return true;
       })();
@@ -279,10 +278,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       },
     });
     notifSocket.on("connected", () => {
-      console.log("connected notif");
     });
     notifSocket.on("logout", () => {
-      console.log("loging out");
       remove("access_token");
       router.push("/login");
     });
@@ -313,7 +310,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       showSnackbar("Game request succesfully sent", true);
     });
     notifSocket.on("gameRequest", (data: any) => {
-      console.log("game data", data);
       showSnackbar(
         `You have a game request from ${data[0]?.username}, check your notifications to accepte or refuse`,
         true
@@ -323,7 +319,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     ////Friends requests
     notifSocket.on("YouhaveFriendRequest", (data: any) => {
       showSnackbar(
-        `You have a riend request from ${data[0].username}, check your notification`,
+        `You have a friend request from ${data[0].username}, check your notification`,
         true
       );
       setUserFriendRequests([...userFriendRequests, data]);
@@ -334,7 +330,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     notifSocket.on("IsNowYourFriend", async (data: any) => {
-      showSnackbar(`${data.username} is now your friend`, true);
+      showSnackbar(`Friend request accepted`, true);
       let updateUserFriendRequests = userFriendRequests.filter(
         (member: any) => {
           return member.username !== data.username;
@@ -345,7 +341,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     notifSocket.on("FriendRequestAccpeted", async (data: any) => {
-      showSnackbar(`${data.username} accepted your friend request`, true);
+      showSnackbar(`your friend request accepted`, true);
       await fetchFriendList();
     });
     return () => {

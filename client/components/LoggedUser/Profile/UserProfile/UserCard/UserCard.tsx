@@ -21,6 +21,7 @@ export default function UserCard(user: any) {
     setFriendRequestSent,
     userFriendRequests,
     setUserFriendRequests,
+    notifSocket
   } = useContext(AuthContext);
   user = user.user;
 
@@ -35,7 +36,6 @@ export default function UserCard(user: any) {
     userFriendRequests?.map((member: any) => {
       pending.push(member.username);
     })
-    console.log(pending);
     setIsFriendList(friendList)
     setPendingRequest(pending)
   }
@@ -65,12 +65,13 @@ export default function UserCard(user: any) {
         `${baseUrlUsers}/block/${user.username}`,
         ""
       );
-      if (response?.error && response?.message === "Unauthorized"){
+      if (response?.error && response?.message === "Unauthorized") {
         showSnackbar("Unauthorized", false)
         return ;
-    }
+      }
       setBlockedUsers([...blockedUsers, user.username]);
-    } catch (error) {
+    }
+    catch (error) {
     }
   };
 
@@ -114,8 +115,10 @@ export default function UserCard(user: any) {
   };
 
   const addFriendHandler = async () => {
+
     try {
-      console.log(`add friend click`)
+      // notifSocket.emit("FriendRequest", {username:user.username});
+      // // console.log(`add friend click`)
       const response = await postRequest(`${baseUrlUsers}/friendRequest/${user.username}`, "");
       if (response?.error && response?.message === "Unauthorized"){
         showSnackbar("Unauthorized", false)
@@ -129,6 +132,7 @@ export default function UserCard(user: any) {
 
   const acceptFriendHandler = async () => {
     try {
+      // notifSocket.emit("AccepetFriendRequest", {username: user.username});
       const response = await putRequest(`${baseUrlUsers}/acceptFriendRequest/${user.username}`,"");
       if (response?.error && response?.message === "Unauthorized"){
         showSnackbar("Unauthorized", false)
@@ -159,41 +163,51 @@ export default function UserCard(user: any) {
       </div>
       <div className="user-details">
         <h2>{user && user.username}</h2>
-          <div className="state-msg friend-state flex gap-4 justify-between items-center cursor-pointer hover:opacity-80">
+        <div className="user-states font-bold tracking-wider flex flex-col w-full items-center gap-2">
+          <div className="state-msg friend-state px-6 py-2 bg-blue-700 rounded-[.4rem] flex gap-4 justify-between items-center cursor-pointer hover:bg-blue-600">
             {isInFriendList.includes(user.username) ? (
-              <p className="flex justify-between gap-2 items-center" onClick={removeFriendHandler}>
+              <div className="flex justify-between items-center gap-4" onClick={removeFriendHandler}>
                 <span>Friends</span>
-                <FaUserCheck />
-              </p>
+                <div className="icon">
+                  <FaUserCheck size={22} />
+                </div>
+              </div>
             ) : friendRequestSent.includes(user.username) ? (
-              <p className="flex justify-between items-center" onClick={cancelRequestHandler} >
+              <div className="flex justify-between items-center gap-4" onClick={cancelRequestHandler} >
                 <span>Friend Request Sent</span>
-                <FaUserClock />
-              </p>
+                <div className="icon">
+                  <FaUserClock size={22} />
+                </div>
+              </div>
             ) : pendingRequests.includes(user.username) ? (
-              <p className="flex justify-between items-center" onClick={acceptFriendHandler} >
+              <div className="flex justify-between items-center gap-4" onClick={acceptFriendHandler} >
                 <span>Accept</span>
-                <FaUserCheck />
-              </p>
+                <div className="icon">
+                  <FaUserCheck size={22} />
+                </div>
+              </div>
             ) 
             : (
-              <p className="flex justify-between items-center" onClick={addFriendHandler}>
+              <div className="flex justify-between items-center gap-4" onClick={addFriendHandler}>
                 <span>Add Friend</span>
-                <FaUserPlus />
-              </p>
+                <div className="icon">
+                  <FaUserPlus size={22} />
+                </div>
+              </div>
             )}
           </div>
-        <div className="block-state">
-          <div className="block-btn">
-            {blockedUsers.includes(user.username) ? (
-              <button className="bg-red-500 text-white rounded px-4 py-2" onClick={handleUnblock}>
-                Unblock
-              </button>
-            ) : (
-              <button type="button" className="bg-red-500 text-white rounded px-4 py-2" onClick={handleBlock}>
-                Block
-              </button>
-            )}
+          <div className="block-state px-6 py-2 bg-red-700 rounded-[.4rem] flex gap-4 justify-between items-center cursor-pointer hover:bg-red-600">
+            <div className="block-btn">
+              {blockedUsers.includes(user.username) ? (
+                <button className="" onClick={handleUnblock}>
+                  Unblock
+                </button>
+              ) : (
+                <button type="button" className="tracking-wider" onClick={handleBlock}>
+                  Block
+                </button>
+              )}
+            </div>
           </div>
         </div>
         <div className="stats">
@@ -203,11 +217,11 @@ export default function UserCard(user: any) {
           </div>
           <div className="stat-item">
             <h4>Wins</h4>
-            <p>{user && user.wins}</p>
+            <p>{user && user.win}</p>
           </div>
           <div className="stat-item">
             <h4>Losses</h4>
-            <p>{user && user.losses}</p>
+            <p>{user && user.loss}</p>
           </div>
         </div>
       </div>

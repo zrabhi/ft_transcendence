@@ -108,10 +108,10 @@ export default function Complete() {
           setUsernameMsg(response?.message);
           showSnackbar(response?.message, false);
         }
-         else
-         {
-            setPasswordMsg("Password is not strong enough");
-            showSnackbar("Password is not strong enough", false);
+        else
+        {
+          setPasswordMsg("Password is not strong enough");
+          showSnackbar("Password is not strong enough", false);
         }
           return false;
     }
@@ -133,10 +133,21 @@ export default function Complete() {
   const handleSubmitClick = async (e: any) => {
     e.preventDefault();
     reset();
+    if (username.indexOf(" ") >= 0) {
+      setError(true);
+      setUsernameMsg("Username must not contain spaces");
+      return;
+    }
     if (username.length < 6) {
       setError(true);
       setUsernameMsg("Username must be at least 6 characters");
       showSnackbar("Username must be at least 6 characters", false);
+      return;
+    }
+    if (username.length > 15) {
+      setError(true);
+      setUsernameMsg("Username must be less than 15 characters");
+      showSnackbar("Username must be less than 15 characters", false);
       return;
     }
     if (!passwordCheck())

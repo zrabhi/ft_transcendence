@@ -10,7 +10,7 @@ import { showSnackbar } from '@/app/context/utils/showSnackBar';
 
 
 export default function TfaPage() {
-  const {fetchUserData } = useContext(AuthContext);
+  const {fetchUserData,setTfaDisabled} = useContext(AuthContext);
   const [qrCodeImage, setQrCodeImage] = useState<any>()
   const [isEnabeld , setIsEnabeld] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
@@ -29,7 +29,6 @@ export default function TfaPage() {
           return ;
       }
         setQrCodeImage(response);
-        // console.log(response);
     })()
   },[])
 
@@ -48,6 +47,7 @@ export default function TfaPage() {
         setErrorMsg(response?.message);
         return false;
       }
+      setTfaDisabled(false);
       return true;
     }
 

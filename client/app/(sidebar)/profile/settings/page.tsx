@@ -17,7 +17,7 @@ import { showSnackbar } from "@/app/context/utils/showSnackBar";
 
 export default function Settings() {
   // use context to get user data
-  const { user, updateUserInfo, tfaDisabled, handleDisable2fa, loginError} =
+  const { fetchUserData , user, updateUserInfo, tfaDisabled, handleDisable2fa, loginError} =
     useContext(AuthContext);
 
   // to check if 2fa is enabled or not
@@ -174,10 +174,14 @@ export default function Settings() {
         setUsernameMsg("Username must be at least 4 characters");
         showSnackbar("Username must be at least 4 characters", false);
         return false;
-      } else if (username.length > 20) {
+      } else if (username.length > 15) {
         setError(true);
-        setUsernameMsg("Username must be at most 20 characters");
-        showSnackbar("Username must be at most 20 characters", false);
+        setUsernameMsg("Username must be at most 15 characters");
+        showSnackbar("Username must be at most 15 characters", false);
+        return false;
+      } else if (username.indexOf(" ") >= 0) {
+        setError(true);
+        setUsernameMsg("Username must not contain spaces");
         return false;
       }
     }
@@ -248,6 +252,7 @@ export default function Settings() {
         return ;
       }
     }
+    await fetchUserData();
     showSnackbar("Updated successfully", true)
     updateMsgRef.current!.innerHTML = "Updated successfully";
     updateMsgRef.current!.classList.remove("error");
@@ -282,7 +287,7 @@ export default function Settings() {
                       type="text"
                       name="username"
                       id="username"
-                      placeholder={user.username ? user.username : "Please enter New Username"}
+                      placeholder={"Please enter New Username"}
                       autoComplete="off"
                       value={username}
                       onChange={handleUsernameChange}
@@ -381,32 +386,6 @@ export default function Settings() {
                     Disable 2FA
                   </Link>
                 )}
-              </div>
-              <div className="social-form">
-                <form action="">
-                  <div className="input">
-                    <label htmlFor="discord">discord</label>
-                    <input
-                      type="text"
-                      name="discord"
-                      id="discord"
-                      autoComplete="off"
-                      placeholder="enter your discord link"
-                      onChange={handleDiscordChange}
-                    />
-                  </div>
-                  <div className="input">
-                    <label htmlFor="twitter">twitter</label>
-                    <input
-                      type="text"
-                      name="twitter"
-                      id="twitter"
-                      autoComplete="off"
-                      placeholder="Enter your twitter link"
-                      onChange={handleTwitterChange}
-                    />
-                  </div>
-                </form>
               </div>
               <button className="submit" onClick={handleSubmitClick}>
                 submit

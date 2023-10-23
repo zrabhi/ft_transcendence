@@ -73,12 +73,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch (err) {
       return client.disconnect(true);
     }
-    // console.log(`Client disconnected   id ${client.id}`);
+    // // console.log(`Client disconnected   id ${client.id}`);
     // client.disconnect(true);
   }
   @SubscribeMessage('joinChat')
   handleJoinChat(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-    // console.log("client joined chat with ", data.id, this.connectedUsers.get(client));
+    // // console.log("client joined chat with ", data.id, this.connectedUsers.get(client));
 
     client.join(data.id);
   }
@@ -264,7 +264,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       client.emit("Unauthorized");
       return client.disconnect(true);
     }
@@ -319,7 +319,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
       if (!payload) return client.disconnect(true);
       /// mute the user here
-      console.log('im hereee');
+      // console.log('im hereee');
       await this.chatService.handleUserMute(
         payload,
         data.channel_id,
@@ -564,7 +564,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         (name = '#' + channel.name),
         (status = ''),
         (avatar = channel.avatar);
-    console.log("data channel id", data.channelId);
+    // console.log("data channel id", data.channelId);
     
     const lastMessage = {
       type: type,

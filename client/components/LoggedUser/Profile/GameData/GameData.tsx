@@ -8,7 +8,7 @@ export default function GameData ({ game }: any) {
 
   const handleAvatarClick = (username: string) => {
     // here i'll redirect to the user profile page
-    // console.log(`clicked on ${username}`)
+    // // console.log(`clicked on ${username}`)
   }
 
   return (

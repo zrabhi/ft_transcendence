@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "./style.scss";
 import Avatar1 from "@/public/images/avatar1.jpeg";
 import Image from "next/image";
@@ -10,6 +10,7 @@ import {
 } from "@/app/context/utils/service";
 import { useRouter } from "next/navigation";
 import { showSnackbar } from "@/app/context/utils/showSnackBar";
+import { AuthContext } from "@/app/context/AuthContext";
 
 export default function TfaPage() {
   const [error, setError] = useState<boolean>(false);
@@ -18,6 +19,7 @@ export default function TfaPage() {
   const [successMsg, setSuccessMsg] = useState<string>("");
   const [success, setSuccess] = useState<boolean>(false);
   const router = useRouter();
+  const {fetchUserData, user, notifSocket} = useContext(AuthContext)
 
   const handleOnChange = (e: any) => {
     setCode(e.target.value);
@@ -71,9 +73,10 @@ export default function TfaPage() {
     setErrorMsg("");
     if (await codeVerifitacion(code)) {
       setSuccess(true);
+      await fetchUserData();
       showSnackbar("successfully authenticated", true);
       setSuccessMsg("successfully authenticated");
-      router.push("/profile");
+      return router.push("/profile");
     }
   };
 

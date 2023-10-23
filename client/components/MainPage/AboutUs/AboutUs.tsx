@@ -36,12 +36,6 @@ export default function AboutUs() {
       linkedinUrl: 'https://www.linkedin.com/in/oussama-bakhti',
       githubUrl: 'https://github.com/OussamaBakhti/',
     },
-    {
-      name: 'Hatim MZAH',
-      imageSrc: hmzahImage,
-      linkedinUrl: 'https://www.linkedin.com/in/hatimmzah/',
-      githubUrl: 'https://github.com/mza7a/',
-    },
   ];
   
     const container = {

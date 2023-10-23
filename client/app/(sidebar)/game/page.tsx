@@ -20,7 +20,7 @@ export default function Game() {
 	<div className="logged-user">
 		<SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
 		<div className={`game ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
-			<div className="game-content h-screen p-8">
+			<div className="game-content p-8">
 				<HeaderBar />
 				<div className="core flex  flex-col">
 					<div className="maps flex justify-between ">
@@ -47,7 +47,7 @@ export default function Game() {
 				</div>
 					<div className="subcore flex-1 flex">
 					<div className={`arena flex flex-1 flex-col`} style={{ backgroundColor: selectedMapColor }}>
-							<div className="presstext flex-1  flex ">PRESS START</div>
+							<div className="presstext flex-1  flex " style={{ backgroundColor: selectedMapColor }} >PRESS START</div>
 							<div className="button cursor-pointer" onClick={startfunc}>START</div>
 						</div>
 					</div>

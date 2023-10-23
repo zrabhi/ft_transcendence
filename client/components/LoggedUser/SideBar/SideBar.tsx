@@ -20,7 +20,7 @@ interface SideBarProps {
 export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
   const router = useRouter();
   const [cookie, setCookie, remove] = useCookies(['access_token']);
-  const{ notifSocket}  = useContext(AuthContext);
+  const {notifSocket} = useContext(AuthContext);
   // const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const handleSignOut = () => {
@@ -35,32 +35,21 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
         {/* <Logo /> */}
       </div>
       <div className="sidebar-nav h-1/3 ">
-        <div className="to-home">
-          <Link href='/home'>
-            <CgHomeAlt size={24} className="icon" />
-          </Link>
-        </div>
-        <div className="to-profile">
-          <Link href='/profile'>
+        <div className="to-profile" onClick={() => router.push('/profile')}>
             <CgProfile size={24} className="icon" />
-          </Link>
         </div>
         <div className="to-chat">
           <Link href='/chat'>
             <PiChatsFill size={24} className="icon" />
           </Link>
         </div>
-        <div className="to-game">
-          <Link href='/game'>
+        <div className="to-game" onClick={() => router.push('/game')} >
             <CgGames size={24} className="icon" />
-          </Link>
         </div>
       </div>
       <div className="sidebar-footer h-1/3 ">
-        <div className="to-settings">
-          <Link href="profile/settings">
+        <div className="to-settings" onClick={() => router.push('/profile/settings')}>
             <IoMdSettings size={24} className="icon" />
-          </Link>
         </div>
         <div className="to-signout" onClick={handleSignOut}>
           <IoMdExit size={24} className="icon" />

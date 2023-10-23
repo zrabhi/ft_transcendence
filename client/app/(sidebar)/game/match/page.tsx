@@ -3,6 +3,7 @@ import HeaderBar from '@/components/LoggedUser/Profile/HeaderBar/HeaderBar';
 import SideBar from '@/components/LoggedUser/SideBar/SideBar'
 import exp from 'constants';
 import React, { useContext } from 'react'
+import { useRouter } from 'next/navigation';
 import './style.scss'
 import Avatar1 from '@/public/images/avatar1.jpeg'
 import { useEffect, useState} from "react";
@@ -11,10 +12,12 @@ import { AuthContext } from '@/app/context/AuthContext';
 import { useCookies } from "react-cookie";
 import { baseUrlUsers, getRequest } from '@/app/context/utils/service';
 import { disconnect } from 'process';
+import Image from 'next/image';
+import { showSnackbar } from '@/app/context/utils/showSnackBar';
 
 export default function match()
 {
-
+    const router = useRouter();
     const [showPopup, setShowPopup] = useState(false);
     const [popupMessage, setPopupMessage] = useState('');
 
@@ -25,20 +28,24 @@ export default function match()
     let selectedcolor = 'black';
     let socket: Socket;
     let count = 0;
-
+    const [checker, setChecker] = useState(false);
     const [opp_username, setoppuser] = useState('opponent');
     const [opponentUser, setOpponentUser] = useState<any>();
-    const [opp_avatar, setOpponentavatar] = useState<string>()
+    const [opp_avatar, setOpponentavatar] = useState<string>("https://cdn.dribbble.com/users/886358/screenshots/2980235/loading.gif")
     const [myscore, setmyscore] = useState(0);
     const [oppscore, setoppscore] = useState(0);
-    const handleNewGameClick = () => {
-      // Redirect to the game match page
-      // router.push('/game/match');
+    const [status, setstatus] = useState("default status")
+    const handleNewGameClick = (e: any) => {
+      e.preventDefault();
+      window.location.href ="/game/match";
+      setShowPopup(false);
     };
-  
-    const handleBackHomeClick = () => {
-      // Redirect to the profile page
-      // router.push('/profile');
+    
+    const handleBackHomeClick = (e: any) => {
+      e.preventDefault();
+
+      window.location.href ="/profile";
+      setShowPopup(false);
     };
   
 
@@ -113,7 +120,6 @@ export default function match()
         raf = window.requestAnimationFrame(() => draw(canvas, ctx));
       else
       {
-        console.log('here we stop drawing');
         ctx?.clearRect(0,0,canvas.width, canvas.height);
       }
     };
@@ -125,9 +131,7 @@ export default function match()
       rightbar.x = canvas.width - 100 - rightbar.width;
       if(game == false) {
         Ball.addx = Ball.addx;
-        console.log(game);
         game = true;
-        console.log("here we init")
         socket.emit('init',
         {
           canvasw:canvas.width,
@@ -185,23 +189,59 @@ export default function match()
       });
     };
   
+    useEffect(() =>{
+      try{
+        (async () =>{
+          const response = await getRequest(`${baseUrlUsers}/userStatus`)
+          if (response?.error)
+          {
+            if (response?.message === "Unauthorized")
+            {
+              showSnackbar("Unauthorized", false)
+            }
+            else
+              showSnackbar("Something went wrong", false);
+            return;
+          } 
+          setstatus(response);
+          setChecker(true);
+        })()
+      }catch(e)
+      {
+        showSnackbar("somthing went wrong", false);
+        window.location.href ="/game";
+      }
+    },[])
+
     useEffect(() => {
+      try{
       selectedcolor = localStorage.getItem("selectedMapColor") as string;
+      if(checker)
+      {
+      if (status === "INGAME")
+      {
+          showSnackbar("already in game", false);
+          window.location.href ="/game";
+          return;
+      }
       socket = io(`${process.env.NEXT_PUBLIC_BACKEND_HOST}/matching`,{
         auth: {
           token: cookie.access_token,
         }});
-      socket.on('connect', () => {
-        console.log('Connected to WebSocket');
+
+     
+        socket.on('connect', () => {
+          socket.on('disconnect',()=>{
+            router.push('/game')
+          })
+
         socket.on('matched right',  (data:any) => {
-          console.log("i match this : " , data);
           setoppuser(data.username);
           setOpponentavatar(data.avatar);
           side = 'right';
           launchGame();
         })
         socket.on('matched left', (data:any) => {
-          console.log("i match this : " , data);
           setoppuser(data.username);
           setOpponentavatar(data.avatar);
           side = 'left';
@@ -228,46 +268,76 @@ export default function match()
         //   socket.off('match frame');
         // });
       });
+ 
       return () => {
         socket.disconnect()
       }
-    }, []);
+    }
+    }catch(e){
+      showSnackbar("somthing went wrong", false);
+      window.location.href ="/game";
+    }
+    }, [checker]);
 
     return (
     <div className="logged-user">
-    <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+    {/* <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} /> */}
     <div className={`game ${isExpanded ? 'ml-12 md:ml-16': ''}`}>
-        <div className="game-content min-h-screen p-8">
+        <div className="game-content p-8">
             <HeaderBar />
             <div className={`core flex w-full`} >
-                <div className="score flex">
-                    <div className="player player1">
-                        <div className='avatar'>
-                            <img src={user?.avatar}  alt="avatar" />
-                        </div>
-                        <div className='player-name invisible lg:visible ' >{user.username}</div>
-                        <div className="score1">{myscore}</div>
+                <div className="score flex p-2 justify-between items-center gap-4">
+                  <div className="player1 flex items-center gap-3 w-1/2 justify-between ">
+                    <div className="avatar w-12 h-12 rounded-full overflow-hidden border border-slate-50">
+                      <Image 
+                        src={user?.avatar}
+                        alt="avatar"
+                        width={100}
+                        height={100}
+                        className='w-full h-full object-cover'
+                      />
                     </div>
-                    <div className="player player2">
-                        <div className="score2">{oppscore}</div>
-                        <div className='player-name invisible lg:visible ' >{opp_username}</div>
-                        <div className='avatar'>
-                            <img src={opp_avatar} alt="avatar" />
-                        </div>
+                    <div className="username text-sm font-bold tracking-wide hidden md:block uppercase">
+                      {user.username}
                     </div>
-                </div>
-                {/* <div className={`${showPopup ? 'bg-blue-400' : 'bg-slate-400 bg-opacity-70 backdrop-blur-sm' } w-screen h-screen fixed inset-0 flex justify-center items-center `} >|
-                  <div className='w-[40rem] xs:w-[18rem] sm:w-[24rem] md:w-[30rem]
-        bg-green-900 rounded-xl  relative p-4 pt-12 pb-8'>
-                    <div className="message">hna radi ykon pop up message{popupMessage}</div>
-                    <div className="buttons">
-                      <button onClick={handleNewGameClick}>New Game</button>
-                      <button onClick={handleBackHomeClick}>Back Home</button>
+                    <div className="player-score text-xl">
+                      {myscore}
                     </div>
                   </div>
-                </div>     */}
+                  <div className="player2 flex flex-row-reverse  items-center justify-between gap-3 w-1/2">
+                    <div className="avatar w-12 h-12 rounded-full overflow-hidden border border-slate-50">
+                      <Image 
+                        src={opp_avatar}
+                        alt="avatar"
+                        width={100}
+                        height={100}
+                        className='w-full h-full object-cover'
+                      />
+                    </div>
+                    <div className="username text-sm font-bold tracking-wide hidden md:block uppercase">
+                      {opp_username}
+                    </div>
+                    <div className="player-score text-xl">
+                      {oppscore}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className={`popup ${showPopup ?  'bg-black-400 bg-opacity-70 backdrop-blur-sm': 'hidden' } w-screen h-screen fixed inset-0 flex justify-center items-center `} >|
+                  <div className='popupcore w-[50rem] xs:w-[18rem] sm:w-[24rem] md:w-[30rem]
+                    rounded-xl  relative p-4 pt-12 pb-8'>
+                    <div className="message">{popupMessage}</div>
+                    <div className="buttons">
+                      <button className={'back'} onClick={(e)=>handleNewGameClick(e)}>New Game</button>
+                      <button className={'refreche'} onClick={(e)=>handleBackHomeClick(e)}>Profile</button>
+                    </div>
+                  </div>
+                </div>    
                 <div className="table" id='table'>
                     <canvas id="canvas" width={1000} height={600}></canvas>
+                </div>
+                <div className="back">
+                  <button onClick={()=>router.push("/game")}>BACK</button>
                 </div>
             </div>
         </div>

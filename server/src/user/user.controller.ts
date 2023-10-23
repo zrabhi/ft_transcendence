@@ -66,12 +66,15 @@ export const strorageAvatar = {
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get('/users')
-  async getAllUsers(@UserInfo() user: User): Promise<User[]> {
+  @UseGuards(JwtAuthGuard)
+  async getUsers(@UserInfo() user: User, @Res() res: Response) {
     try {
-      return await this.userService.findAllUsers(user);
-    } catch (err) {}
+      const users = await this.userService.findAllUsers(user);
+      res.status(200).json(users);
+    } catch (err) {
+      res.status(400).json("ko");
+    }
   }
   @Get('allUsers')
   @UseGuards(JwtAuthGuard)
@@ -105,7 +108,7 @@ export class UserController {
   //   try{
   //     if (!username)
   //       return res.status(400).json({ msg: 'user not found' })
-  //     console.log("in user get requets")
+  //     // console.log("in user get requets")
   //   const result = await this.userService.findUserName(username);
   //   return res.status(200).json(result);
   //   }catch(err)
@@ -163,16 +166,6 @@ export class UserController {
       );
       const againstMatches = [];
       for (const match of allUserMatches) {
-        if (match.loser_id == searchedUser.id) {
-          const loser = await this.userService.findUserById(searchedUser.id);
-          const winner = await this.userService.findUserById(match.loser_id);
-          againstMatches.push({
-            winnerScore: match.winner_score,
-            loserScore: match.loser_score,
-            loser: loser,
-            winner: winner,
-          });
-        } else {
           const loser = await this.userService.findUserById(match.loser_id);
           const winner = await this.userService.findUserById(match.winner_id);
           againstMatches.push({
@@ -181,7 +174,6 @@ export class UserController {
             loser: loser,
             winner: winner,
           });
-        }
       }
       res.status(200).json(againstMatches);
     } catch (err) {
@@ -197,16 +189,6 @@ export class UserController {
       );
       const againstMatches = [];
       for (const match of allUserMatches) {
-        if (match.loser_id == req.user.id) {
-          const loser = await this.userService.findUserById(req.user.id);
-          const winner = await this.userService.findUserById(match.loser_id);
-          againstMatches.push({
-            winnerScore: match.winner_score,
-            loserScore: match.loser_score,
-            loser: loser,
-            winner: winner,
-          });
-        } else {
           const loser = await this.userService.findUserById(match.loser_id);
           const winner = await this.userService.findUserById(match.winner_id);
           againstMatches.push({
@@ -214,8 +196,8 @@ export class UserController {
             loserScore: match.loser_score,
             loser: loser,
             winner: winner,
+            playedAt:match.played_at
           });
-        }
       }
       res.status(200).json(againstMatches);
     } catch (error) {
@@ -343,7 +325,7 @@ export class UserController {
       );
       return response.status(200).json(file);
     } catch (err) {
-      // console.log('image rro', err.message);
+      // // console.log('image rro', err.message);
       response.status(200).json('error');
     }
     return response.status(200).json(file.path);
@@ -377,7 +359,7 @@ export class UserController {
       if (!checker) return res.status(400).json({ msg: 'Incorrect Password' });
       return res.status(200).json({ msg: 'Password Correct' });
     } catch (err) {
-      // console.log(err);
+      // // console.log(err);
     }
   }
   /// --------------------------------------------------Ranking--------------------------------------------------
@@ -425,7 +407,7 @@ export class UserController {
   async handleGetFriends(@Req() req, @Res() res, @UserInfo() currUser) {
     try {
       const friends = await this.userService.getFriendsByUserId(currUser.id);
-      console.log(friends);
+      // console.log(friends);
 
       const friendsList = [];
       for (const friend of friends) {
@@ -436,10 +418,10 @@ export class UserController {
           user = await this.userService.findUserById(friend.user_id);
         friendsList.push(user);
       }
-      console.log(friendsList);
+      // console.log(friendsList);
       return res.status(200).json(friendsList);
     } catch (err) {
-      console.log('error in get friends  ', err);
+      // console.log('error in get friends  ', err);
     }
   }
 
@@ -531,13 +513,16 @@ export class UserController {
     @Res() res: Response,
   ) {
     try {
-      await this.userService.updateFriendRequestState(
+      const result = await this.userService.updateFriendRequestState(
         user.id,
         username,
         'ACCEPTED',
       );
-      await this.userService.createFriendship(user.id, username);
-      res.status(200).json({ success: true, message: 'ACCEPTED' });
+      if (result){
+        await this.userService.createFriendship(user.id, username);
+      res.status(200).json({ success: true, message: 'ACCEPTED' });}
+      else
+        res.status(200).json("firend request canceld");
     } catch (err) {
       res.status(400).json('error occured');
     }
@@ -581,7 +566,17 @@ export class UserController {
     if (result.success) return res.status(200).json(result);
     return res.status(400).json(result);
   }
-
+  @Get('userStatus')
+  @UseGuards(JwtAuthGuard)
+  async handleGetUserStatus(@Res() res: Response, @UserInfo() user: User)
+  {
+    try{
+      const status = await this.userService.handleGetUserStatus(user);
+      res.status(200).json(status);
+    }catch(err){
+        res.status(400).json("error")
+    }
+  }
   @Post('friendRequest/:username')
   @UseGuards(JwtAuthGuard)
   async handleFriendRequest(

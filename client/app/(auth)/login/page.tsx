@@ -74,9 +74,8 @@ export default function SignIn() {
   const handleClickButton = async (e: any) => {
     e.preventDefault();
     const result = await LogIn(loginInfo);
-    if (result) {
-      // console.log(user.tfa);
-      if (user.tfa) {
+    if (result?.success) {
+      if (result?.data?.tfa) {
         return router.push("/login/tfalogin");
       }
       router.push("/profile");
@@ -149,16 +148,6 @@ export default function SignIn() {
                     You can sign in with
                   </span>
                   <div className="logos">
-                    <Link href="http://127.0.0.1:8080/api/auth/google/login">
-                      <div className="google">
-                        <Image
-                          src={googleLogo}
-                          width={24}
-                          height={24}
-                          alt="google icon"
-                        />
-                      </div>{" "}
-                    </Link>
                     <Link href={intraRedirect}>
                       <div className="school">
                         <Image

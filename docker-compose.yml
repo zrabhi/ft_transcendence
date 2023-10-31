@@ -39,5 +39,5 @@ services:
 volumes:
   docker-nest-postgres:
 networks:
-    network:
-     driver: bridge
+  network:
+    driver: bridge
